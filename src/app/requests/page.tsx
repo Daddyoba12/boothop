@@ -12,7 +12,7 @@ import {
   DollarSign,
   AlertCircle
 } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase';
 import type { DeliveryRequest } from '@/lib/supabase';
 
 type RequestWithProfile = DeliveryRequest & {
@@ -339,3 +339,4 @@ export default function BrowseRequestsPage() {
     </div>
   );
 }
+

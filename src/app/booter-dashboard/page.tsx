@@ -13,7 +13,7 @@ import {
   Clock,
   MessageSquare
 } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase';
 import type { Profile, Journey, DeliveryMatch } from '@/lib/supabase';
 
 export default function BooterDashboard() {
@@ -380,4 +380,5 @@ export default function BooterDashboard() {
     </div>
   );
 }
+
 

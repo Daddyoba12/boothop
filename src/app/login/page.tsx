@@ -4,11 +4,16 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Package, AlertCircle } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase';
+
+
+const supabase = createSupabaseClient()
+
 
 export default function LoginPage() {
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  /*const supabase = createClientComponentClient();  */
+
   
   const [formData, setFormData] = useState({
     email: '',
@@ -146,3 +151,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

@@ -13,7 +13,7 @@ import {
   MessageSquare,
   DollarSign
 } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase';
 import type { Profile, DeliveryRequest, DeliveryMatch } from '@/lib/supabase';
 
 export default function HooperDashboard() {
@@ -382,3 +382,4 @@ export default function HooperDashboard() {
     </div>
   );
 }
+

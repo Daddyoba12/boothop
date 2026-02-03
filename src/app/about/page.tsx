@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import { Package, Users, Globe, Shield, Star, ArrowRight } from 'lucide-react';
+import { Package, Users, Globe, Shield, Star, ArrowRight, CheckCircle } from 'lucide-react';
 
 export default function AboutPage() {
   return (
@@ -44,88 +43,151 @@ export default function AboutPage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 bg-gradient-to-b from-blue-50 to-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">About Us</h1>
-          <p className="text-2xl text-gray-600 mb-4">
-            BootHop is a people-powered transportation network.
-          </p>
-          <p className="text-xl text-gray-600">
-            We optimize the value of any journey by connecting people to help goods get to their destination.
-          </p>
-        </div>
-      </section>
+{/* Three Videos Side by Side */}
+<div className="grid grid-cols-3 gap-4 h-[500px]">
+  
+  {/* Left Video */}
+  <div className="relative rounded-xl overflow-hidden shadow-lg bg-black">
+    <video
+      autoPlay
+      muted
+      loop
+      playsInline
+      className="w-full h-full object-cover"
+    >
+      <source src="/videos/Aboutus_train.mp4" type="video/mp4" />
 
-      {/* Redundant Boot Space */}
+      
+     
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  {/* Center Video (Main) */}
+  <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl bg-gray-900">
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    className="w-full h-full object-contain"
+    style={{ objectPosition: 'center center' }}
+  >
+    <source src="/videos/about-us.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+  
+  {/* Badge overlay */}
+  <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm px-6 py-3 rounded-lg shadow-lg">
+    <div className="flex items-center gap-2">
+      <Package className="h-5 w-5 text-blue-600" />
+      <span className="font-semibold text-gray-900">About BootHop</span>
+    </div>
+  </div>
+</div>
+
+
+  {/* Right Video */}
+  <div className="relative rounded-xl overflow-hidden shadow-lg bg-black">
+    <video
+      autoPlay
+      muted
+      loop
+      playsInline
+      className="w-full h-full object-cover"
+    >
+      <source src="/videos/Aboutus_train.mp4" type="video/mp4" />
+      
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+</div>
+
+
+
+      {/* Our Story Section */}
       <section className="py-20 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <Package className="h-8 w-8 text-blue-600" />
-                </div>
-                <h2 className="text-3xl font-bold text-gray-900">Redundant Boot Space</h2>
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            {/* Left - Icon Feature */}
+            <div className="relative">
+              <div className="absolute -top-4 -left-4 w-24 h-24 bg-blue-100 rounded-full opacity-50"></div>
+              <div className="relative bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-12 text-white">
+                <Package className="h-20 w-20 mb-6 opacity-90" />
+                <h3 className="text-3xl font-bold mb-4">Redundant Boot Space</h3>
+                <p className="text-lg text-blue-100">
+                  Every journey has the potential to move items. Why travel with empty space?
+                </p>
               </div>
-              
-              <div className="space-y-4 text-gray-600 text-lg">
+            </div>
+
+            {/* Right - Story Content */}
+            <div>
+              <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Story</h2>
+              <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
                 <p>
-                  We started with the idea to use redundant boot space to transport goods to their destination. 
-                  The idea was simple: every journey has the potential to move items.
+                  We started with a simple idea: <strong>use redundant boot space to transport goods</strong> to their destination. Every journey has the potential to move items.
+                </p>
+                <p className="text-2xl font-semibold text-blue-600">
+                  Why drive an empty car? Why drive with an empty boot?
+                </p>
+                <p>
+                  Documents are even more convenient to transport. They easily fit into hand luggage, and you'd be helping someone else out.
                 </p>
                 <p className="font-semibold text-gray-900">
-                  Why drive an empty car? Why drive with an empty boot? Make every journey count.
-                </p>
-                <p>
-                  Documents are even more convenient to transport. They easily fit into hand luggage, and you'd be 
-                  helping someone else out. We're helping to connect the world.
+                  We're helping to connect the world, one journey at a time.
                 </p>
               </div>
-
-              <Link 
-                href="/register"
-                className="inline-flex items-center mt-8 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-              >
-                Maximize Every Journey
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </div>
-
-            <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-              <Image
-                src="/images/city-traffic.jpg"
-                alt="City Traffic"
-                fill
-                className="object-cover"
-              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Our Mission */}
+      {/* Our Mission Section */}
       <section className="py-20 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-gray-900 mb-8 text-center">Our Mission</h2>
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Mission</h2>
           
-          <div className="space-y-6 text-lg text-gray-600">
-            <p>
-              We love little things, small and medium-sized packages—actually anything that can be carried 
-              on an existing journey. We specialize in <strong>personal effects, letters, and small parcels</strong>.
+          <div className="bg-white rounded-2xl shadow-lg p-12 mb-8">
+            <p className="text-xl text-gray-700 mb-6 leading-relaxed">
+              We love little things, small and medium-sized packages—actually anything that can be carried on an existing journey. We specialize in{' '}
+              <span className="font-bold text-blue-600">personal effects, letters, and small parcels</span>.
             </p>
-            <p>
-              Courier services are great, but they're not one-size-fits-all. We are an alternative service 
-              that's flexible and convenient.
+            <p className="text-lg text-gray-600 mb-8">
+              Courier services are great, but they're not one-size-fits-all. We are an alternative service that's flexible and convenient.
             </p>
-            <p className="text-2xl font-semibold text-blue-600 text-center py-6">
-              You are already going to make that journey—why not make it count?
-            </p>
+            
+            <div className="bg-blue-600 text-white rounded-xl p-8">
+              <p className="text-3xl font-bold mb-2">
+                You are already going to make that journey
+              </p>
+              <p className="text-2xl">—why not make it count?</p>
+            </div>
+          </div>
+
+          {/* Key Features */}
+          <div className="grid md:grid-cols-3 gap-6 mt-12">
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <h3 className="font-bold text-lg mb-2">Personal Effects</h3>
+              <p className="text-gray-600 text-sm">Small personal items delivered with care</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <h3 className="font-bold text-lg mb-2">Letters & Documents</h3>
+              <p className="text-gray-600 text-sm">Important papers delivered securely</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <h3 className="font-bold text-lg mb-2">Small Parcels</h3>
+              <p className="text-gray-600 text-sm">Compact packages sent worldwide</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Our Values */}
+      {/* Our Values Section */}
       <section className="py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -134,90 +196,88 @@ export default function AboutPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-blue-50 p-8 rounded-2xl">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-                <Users className="h-8 w-8 text-blue-600" />
+            <div className="text-center">
+              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Users className="h-10 w-10 text-blue-600" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Community First</h3>
-              <p className="text-gray-600">
-                We believe in the power of people helping people. Our platform connects communities and creates 
-                meaningful interactions between travelers and senders.
+              <p className="text-gray-600 leading-relaxed">
+                We believe in the power of people helping people. Our platform connects communities and creates meaningful interactions between travelers and senders.
               </p>
             </div>
 
-            <div className="bg-green-50 p-8 rounded-2xl">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                <Globe className="h-8 w-8 text-green-600" />
+            <div className="text-center">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Globe className="h-10 w-10 text-green-600" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Efficiency</h3>
-              <p className="text-gray-600">
-                We maximize the potential of every journey by utilizing existing transportation capacity, 
-                reducing waste and environmental impact.
+              <p className="text-gray-600 leading-relaxed">
+                We maximize the potential of every journey by utilizing existing transportation capacity, reducing waste and environmental impact.
               </p>
             </div>
 
-            <div className="bg-purple-50 p-8 rounded-2xl">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6">
-                <Shield className="h-8 w-8 text-purple-600" />
+            <div className="text-center">
+              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Shield className="h-10 w-10 text-purple-600" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Trust & Safety</h3>
-              <p className="text-gray-600">
-                Safety and trust are at the core of our platform. We provide secure transactions and verified 
-                user profiles to ensure peace of mind.
+              <p className="text-gray-600 leading-relaxed">
+                Safety and trust are at the core of our platform. We provide secure transactions and verified user profiles to ensure peace of mind.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* By The Numbers */}
-      <section className="py-20 px-4 bg-gradient-to-b from-gray-50 to-white">
+      {/* Stats Section */}
+      <section className="py-20 px-4 bg-gradient-to-br from-blue-600 to-purple-600 text-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">BootHop by the Numbers</h2>
-            <p className="text-xl text-gray-600">Making a real impact on communities worldwide</p>
+            <h2 className="text-4xl font-bold mb-4">BootHop by the Numbers</h2>
+            <p className="text-xl text-blue-100">Making a real impact on communities worldwide</p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-5xl font-bold text-blue-600 mb-2">10K+</div>
-              <div className="text-gray-600 text-lg">Happy Users</div>
+          <div className="grid md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-6xl font-bold mb-2">10K+</div>
+              <div className="text-xl text-blue-100">Happy Users</div>
             </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold text-green-600 mb-2">50K+</div>
-              <div className="text-gray-600 text-lg">Successful Deliveries</div>
+            <div>
+              <div className="text-6xl font-bold mb-2">50K+</div>
+              <div className="text-xl text-blue-100">Successful Deliveries</div>
             </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold text-purple-600 mb-2">200+</div>
-              <div className="text-gray-600 text-lg">Cities Covered</div>
+            <div>
+              <div className="text-6xl font-bold mb-2">200+</div>
+              <div className="text-xl text-blue-100">Cities Covered</div>
             </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold text-orange-600 mb-2">95%</div>
-              <div className="text-gray-600 text-lg">Satisfaction Rate</div>
+            <div>
+              <div className="text-6xl font-bold mb-2">95%</div>
+              <div className="text-xl text-blue-100">Satisfaction Rate</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-blue-600">
-        <div className="max-w-4xl mx-auto text-center text-white">
-          <h2 className="text-4xl font-bold mb-6">Ready to Get Started?</h2>
-          <p className="text-xl mb-8">
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">Ready to Get Started?</h2>
+          <p className="text-xl text-gray-600 mb-8">
             Join thousands of travelers and senders already using BootHop
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/register"
-              className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition"
+              className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition inline-flex items-center justify-center"
             >
               Sign Up Now
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
             <Link 
-              href="/journeys"
-              className="bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-800 transition border-2 border-white"
+              href="/how-it-works"
+              className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transition"
             >
-              Explore Platform
+              Learn More
             </Link>
           </div>
         </div>

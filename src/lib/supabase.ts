@@ -1,20 +1,34 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 
-// Client-side Supabase client
-export const supabase = createClientComponentClient();
+// Client-side Supabase client (for use in components)
+export function createSupabaseClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
 
 // Server-side Supabase client (for API routes)
-export const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
+export function getSupabaseAdmin() {
+  if (typeof window !== 'undefined') {
+    throw new Error('supabaseAdmin cannot be used in the browser')
+  }
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!url || !key) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is missing')
+  }
+
+  return createClient(url, key, {
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-);
+      persistSession: false,
+    },
+  })
+}
 
 // Database Types
 export type Profile = {
@@ -74,7 +88,6 @@ export type DeliveryRequest = {
   is_international: boolean;
   requires_customs: boolean;
   special_instructions?: string;
-  handling_requirements?: string[];
   offered_price: number;
   status: 'draft' | 'open' | 'matched' | 'in_transit' | 'delivered' | 'cancelled';
   urgency: 'normal' | 'urgent';
@@ -97,9 +110,7 @@ export type DeliveryMatch = {
   platform_fee: number;
   payment_status: 'pending' | 'escrowed' | 'released' | 'refunded';
   stripe_payment_intent_id?: string;
-  stripe_transfer_id?: string;
   status: 'pending' | 'accepted' | 'in_transit' | 'completed' | 'disputed' | 'cancelled';
-  booter_confirmed_pickup: boolean;
   booter_confirmed_delivery: boolean;
   hooper_confirmed_receipt: boolean;
   hooper_confirmed_condition: boolean;
@@ -107,8 +118,6 @@ export type DeliveryMatch = {
   hooper_confirmed_at?: string;
   payment_released_at?: string;
   customs_declaration_accepted: boolean;
-  booter_customs_accepted: boolean;
-  hooper_customs_accepted: boolean;
   created_at: string;
   updated_at: string;
 };

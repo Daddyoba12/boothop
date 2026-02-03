@@ -14,7 +14,7 @@ import {
   CheckCircle,
   Camera
 } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase';
 import type { Profile, Rating } from '@/lib/supabase';
 
 type RatingWithReviewer = Rating & {
@@ -427,4 +427,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
 

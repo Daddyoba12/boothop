@@ -10,7 +10,7 @@ import {
   Users,
   CheckCircle
 } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase';
 
 export default function CreateRatingPage() {
   const router = useRouter();
@@ -288,3 +288,4 @@ export default function CreateRatingPage() {
     </div>
   );
 }
+

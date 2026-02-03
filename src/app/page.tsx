@@ -1,6 +1,204 @@
+'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Package, Users, Globe, Shield, Star, Plane } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+import { 
+  Package, 
+  ArrowRight, 
+  Plane,
+  MapPin,
+  Calendar,
+  Star,
+  Plus,
+  Users,
+  Globe,
+  Shield,
+  CheckCircle
+} from 'lucide-react';
+const testimonials = [
+  {
+    name: 'Toyin A.',
+    role: 'MSc Student, London',
+    route: 'Lagos → London',
+    text: 'I travelled from Lagos to London and used BootHop to send documents ahead. Everything arrived before I did.',
+  },
+  {
+    name: 'Kunle O.',
+    role: 'Tech Consultant',
+    route: 'Lagos → London',
+    text: 'Moving from Lagos to London for work was hectic, but BootHop made sending personal items simple.',
+  },
+  {
+    name: 'James R.',
+    role: 'Management Consultant',
+    route: 'London → New York',
+    text: 'I travelled from London to New York and delivered a small parcel via BootHop. Easy process.',
+  },
+  {
+    name: 'Oluwaseun D.',
+    role: 'PhD Student, Prague',
+    route: 'Lagos → Prague',
+    text: 'BootHop helped me send essentials ahead of my Lagos–Prague move. It reduced my luggage stress.',
+  },
+  {
+    name: 'Lukas P.',
+    role: 'Software Engineer',
+    route: 'Prague → UK',
+    text: 'Delivered a package from Prague to the UK smoothly. Clear rules and great communication.',
+  },
+];
+
+// City Card – shows rotating images inside a fixed frame
+function CityCard({ name, images }: { name: string; images: string[] }) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }, 3000); // 👈 DEV speed (3s)
+
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  return (
+    <div
+      className="
+        relative h-64 rounded-xl overflow-hidden shadow-lg
+        group cursor-pointer
+        transition-transform duration-300
+        hover:scale-105
+      "
+    >
+      <Image
+        src={images[currentImageIndex]}
+        alt={name}
+        fill
+        className="
+          object-cover
+          transition-transform duration-700
+          group-hover:scale-110
+        "
+      />
+
+      {/* dark overlay */}
+      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition duration-300" />
+
+      {/* city name */}
+      <div className="absolute bottom-4 left-4 text-white text-2xl font-bold drop-shadow-lg">
+        {name}
+      </div>
+    </div>
+  );
+}
+
+function CitiesSection() {
+  const cities = [
+    {
+      name: 'Lagos',
+      images: [
+        '/images/cities/lagos1.jpg',
+        '/images/cities/lagos2.jpg',
+        '/images/cities/lagos3.jpg',
+      ],
+    },
+    {
+      name: 'London',
+      images: [
+        '/images/cities/london1.jpg',
+        '/images/cities/london2.jpg',
+      ],
+    },
+    {
+      name: 'New York',
+      images: [
+        '/images/cities/ny1.jpg',
+        '/images/cities/ny2.jpg',
+      ],
+    },
+    {
+      name: 'Tokyo',
+      images: [
+        '/images/cities/tokyo1.jpg',
+        '/images/cities/tokyo2.jpg',
+      ],
+    },
+  ];
+
+  return (
+    <section className="py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-4">
+        <h2 className="text-3xl font-bold mb-8 text-center">
+          Popular Routes
+        </h2>
+
+        <div className="grid md:grid-cols-4 gap-6">
+          {cities.map((city) => (
+            <CityCard
+              key={city.name}
+              name={city.name}
+              images={city.images}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TestimonialsSection() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % testimonials.length);
+    }, 5000); // change testimonial every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const current = testimonials[index];
+
+  return (
+    <section className="py-20 bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 text-center">
+        <h2 className="text-3xl font-bold mb-10">
+          Trusted by travellers worldwide
+        </h2>
+
+        <div className="bg-white rounded-2xl p-8 shadow-md transition-all duration-500">
+          <p className="text-lg italic text-gray-700 mb-6">
+            “{current.text}”
+          </p>
+
+          <div>
+            <p className="font-semibold text-gray-900">
+              {current.name}
+            </p>
+            <p className="text-sm text-gray-500">
+              {current.role}
+            </p>
+            <p className="text-sm text-gray-400 mt-1">
+              {current.route}
+            </p>
+          </div>
+        </div>
+
+        {/* dots */}
+        <div className="flex justify-center mt-6 gap-2">
+          {testimonials.map((_, i) => (
+            <span
+              key={i}
+              className={`h-2 w-2 rounded-full transition ${
+                i === index ? 'bg-black' : 'bg-gray-300'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function HomePage() {
   return (
@@ -166,53 +364,50 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-              <Image
-                src="/images/travelers-group.jpg"
-                alt="Connect & Travel Together"
-                fill
-                className="object-cover"
-              />
-              <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm px-6 py-3 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Package className="h-5 w-5 text-blue-600" />
-                  <span className="font-semibold">Connect & Travel Together</span>
-                </div>
-              </div>
-            </div>
+            {/* Travelers Image - FIXED WITH GRADIENT */}
+    <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
+  {/* Animated Image Slider */}
+  <div className="relative w-full h-full">
+    <Image
+      src="/images/drealboothop.jpg"
+      alt="BootHop Community"
+      fill
+      className="object-cover animate-fade-in-out"
+      priority
+    />
+    <Image
+      src="/images/betterPics.png"
+      alt="BootHop Network"
+      fill
+      className="object-cover animate-fade-in-out-delayed"
+      priority
+    />
+  </div>
+  
+  {/* Overlay Badge */}
+  <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm px-6 py-3 rounded-lg shadow-lg z-10">
+    <div className="flex items-center gap-2">
+      <Package className="h-5 w-5 text-blue-600" />
+      <span className="font-semibold text-gray-900">Connect & Travel Together</span>
+    </div>
+  </div>
+</div>
+
           </div>
         </div>
       </section>
 
-      {/* Cities Section */}
+      {/* Cities Section - FIXED WITH GRADIENTS */}
       <section className="py-20 px-4 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Connecting Cities Worldwide</h2>
             <p className="text-xl text-gray-600">From bustling metropolises to charming destinations</p>
           </div>
+<CitiesSection />
+<TestimonialsSection />
 
-          <div className="grid md:grid-cols-4 gap-6">
-            {[
-              { name: 'Lagos', image: '/images/lagos.jpg' },
-              { name: 'London', image: '/images/london.jpg' },
-              { name: 'New York', image: '/images/newyork.jpg' },
-              { name: 'Tokyo', image: '/images/tokyo.jpg' },
-            ].map((city) => (
-              <div key={city.name} className="relative h-64 rounded-xl overflow-hidden group cursor-pointer">
-                <Image
-                  src={city.image}
-                  alt={city.name}
-                  fill
-                  className="object-cover group-hover:scale-110 transition duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-4 left-4 text-white text-2xl font-bold">
-                  {city.name}
-                </div>
-              </div>
-            ))}
-          </div>
+
         </div>
       </section>
 
@@ -326,3 +521,4 @@ export default function HomePage() {
     </div>
   );
 }
+

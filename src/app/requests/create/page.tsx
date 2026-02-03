@@ -14,7 +14,7 @@ import {
   Upload,
   X
 } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase';
 
 export default function CreateRequestPage() {
   const router = useRouter();
@@ -202,3 +202,4 @@ export default function CreateRequestPage() {
             <div>
               <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <FileText className="h-6 w-
+

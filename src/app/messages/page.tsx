@@ -9,7 +9,7 @@ import {
   Search,
   Clock
 } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase';
 
 type Conversation = {
   match_id: string;
@@ -187,3 +187,4 @@ export default function MessagesPage() {
     </div>
   );
 }
+

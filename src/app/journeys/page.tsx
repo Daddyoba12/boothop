@@ -13,7 +13,7 @@ import {
   Star,
   ArrowRight
 } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase';
 import type { Journey } from '@/lib/supabase';
 
 type JourneyWithProfile = Journey & {
@@ -26,7 +26,9 @@ type JourneyWithProfile = Journey & {
 
 export default function BrowseJourneysPage() {
   const router = useRouter();
-  const supabase = createClientComponentClient();
+ /* const supabase = createClientComponentClient();*/
+ const supabase = createSupabaseClient()
+
   
   const [journeys, setJourneys] = useState<JourneyWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -290,3 +292,4 @@ export default function BrowseJourneysPage() {
     </div>
   );
 }
+

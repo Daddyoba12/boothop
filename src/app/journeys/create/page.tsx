@@ -14,7 +14,7 @@ import {
   X,
   Plus
 } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase';
 
 export default function CreateJourneyPage() {
   const router = useRouter();
@@ -514,3 +514,4 @@ export default function CreateJourneyPage() {
     </div>
   );
 }
+

@@ -1,15 +1,18 @@
 'use client';
 
+console.log('URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+console.log('ANON:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Package, User, Send, Shield, AlertCircle } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase';
 
 export default function RegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createClientComponentClient();
+  const supabase = createSupabaseClient();
   
   const [userType, setUserType] = useState<'booter' | 'hooper'>(
     (searchParams.get('type') as 'booter' | 'hooper') || 'booter'
