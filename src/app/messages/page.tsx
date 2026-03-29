@@ -29,7 +29,7 @@ type Conversation = {
 
 export default function MessagesPage() {
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createSupabaseClient();
   
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,7 +96,7 @@ export default function MessagesPage() {
         })
       );
 
-      setConversations(conversationsData.filter(c => c.last_message) as Conversation[]);
+      setConversations(conversationsData.filter(c => c.last_message) as unknown as Conversation[]);
     } catch (error) {
       console.error('Error fetching conversations:', error);
     } finally {
@@ -167,7 +167,7 @@ export default function MessagesPage() {
                     </div>
                     
                     <p className={`text-sm truncate ${
-                      !conversation.last_message.is_read && conversation.last_message.sender_id !== currentUserId
+                      !conversation.last_message.is_read && (conversation.last_message as any).sender_id !== currentUserId
                         ? 'font-semibold text-gray-900'
                         : 'text-gray-600'
                     }`}>
@@ -175,7 +175,7 @@ export default function MessagesPage() {
                     </p>
                   </div>
 
-                  {!conversation.last_message.is_read && conversation.last_message.sender_id !== currentUserId && (
+                  {!conversation.last_message.is_read && (conversation.last_message as any).sender_id !== currentUserId && (
                     <div className="w-3 h-3 bg-blue-600 rounded-full flex-shrink-0"></div>
                   )}
                 </div>

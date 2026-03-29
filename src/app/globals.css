@@ -2,7 +2,9 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0f172a;
+  --brand: #2563eb;
+  --brand-dark: #1e40af;
 }
 
 @theme inline {
@@ -12,53 +14,83 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
-/* Image Slider Animation */
+
+/* ── Image Slider ── */
 @keyframes fadeInOut {
-  0%, 45% {
-    opacity: 1;
-    z-index: 2;
-  }
-  50%, 95% {
-    opacity: 0;
-    z-index: 1;
-  }
-  100% {
-    opacity: 1;
-    z-index: 2;
-  }
+  0%, 45%  { opacity: 1; z-index: 2; }
+  50%, 95% { opacity: 0; z-index: 1; }
+  100%     { opacity: 1; z-index: 2; }
 }
-
 @keyframes fadeInOutDelayed {
-  0%, 45% {
-    opacity: 0;
-    z-index: 1;
-  }
-  50%, 95% {
-    opacity: 1;
-    z-index: 2;
-  }
-  100% {
-    opacity: 0;
-    z-index: 1;
-  }
+  0%, 45%  { opacity: 0; z-index: 1; }
+  50%, 95% { opacity: 1; z-index: 2; }
+  100%     { opacity: 0; z-index: 1; }
+}
+.animate-fade-in-out         { animation: fadeInOut 6s ease-in-out infinite; }
+.animate-fade-in-out-delayed { animation: fadeInOutDelayed 6s ease-in-out infinite; }
+
+/* ── Stat counter pulse ── */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-count-up { animation: countUp 0.6s ease-out forwards; }
+
+/* ── Floating card shimmer ── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s ease-in-out infinite;
 }
 
-.animate-fade-in-out {
-  animation: fadeInOut 6s ease-in-out infinite;
+/* ── Gradient text utility ── */
+.gradient-text {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.animate-fade-in-out-delayed {
-  animation: fadeInOutDelayed 6s ease-in-out infinite;
+/* ── Card hover lift ── */
+.card-lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+}
+
+/* ── Mobile nav slide ── */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-down { animation: slideDown 0.2s ease-out forwards; }
+
+/* ── Dot indicator ── */
+.dot-active   { background: #2563eb; transform: scale(1.3); }
+.dot-inactive { background: #cbd5e1; }
+body {
+  background: linear-gradient(135deg, #0a0a0a 0%, #001a33 50%, #0a0a0a 100%);
+  background-attachment: fixed;
+}
+/* Your existing CSS stays the same, just make sure this is at the bottom: */
+
+body {
+  background: linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%);
+  background-attachment: fixed;
 }

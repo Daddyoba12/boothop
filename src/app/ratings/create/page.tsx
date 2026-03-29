@@ -12,10 +12,10 @@ import {
 } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
 
-export default function CreateRatingPage() {
+function CreateRatingPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createClientComponentClient();
+  const supabase = createSupabaseClient();
   
   const matchId = searchParams.get('match');
   
@@ -289,3 +289,7 @@ export default function CreateRatingPage() {
   );
 }
 
+import { Suspense } from 'react';
+export default function CreateRatingPage() {
+  return <Suspense><CreateRatingPageInner /></Suspense>;
+}

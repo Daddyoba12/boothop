@@ -18,7 +18,7 @@ import { createSupabaseClient } from '@/lib/supabase';
 
 export default function CreateJourneyPage() {
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createSupabaseClient();
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -269,8 +269,7 @@ export default function CreateJourneyPage() {
                     <div className="text-sm text-yellow-800">
                       <p className="font-semibold mb-1">International Journey</p>
                       <p>
-                        This is an international route. Both you and Hoopers must comply with{' '}
-                        <Link href="/customs" className="underline font-semibold">customs regulations</Link>.
+                        This is an international route. Both you and Hoopers must comply with customs regulations.
                       </p>
                     </div>
                   </div>

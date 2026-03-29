@@ -1,0 +1,44 @@
+import { NextResponse } from "next/server";
+import { createSupabaseServerClient } from "@/lib/supabase";
+
+export async function POST(req: Request) {
+  const supabase = await createSupabaseServerClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated" });
+  }
+
+  const body = await req.json();
+
+  const {
+    from,
+    to,
+    departure,
+    arrival,
+    weight,
+    price,
+    description,
+  } = body;
+
+  const { error } = await supabase.from("journeys").insert({
+    booter_id: user.id, // 🔐 attached here
+    from_city: from,
+    to_city: to,
+    departure_date: departure,
+    arrival_date: arrival,
+    available_weight: weight,
+    price_per_kg: price,
+    description,
+    status: "active",
+  });
+
+  if (error) {
+    return NextResponse.json({ error: error.message });
+  }
+
+  return NextResponse.json({ success: true });
+}

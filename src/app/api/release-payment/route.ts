@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase.admin';
 import { stripe } from '@/lib/stripe';
 
 // This should be called by a webhook or scheduled job when both parties confirm

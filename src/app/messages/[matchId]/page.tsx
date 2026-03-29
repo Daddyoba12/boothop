@@ -4,11 +4,13 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
-  Package, 
+  Package,
   Send,
+  MessageSquare,
   ArrowLeft
 } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+import { createSupabaseClient } from '@/lib/supabase';
 import type { Message } from '@/lib/supabase';
 
 type MessageWithProfile = Message & {
@@ -19,7 +21,7 @@ type MessageWithProfile = Message & {
 
 export default function ChatPage({ params }: { params: { matchId: string } }) {
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createSupabaseClient();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const [messages, setMessages] = useState<MessageWithProfile[]>([]);

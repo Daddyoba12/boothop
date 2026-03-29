@@ -1,0 +1,829 @@
+'use client';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useState, useEffect, useCallback } from 'react';
+import {
+  Package, ArrowRight, Plane, Star, Users, Globe, Shield,
+  CheckCircle, Menu, X, ChevronRight, Zap, Lock, TrendingDown,
+  MapPin, Clock, BadgeCheck, Quote,
+} from 'lucide-react';
+
+// ─── Data ────────────────────────────────────────────────────────────────────
+
+const stats = [
+  { value: '10K+',  label: 'Verified Users' },
+  { value: '50K+',  label: 'Successful Deliveries' },
+  { value: '200+',  label: 'Cities Worldwide' },
+  { value: '95%',   label: 'Satisfaction Rate' },
+];
+
+const steps = {
+  booter: [
+    {
+      icon: <Plane className="h-6 w-6" />,
+      title: 'Post Your Journey',
+      desc: 'Share your travel dates, route, and how much space you have. Takes under 2 minutes.',
+    },
+    {
+      icon: <Users className="h-6 w-6" />,
+      title: 'Get Matched',
+      desc: 'Hoopers with items along your route see your journey and request a match.',
+    },
+    {
+      icon: <Lock className="h-6 w-6" />,
+      title: 'Secure Payment',
+      desc: 'Funds go into escrow. You collect items, deliver, and get paid automatically.',
+    },
+    {
+      icon: <Star className="h-6 w-6" />,
+      title: 'Build Reputation',
+      desc: 'Earn ratings after each delivery and unlock higher-value bookings.',
+    },
+  ],
+  hooper: [
+    {
+      icon: <Package className="h-6 w-6" />,
+      title: 'Post Your Request',
+      desc: 'Describe what you need delivered – weight, dimensions, destination, and value.',
+    },
+    {
+      icon: <Globe className="h-6 w-6" />,
+      title: 'Browse Journeys',
+      desc: 'Find verified travelers heading to your destination and propose a match.',
+    },
+    {
+      icon: <BadgeCheck className="h-6 w-6" />,
+      title: 'Pay in Escrow',
+      desc: 'Your payment is held safely until you confirm the item arrived in good condition.',
+    },
+    {
+      icon: <TrendingDown className="h-6 w-6" />,
+      title: 'Save Up to 80%',
+      desc: 'Pay a fraction of traditional courier rates. No hidden fees — just a 3% service charge.',
+    },
+  ],
+};
+
+const testimonials = [
+  {
+    name: 'Toyin A.',
+    role: 'MSc Student, London',
+    route: 'Lagos → London',
+    text: 'I travelled from Lagos to London and used BootHop to send documents ahead. Everything arrived before I did. Genuinely impressive service.',
+    rating: 5,
+    avatar: '/images/boothopG1.jpeg',
+  },
+  {
+    name: 'Kunle O.',
+    role: 'Tech Consultant',
+    route: 'Lagos → London',
+    text: 'Moving from Lagos to London for work was hectic, but BootHop made sending personal items simple. Highly recommended to anyone relocating.',
+    rating: 5,
+    avatar: '/images/boothopimage.jpg',
+  },
+  {
+    name: 'James R.',
+    role: 'Management Consultant',
+    route: 'London → New York',
+    text: 'Delivered a small parcel via BootHop on my London–New York trip. Straightforward process, great communication throughout.',
+    rating: 5,
+    avatar: '/images/drealboothop.jpg',
+  },
+  {
+    name: 'Oluwaseun D.',
+    role: 'PhD Student, Prague',
+    route: 'Lagos → Prague',
+    text: 'BootHop helped me send essentials ahead of my Lagos–Prague move. It dramatically reduced my luggage stress and saved me real money.',
+    rating: 5,
+    avatar: '/images/TrustedComm.jpg',
+  },
+  {
+    name: 'Lukas P.',
+    role: 'Software Engineer',
+    route: 'Prague → UK',
+    text: 'Delivered a package from Prague to the UK smoothly. Clear rules, trustworthy platform, and great communication from the sender.',
+    rating: 5,
+    avatar: '/images/betterPics.jpg',
+  },
+];
+
+const cities = [
+  {
+    name: 'Lagos',
+    country: 'Nigeria',
+    images: ['/images/cities/lagos1.jpg', '/images/cities/lagos2.jpg', '/images/cities/lagos3.jpg'],
+  },
+  {
+    name: 'London',
+    country: 'United Kingdom',
+    images: ['/images/cities/london1.jpg', '/images/cities/london2.jpg', '/images/cities/londo3.jpg'],
+  },
+  {
+    name: 'New York',
+    country: 'United States',
+    images: ['/images/cities/ny1.jpg', '/images/cities/ny2.jpg'],
+  },
+  {
+    name: 'Tokyo',
+    country: 'Japan',
+    images: ['/images/cities/tokyo1.jpg', '/images/cities/tokyo2.jpg', '/images/cities/tokyoboothop.jpg'],
+  },
+];
+
+const features = [
+  {
+    icon: <Shield className="h-7 w-7 text-blue-600" />,
+    bg: 'bg-blue-50',
+    title: 'Identity Verification',
+    desc: 'Every user undergoes KYC verification before they can participate. Passport checks, address confirmation, and ongoing monitoring keep the community safe.',
+    highlights: ['Government ID check', 'Address verification', 'Continuous monitoring'],
+  },
+  {
+    icon: <Lock className="h-7 w-7 text-violet-600" />,
+    bg: 'bg-violet-50',
+    title: 'Escrow Payments',
+    desc: "Your money never goes directly to a stranger. Stripe escrow holds funds until both parties confirm successful delivery — no disputes, no stress.",
+    highlights: ['Stripe-powered escrow', 'Dual confirmation', 'Instant release'],
+  },
+  {
+    icon: <Zap className="h-7 w-7 text-amber-600" />,
+    bg: 'bg-amber-50',
+    title: 'Real-Time Matching',
+    desc: 'Our algorithm matches delivery requests with compatible journeys in real time. Get notified the moment a traveler posts a matching route.',
+    highlights: ['Instant notifications', 'Route algorithm', 'Smart scheduling'],
+  },
+];
+
+// ─── Sub-components ────────────────────────────────────────────────────────
+
+function StarRating({ count }: { count: number }) {
+  return (
+    <div className="flex gap-0.5">
+      {Array.from({ length: count }).map((_, i) => (
+        <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+      ))}
+    </div>
+  );
+}
+
+function CityCard({ name, country, images }: { name: string; country: string; images: string[] }) {
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => setIdx((p) => (p + 1) % images.length), 3500);
+    return () => clearInterval(t);
+  }, [images.length]);
+
+  return (
+    <div className="relative h-72 rounded-2xl overflow-hidden shadow-lg group cursor-pointer card-lift">
+      <Image
+        src={images[idx]}
+        alt={name}
+        fill
+        className="object-cover transition-transform duration-700 group-hover:scale-105"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      <div className="absolute bottom-0 left-0 p-5">
+        <p className="text-white text-xl font-bold leading-tight">{name}</p>
+        <p className="text-white/70 text-sm mt-0.5 flex items-center gap-1">
+          <MapPin className="h-3 w-3" /> {country}
+        </p>
+      </div>
+      <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <Plane className="h-3 w-3" /> Active routes
+      </div>
+    </div>
+  );
+}
+
+function TestimonialsCarousel() {
+  const [idx, setIdx] = useState(0);
+  const [animating, setAnimating] = useState(false);
+
+  const goTo = useCallback((next: number) => {
+    setAnimating(true);
+    setTimeout(() => {
+      setIdx(next);
+      setAnimating(false);
+    }, 250);
+  }, []);
+
+  useEffect(() => {
+    const t = setInterval(() => goTo((idx + 1) % testimonials.length), 5500);
+    return () => clearInterval(t);
+  }, [idx, goTo]);
+
+  const t = testimonials[idx];
+
+  return (
+    <section className="py-24 bg-slate-900 relative overflow-hidden">
+      {/* subtle grid pattern */}
+      <div
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(255,255,255,.3) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.3) 1px,transparent 1px)',
+          backgroundSize: '40px 40px',
+        }}
+      />
+      <div className="relative max-w-4xl mx-auto px-4 text-center">
+        <p className="text-blue-400 font-semibold text-sm uppercase tracking-widest mb-3">Community Stories</p>
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-12">
+          Trusted by travellers worldwide
+        </h2>
+
+        <div
+          className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-3xl p-8 md:p-12 transition-opacity duration-250"
+          style={{ opacity: animating ? 0 : 1 }}
+        >
+          <Quote className="h-8 w-8 text-blue-400 mx-auto mb-6" />
+          <p className="text-lg md:text-xl text-white/90 leading-relaxed mb-8 italic">
+            "{t.text}"
+          </p>
+          <div className="flex flex-col items-center gap-2">
+            <StarRating count={t.rating} />
+            <p className="font-semibold text-white mt-1">{t.name}</p>
+            <p className="text-white/50 text-sm">{t.role}</p>
+            <span className="mt-1 text-xs bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-0.5 rounded-full flex items-center gap-1">
+              <Plane className="h-3 w-3" /> {t.route}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex justify-center mt-8 gap-2">
+          {testimonials.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goTo(i)}
+              className={`h-2 rounded-full transition-all duration-300 ${i === idx ? 'bg-blue-400 w-6' : 'bg-white/20 w-2'}`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Main Page ─────────────────────────────────────────────────────────────
+
+export default function HomePage() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeTab, setActiveTab] = useState<'booter' | 'hooper'>('hooper');
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handler);
+    return () => window.removeEventListener('scroll', handler);
+  }, []);
+
+  const navLinks = [
+    { href: '/how-it-works', label: 'How It Works' },
+    { href: '/pricing',      label: 'Pricing' },
+    { href: '/about',        label: 'About' },
+    { href: '/customs',      label: 'Customs' },
+  ];
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* ── Navigation ───────────────────────────────────────────────── */}
+      <nav
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+          scrolled
+            ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100'
+            : 'bg-transparent'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center shadow-sm">
+                <Plane className="h-4 w-4 text-white" />
+              </div>
+              <span
+                className={`text-xl font-bold tracking-tight transition-colors ${
+                  scrolled ? 'text-slate-900' : 'text-white'
+                }`}
+              >
+                Boot<span className="text-blue-400">Hop</span>
+              </span>
+            </Link>
+
+            {/* Desktop links */}
+            <div className="hidden md:flex items-center gap-1">
+              {navLinks.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    scrolled
+                      ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+
+            {/* Desktop CTA */}
+            <div className="hidden md:flex items-center gap-3">
+              <Link
+                href="/login"
+                className={`text-sm font-medium px-4 py-2 rounded-lg transition-colors ${
+                  scrolled
+                    ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                Log in
+              </Link>
+              <Link
+                href="/register"
+                className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all hover:shadow-md"
+              >
+                Get Started →
+              </Link>
+            </div>
+
+            {/* Mobile hamburger */}
+            <button
+              className={`md:hidden p-2 rounded-lg transition-colors ${
+                scrolled ? 'text-slate-700 hover:bg-slate-100' : 'text-white hover:bg-white/10'
+              }`}
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        {mobileOpen && (
+          <div className="md:hidden bg-white border-t border-slate-100 shadow-lg animate-slide-down">
+            <div className="px-4 py-4 space-y-1">
+              {navLinks.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="block px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg"
+                >
+                  {l.label}
+                </Link>
+              ))}
+              <div className="pt-3 flex flex-col gap-2">
+                <Link href="/login" className="block text-center text-sm font-medium text-slate-700 border border-slate-200 py-2.5 rounded-xl hover:bg-slate-50 transition">
+                  Log in
+                </Link>
+                <Link href="/register" className="block text-center text-sm font-semibold text-white bg-blue-600 py-2.5 rounded-xl hover:bg-blue-700 transition">
+                  Get Started →
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* ── Hero ─────────────────────────────────────────────────────── */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/images/drealboothop.jpg"
+            alt="BootHop community of travellers"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-blue-950/80 to-slate-900/70" />
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
+          <div className="max-w-3xl">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-sm text-white/90 text-sm px-4 py-1.5 rounded-full mb-8">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              Trusted by 10,000+ verified users worldwide
+            </div>
+
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white leading-tight tracking-tight mb-6">
+              Ship Anything.<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-violet-400">
+                Anywhere.
+              </span><br />
+              With a Verified<br />Traveler.
+            </h1>
+
+            <p className="text-lg sm:text-xl text-white/75 max-w-xl leading-relaxed mb-10">
+              BootHop is the peer-to-peer logistics platform that connects verified travelers
+              with people who need personal effects, letters, and parcels delivered internationally —
+              at a fraction of courier costs.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/register?type=hooper"
+                className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-7 py-4 rounded-2xl text-base font-semibold shadow-lg shadow-blue-900/40 transition-all hover:-translate-y-0.5 hover:shadow-xl"
+              >
+                Send an Item
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/register?type=booter"
+                className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white px-7 py-4 rounded-2xl text-base font-semibold backdrop-blur-sm transition-all hover:-translate-y-0.5"
+              >
+                Earn While Travelling
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            {/* Mini trust strip */}
+            <div className="flex flex-wrap items-center gap-5 mt-10 text-white/60 text-sm">
+              {['Identity verified', 'Stripe escrow', '95% satisfaction', 'Free to join'].map((item) => (
+                <span key={item} className="flex items-center gap-1.5">
+                  <CheckCircle className="h-4 w-4 text-green-400" />
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll cue */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40 text-xs">
+          <span>Scroll to explore</span>
+          <div className="w-px h-8 bg-gradient-to-b from-white/30 to-transparent" />
+        </div>
+      </section>
+
+      {/* ── Stats Bar ────────────────────────────────────────────────── */}
+      <section className="bg-blue-600 py-10">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-0 md:divide-x divide-blue-500">
+            {stats.map((s) => (
+              <div key={s.label} className="text-center px-6">
+                <div className="text-4xl font-bold text-white mb-1">{s.value}</div>
+                <div className="text-blue-200 text-sm">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── How It Works ─────────────────────────────────────────────── */}
+      <section className="py-24 px-4 bg-slate-50" id="how-it-works">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Simple Process</p>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">How BootHop Works</h2>
+            <p className="text-slate-500 text-lg max-w-xl mx-auto">
+              Whether you're sending an item or travelling with spare luggage space.
+            </p>
+          </div>
+
+          {/* Tab switcher */}
+          <div className="flex justify-center mb-12">
+            <div className="bg-white border border-slate-200 rounded-2xl p-1.5 flex gap-1 shadow-sm">
+              <button
+                onClick={() => setActiveTab('hooper')}
+                className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  activeTab === 'hooper'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                I need to send an item
+              </button>
+              <button
+                onClick={() => setActiveTab('booter')}
+                className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  activeTab === 'booter'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                I'm travelling
+              </button>
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {steps[activeTab].map((step, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm card-lift relative"
+              >
+                <div className="absolute -top-3 -right-3 w-7 h-7 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow">
+                  {i + 1}
+                </div>
+                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 mb-5">
+                  {step.icon}
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-2">{step.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <Link
+              href="/how-it-works"
+              className="inline-flex items-center gap-2 text-blue-600 font-medium hover:text-blue-700 transition-colors"
+            >
+              Learn more about the process
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Popular Routes ───────────────────────────────────────────── */}
+      <section className="py-24 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Global Network</p>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">Popular Routes</h2>
+            <p className="text-slate-500 text-lg max-w-xl mx-auto">
+              From Lagos to London, New York to Tokyo — our community spans every major hub.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+            {cities.map((city) => (
+              <CityCard
+                key={city.name}
+                name={city.name}
+                country={city.country}
+                images={city.images}
+              />
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <Link
+              href="/journeys"
+              className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:-translate-y-0.5 shadow-sm hover:shadow"
+            >
+              Browse All Journeys
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonials ─────────────────────────────────────────────── */}
+      <TestimonialsCarousel />
+
+      {/* ── Features / Why BootHop ───────────────────────────────────── */}
+      <section className="py-24 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Why BootHop</p>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">Built on trust. Designed for people.</h2>
+            <p className="text-slate-500 text-lg max-w-xl mx-auto">
+              Every feature exists to make sure your item — and your money — arrives safely.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {features.map((f) => (
+              <div
+                key={f.title}
+                className="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm card-lift"
+              >
+                <div className={`${f.bg} w-14 h-14 rounded-2xl flex items-center justify-center mb-6`}>
+                  {f.icon}
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{f.title}</h3>
+                <p className="text-slate-500 leading-relaxed mb-5">{f.desc}</p>
+                <ul className="space-y-2">
+                  {f.highlights.map((h) => (
+                    <li key={h} className="flex items-center gap-2 text-sm text-slate-600">
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      {h}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Social Proof / Image Banner ──────────────────────────────── */}
+      <section className="relative py-0 overflow-hidden">
+        <div className="relative h-80 w-full">
+          <Image
+            src="/images/TrustedComm.jpg"
+            alt="BootHop trusted community"
+            fill
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-slate-900/80" />
+          <div className="relative z-10 h-full flex items-center justify-center text-center px-4">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+                A community built on mutual trust
+              </h2>
+              <p className="text-white/70 max-w-lg mx-auto mb-6">
+                Every Booter and Hooper is ID-verified. Every payment is in escrow. Every delivery is rated.
+              </p>
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 bg-white text-blue-600 font-semibold px-6 py-3 rounded-xl hover:bg-blue-50 transition shadow"
+              >
+                Join the Community
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Pricing Teaser ───────────────────────────────────────────── */}
+      <section className="py-24 px-4 bg-slate-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Transparent Pricing</p>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">Simple, honest fees</h2>
+            <p className="text-slate-500 text-lg">No hidden charges. Pay only when a delivery is confirmed.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Hoopers */}
+            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                  <Package className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="font-bold text-slate-900">Hoopers (Senders)</p>
+                  <p className="text-slate-500 text-sm">People sending items</p>
+                </div>
+              </div>
+              <div className="flex items-baseline gap-1 mb-3">
+                <span className="text-5xl font-bold text-slate-900">+3%</span>
+                <span className="text-slate-500 ml-1">service fee</span>
+              </div>
+              <p className="text-slate-500 text-sm mb-4">Added to the agreed delivery price. That's it.</p>
+              <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-600">
+                Example: Agree £100 → you pay <strong>£103</strong> total.
+              </div>
+            </div>
+
+            {/* Booters */}
+            <div className="bg-blue-600 rounded-3xl p-8 text-white">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Plane className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-bold">Booters (Travelers)</p>
+                  <p className="text-white/70 text-sm">People carrying items</p>
+                </div>
+              </div>
+              <div className="flex items-baseline gap-1 mb-3">
+                <span className="text-5xl font-bold">Earn</span>
+                <span className="text-white/70 ml-2">per delivery</span>
+              </div>
+              <p className="text-white/70 text-sm mb-4">Set your own price. We take a small platform fee.</p>
+              <div className="bg-white/10 rounded-xl p-4 text-sm text-white/80">
+                Example: Agreed £100 → you receive approx. <strong>£95</strong> after fees.
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-8">
+            <Link href="/pricing" className="text-blue-600 font-medium hover:text-blue-700 inline-flex items-center gap-1">
+              See full pricing breakdown <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Final CTA ────────────────────────────────────────────────── */}
+      <section className="py-24 px-4 bg-gradient-to-br from-slate-900 to-blue-950 relative overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at 20% 50%, #3b82f6 0%, transparent 50%), radial-gradient(circle at 80% 20%, #7c3aed 0%, transparent 50%)',
+          }}
+        />
+        <div className="relative max-w-3xl mx-auto text-center">
+          <p className="text-blue-400 font-semibold text-sm uppercase tracking-widest mb-4">Ready to start?</p>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+            Your next delivery is one<br />journey away.
+          </h2>
+          <p className="text-white/60 text-lg mb-10 max-w-xl mx-auto">
+            Join thousands of Booters earning on their trips and Hoopers saving on every shipment.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/register"
+              className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl text-base font-semibold shadow-lg shadow-blue-900/40 transition-all hover:-translate-y-0.5 hover:shadow-xl"
+            >
+              Create Free Account
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/how-it-works"
+              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white px-8 py-4 rounded-2xl text-base font-semibold transition-all hover:-translate-y-0.5"
+            >
+              How It Works
+            </Link>
+          </div>
+          <p className="text-white/30 text-sm mt-6">Free to join · No subscription · Cancel anytime</p>
+        </div>
+      </section>
+
+      {/* ── Footer ───────────────────────────────────────────────────── */}
+      <footer className="bg-slate-950 text-slate-400 py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-5 gap-10 mb-12">
+            {/* Brand */}
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
+                  <Plane className="h-4 w-4 text-white" />
+                </div>
+                <span className="text-xl font-bold text-white tracking-tight">
+                  Boot<span className="text-blue-400">Hop</span>
+                </span>
+              </div>
+              <p className="text-sm leading-relaxed max-w-xs mb-5">
+                Connecting verified travelers with people who need items delivered internationally.
+                Safe, secure, peer-to-peer logistics.
+              </p>
+              <div className="flex items-center gap-2 text-xs">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span className="text-slate-500">Platform operational</span>
+              </div>
+            </div>
+
+            {/* Platform */}
+            <div>
+              <h4 className="font-semibold text-white mb-4 text-sm">Platform</h4>
+              <ul className="space-y-2.5 text-sm">
+                {[
+                  { href: '/how-it-works', label: 'How It Works' },
+                  { href: '/pricing',      label: 'Pricing & Fees' },
+                  { href: '/journeys',     label: 'Browse Journeys' },
+                  { href: '/trust-safety', label: 'Trust & Safety' },
+                ].map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} className="hover:text-white transition-colors">{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <h4 className="font-semibold text-white mb-4 text-sm">Legal</h4>
+              <ul className="space-y-2.5 text-sm">
+                {[
+                  { href: '/terms',    label: 'Terms of Service' },
+                  { href: '/privacy',  label: 'Privacy Policy' },
+                ].map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} className="hover:text-white transition-colors">{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Support */}
+            <div>
+              <h4 className="font-semibold text-white mb-4 text-sm">Support</h4>
+              <ul className="space-y-2.5 text-sm">
+                {[
+                  { href: '/help',    label: 'Help Center' },
+                  { href: '/contact', label: 'Contact Us' },
+                  { href: '/about',   label: 'About BootHop' },
+                ].map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} className="hover:text-white transition-colors">{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
+            <p>© {new Date().getFullYear()} BootHop. All rights reserved.</p>
+            <div className="flex items-center gap-5">
+              <Link href="/terms"    className="hover:text-white transition-colors">Terms</Link>
+              <Link href="/privacy"  className="hover:text-white transition-colors">Privacy</Link>
+              <Link href="/customs"  className="hover:text-white transition-colors">Customs</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

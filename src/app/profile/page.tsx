@@ -25,7 +25,7 @@ type RatingWithReviewer = Rating & {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createSupabaseClient();
   
   const [profile, setProfile] = useState<Profile | null>(null);
   const [ratings, setRatings] = useState<RatingWithReviewer[]>([]);

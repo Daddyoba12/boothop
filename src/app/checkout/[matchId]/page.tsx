@@ -12,7 +12,8 @@ import {
 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase';
+
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -104,7 +105,7 @@ function CheckoutForm({ matchId, amount }: { matchId: string; amount: number }) 
 
 export default function CheckoutPage({ params }: { params: { matchId: string } }) {
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createSupabaseClient();
   
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [match, setMatch] = useState<any>(null);

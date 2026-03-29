@@ -1,323 +1,330 @@
 'use client';
 
-console.log('URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
-console.log('ANON:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Package, User, Send, Shield, AlertCircle } from 'lucide-react';
+import { Plane, Package, Send, User, Shield, AlertCircle, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
 
-export default function RegisterPage() {
-  const router = useRouter();
+function RegisterForm() {
+  const router       = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createSupabaseClient();
-  
+  const supabase     = createSupabaseClient();
+
   const [userType, setUserType] = useState<'booter' | 'hooper'>(
-    (searchParams.get('type') as 'booter' | 'hooper') || 'booter'
+    (searchParams.get('type') as 'booter' | 'hooper') || 'hooper',
   );
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    fullName: '', email: '', password: '', confirmPassword: '',
   });
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [acceptedCustoms, setAcceptedCustoms] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword]         = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptedTerms, setAcceptedTerms]       = useState(false);
+  const [acceptedCustoms, setAcceptedCustoms]   = useState(false);
+  const [loading, setLoading]                   = useState(false);
+  const [error, setError]                       = useState<string | null>(null);
+
+  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setFormData((p) => ({ ...p, [field]: e.target.value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Validation
     if (!formData.fullName || !formData.email || !formData.password) {
-      setError('Please fill in all fields');
+      setError('Please fill in all required fields.');
       return;
     }
-
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passwords do not match.');
       return;
     }
-
     if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError('Password must be at least 8 characters.');
       return;
     }
-
-    if (!acceptedTerms) {
-      setError('You must accept the Terms of Service');
-      return;
-    }
-
     if (!acceptedCustoms) {
-      setError('You must acknowledge customs responsibilities');
+      setError('You must acknowledge customs responsibilities.');
+      return;
+    }
+    if (!acceptedTerms) {
+      setError('You must accept the Terms of Service.');
       return;
     }
 
     setLoading(true);
-
     try {
-      // Sign up with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
-        options: {
-          data: {
-            full_name: formData.fullName,
-            user_type: userType,
-          },
-        },
+        options: { data: { full_name: formData.fullName, user_type: userType } },
       });
 
       if (authError) throw authError;
 
       if (authData.user) {
-        // Create profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            email: formData.email,
-            full_name: formData.fullName,
-            user_type: userType,
-          });
-
+        const { error: profileError } = await supabase.from('profiles').insert({
+          id: authData.user.id,
+          email: formData.email,
+          full_name: formData.fullName,
+          user_type: userType,
+        });
         if (profileError) throw profileError;
 
-        // Redirect based on user type
-        if (userType === 'booter') {
-          router.push('/booter-dashboard');
-        } else {
-          router.push('/hooper-dashboard');
-        }
+        router.push(userType === 'booter' ? '/booter-dashboard' : '/hooper-dashboard');
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during registration');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'An error occurred during registration.');
     } finally {
       setLoading(false);
     }
   };
 
+  const roles = [
+    {
+      key:   'hooper' as const,
+      icon:  <Package className="h-6 w-6" />,
+      title: 'Send an Item',
+      label: 'Hooper',
+      desc:  'Send items worldwide through verified travelers at up to 80% less than courier rates.',
+    },
+    {
+      key:   'booter' as const,
+      icon:  <Send className="h-6 w-6" />,
+      title: 'Travel & Earn',
+      label: 'Booter',
+      desc:  'Monetise your spare luggage space. Earn money on trips you\'re already taking.',
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      {/* Header */}
-      <nav className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center space-x-2">
-              <Package className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">BootHop</span>
-            </Link>
-            <Link href="/login" className="text-gray-600 hover:text-gray-900">
-              Already have an account? <span className="text-blue-600 font-semibold">Sign in</span>
-            </Link>
-          </div>
+    <div className="min-h-screen flex">
+      {/* Left: image panel */}
+      <div className="hidden lg:flex lg:w-5/12 relative flex-col justify-between p-12 overflow-hidden">
+        <div className="absolute inset-0">
+          <Image src="/images/Handover.jpg" alt="BootHop delivery handover" fill className="object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-950/85 via-slate-900/75 to-blue-900/60" />
         </div>
-      </nav>
 
-      {/* Registration Form */}
-      <div className="max-w-2xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          {/* Logo & Title */}
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <Package className="h-16 w-16 text-blue-600" />
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900">Join BootHop</h1>
-            <p className="text-gray-600 mt-2">Create your account to start connecting</p>
+        {/* Logo */}
+        <Link href="/" className="relative z-10 flex items-center gap-2">
+          <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+            <Plane className="h-5 w-5 text-white" />
           </div>
+          <span className="text-2xl font-bold text-white tracking-tight">
+            Boot<span className="text-blue-400">Hop</span>
+          </span>
+        </Link>
 
-          {/* Error Message */}
-          {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start">
-              <AlertCircle className="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" />
-              <p className="text-red-800 text-sm">{error}</p>
+        {/* Bottom stats */}
+        <div className="relative z-10 space-y-4">
+          <h2 className="text-white text-2xl font-bold leading-snug">
+            Join 10,000+ people already shipping smarter
+          </h2>
+          {[
+            { value: '50K+', label: 'successful deliveries' },
+            { value: '200+', label: 'cities worldwide' },
+            { value: '95%',  label: 'satisfaction rate' },
+          ].map((s) => (
+            <div key={s.label} className="flex items-center gap-3">
+              <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <span className="text-white/80 text-sm">
+                <strong className="text-white font-semibold">{s.value}</strong> {s.label}
+              </span>
             </div>
-          )}
+          ))}
+        </div>
+      </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* User Type Selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                I want to...
-              </label>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => setUserType('booter')}
-                  className={`p-4 rounded-lg border-2 transition ${
-                    userType === 'booter'
-                      ? 'border-blue-600 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-center mb-2">
-                    <Send className={`h-6 w-6 ${userType === 'booter' ? 'text-blue-600' : 'text-gray-400'}`} />
-                  </div>
-                  <div className="font-semibold">Become a Booter</div>
-                  <div className="text-sm text-gray-600 mt-1">
-                    Earn money by delivering items during your travels
-                  </div>
-                </button>
+      {/* Right: form */}
+      <div className="flex-1 overflow-y-auto bg-white flex flex-col">
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 lg:hidden">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
+              <Plane className="h-4 w-4 text-white" />
+            </div>
+            <span className="text-lg font-bold text-slate-900">Boot<span className="text-blue-600">Hop</span></span>
+          </Link>
+          <Link href="/login" className="text-sm text-slate-500">
+            Have an account? <span className="text-blue-600 font-semibold">Sign in</span>
+          </Link>
+        </div>
 
-                <button
-                  type="button"
-                  onClick={() => setUserType('hooper')}
-                  className={`p-4 rounded-lg border-2 transition ${
-                    userType === 'hooper'
-                      ? 'border-blue-600 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-center mb-2">
-                    <User className={`h-6 w-6 ${userType === 'hooper' ? 'text-blue-600' : 'text-gray-400'}`} />
-                  </div>
-                  <div className="font-semibold">Become a Hooper</div>
-                  <div className="text-sm text-gray-600 mt-1">
-                    Send items worldwide through verified travelers
-                  </div>
-                </button>
+        <div className="flex-1 flex items-start justify-center px-6 py-10">
+          <div className="w-full max-w-lg">
+            {/* Header */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">Create your account</h1>
+              <p className="text-slate-500">
+                Already have one?{' '}
+                <Link href="/login" className="text-blue-600 font-medium hover:text-blue-700">Sign in →</Link>
+              </p>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div className="mb-6 flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl p-4">
+                <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <p className="text-red-700 text-sm">{error}</p>
               </div>
-            </div>
+            )}
 
-            {/* Full Name */}
-            <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name
-              </label>
-              <input
-                type="text"
-                id="fullName"
-                value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Role selector */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-3">I want to…</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {roles.map((r) => (
+                    <button
+                      key={r.key}
+                      type="button"
+                      onClick={() => setUserType(r.key)}
+                      className={`p-4 rounded-2xl border-2 text-left transition-all ${
+                        userType === r.key
+                          ? 'border-blue-600 bg-blue-50'
+                          : 'border-slate-200 hover:border-slate-300 bg-white'
+                      }`}
+                    >
+                      <div className={`mb-2 ${userType === r.key ? 'text-blue-600' : 'text-slate-400'}`}>
+                        {r.icon}
+                      </div>
+                      <p className="font-semibold text-slate-900 text-sm">{r.title}</p>
+                      <p className="text-xs text-slate-500 mt-1 leading-snug">{r.desc}</p>
+                      {userType === r.key && (
+                        <span className="inline-block mt-2 text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">
+                          {r.label}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
+              {/* Name */}
+              <div>
+                <label htmlFor="fullName" className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Full name
+                </label>
+                <input
+                  id="fullName" type="text" value={formData.fullName}
+                  onChange={set('fullName')} required placeholder="Jane Smith"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm"
+                />
+              </div>
 
-            {/* Password */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                minLength={8}
-                required
-              />
-            </div>
+              {/* Email */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Email address
+                </label>
+                <input
+                  id="email" type="email" value={formData.email}
+                  onChange={set('email')} required placeholder="you@example.com"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm"
+                />
+              </div>
 
-            {/* Confirm Password */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                minLength={8}
-                required
-              />
-            </div>
+              {/* Password row */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1.5">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="password" type={showPassword ? 'text' : 'password'}
+                      value={formData.password} onChange={set('password')}
+                      required minLength={8} placeholder="Min. 8 chars"
+                      className="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm"
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-1.5">
+                    Confirm
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'}
+                      value={formData.confirmPassword} onChange={set('confirmPassword')}
+                      required minLength={8} placeholder="Repeat password"
+                      className="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm"
+                    />
+                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-            {/* Identity Verification Notice */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-start">
-                <Shield className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-blue-800">
-                  <p className="font-semibold mb-1">Identity Verification</p>
-                  <p>
-                    For international deliveries, we use secure identity verification to ensure safety and compliance.
+              {/* Verification notice */}
+              <div className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl p-4">
+                <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-blue-900 mb-0.5">Identity Verification</p>
+                  <p className="text-xs text-blue-700 leading-relaxed">
+                    We use secure KYC verification for international deliveries to keep all users safe.
                   </p>
                 </div>
               </div>
-            </div>
 
-            {/* Customs Acknowledgment */}
-            <div className="space-y-3">
-              <label className="flex items-start">
-                <input
-                  type="checkbox"
-                  checked={acceptedCustoms}
-                  onChange={(e) => setAcceptedCustoms(e.target.checked)}
-                  className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  required
-                />
-                <span className="ml-3 text-sm text-gray-700">
-                  ☑️ I understand I am responsible for customs compliance and that BootHop is a platform for sending{' '}
-                  <strong>personal effects, letters, and small parcels only</strong>. BootHop is not responsible or obligated for items transported.{' '}
-                  <Link href="/customs" className="text-blue-600 underline hover:text-blue-700">
-                    View customs regulations
-                  </Link>
-                </span>
-              </label>
+              {/* Checkboxes */}
+              <div className="space-y-3">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" checked={acceptedCustoms}
+                    onChange={(e) => setAcceptedCustoms(e.target.checked)} required
+                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                  <span className="text-sm text-slate-600 leading-relaxed">
+                    I understand I am responsible for customs compliance. BootHop handles{' '}
+                    <strong className="text-slate-800">personal effects, letters, and small parcels only</strong> and is not
+                    liable for transported items.
+                  </span>
+                </label>
 
-              <label className="flex items-start">
-                <input
-                  type="checkbox"
-                  checked={acceptedTerms}
-                  onChange={(e) => setAcceptedTerms(e.target.checked)}
-                  className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  required
-                />
-                <span className="ml-3 text-sm text-gray-700">
-                  I agree to the{' '}
-                  <Link href="/terms" className="text-blue-600 underline hover:text-blue-700">
-                    Terms of Service
-                  </Link>
-                  {' '}and{' '}
-                  <Link href="/privacy" className="text-blue-600 underline hover:text-blue-700">
-                    Privacy Policy
-                  </Link>
-                </span>
-              </label>
-            </div>
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)} required
+                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                  <span className="text-sm text-slate-600">
+                    I agree to the{' '}
+                    <Link href="/terms" className="text-blue-600 underline">Terms of Service</Link>{' '}
+                    and{' '}
+                    <Link href="/privacy" className="text-blue-600 underline">Privacy Policy</Link>
+                  </span>
+                </label>
+              </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </button>
-          </form>
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 px-4 rounded-xl transition-all shadow-sm hover:shadow-md"
+              >
+                {loading ? 'Creating account…' : 'Create Free Account'}
+              </button>
 
-          {/* Sign In Link */}
-          <div className="mt-6 text-center text-sm text-gray-600">
-            Already have an account?{' '}
-            <Link href="/login" className="text-blue-600 font-semibold hover:text-blue-700">
-              Sign in
-            </Link>
+              <p className="text-center text-xs text-slate-400">
+                Free to join · No subscription · Cancel anytime
+              </p>
+            </form>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterForm />
+    </Suspense>
   );
 }

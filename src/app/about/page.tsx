@@ -23,9 +23,6 @@ export default function AboutPage() {
               <Link href="/pricing" className="text-gray-600 hover:text-gray-900">
                 Pricing
               </Link>
-              <Link href="/customs" className="text-gray-600 hover:text-gray-900">
-                Customs Info
-              </Link>
             </div>
 
             <div className="flex items-center space-x-4">
@@ -309,7 +306,6 @@ export default function AboutPage() {
             <div>
               <h4 className="font-semibold text-white mb-4">Legal</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/customs" className="hover:text-white">Customs & Regulations</Link></li>
                 <li><Link href="/terms" className="hover:text-white">Terms of Service</Link></li>
                 <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
               </ul>

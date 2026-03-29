@@ -3,16 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-
-  Package, 
+import {
+  Package,
   Users,
   TrendingUp,
   DollarSign,
   CheckCircle,
   AlertCircle,
   BarChart,
-  Settings
+  Settings,
+  ShieldAlert,
 } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
 
@@ -384,6 +384,15 @@ export default function AdminDashboard() {
             <Settings className="h-12 w-12 text-purple-600 mx-auto mb-3" />
             <h3 className="font-bold text-gray-900 mb-1">Platform Settings</h3>
             <p className="text-sm text-gray-600">Configure platform options</p>
+          </Link>
+
+          <Link
+            href="/admin/compliance"
+            className="bg-white rounded-xl shadow-sm border-2 border-amber-200 p-6 hover:border-amber-500 transition text-center"
+          >
+            <ShieldAlert className="h-12 w-12 text-amber-500 mx-auto mb-3" />
+            <h3 className="font-bold text-gray-900 mb-1">Compliance Queue</h3>
+            <p className="text-sm text-gray-600">Review flagged shipments</p>
           </Link>
         </div>
       </div>

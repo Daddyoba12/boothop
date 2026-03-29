@@ -26,7 +26,7 @@ type JourneyWithProfile = Journey & {
 
 export default function BrowseJourneysPage() {
   const router = useRouter();
- /* const supabase = createClientComponentClient();*/
+ /* const supabase = createSupabaseClient();*/
  const supabase = createSupabaseClient()
 
   

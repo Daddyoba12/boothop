@@ -25,7 +25,7 @@ type RequestWithProfile = DeliveryRequest & {
 
 export default function BrowseRequestsPage() {
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createSupabaseClient();
   
   const [requests, setRequests] = useState<RequestWithProfile[]>([]);
   const [loading, setLoading] = useState(true);

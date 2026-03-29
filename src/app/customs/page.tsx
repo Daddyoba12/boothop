@@ -1,427 +1,583 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
-import { Package, AlertTriangle, ExternalLink, Shield, FileText, Globe } from 'lucide-react';
+import {
+  ShieldCheck, ShieldAlert, ShieldX, Loader2, Activity,
+  ChevronDown, ChevronUp, Globe, AlertTriangle, CheckCircle2,
+  XCircle, Info, Package, FileText, Search,
+} from 'lucide-react';
 
+// ── Types ─────────────────────────────────────────────────────────────────────
+interface CheckResult {
+  item:        string;
+  country:     string;
+  category:    string;
+  riskScore:   number;
+  rulesStatus: string;
+  decision: {
+    status:  string;
+    action:  string;
+    label:   string;
+    color:   'green' | 'amber' | 'red';
+    message: string;
+  };
+  breakdown: {
+    itemScore:     number;
+    countryScore:  number;
+    userScore:     number;
+    valueScore:    number;
+    quantityScore: number;
+  };
+}
+
+// ── Country data ───────────────────────────────────────────────────────────────
+const countries = [
+  'United Kingdom','Nigeria','United States','Canada','Germany','France',
+  'UAE','Saudi Arabia','China','India','Australia','South Africa',
+  'Kenya','Ghana','Netherlands','Italy','Spain','Ireland','Singapore','Japan',
+];
+
+const countryTier: Record<string, 'strict' | 'moderate' | 'standard'> = {
+  'UAE': 'strict', 'Saudi Arabia': 'strict', 'Singapore': 'strict',
+  'China': 'moderate', 'Nigeria': 'moderate', 'India': 'moderate',
+};
+
+const tierLabel = { strict: 'Strict', moderate: 'Moderate', standard: 'Standard' };
+const tierColor = {
+  strict:   'bg-red-100 text-red-700',
+  moderate: 'bg-amber-100 text-amber-700',
+  standard: 'bg-green-100 text-green-700',
+};
+
+// ── Color map ──────────────────────────────────────────────────────────────────
+const colorMap = {
+  green: {
+    icon:   <ShieldCheck className="h-6 w-6" />,
+    bg:     'bg-green-50', border: 'border-green-200',
+    text:   'text-green-700', bar: 'bg-green-500',
+    badge:  'bg-green-100 text-green-800',
+  },
+  amber: {
+    icon:   <ShieldAlert className="h-6 w-6" />,
+    bg:     'bg-amber-50', border: 'border-amber-200',
+    text:   'text-amber-700', bar: 'bg-amber-500',
+    badge:  'bg-amber-100 text-amber-800',
+  },
+  red: {
+    icon:   <ShieldX className="h-6 w-6" />,
+    bg:     'bg-red-50', border: 'border-red-200',
+    text:   'text-red-700', bar: 'bg-red-500',
+    badge:  'bg-red-100 text-red-800',
+  },
+};
+
+// ── Documents by status ────────────────────────────────────────────────────────
+const docsForStatus: Record<string, { name: string; desc: string }[]> = {
+  ALLOWED: [
+    { name: 'Commercial / Gift Invoice',    desc: 'Required for all international parcels — list item, value and purpose.' },
+    { name: 'Packing List',                 desc: 'Contents, quantity and weight of the parcel.' },
+  ],
+  RESTRICTED: [
+    { name: 'Commercial / Gift Invoice',    desc: 'Required for all international parcels.' },
+    { name: 'Packing List',                 desc: 'Contents, quantity and weight.' },
+    { name: 'Import / Export Licence',      desc: 'May be required for restricted goods — check destination country rules.' },
+    { name: 'Health / Phytosanitary Cert',  desc: 'Required for food, plants or animal products.' },
+    { name: 'Prescription (if applicable)', desc: 'Required for medications or controlled substances.' },
+  ],
+  PROHIBITED: [],
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
 export default function CustomsPage() {
-  const countries = [
-    { code: 'GB', name: 'United Kingdom', url: 'https://www.gov.uk/government/organisations/hm-revenue-customs' },
-    { code: 'US', name: 'United States', url: 'https://www.cbp.gov/' },
-    { code: 'EU', name: 'European Union', url: 'https://ec.europa.eu/taxation_customs/index_en' },
-    { code: 'CA', name: 'Canada', url: 'https://www.cbsa-asfc.gc.ca/' },
-    { code: 'AU', name: 'Australia', url: 'https://www.abf.gov.au/' },
-    { code: 'NZ', name: 'New Zealand', url: 'https://www.customs.govt.nz/' },
-    { code: 'JP', name: 'Japan', url: 'https://www.customs.go.jp/english/' },
-    { code: 'SG', name: 'Singapore', url: 'https://www.customs.gov.sg/' },
-    { code: 'AE', name: 'UAE', url: 'https://www.fca.gov.ae/' },
-    { code: 'ZA', name: 'South Africa', url: 'https://www.sars.gov.za/' },
-    { code: 'NG', name: 'Nigeria', url: 'https://customs.gov.ng/' },
-    { code: 'IN', name: 'India', url: 'https://www.cbic.gov.in/' },
-  ];
+  const [item,      setItem]      = useState('');
+  const [country,   setCountry]   = useState('');
+  const [value,     setValue]     = useState('');
+  const [quantity,  setQuantity]  = useState('1');
+  const [result,    setResult]    = useState<CheckResult | null>(null);
+  const [loading,   setLoading]   = useState(false);
+  const [error,     setError]     = useState<string | null>(null);
+  const [expanded,  setExpanded]  = useState<string | null>(null);
 
-  const prohibitedItems = [
-    'Illegal drugs or controlled substances',
-    'Weapons, firearms, ammunition, or explosives',
-    'Counterfeit goods or pirated materials',
-    'Hazardous or flammable materials',
-    'Live animals or plants (without permits)',
-    'Human remains',
-    'Stolen property or items',
-    'Items violating intellectual property rights',
-    'Pornographic or obscene materials (where illegal)',
-    'Tobacco products (without proper documentation)',
-  ];
+  const canCheck = item.trim() && country && Number(value) > 0;
+
+  const runCheck = async () => {
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    try {
+      const res = await fetch('/api/compliance/check', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item:     item.trim(),
+          country,
+          value:    Number(value),
+          quantity: Number(quantity),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Check failed');
+      setResult(data as CheckResult);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cfg = result ? colorMap[result.decision.color] : null;
+  const docs = result ? (docsForStatus[result.decision.status] ?? docsForStatus.ALLOWED) : [];
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center space-x-2">
-              <Package className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">BootHop</span>
-            </Link>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/about" className="text-gray-600 hover:text-gray-900">
-                About Us
-              </Link>
-              <Link href="/how-it-works" className="text-gray-600 hover:text-gray-900">
-                How It Works
-              </Link>
-              <Link href="/pricing" className="text-gray-600 hover:text-gray-900">
-                Pricing
-              </Link>
-              <Link href="/customs" className="text-blue-600 font-semibold">
-                Customs Info
-              </Link>
-            </div>
+    <div className="min-h-screen bg-slate-50">
 
-            <div className="flex items-center space-x-4">
-              <Link href="/login" className="text-gray-600 hover:text-gray-900">
-                Login
-              </Link>
-              <Link 
-                href="/register" 
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-              >
-                Get Started
-              </Link>
-            </div>
+      {/* ── Nav ────────────────────────────────────────────────────────── */}
+      <nav className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <Package className="h-7 w-7 text-blue-600" />
+            <span className="text-xl font-bold text-slate-900">BootHop</span>
+          </Link>
+          <div className="flex items-center gap-6 text-sm font-medium">
+            <Link href="/how-it-works" className="text-slate-500 hover:text-slate-900 transition">How It Works</Link>
+            <Link href="/pricing"      className="text-slate-500 hover:text-slate-900 transition">Pricing</Link>
+            <Link href="/customs"      className="text-blue-600 font-semibold">Customs</Link>
+            <Link href="/login"        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition">
+              Sign In
+            </Link>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-12 px-4 bg-gradient-to-b from-yellow-50 to-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="flex justify-center mb-6">
-            <div className="p-4 bg-yellow-100 rounded-full">
-              <AlertTriangle className="h-12 w-12 text-yellow-600" />
-            </div>
+      {/* ── Hero ───────────────────────────────────────────────────────── */}
+      <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white py-20 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1.5 text-blue-300 text-sm font-medium mb-6">
+            <ShieldCheck className="h-4 w-4" />
+            Powered by BootHop Compliance Engine
           </div>
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">Customs & Regulations</h1>
-          <p className="text-xl text-gray-600">
-            Important information about international shipping responsibilities
+          <h1 className="text-4xl sm:text-5xl font-bold mb-5 leading-tight">
+            Customs &amp; Declaration
+            <span className="block text-blue-400 mt-1">Know Before You Ship</span>
+          </h1>
+          <p className="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto">
+            Instantly check whether your item is allowed, restricted, or prohibited at your
+            destination — powered by our own real-time compliance engine covering 20 countries.
           </p>
         </div>
-      </section>
+      </div>
 
-      {/* Warning Banner */}
-      <section className="px-4 pb-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-lg">
-            <div className="flex items-start">
-              <AlertTriangle className="h-6 w-6 text-red-500 mr-3 flex-shrink-0 mt-1" />
+      <div className="max-w-6xl mx-auto px-6 py-14 space-y-14">
+
+        {/* ── Compliance Checker ─────────────────────────────────────── */}
+        <section>
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Item Compliance Checker</h2>
+            <p className="text-slate-500">Enter your item details to get an instant compliance verdict and risk score.</p>
+          </div>
+
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden max-w-3xl mx-auto">
+            <div className="p-8 space-y-5">
+              {/* Item */}
               <div>
-                <h3 className="text-lg font-bold text-red-900 mb-2">Critical Information</h3>
-                <p className="text-red-800">
-                  <strong>BootHop is a platform for sending personal effects, letters, and small parcels only.</strong> 
-                  We are NOT responsible or obligated for items transported. Both Booters and Hoopers are independently 
-                  responsible for understanding and complying with all customs regulations.
-                </p>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Item Description</label>
+                <input
+                  type="text"
+                  value={item}
+                  onChange={(e) => setItem(e.target.value)}
+                  placeholder="e.g. iPhone 15, Perfume, Vitamins, Trainers…"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Your Responsibility */}
-      <section className="py-12 px-4 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Your Responsibility</h2>
-          
-          <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <div className="flex items-start">
-                <Shield className="h-6 w-6 text-blue-600 mr-3 flex-shrink-0 mt-1" />
+              {/* Country + Value + Qty */}
+              <div className="grid sm:grid-cols-3 gap-4">
+                <div className="sm:col-span-1">
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Destination Country</label>
+                  <select
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  >
+                    <option value="">Select country…</option>
+                    {countries.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2">Both Parties Must:</h3>
-                  <ul className="space-y-2 text-gray-700">
-                    <li className="flex items-start">
-                      <span className="mr-2">✓</span>
-                      <span>Verify that items are legal to export from the departure country</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">✓</span>
-                      <span>Verify that items are legal to import into the destination country</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">✓</span>
-                      <span>Declare all items accurately and honestly</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">✓</span>
-                      <span>Pay any applicable duties, taxes, or fees</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">✓</span>
-                      <span>Obtain necessary permits or licenses (if required)</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">✓</span>
-                      <span>Provide proper documentation (invoices, receipts, etc.)</span>
-                    </li>
-                  </ul>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Declared Value (£)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                    placeholder="e.g. 150"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-              <div className="flex items-start">
-                <FileText className="h-6 w-6 text-gray-600 mr-3 flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2">Before Posting or Accepting:</h3>
-                  <ul className="space-y-2 text-gray-700">
-                    <li className="flex items-start">
-                      <span className="mr-2">1.</span>
-                      <span>Check departure country export regulations</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">2.</span>
-                      <span>Check destination country import regulations</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">3.</span>
-                      <span>Understand potential duty and tax obligations</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">4.</span>
-                      <span>Ensure proper packaging and labeling</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">5.</span>
-                      <span>Keep copies of all documentation</span>
-                    </li>
-                  </ul>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Quantity</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    placeholder="1"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Prohibited Items */}
-      <section className="py-12 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Strictly Prohibited Items</h2>
-          
-          <div className="bg-red-50 border-2 border-red-200 rounded-lg p-8">
-            <p className="font-bold text-red-900 mb-6 text-lg">
-              BootHop STRICTLY PROHIBITS the transport of the following items:
-            </p>
-            
-            <div className="grid md:grid-cols-2 gap-4">
-              {prohibitedItems.map((item, index) => (
-                <div key={index} className="flex items-start bg-white p-4 rounded-lg border border-red-200">
-                  <span className="text-red-600 font-bold mr-3">❌</span>
-                  <span className="text-gray-900">{item}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 p-4 bg-white rounded-lg border-2 border-red-300">
-              <p className="text-red-900 font-semibold">
-                ⚠️ Violation of these prohibitions may result in immediate account suspension, 
-                legal action, and notification to relevant authorities.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Customs Resources */}
-      <section className="py-12 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <Globe className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Customs Authority Resources</h2>
-            <p className="text-gray-600">
-              Links to official customs websites by country
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {countries.map((country) => (
-              <a
-                key={country.code}
-                href={country.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between p-4 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-lg transition group"
+              {/* CTA */}
+              <button
+                onClick={runCheck}
+                disabled={!canCheck || loading}
+                className={`w-full py-3.5 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 ${
+                  canCheck && !loading
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
+                    : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                }`}
               >
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 group-hover:bg-blue-200 transition">
-                    <span className="text-lg font-bold text-blue-600">{country.code}</span>
-                  </div>
-                  <span className="font-semibold text-gray-900">{country.name}</span>
+                {loading
+                  ? <><Loader2 className="h-4 w-4 animate-spin" /> Checking…</>
+                  : <><Search className="h-4 w-4" /> Check Compliance</>}
+              </button>
+
+              {!canCheck && (
+                <p className="text-center text-xs text-slate-400">Fill in item, destination country, and declared value to run a check.</p>
+              )}
+            </div>
+
+            {/* ── Result ─────────────────────────────────────────────── */}
+            {error && (
+              <div className="border-t border-slate-100 px-8 py-5">
+                <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                  <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700">{error}</p>
                 </div>
-                <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition" />
-              </a>
+              </div>
+            )}
+
+            {result && cfg && (
+              <div className="border-t border-slate-100">
+                {/* Status banner */}
+                <div className={`${cfg.bg} border-b ${cfg.border} px-8 py-5 flex items-start gap-4`}>
+                  <span className={cfg.text}>{cfg.icon}</span>
+                  <div className="flex-1">
+                    <p className={`font-bold text-base ${cfg.text}`}>{result.decision.label}</p>
+                    <p className={`text-sm mt-0.5 ${cfg.text} opacity-90`}>{result.decision.message}</p>
+                  </div>
+                </div>
+
+                <div className="px-8 py-6 space-y-6">
+                  {/* Risk score */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
+                        <Activity className="h-4 w-4" /> Risk Score
+                      </div>
+                      <span className="text-2xl font-bold text-slate-900">{result.riskScore}<span className="text-sm text-slate-400 font-normal">/100</span></span>
+                    </div>
+                    <div className="w-full bg-slate-100 rounded-full h-3">
+                      <div className={`h-3 rounded-full ${cfg.bar} transition-all`} style={{ width: `${result.riskScore}%` }} />
+                    </div>
+                    {/* Breakdown */}
+                    <div className="mt-3 grid grid-cols-5 gap-2 text-center">
+                      {[
+                        { label: 'Item',    v: result.breakdown.itemScore },
+                        { label: 'Country', v: result.breakdown.countryScore },
+                        { label: 'User',    v: result.breakdown.userScore },
+                        { label: 'Value',   v: result.breakdown.valueScore },
+                        { label: 'Qty',     v: result.breakdown.quantityScore },
+                      ].map((b) => (
+                        <div key={b.label} className="bg-slate-50 rounded-lg py-2 border border-slate-100">
+                          <p className="text-xs text-slate-400">{b.label}</p>
+                          <p className="text-sm font-bold text-slate-700">+{b.v}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Category pill */}
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">Item Category</span>
+                    <span className="capitalize text-sm font-semibold bg-slate-100 text-slate-700 px-3 py-1 rounded-full">
+                      {result.category}
+                    </span>
+                  </div>
+
+                  {/* Documents required */}
+                  {docs.length > 0 && (
+                    <div>
+                      <p className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-slate-500" /> Required Documents
+                      </p>
+                      <ul className="space-y-2.5">
+                        {docs.map((d) => (
+                          <li key={d.name} className="flex items-start gap-3 bg-slate-50 rounded-xl px-4 py-3">
+                            <CheckCircle2 className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-sm font-semibold text-slate-800">{d.name}</p>
+                              <p className="text-xs text-slate-500 mt-0.5">{d.desc}</p>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {result.decision.action === 'BLOCK' && (
+                    <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                      <XCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-red-700 font-medium">
+                        This item cannot be shipped via BootHop to this destination. Please choose a different item or destination.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ── How it works ───────────────────────────────────────────── */}
+        <section>
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">How Our Compliance Engine Works</h2>
+            <p className="text-slate-500">Five factors combine to give every shipment a precise risk score.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {[
+              { icon: <Package className="h-5 w-5" />,      title: 'Item Type',       desc: 'Weapon, drug, food, electronics and 11 more categories — each carries a base risk.' },
+              { icon: <Globe className="h-5 w-5" />,         title: 'Country Tier',    desc: 'Strict, Moderate, or Standard — reflects how closely the destination enforces rules.' },
+              { icon: <ShieldCheck className="h-5 w-5" />,   title: 'User Profile',    desc: 'Verified & experienced users benefit from a lower risk contribution.' },
+              { icon: <Activity className="h-5 w-5" />,      title: 'Declared Value',  desc: 'Higher-value goods face increased scrutiny at customs.' },
+              { icon: <Info className="h-5 w-5" />,          title: 'Quantity',        desc: 'Bulk quantities may trigger commercial import rules.' },
+            ].map((s) => (
+              <div key={s.title} className="bg-white rounded-2xl border border-slate-200 p-5 text-center">
+                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 mx-auto mb-3">
+                  {s.icon}
+                </div>
+                <p className="font-semibold text-slate-900 text-sm mb-1">{s.title}</p>
+                <p className="text-xs text-slate-500 leading-relaxed">{s.desc}</p>
+              </div>
             ))}
           </div>
+        </section>
 
-          <div className="mt-8 text-center">
-            <p className="text-gray-600 mb-4">Don't see your country listed?</p>
-            <Link 
-              href="/contact"
-              className="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold"
+        {/* ── Decision levels ────────────────────────────────────────── */}
+        <section>
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Decision Levels</h2>
+            <p className="text-slate-500">Every check returns one of three outcomes.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              {
+                icon:   <ShieldCheck className="h-7 w-7 text-green-600" />,
+                label:  'Allowed',
+                score:  'Score 0–49',
+                color:  'border-green-200 bg-green-50',
+                text:   'text-green-700',
+                bullet: 'bg-green-400',
+                points: [
+                  'No import restrictions found',
+                  'Standard documents apply',
+                  'Proceed to book your delivery',
+                ],
+              },
+              {
+                icon:   <ShieldAlert className="h-7 w-7 text-amber-600" />,
+                label:  'Restricted — Admin Review',
+                score:  'Score 50–79',
+                color:  'border-amber-200 bg-amber-50',
+                text:   'text-amber-700',
+                bullet: 'bg-amber-400',
+                points: [
+                  'Import licence or declaration required',
+                  'Flagged for admin review before matching',
+                  'You may need to provide extra documents',
+                ],
+              },
+              {
+                icon:   <ShieldX className="h-7 w-7 text-red-600" />,
+                label:  'Blocked',
+                score:  'Score 80–100 or Prohibited',
+                color:  'border-red-200 bg-red-50',
+                text:   'text-red-700',
+                bullet: 'bg-red-400',
+                points: [
+                  'Item or route is prohibited',
+                  'Booking cannot proceed',
+                  'Choose a different item or destination',
+                ],
+              },
+            ].map((d) => (
+              <div key={d.label} className={`rounded-2xl border ${d.color} p-6`}>
+                <div className="flex items-center gap-3 mb-4">
+                  {d.icon}
+                  <div>
+                    <p className={`font-bold text-sm ${d.text}`}>{d.label}</p>
+                    <p className="text-xs text-slate-400">{d.score}</p>
+                  </div>
+                </div>
+                <ul className="space-y-2">
+                  {d.points.map((p) => (
+                    <li key={p} className="flex items-start gap-2 text-sm text-slate-700">
+                      <span className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${d.bullet}`} />
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Country browser ────────────────────────────────────────── */}
+        <section>
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Country Risk Tiers</h2>
+            <p className="text-slate-500">Click any country to see its restrictions.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {countries.map((c) => {
+              const tier = countryTier[c] ?? 'standard';
+              const isOpen = expanded === c;
+              return (
+                <div key={c} className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                  <button
+                    onClick={() => setExpanded(isOpen ? null : c)}
+                    className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-slate-50 transition"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Globe className="h-4 w-4 text-slate-400 flex-shrink-0" />
+                      <span className="text-sm font-semibold text-slate-800">{c}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${tierColor[tier]}`}>
+                        {tierLabel[tier]}
+                      </span>
+                      {isOpen ? <ChevronUp className="h-3.5 w-3.5 text-slate-400" /> : <ChevronDown className="h-3.5 w-3.5 text-slate-400" />}
+                    </div>
+                  </button>
+                  {isOpen && (
+                    <div className="border-t border-slate-100 px-4 py-3 space-y-3 bg-slate-50 text-xs">
+                      <div>
+                        <p className="font-semibold text-red-600 mb-1.5 flex items-center gap-1.5">
+                          <XCircle className="h-3.5 w-3.5" /> Prohibited
+                        </p>
+                        <button
+                          onClick={() => { setCountry(c); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                          className="mt-2 text-xs text-blue-600 hover:underline font-medium"
+                        >
+                          Check an item for {c} →
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ── General guidelines ─────────────────────────────────────── */}
+        <section className="bg-white rounded-3xl border border-slate-200 p-8 sm:p-10">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <FileText className="h-5 w-5 text-blue-600" /> General Customs Guidelines
+          </h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            {[
+              {
+                heading: 'Your Responsibilities',
+                items: [
+                  'Declare the true value and nature of your items',
+                  'Ensure you have valid receipts or invoices for high-value goods',
+                  'Comply with both the origin and destination country\'s import rules',
+                  'Never ask a Booter to underdeclare or misdeclare items',
+                ],
+              },
+              {
+                heading: 'Booter (Traveller) Responsibilities',
+                items: [
+                  'You are legally responsible for items you carry across borders',
+                  'Declare all items at customs when requested',
+                  'Refuse any item you are not comfortable declaring',
+                  'Keep the BootHop invoice and packing list handy',
+                ],
+              },
+              {
+                heading: 'What Counts as Personal Effects?',
+                items: [
+                  'Clothing, shoes and personal accessories',
+                  'Small electronics for personal use (not for resale)',
+                  'Books, documents and printed materials',
+                  'Gifts under the destination country\'s duty-free threshold',
+                ],
+              },
+              {
+                heading: 'Prohibited Across All Routes',
+                items: [
+                  'Narcotics, drugs and controlled substances',
+                  'Weapons, ammunition and explosives',
+                  'Counterfeit or pirated goods',
+                  'Live animals (unless under CITES permit)',
+                ],
+              },
+            ].map((g) => (
+              <div key={g.heading}>
+                <p className="font-semibold text-slate-900 mb-3">{g.heading}</p>
+                <ul className="space-y-2">
+                  {g.items.map((it) => (
+                    <li key={it} className="flex items-start gap-2 text-sm text-slate-600">
+                      <CheckCircle2 className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                      {it}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── CTA ────────────────────────────────────────────────────── */}
+        <section className="text-center bg-gradient-to-r from-blue-600 to-blue-700 rounded-3xl p-12 text-white">
+          <h2 className="text-2xl font-bold mb-3">Ready to Ship?</h2>
+          <p className="text-blue-100 mb-7 max-w-lg mx-auto">
+            Once your item passes the compliance check, post your delivery request and get matched with a verified Booter.
+          </p>
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <Link
+              href="/requests/create"
+              className="bg-white text-blue-700 font-semibold px-7 py-3 rounded-xl hover:bg-blue-50 transition shadow-sm"
             >
-              Contact us to add more countries
-              <ExternalLink className="ml-2 h-4 w-4" />
+              Post a Delivery Request
+            </Link>
+            <Link
+              href="/how-it-works"
+              className="border border-white/40 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition"
+            >
+              How It Works
             </Link>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Delivery Type Guidance */}
-      <section className="py-12 px-4 bg-blue-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">When Do Customs Regulations Apply?</h2>
-          
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg p-6 border-2 border-blue-200">
-              <h3 className="font-bold text-xl text-gray-900 mb-4">✅ International Deliveries</h3>
-              <p className="text-gray-700 mb-4">
-                <strong>Full customs compliance required</strong> when crossing international borders.
-              </p>
-              <ul className="space-y-2 text-gray-600 text-sm">
-                <li>• Declaration forms required</li>
-                <li>• Duties and taxes may apply</li>
-                <li>• Items may be inspected</li>
-                <li>• Proper documentation essential</li>
-              </ul>
-            </div>
+      </div>
 
-            <div className="bg-white rounded-lg p-6 border-2 border-green-200">
-              <h3 className="font-bold text-xl text-gray-900 mb-4">✅ Domestic Deliveries</h3>
-              <p className="text-gray-700 mb-4">
-                <strong>Simplified process</strong> for deliveries within the same country.
-              </p>
-              <ul className="space-y-2 text-gray-600 text-sm">
-                <li>• No customs declarations</li>
-                <li>• No import duties</li>
-                <li>• Faster process</li>
-                <li>• Still subject to local laws</li>
-              </ul>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 border-2 border-purple-200">
-              <h3 className="font-bold text-xl text-gray-900 mb-4">✅ Within EU/Schengen</h3>
-              <p className="text-gray-700 mb-4">
-                <strong>Reduced requirements</strong> for travel within the European Union.
-              </p>
-              <ul className="space-y-2 text-gray-600 text-sm">
-                <li>• Generally no customs checks</li>
-                <li>• Free movement of goods</li>
-                <li>• Some restrictions still apply</li>
-                <li>• Check specific regulations</li>
-              </ul>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 border-2 border-orange-200">
-              <h3 className="font-bold text-xl text-gray-900 mb-4">⚠️ Special Cases</h3>
-              <p className="text-gray-700 mb-4">
-                <strong>Extra caution needed</strong> for certain items or routes.
-              </p>
-              <ul className="space-y-2 text-gray-600 text-sm">
-                <li>• High-value items (over $800)</li>
-                <li>• Electronics and batteries</li>
-                <li>• Food and agricultural products</li>
-                <li>• Medications and supplements</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Liability Statement */}
-      <section className="py-12 px-4 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Liability & Disclaimer</h2>
-          
-          <div className="bg-gray-50 border-l-4 border-gray-400 p-6 rounded-r-lg space-y-4 text-gray-700">
-            <p className="font-semibold text-gray-900">
-              BootHop is a platform that connects travelers (Booters) with senders (Hoopers).
-            </p>
-            
-            <div>
-              <h3 className="font-bold text-gray-900 mb-2">YOU are responsible for:</h3>
-              <ul className="space-y-1 ml-4">
-                <li>• Complying with all applicable laws and regulations</li>
-                <li>• Declaring items accurately and honestly</li>
-                <li>• Paying any duties, taxes, or fees that may be owed</li>
-                <li>• Ensuring items are legal in both departure and destination countries</li>
-                <li>• Obtaining necessary permits, licenses, or approvals</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-bold text-gray-900 mb-2">BootHop is NOT responsible for:</h3>
-              <ul className="space-y-1 ml-4">
-                <li>• Customs seizures or confiscations</li>
-                <li>• Legal violations by users</li>
-                <li>• Duties, taxes, or fees owed</li>
-                <li>• Delays caused by customs inspections</li>
-                <li>• Items prohibited by law in any jurisdiction</li>
-                <li>• Penalties or fines incurred by users</li>
-              </ul>
-            </div>
-
-            <div className="bg-yellow-50 border border-yellow-300 rounded p-4 mt-4">
-              <p className="text-yellow-900 font-semibold">
-                ⚠️ By using BootHop, you acknowledge that you are solely responsible for customs compliance 
-                and that BootHop provides only a platform to connect users. We strongly advise consulting 
-                with customs authorities or legal professionals if you have any doubts.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-12 px-4 bg-blue-600">
-        <div className="max-w-4xl mx-auto text-center text-white">
-          <h2 className="text-3xl font-bold mb-4">Understand Your Responsibilities?</h2>
-          <p className="text-xl mb-8">
-            Start using BootHop for personal effects, letters, and small parcels
-          </p>
-          <Link 
-            href="/register"
-            className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition"
-          >
-            Get Started
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Package className="h-8 w-8 text-blue-400" />
-                <span className="text-xl font-bold text-white">BootHop</span>
-              </div>
-              <p className="text-sm">
-                Connecting the world, one journey at a time.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-white mb-4">Platform</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/how-it-works" className="hover:text-white">How It Works</Link></li>
-                <li><Link href="/pricing" className="hover:text-white">Pricing & Fees</Link></li>
-                <li><Link href="/trust-safety" className="hover:text-white">Trust & Safety</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-white mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/customs" className="hover:text-white">Customs & Regulations</Link></li>
-                <li><Link href="/terms" className="hover:text-white">Terms of Service</Link></li>
-                <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-white mb-4">Support</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/help" className="hover:text-white">Help Center</Link></li>
-                <li><Link href="/contact" className="hover:text-white">Contact Us</Link></li>
-                <li><Link href="/about" className="hover:text-white">About Us</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 pt-8 text-center text-sm">
-            <p>© 2024 BootHop. All rights reserved.</p>
+      {/* ── Footer ─────────────────────────────────────────────────────── */}
+      <footer className="border-t border-slate-200 bg-white mt-6 py-8 px-6">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+          <p>© {new Date().getFullYear()} BootHop. All rights reserved.</p>
+          <div className="flex items-center gap-5">
+            <Link href="/terms"   className="hover:text-slate-900 transition">Terms</Link>
+            <Link href="/privacy" className="hover:text-slate-900 transition">Privacy</Link>
+            <Link href="/customs" className="text-blue-600 font-medium">Customs</Link>
           </div>
         </div>
       </footer>
     </div>
   );
 }
-
