@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  Users, Package, DollarSign, AlertTriangle, 
+  Users, User, Package, DollarSign, AlertTriangle, 
   CheckCircle, XCircle, Shield, Search, Filter,
   Eye, Ban, Mail, Calendar, MapPin, Loader2,
   TrendingUp, Activity, Download, RefreshCw
