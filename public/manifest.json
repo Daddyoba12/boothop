@@ -1,0 +1,52 @@
+{
+  "name": "BootHop – Ship Anything. Anywhere.",
+  "short_name": "BootHop",
+  "description": "Peer-to-peer international delivery. Connect verified travellers with senders worldwide.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0f1e",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["travel", "shopping", "logistics"],
+  "icons": [
+    {
+      "src": "/images/boothop.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/boothop.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Send a Package",
+      "short_name": "Send",
+      "description": "Post a delivery request",
+      "url": "/intent",
+      "icons": [{ "src": "/images/boothop.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "I'm Travelling",
+      "short_name": "Travel",
+      "description": "Post your trip and earn",
+      "url": "/intent",
+      "icons": [{ "src": "/images/boothop.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/boothop2 image.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "BootHop homepage"
+    }
+  ]
+}

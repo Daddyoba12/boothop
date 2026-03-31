@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { sendPaymentConfirmationEmail } from '@/lib/email';
 
 // ============================================================================
 // ELITE STRIPE WEBHOOK HANDLER
@@ -11,7 +12,7 @@ import { createClient } from '@supabase/supabase-js';
 // ============================================================================
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2026-02-25.clover',
   typescript: true,
 });
 
@@ -31,8 +32,10 @@ export async function POST(request: NextRequest) {
   
   try {
     const body = await request.text();
-    const headersList = headers();
-    const signature = headersList.get('stripe-signature');
+    
+     const headersList = await headers();
+const signature = headersList.get('stripe-signature');
+    
 
     if (!signature) {
       console.error('❌ Missing Stripe signature');
@@ -374,23 +377,57 @@ async function handlePaymentCanceled(paymentIntent: Stripe.PaymentIntent) {
 
 async function sendPaymentConfirmationEmails(matchId: string, customerEmail?: string | null) {
   console.log(`📧 Sending payment confirmation emails for match ${matchId}`);
-  
-  // Get match details
+
   const { data: match } = await supabase
     .from('matches')
     .select(`
       *,
-      sender_profile:sender_trip_id(user:user_id(email, full_name)),
-      traveler_profile:traveler_trip_id(user:user_id(email, full_name))
+      sender_trip:sender_trip_id(from_city, to_city, travel_date, user_id),
+      traveler_trip:traveler_trip_id(from_city, to_city, travel_date, user_id)
     `)
     .eq('id', matchId)
     .single();
 
-  if (match) {
-    // TODO: Integrate with email service (Resend, SendGrid, etc.)
-    console.log(`✉️  Would send email to sender: ${match.sender_profile?.user?.email}`);
-    console.log(`✉️  Would send email to traveler: ${match.traveler_profile?.user?.email}`);
-  }
+  if (!match) return;
+
+  // Fetch user emails via admin API
+  const { createClient: mkClient } = await import('@supabase/supabase-js');
+  const admin = mkClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const [{ data: senderData }, { data: travelerData }] = await Promise.all([
+    admin.auth.admin.getUserById(match.sender_trip?.user_id),
+    admin.auth.admin.getUserById(match.traveler_trip?.user_id),
+  ]);
+
+  const route    = `${match.sender_trip?.from_city} → ${match.sender_trip?.to_city}`;
+  const date     = match.sender_trip?.travel_date || '';
+  const amount   = `£${match.agreed_price || match.hooper_pays || 0}`;
+
+  await Promise.allSettled([
+    senderData?.user?.email && sendPaymentConfirmationEmail({
+      to:           senderData.user.email,
+      name:         senderData.user.user_metadata?.full_name || 'there',
+      amount,
+      role:         'sender',
+      from:         match.sender_trip?.from_city,
+      to_location:  match.sender_trip?.to_city,
+      transactionId: matchId,
+      date,
+    }),
+    travelerData?.user?.email && sendPaymentConfirmationEmail({
+      to:           travelerData.user.email,
+      name:         travelerData.user.user_metadata?.full_name || 'there',
+      amount:       `£${match.booter_receives || 0}`,
+      role:         'traveler',
+      from:         match.traveler_trip?.from_city,
+      to_location:  match.traveler_trip?.to_city,
+      transactionId: matchId,
+      date,
+    }),
+  ]);
 }
 
 async function sendPaymentFailureNotification(matchId: string) {
@@ -421,14 +458,14 @@ async function createMatchNotifications(matchId: string, type: string) {
     const notifications = [
       {
         match_id: matchId,
-        user_id: match.sender_trip.user_id,
+        user_id: (match.sender_trip as any)?.user_id,
         type,
         message: getNotificationMessage(type, 'sender'),
         read: false
       },
       {
         match_id: matchId,
-        user_id: match.traveler_trip.user_id,
+        user_id: (match.traveler_trip as any)?.user_id,
         type,
         message: getNotificationMessage(type, 'traveler'),
         read: false

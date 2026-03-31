@@ -148,7 +148,9 @@ export default function MatchDetailsPage() {
       const updatedMatch = { ...match, [updateField]: true };
       
       if (updatedMatch.sender_accepted && updatedMatch.traveler_accepted) {
-        await initiatePayment();
+        // Both accepted → update status then go to KYC
+        await supabase.from('matches').update({ status: 'accepted' }).eq('id', matchId);
+        router.push(`/kyc/${matchId}`);
       } else {
         alert('✅ Match accepted! Waiting for the other party to accept.');
         loadMatch();

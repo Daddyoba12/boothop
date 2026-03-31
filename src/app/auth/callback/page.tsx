@@ -66,15 +66,15 @@ export default function AuthCallbackPage() {
             
             // Redirect to home after 2 seconds
             setTimeout(() => {
-              router.push('/?registered=true');
+              router.push('/intent');
             }, 2000);
           } else {
             // No pending trip, just verified email
             setStatus('success');
             setMessage('Email verified successfully!');
-            
+
             setTimeout(() => {
-              router.push('/');
+              router.push('/intent');
             }, 2000);
           }
         } else {

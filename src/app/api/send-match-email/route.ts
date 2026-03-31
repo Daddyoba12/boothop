@@ -1,16 +1,12 @@
-import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { sendMatchNotificationEmail } from '@/lib/email';
 
 export async function POST(request: Request) {
   try {
     const { matchId } = await request.json();
+    const supabase = getSupabaseAdmin();
 
-    // Get match details
     const { data: match } = await supabase
       .from('matches')
       .select(`
@@ -25,40 +21,43 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Match not found' }, { status: 404 });
     }
 
-    // Get user emails
-    const { data: senderUser } = await supabase.auth.admin.getUserById(match.sender_trip.user_id);
+    const { data: senderUser }   = await supabase.auth.admin.getUserById(match.sender_trip.user_id);
     const { data: travelerUser } = await supabase.auth.admin.getUserById(match.traveler_trip.user_id);
 
-    // TODO: Integrate with Resend, SendGrid, or Supabase Edge Functions
-    // For now, we'll use Supabase's built-in email (you can enhance this)
-    
-    const emailContent = {
-      sender: {
-        to: senderUser?.user?.email,
-        subject: '🎉 You\'ve Been Matched on BootHop!',
-        body: `
-          <h1>Great news!</h1>
-          <p>A traveler heading from ${match.traveler_trip.from_city} to ${match.traveler_trip.to_city} on ${match.traveler_trip.travel_date} can carry your package.</p>
-          <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/matches/${matchId}">View Match Details</a></p>
-        `
-      },
-      traveler: {
-        to: travelerUser?.user?.email,
-        subject: '💰 New Delivery Opportunity on BootHop!',
-        body: `
-          <h1>Earn while you travel!</h1>
-          <p>Someone needs a package delivered from ${match.sender_trip.from_city} to ${match.sender_trip.to_city} on ${match.sender_trip.travel_date}.</p>
-          <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/matches/${matchId}">View Match Details</a></p>
-        `
-      }
-    };
+    const route  = `${match.sender_trip.from_city} → ${match.sender_trip.to_city}`;
+    const date   = match.sender_trip.travel_date || match.traveler_trip.travel_date;
+    const price  = match.agreed_price ? `£${match.agreed_price}` : 'To be agreed';
 
-    console.log('Emails to send:', emailContent);
+    const results = await Promise.allSettled([
+      senderUser?.user?.email && sendMatchNotificationEmail({
+        to:           senderUser.user.email,
+        name:         senderUser.user.user_metadata?.full_name || 'there',
+        matchedWith:  travelerUser?.user?.user_metadata?.full_name || 'a traveller',
+        from:         match.sender_trip.from_city,
+        to_location:  match.sender_trip.to_city,
+        date,
+        price,
+        matchId,
+      }),
+      travelerUser?.user?.email && sendMatchNotificationEmail({
+        to:           travelerUser.user.email,
+        name:         travelerUser.user.user_metadata?.full_name || 'there',
+        matchedWith:  senderUser?.user?.user_metadata?.full_name || 'a sender',
+        from:         match.traveler_trip.from_city,
+        to_location:  match.traveler_trip.to_city,
+        date,
+        price,
+        matchId,
+      }),
+    ]);
 
-    return NextResponse.json({ success: true, emailContent });
+    const errors = results.filter(r => r.status === 'rejected');
+    if (errors.length) console.error('Some match emails failed:', errors);
+
+    return NextResponse.json({ success: true, route });
 
   } catch (error) {
-    console.error('Email sending error:', error);
+    console.error('Match email error:', error);
     return NextResponse.json({ error: 'Email sending failed' }, { status: 500 });
   }
 }
