@@ -91,11 +91,21 @@ export default function DashboardPage() {
   };
 
   const getMatchStatus = (match: any) => {
-    if (match.status === 'completed') return { label: 'Completed', color: 'green', icon: CheckCircle };
-    if (match.status === 'accepted') return { label: 'In Progress', color: 'blue', icon: Clock };
-    if (match.status === 'pending') return { label: 'Pending', color: 'yellow', icon: Clock };
-    if (match.status === 'declined') return { label: 'Declined', color: 'red', icon: XCircle };
-    return { label: 'Unknown', color: 'gray', icon: AlertCircle };
+    switch (match.status) {
+      case 'matched':         return { label: 'Matched',       color: 'blue',   icon: Clock };
+      case 'pending':         return { label: 'Pending',       color: 'yellow', icon: Clock };
+      case 'accepted':        return { label: 'Accepted',      color: 'blue',   icon: Clock };
+      case 'kyc_pending':     return { label: 'ID Check',      color: 'violet', icon: Shield };
+      case 'kyc_complete':    return { label: 'ID Verified',   color: 'green',  icon: CheckCircle };
+      case 'payment_pending': return { label: 'Awaiting Pay',  color: 'amber',  icon: Clock };
+      case 'payment_held':    return { label: 'Escrow Held',   color: 'amber',  icon: Shield };
+      case 'active':          return { label: 'Active',        color: 'blue',   icon: CheckCircle };
+      case 'completed':       return { label: 'Completed',     color: 'green',  icon: CheckCircle };
+      case 'released':        return { label: 'Paid Out',      color: 'green',  icon: CheckCircle };
+      case 'declined':        return { label: 'Declined',      color: 'red',    icon: XCircle };
+      case 'cancelled':       return { label: 'Cancelled',     color: 'red',    icon: XCircle };
+      default:                return { label: match.status ?? 'Unknown', color: 'gray', icon: AlertCircle };
+    }
   };
 
   if (loading) {

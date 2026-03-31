@@ -77,36 +77,55 @@ export async function POST(request: Request) {
     // Create matches in database
     const createdMatches = [];
     for (const match of matches.slice(0, 3)) { // Top 3 matches
-      const sender_trip_id = newTrip.type === 'send' ? newTrip.id : match.id;
-      const traveler_trip_id = newTrip.type === 'travel' ? newTrip.id : match.id;
+      const isSender        = newTrip.type === 'send';
+      const sender_trip_id  = isSender ? newTrip.id : match.id;
+      const traveler_trip_id = isSender ? match.id : newTrip.id;
+      const sender_user_id  = isSender ? newTrip.user_id : match.user_id;
+      const traveler_user_id = isSender ? match.user_id : newTrip.user_id;
 
       const { data: matchRecord } = await supabase
         .from('matches')
         .insert([{
           sender_trip_id,
           traveler_trip_id,
-          status: 'pending'
+          sender_user_id,
+          traveler_user_id,
+          status:       'matched',
+          agreed_price: match.price || newTrip.price,
         }])
         .select()
         .single();
 
+      if (!matchRecord) continue;
       createdMatches.push(matchRecord);
 
-      // Create notifications for both users
+      // In-app notifications
       await supabase.from('notifications').insert([
         {
-          user_id: newTrip.user_id,
+          user_id:  newTrip.user_id,
           match_id: matchRecord.id,
-          type: 'new_match',
-          message: `New match found: ${match.from_city} → ${match.to_city}`
+          type:     'new_match',
+          message:  `New match found: ${match.from_city} → ${match.to_city}`,
         },
         {
-          user_id: match.user_id,
+          user_id:  match.user_id,
           match_id: matchRecord.id,
-          type: 'new_match',
-          message: `New match found: ${newTrip.from_city} → ${newTrip.to_city}`
-        }
+          type:     'new_match',
+          message:  `New match found: ${newTrip.from_city} → ${newTrip.to_city}`,
+        },
       ]);
+
+      // Fire Resend match emails
+      try {
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+        await fetch(`${appUrl}/api/send-match-email`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ matchId: matchRecord.id }),
+        });
+      } catch (emailErr) {
+        console.error('Match email failed (non-blocking):', emailErr);
+      }
     }
 
     return NextResponse.json({
