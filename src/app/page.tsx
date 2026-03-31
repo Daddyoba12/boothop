@@ -302,7 +302,7 @@ export default function HomePage() {
       <section className="relative flex min-h-screen items-center overflow-hidden">
         <div className="absolute inset-0">
           <Image src="/images/drealboothop.jpg" alt="BootHop community" fill priority className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-950/95 via-blue-950/85 to-slate-900/80" />
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-950/80 via-slate-900/75 to-slate-800/70" />
         </div>
         <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-20 pt-28 sm:px-6">
           <div className="mx-auto max-w-5xl text-center">
