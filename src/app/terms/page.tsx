@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { Shield, AlertTriangle, CheckCircle, Globe, FileText, Scale } from 'lucide-react';
+import BootHopLogo from '@/components/BootHopLogo';
 
 export const metadata = {
   title: 'Terms & Conditions – BootHop',
@@ -107,8 +107,8 @@ export default function TermsPage() {
       {/* NAV */}
       <nav className="fixed top-0 w-full z-50 border-b border-slate-100 bg-white/95 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <Image src="/images/boothop.png" alt="BootHop" width={160} height={44} className="h-10 w-auto object-contain" />
+          <Link href="/">
+            <BootHopLogo iconClass="text-slate-900" textClass="text-slate-900" />
           </Link>
           <Link href="/" className="text-sm text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-2 group">
             <span className="group-hover:-translate-x-1 transition-transform inline-block">←</span> Back to Home

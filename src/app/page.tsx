@@ -9,6 +9,7 @@ import {
   Plane, Quote, Search, Star, X,
 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import BootHopLogo from '@/components/BootHopLogo';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -252,13 +253,9 @@ export default function HomePage() {
       <nav className={`fixed top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur-md' : 'bg-transparent'}`}>
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="flex items-center">
-            <Image
-              src="/images/boothop.png"
-              alt="BootHop"
-              width={130}
-              height={36}
-              className={`h-9 w-auto transition-all duration-300 ${scrolled ? 'brightness-0' : 'brightness-100'}`}
-              priority
+            <BootHopLogo
+              iconClass={scrolled ? 'text-slate-900' : 'text-white'}
+              textClass={scrolled ? 'text-slate-900' : 'text-white'}
             />
           </Link>
 
@@ -273,7 +270,6 @@ export default function HomePage() {
 
           <div className="hidden items-center gap-3 md:flex">
             <Link href="/login" className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${scrolled ? 'text-slate-600 hover:bg-slate-100' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>Log in</Link>
-            <Link href="/register" className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700">Get Started</Link>
           </div>
 
           <button className={`rounded-lg p-2 md:hidden ${scrolled ? 'text-slate-700 hover:bg-slate-100' : 'text-white hover:bg-white/10'}`}
@@ -291,7 +287,6 @@ export default function HomePage() {
               ))}
               <div className="flex flex-col gap-2 pt-3">
                 <Link href="/login" className="block rounded-xl border border-slate-200 py-3 text-center text-sm font-medium text-slate-700 hover:bg-slate-50">Log in</Link>
-                <Link href="/register" className="block rounded-xl bg-blue-600 py-3 text-center text-sm font-semibold text-white hover:bg-blue-700">Get Started</Link>
               </div>
             </div>
           </div>
@@ -347,7 +342,7 @@ export default function HomePage() {
                   )}
                   {queryTo && !toSelected && <p className="absolute -bottom-5 left-0 text-xs text-amber-400">Select from list</p>}
                 </div>
-                <input type="date" value={trip.date} onChange={(e) => setTrip({ ...trip, date: e.target.value })} className={`${inputClass} [color-scheme:dark]`} />
+                <input type="date" value={trip.date} min={new Date().toISOString().split('T')[0]} onChange={(e) => setTrip({ ...trip, date: e.target.value })} className={`${inputClass} [color-scheme:dark]`} />
                 <select value={trip.weight} onChange={(e) => setTrip({ ...trip, weight: e.target.value })} className={`${inputClass} cursor-pointer`}>
                   <option value="" disabled className="bg-slate-900 text-white/50">Weight</option>
                   {weightOptions.map((o) => <option key={o.value} value={o.value} className="bg-slate-900 text-white">{o.label}</option>)}
@@ -488,7 +483,7 @@ export default function HomePage() {
       <section className="relative overflow-hidden py-16 md:py-24">
         <div className="absolute inset-0">
           <Image src="/images/TrustedComm.jpg" alt="BootHop community" fill className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/88 via-slate-900/85 to-slate-950/90" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-800/60 to-slate-900/72" />
         </div>
         <div className="relative z-10 mx-auto max-w-7xl px-4">
 
@@ -640,7 +635,7 @@ export default function HomePage() {
           <div className="mb-10 grid gap-8 sm:grid-cols-2 md:grid-cols-5">
             <div className="sm:col-span-2 md:col-span-2">
               <div className="mb-4">
-                <Image src="/images/boothop.png" alt="BootHop" width={120} height={34} className="h-8 w-auto brightness-0 invert" />
+                <BootHopLogo iconClass="text-white" textClass="text-white" />
               </div>
               <p className="mb-5 max-w-xs text-sm leading-relaxed">Connecting verified travelers with people who need items delivered internationally.</p>
               <div className="flex items-center gap-2 text-xs">

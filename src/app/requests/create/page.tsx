@@ -226,12 +226,12 @@ export default function CreateRequestPage() {
             <div className="grid md:grid-cols-2 gap-5">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Preferred Pickup Date *</label>
-                <input type="date" value={formData.preferredPickupDate} onChange={set('preferredPickupDate')}
+                <input type="date" value={formData.preferredPickupDate} min={new Date().toISOString().split('T')[0]} onChange={set('preferredPickupDate')}
                   required className={inputCls} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Flexible Until *</label>
-                <input type="date" value={formData.flexibleUntil} onChange={set('flexibleUntil')}
+                <input type="date" value={formData.flexibleUntil} min={formData.preferredPickupDate || new Date().toISOString().split('T')[0]} onChange={set('flexibleUntil')}
                   required className={inputCls} />
               </div>
               <div>
