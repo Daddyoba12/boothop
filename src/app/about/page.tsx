@@ -1,328 +1,311 @@
+'use client';
+
 import Link from 'next/link';
-import { Package, Users, Globe, Shield, Star, ArrowRight, CheckCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Package, Users, Globe, Shield, Star, ArrowRight, CheckCircle, Sparkles, TrendingUp } from 'lucide-react';
+import BootHopLogo from '@/components/BootHopLogo';
 
 export default function AboutPage() {
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center space-x-2">
-              <Package className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">BootHop</span>
-            </Link>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/about" className="text-blue-600 font-semibold">
-                About Us
-              </Link>
-              <Link href="/how-it-works" className="text-gray-600 hover:text-gray-900">
-                How It Works
-              </Link>
-              <Link href="/pricing" className="text-gray-600 hover:text-gray-900">
-                Pricing
-              </Link>
-            </div>
+  const [scrollY, setScrollY] = useState(0);
+  useEffect(() => {
+    const h = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', h);
+    return () => window.removeEventListener('scroll', h);
+  }, []);
 
-            <div className="flex items-center space-x-4">
-              <Link href="/login" className="text-gray-600 hover:text-gray-900">
-                Login
-              </Link>
-              <Link 
-                href="/register" 
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-              >
-                Get Started
-              </Link>
-            </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden font-sans">
+
+      {/* ANIMATED BLOBS */}
+      <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
+        <div className="absolute top-0 -left-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'4s'}} />
+        <div className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'6s',animationDelay:'2s'}} />
+        <div className="absolute bottom-40 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s',animationDelay:'1s'}} />
+      </div>
+
+      {/* NAV */}
+      <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-2xl">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <Link href="/">
+            <BootHopLogo iconClass="text-white" textClass="text-white" />
+          </Link>
+          <div className="hidden md:flex items-center gap-6 text-sm text-slate-400">
+            <Link href="/how-it-works" className="hover:text-white transition">How It Works</Link>
+            <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
           </div>
+          <Link href="/login" className="text-sm text-slate-400 hover:text-white transition-all duration-300">Log in</Link>
         </div>
       </nav>
 
-{/* Three Videos Side by Side */}
-<div className="grid grid-cols-3 gap-4 h-[500px]">
-  
-  {/* Left Video */}
-  <div className="relative rounded-xl overflow-hidden shadow-lg bg-black">
-    <video
-      autoPlay
-      muted
-      loop
-      playsInline
-      className="w-full h-full object-cover"
-    >
-      <source src="/videos/Aboutus_train.mp4" type="video/mp4" />
+      {/* VIDEO HERO — three videos floating */}
+      <section className="relative pt-32 pb-0 overflow-hidden">
+        {/* Parallax ping dots */}
+        <div className="absolute inset-0 opacity-30 pointer-events-none z-10" style={{transform:`translateY(${scrollY*0.3}px)`}}>
+          <div className="absolute top-24 left-1/4 w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
+          <div className="absolute top-44 right-1/3 w-2 h-2 bg-blue-400 rounded-full animate-ping" style={{animationDelay:'1s'}} />
+          <div className="absolute bottom-20 left-1/2 w-2 h-2 bg-purple-400 rounded-full animate-ping" style={{animationDelay:'2s'}} />
+        </div>
 
-      
-     
-      Your browser does not support the video tag.
-    </video>
-  </div>
+        {/* Badge + heading above videos */}
+        <div className="relative z-20 text-center px-6 mb-10">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/30 rounded-full px-6 py-3 mb-6 backdrop-blur-xl">
+            <Sparkles className="w-4 h-4 text-cyan-400" />
+            <span className="text-sm text-cyan-300 font-medium">About BootHop</span>
+          </div>
+          <h1 className="text-6xl md:text-8xl font-black leading-tight mb-4">
+            Connecting<br />
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent animate-pulse">
+              the world.
+            </span>
+          </h1>
+          <p className="text-slate-400 text-xl max-w-2xl mx-auto">
+            One journey at a time.
+          </p>
+        </div>
 
-  {/* Center Video (Main) */}
-  <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl bg-gray-900">
-  <video
-    autoPlay
-    muted
-    loop
-    playsInline
-    className="w-full h-full object-contain"
-    style={{ objectPosition: 'center center' }}
-  >
-    <source src="/videos/about-us.mp4" type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
-  
-  {/* Badge overlay */}
-  <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm px-6 py-3 rounded-lg shadow-lg">
-    <div className="flex items-center gap-2">
-      <Package className="h-5 w-5 text-blue-600" />
-      <span className="font-semibold text-gray-900">About BootHop</span>
-    </div>
-  </div>
-</div>
+        {/* Three Videos Side by Side — with premium floating cards */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-3 gap-4 h-[500px]">
 
+          {/* Left Video */}
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-blue-500/20 border border-white/10 hover:scale-[1.02] transition-all duration-500 hover:shadow-blue-500/30 hover:border-white/20">
+            <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+              <source src="/videos/Aboutus_train.mp4" type="video/mp4" />
+            </video>
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
+          </div>
 
-  {/* Right Video */}
-  <div className="relative rounded-xl overflow-hidden shadow-lg bg-black">
-    <video
-      autoPlay
-      muted
-      loop
-      playsInline
-      className="w-full h-full object-cover"
-    >
-      <source src="/videos/Aboutus_train.mp4" type="video/mp4" />
-      
-      Your browser does not support the video tag.
-    </video>
-  </div>
+          {/* Center Video (Main) */}
+          <div className="relative h-[400px] md:h-[500px] rounded-3xl overflow-hidden shadow-2xl shadow-cyan-500/20 border border-cyan-500/20 hover:scale-[1.02] transition-all duration-500 hover:shadow-cyan-500/30">
+            <video autoPlay muted loop playsInline className="w-full h-full object-contain" style={{objectPosition:'center center'}}>
+              <source src="/videos/about-us.mp4" type="video/mp4" />
+            </video>
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
+            {/* Badge overlay */}
+            <div className="absolute bottom-6 left-6 bg-slate-900/80 backdrop-blur-md px-5 py-3 rounded-xl border border-white/10 shadow-lg">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center">
+                  <Package className="h-3.5 w-3.5 text-white" />
+                </div>
+                <span className="font-semibold text-white text-sm">About BootHop</span>
+              </div>
+            </div>
+          </div>
 
-</div>
+          {/* Right Video */}
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-purple-500/20 border border-white/10 hover:scale-[1.02] transition-all duration-500 hover:shadow-purple-500/30 hover:border-white/20">
+            <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+              <source src="/videos/Aboutus_train.mp4" type="video/mp4" />
+            </video>
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
+          </div>
+        </div>
+      </section>
 
-
-
-      {/* Our Story Section */}
-      <section className="py-20 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
+      {/* OUR STORY */}
+      <section className="relative py-24 px-6">
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
+        <div className="relative max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
-            {/* Left - Icon Feature */}
-            <div className="relative">
-              <div className="absolute -top-4 -left-4 w-24 h-24 bg-blue-100 rounded-full opacity-50"></div>
-              <div className="relative bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-12 text-white">
-                <Package className="h-20 w-20 mb-6 opacity-90" />
-                <h3 className="text-3xl font-bold mb-4">Redundant Boot Space</h3>
-                <p className="text-lg text-blue-100">
+            {/* Left — premium highlight box */}
+            <div className="group relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-br from-blue-600/20 to-purple-600/10 backdrop-blur-sm p-12 hover:scale-[1.02] transition-all duration-500 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/20">
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl group-hover:opacity-80 transition-opacity" />
+              <div className="relative">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-3xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
+                  <Package className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-3xl font-black text-white mb-4">Redundant Boot Space</h3>
+                <p className="text-lg text-blue-200 leading-relaxed">
                   Every journey has the potential to move items. Why travel with empty space?
                 </p>
               </div>
             </div>
 
-            {/* Right - Story Content */}
+            {/* Right — story content */}
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Story</h2>
-              <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
-                <p>
-                  We started with a simple idea: <strong>use redundant boot space to transport goods</strong> to their destination. Every journey has the potential to move items.
-                </p>
-                <p className="text-2xl font-semibold text-blue-600">
+              <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-6">
+                <TrendingUp className="w-4 h-4 text-blue-400" />
+                <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">Our Story</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black text-white mb-6">Our Story</h2>
+              <div className="space-y-5 text-lg text-slate-400 leading-relaxed">
+                <p>We started with a simple idea: <strong className="text-white">use redundant boot space to transport goods</strong> to their destination. Every journey has the potential to move items.</p>
+                <p className="text-2xl font-black bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
                   Why drive an empty car? Why drive with an empty boot?
                 </p>
-                <p>
-                  Documents are even more convenient to transport. They easily fit into hand luggage, and you'd be helping someone else out.
-                </p>
-                <p className="font-semibold text-gray-900">
-                  We're helping to connect the world, one journey at a time.
-                </p>
+                <p>Documents are even more convenient to transport. They easily fit into hand luggage, and you'd be helping someone else out.</p>
+                <p className="font-bold text-white">We're helping to connect the world, one journey at a time.</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Our Mission Section */}
-      <section className="py-20 px-4 bg-gray-50">
+      {/* OUR MISSION */}
+      <section className="relative py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Mission</h2>
-          
-          <div className="bg-white rounded-2xl shadow-lg p-12 mb-8">
-            <p className="text-xl text-gray-700 mb-6 leading-relaxed">
-              We love little things, small and medium-sized packages—actually anything that can be carried on an existing journey. We specialize in{' '}
-              <span className="font-bold text-blue-600">personal effects, letters, and small parcels</span>.
-            </p>
-            <p className="text-lg text-gray-600 mb-8">
-              Courier services are great, but they're not one-size-fits-all. We are an alternative service that's flexible and convenient.
-            </p>
-            
-            <div className="bg-blue-600 text-white rounded-xl p-8">
-              <p className="text-3xl font-bold mb-2">
-                You are already going to make that journey
+          <div className="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-2 mb-6">
+            <Sparkles className="w-4 h-4 text-cyan-400" />
+            <span className="text-xs font-semibold uppercase tracking-widest text-cyan-400">Our Mission</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-8">Our Mission</h2>
+
+          <div className="relative overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-12 mb-8 hover:border-slate-600 hover:shadow-2xl transition-all duration-500">
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative">
+              <p className="text-xl text-slate-300 mb-6 leading-relaxed">
+                We love little things, small and medium-sized packages—actually anything that can be carried on an existing journey. We specialize in{' '}
+                <span className="font-bold text-cyan-400">personal effects, letters, and small parcels</span>.
               </p>
-              <p className="text-2xl">—why not make it count?</p>
+              <p className="text-lg text-slate-400 mb-8">
+                Courier services are great, but they're not one-size-fits-all. We are an alternative service that's flexible and convenient.
+              </p>
+              <div className="relative overflow-hidden rounded-2xl border border-blue-500/30 bg-gradient-to-r from-blue-600/30 to-cyan-600/20 backdrop-blur-sm p-8">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/5 pointer-events-none" />
+                <p className="relative text-3xl font-black text-white mb-2">You are already going to make that journey</p>
+                <p className="relative text-2xl text-cyan-300">—why not make it count?</p>
+              </div>
             </div>
           </div>
 
           {/* Key Features */}
           <div className="grid md:grid-cols-3 gap-6 mt-12">
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
-              <h3 className="font-bold text-lg mb-2">Personal Effects</h3>
-              <p className="text-gray-600 text-sm">Small personal items delivered with care</p>
-            </div>
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
-              <h3 className="font-bold text-lg mb-2">Letters & Documents</h3>
-              <p className="text-gray-600 text-sm">Important papers delivered securely</p>
-            </div>
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
-              <h3 className="font-bold text-lg mb-2">Small Parcels</h3>
-              <p className="text-gray-600 text-sm">Compact packages sent worldwide</p>
-            </div>
+            {[
+              { label: 'Personal Effects', desc: 'Small personal items delivered with care', gradient: 'from-blue-500 to-cyan-400', glow: 'shadow-blue-500/50', hover: 'hover:border-blue-500/50 hover:shadow-blue-500/20' },
+              { label: 'Letters & Documents', desc: 'Important papers delivered securely', gradient: 'from-emerald-500 to-teal-400', glow: 'shadow-emerald-500/50', hover: 'hover:border-emerald-500/50 hover:shadow-emerald-500/20' },
+              { label: 'Small Parcels', desc: 'Compact packages sent worldwide', gradient: 'from-purple-500 to-pink-400', glow: 'shadow-purple-500/50', hover: 'hover:border-purple-500/50 hover:shadow-purple-500/20' },
+            ].map((f) => (
+              <div key={f.label} className={`group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:scale-105 transition-all duration-500 hover:shadow-xl ${f.hover} cursor-pointer`}>
+                <div className={`absolute inset-0 bg-gradient-to-br ${f.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+                <div className="relative">
+                  <div className={`w-14 h-14 bg-gradient-to-br ${f.gradient} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg ${f.glow} group-hover:scale-110 transition-transform duration-300`}>
+                    <CheckCircle className="h-7 w-7 text-white" />
+                  </div>
+                  <h3 className="font-black text-lg text-white mb-2 group-hover:text-cyan-400 transition-colors duration-300">{f.label}</h3>
+                  <p className="text-slate-400 text-sm">{f.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Our Values Section */}
-      <section className="py-20 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Values</h2>
-            <p className="text-xl text-gray-600">The principles that guide everything we do at BootHop</p>
+      {/* OUR VALUES */}
+      <section className="relative py-20 px-6">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent pointer-events-none" />
+        <div className="relative max-w-7xl mx-auto">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-2 mb-4">
+              <Star className="w-4 h-4 text-purple-400" />
+              <span className="text-xs font-semibold uppercase tracking-widest text-purple-400">Our Values</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Our Values</h2>
+            <p className="text-xl text-slate-400">The principles that guide everything we do at BootHop</p>
           </div>
-
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Users className="h-10 w-10 text-blue-600" />
+            {[
+              { icon: Users, label: 'Community First', desc: 'We believe in the power of people helping people. Our platform connects communities and creates meaningful interactions between travelers and senders.', gradient: 'from-blue-500 to-cyan-400', glow: 'shadow-blue-500/50', hover: 'hover:border-blue-500/50 hover:shadow-blue-500/20' },
+              { icon: Globe, label: 'Efficiency', desc: 'We maximize the potential of every journey by utilizing existing transportation capacity, reducing waste and environmental impact.', gradient: 'from-emerald-500 to-teal-400', glow: 'shadow-emerald-500/50', hover: 'hover:border-emerald-500/50 hover:shadow-emerald-500/20' },
+              { icon: Shield, label: 'Trust & Safety', desc: 'Safety and trust are at the core of our platform. We provide secure transactions and verified user profiles to ensure peace of mind.', gradient: 'from-purple-500 to-pink-400', glow: 'shadow-purple-500/50', hover: 'hover:border-purple-500/50 hover:shadow-purple-500/20' },
+            ].map(({ icon: Icon, label, desc, gradient, glow, hover }) => (
+              <div key={label} className={`group relative overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-10 text-center hover:scale-105 transition-all duration-500 hover:shadow-2xl ${hover} cursor-pointer`}>
+                <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+                <div className="relative">
+                  <div className={`w-20 h-20 bg-gradient-to-br ${gradient} rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg ${glow} group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon className="h-10 w-10 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-black text-white mb-4 group-hover:text-cyan-400 transition-colors duration-300">{label}</h3>
+                  <p className="text-slate-400 leading-relaxed">{desc}</p>
+                </div>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Community First</h3>
-              <p className="text-gray-600 leading-relaxed">
-                We believe in the power of people helping people. Our platform connects communities and creates meaningful interactions between travelers and senders.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Globe className="h-10 w-10 text-green-600" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Efficiency</h3>
-              <p className="text-gray-600 leading-relaxed">
-                We maximize the potential of every journey by utilizing existing transportation capacity, reducing waste and environmental impact.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Shield className="h-10 w-10 text-purple-600" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Trust & Safety</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Safety and trust are at the core of our platform. We provide secure transactions and verified user profiles to ensure peace of mind.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-blue-600 to-purple-600 text-white">
+      {/* STATS */}
+      <section className="relative py-20 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">BootHop by the Numbers</h2>
-            <p className="text-xl text-blue-100">Making a real impact on communities worldwide</p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-6xl font-bold mb-2">10K+</div>
-              <div className="text-xl text-blue-100">Happy Users</div>
+          <div className="relative overflow-hidden rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-600/20 to-purple-600/10 backdrop-blur-sm p-16">
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute -top-10 -left-10 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl" />
+              <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl" />
             </div>
-            <div>
-              <div className="text-6xl font-bold mb-2">50K+</div>
-              <div className="text-xl text-blue-100">Successful Deliveries</div>
+            <div className="relative text-center mb-12">
+              <h2 className="text-4xl font-black text-white mb-2">BootHop by the Numbers</h2>
+              <p className="text-slate-400">Making a real impact on communities worldwide</p>
             </div>
-            <div>
-              <div className="text-6xl font-bold mb-2">200+</div>
-              <div className="text-xl text-blue-100">Cities Covered</div>
-            </div>
-            <div>
-              <div className="text-6xl font-bold mb-2">95%</div>
-              <div className="text-xl text-blue-100">Satisfaction Rate</div>
+            <div className="relative grid md:grid-cols-4 gap-8 text-center">
+              {[
+                { value: '10K+', label: 'Happy Users', gradient: 'from-blue-400 to-cyan-300' },
+                { value: '50K+', label: 'Successful Deliveries', gradient: 'from-emerald-400 to-teal-300' },
+                { value: '200+', label: 'Cities Covered', gradient: 'from-purple-400 to-pink-300' },
+                { value: '95%', label: 'Satisfaction Rate', gradient: 'from-amber-400 to-yellow-300' },
+              ].map((s) => (
+                <div key={s.label} className="group">
+                  <div className={`text-6xl font-black mb-2 bg-gradient-to-r ${s.gradient} bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300 inline-block`}>{s.value}</div>
+                  <div className="text-slate-400">{s.label}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 bg-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-gray-600 mb-8">
-            Join thousands of travelers and senders already using BootHop
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/register"
-              className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition inline-flex items-center justify-center"
-            >
-              Sign Up Now
-              <ArrowRight className="ml-2 h-5 w-5" />
+      {/* CTA */}
+      <section className="relative py-24 text-center px-6">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-5xl md:text-6xl font-black mb-6 leading-tight">
+            Ready to{' '}
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
+              get started?
+            </span>
+          </h2>
+          <p className="text-xl text-slate-400 mb-12">Join thousands of travelers and senders already using BootHop</p>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Link href="/register" className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-10 py-5 rounded-2xl text-lg font-bold hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 inline-flex items-center justify-center gap-3">
+              Sign Up Now <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
-            <Link 
-              href="/how-it-works"
-              className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transition"
-            >
+            <Link href="/how-it-works" className="border border-white/20 text-white px-10 py-5 rounded-2xl text-lg font-bold hover:bg-white/10 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
               Learn More
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12 px-4">
+      {/* FOOTER */}
+      <footer className="border-t border-slate-800 py-12 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8 text-sm text-slate-500">
             <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Package className="h-8 w-8 text-blue-400" />
-                <span className="text-xl font-bold text-white">BootHop</span>
-              </div>
-              <p className="text-sm">
-                Connecting the world, one journey at a time.
-              </p>
+              <BootHopLogo iconClass="text-white" textClass="text-white" className="mb-4" />
+              <p>Connecting the world, one journey at a time.</p>
             </div>
-
             <div>
               <h4 className="font-semibold text-white mb-4">Platform</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/how-it-works" className="hover:text-white">How It Works</Link></li>
-                <li><Link href="/pricing" className="hover:text-white">Pricing & Fees</Link></li>
-                <li><Link href="/trust-safety" className="hover:text-white">Trust & Safety</Link></li>
+              <ul className="space-y-2">
+                <li><Link href="/how-it-works" className="hover:text-white transition">How It Works</Link></li>
+                <li><Link href="/pricing" className="hover:text-white transition">Pricing & Fees</Link></li>
+                <li><Link href="/trust-safety" className="hover:text-white transition">Trust & Safety</Link></li>
               </ul>
             </div>
-
             <div>
               <h4 className="font-semibold text-white mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/terms" className="hover:text-white">Terms of Service</Link></li>
-                <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
+              <ul className="space-y-2">
+                <li><Link href="/terms" className="hover:text-white transition">Terms of Service</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
               </ul>
             </div>
-
             <div>
               <h4 className="font-semibold text-white mb-4">Support</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/help" className="hover:text-white">Help Center</Link></li>
-                <li><Link href="/contact" className="hover:text-white">Contact Us</Link></li>
-                <li><Link href="/about" className="hover:text-white">About Us</Link></li>
+              <ul className="space-y-2">
+                <li><Link href="/help" className="hover:text-white transition">Help Center</Link></li>
+                <li><Link href="/contact" className="hover:text-white transition">Contact Us</Link></li>
+                <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
               </ul>
             </div>
           </div>
-
-          <div className="border-t border-gray-800 pt-8 text-center text-sm">
-            <p>© 2024 BootHop. All rights reserved.</p>
+          <div className="border-t border-slate-800 pt-8 text-center text-sm text-slate-500">
+            <p>© {new Date().getFullYear()} BootHop. All rights reserved.</p>
           </div>
         </div>
       </footer>
