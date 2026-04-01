@@ -7,19 +7,29 @@ import { sendPaymentConfirmationEmail } from '@/lib/email';
 // ============================================================================
 // ELITE STRIPE WEBHOOK HANDLER
 // ============================================================================
-// Enterprise-grade payment processing with comprehensive error handling,
-// audit logging, and automated notifications
-// ============================================================================
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-02-25.clover',
-  typescript: true,
+function getStripeClient() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error('Missing STRIPE_SECRET_KEY');
+  return new Stripe(key, { apiVersion: '2026-02-25.clover', typescript: true });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _supabase: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getSupabase(): any {
+  if (!_supabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) throw new Error('Missing Supabase env vars');
+    _supabase = createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+  }
+  return _supabase;
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const supabase: any = new Proxy({} as any, {
+  get(_t, prop) { return getSupabase()[prop]; },
 });
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -29,7 +39,8 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
-  
+  const stripe = getStripeClient();
+
   try {
     const body = await request.text();
     
