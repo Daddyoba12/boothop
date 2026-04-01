@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { ChevronDown, Package, Plane, Shield, CreditCard, MessageCircle, UserCheck, Clock, AlertTriangle, ArrowRight, Sparkles } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
 
-export const metadata = undefined; // metadata moved to layout for client pages
+
 
 const faqs = [
   {

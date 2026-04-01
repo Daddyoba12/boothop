@@ -1,275 +1,393 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import { ArrowRight, Shield, CheckCircle, Star } from 'lucide-react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { ArrowRight, Shield, CheckCircle, Star, Sparkles, TrendingUp, Globe, Lock, ArrowUp } from 'lucide-react';
 
 export default function HowItWorksPage() {
+  const [scrollY, setScrollY] = useState(0);
+  const [activeSection, setActiveSection] = useState('booter');
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+      setShowScrollTop(window.scrollY > 500);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const booterSteps = [
-    { num: '01', title: 'Post Your Journey', desc: 'Share your route, travel dates, and available luggage capacity. Takes under 60 seconds.' },
-    { num: '02', title: 'Browse Requests', desc: 'See curated delivery requests along your exact route from verified senders.' },
-    { num: '03', title: 'Agree on Terms', desc: 'Confirm price and customs compliance through our secure in-app messaging.' },
-    { num: '04', title: 'Collect & Deliver', desc: 'Meet the sender, carry the item, and deliver it safely at your destination.' },
-    { num: '05', title: 'Get Paid Instantly', desc: 'Payment is released the moment delivery is confirmed by both parties.' },
+    { num: '01', title: 'Post Your Journey', desc: 'Share your route, travel dates, and available luggage capacity. Takes under 60 seconds.', icon: '✈️' },
+    { num: '02', title: 'Browse Requests', desc: 'See curated delivery requests along your exact route from verified senders.', icon: '🔍' },
+    { num: '03', title: 'Agree on Terms', desc: 'Confirm price and compliance through secure messaging.', icon: '🤝' },
+    { num: '04', title: 'Collect & Deliver', desc: 'Meet sender, carry item, deliver safely.', icon: '📦' },
+    { num: '05', title: 'Get Paid', desc: 'Payment released instantly after confirmation.', icon: '💰' },
   ];
 
   const hooperSteps = [
-    { num: '01', title: 'Post Your Request', desc: 'Describe your item, pickup and delivery locations, and set your budget.' },
-    { num: '02', title: 'Find a Traveller', desc: 'Browse verified travellers heading your way or get matched automatically.' },
-    { num: '03', title: 'Pay Securely', desc: 'Funds go into escrow — your money is protected until delivery is confirmed.' },
-    { num: '04', title: 'Track Delivery', desc: 'Stay in touch with your Booter through real-time in-app messaging.' },
-    { num: '05', title: 'Confirm Receipt', desc: 'Confirm safe delivery to release payment. Rate your experience.' },
+    { num: '01', title: 'Post Your Request', desc: 'Describe item, route, and budget.', icon: '📝' },
+    { num: '02', title: 'Find Traveller', desc: 'Browse or get matched automatically.', icon: '🎯' },
+    { num: '03', title: 'Pay Securely', desc: 'Funds held safely in escrow.', icon: '🔒' },
+    { num: '04', title: 'Track Delivery', desc: 'Stay connected in real time.', icon: '📍' },
+    { num: '05', title: 'Confirm Receipt', desc: 'Release payment and rate experience.', icon: '⭐' },
   ];
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white font-sans overflow-x-hidden">
+      
+      {/* Animated background */}
+      <div className="fixed inset-0 opacity-20">
+        <div className="absolute top-0 -left-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration: '4s'}}></div>
+        <div className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration: '6s', animationDelay: '2s'}}></div>
+        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration: '5s', animationDelay: '1s'}}></div>
+      </div>
 
-      {/* ── NAV ── */}
-      <nav className="fixed top-0 w-full z-50 border-b border-slate-100 bg-white/95 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <Image src="/images/boothop.png" alt="BootHop" width={160} height={44} className="h-10 w-auto object-contain" />
-          </Link>
-          <Link href="/" className="text-sm text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-2 group">
-            <span className="group-hover:-translate-x-1 transition-transform inline-block">←</span> Back to Home
-          </Link>
+      {/* NAV */}
+      <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-2xl">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center font-black text-white shadow-lg shadow-blue-500/50">
+              BH
+            </div>
+            <span className="text-2xl font-black bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+              BootHop
+            </span>
+          </div>
+          <a 
+            href="/"
+            className="text-sm text-slate-400 hover:text-white flex items-center gap-2 transition-all duration-300 hover:gap-3"
+          >
+            ← Back
+          </a>
         </div>
       </nav>
 
-      {/* ── HERO ── */}
-      <section className="pt-32 pb-16 px-6 bg-gradient-to-b from-slate-50 to-white text-center">
-        <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 rounded-full bg-blue-50 border border-blue-100">
-          <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-          <span className="text-xs font-semibold tracking-widest uppercase text-blue-600">How It Works</span>
+      {/* HERO */}
+      <section className="relative pt-40 pb-32 px-6 text-center overflow-hidden">
+        <div 
+          className="absolute inset-0 opacity-30"
+          style={{transform: `translateY(${scrollY * 0.5}px)`}}
+        >
+          <div className="absolute top-20 left-1/4 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
+          <div className="absolute top-40 right-1/3 w-2 h-2 bg-blue-400 rounded-full animate-ping" style={{animationDelay: '1s'}}></div>
+          <div className="absolute bottom-20 left-1/2 w-2 h-2 bg-purple-400 rounded-full animate-ping" style={{animationDelay: '2s'}}></div>
         </div>
-        <h1 className="text-5xl md:text-7xl font-black text-slate-900 leading-tight mb-6">
-          Delivery,<br />
-          <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">reimagined.</span>
-        </h1>
-        <p className="text-lg text-slate-500 max-w-xl mx-auto leading-relaxed">
-          A global community of verified travellers and trusted senders, connected through escrow-protected deliveries.
-        </p>
+        
+        <div className="relative">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/30 rounded-full px-6 py-3 mb-8 backdrop-blur-xl">
+            <Sparkles className="w-4 h-4 text-cyan-400" />
+            <span className="text-sm text-cyan-300 font-medium">The Future of Delivery</span>
+          </div>
+          
+          <h1 className="text-6xl md:text-8xl font-black mb-6 leading-tight">
+            Delivery,<br />
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent animate-pulse">
+              reimagined.
+            </span>
+          </h1>
+          <p className="text-slate-400 text-xl max-w-2xl mx-auto leading-relaxed">
+            A revolutionary trusted network connecting travellers and senders worldwide.
+          </p>
+        </div>
       </section>
 
-      {/* ── BOOTER SECTION ── */}
-      <section className="overflow-hidden">
-        <div className="relative h-[520px] md:h-[600px] w-full">
-          <Image
-            src="/images/Delivery.jpg"
-            alt="Booter — earn while you travel"
-            fill
-            className="object-cover object-left"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/40 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
-
-          <div className="absolute inset-0 flex items-center">
-            <div className="max-w-7xl mx-auto px-6 w-full">
-              <div className="max-w-lg">
-                <div className="inline-flex items-center gap-2 mb-5 px-4 py-2 rounded-full border border-cyan-400/30 bg-cyan-500/10 backdrop-blur-sm">
-                  <span className="text-xs font-bold tracking-widest uppercase text-cyan-300">For Booters ✈️</span>
+      {/* BOOTER SECTION */}
+      <section className="relative py-20 px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent"></div>
+        
+        <div className="max-w-7xl mx-auto relative">
+          {/* Hero Card */}
+          <div className="relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/10">
+            {/* Background Image */}
+            <div className="absolute inset-0">
+              <img 
+                src="/images/Delivery.jpg" 
+                alt="Delivery" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-900/50 to-slate-950/30"></div>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-8 p-12 relative z-10">
+              <div className="flex flex-col justify-center">
+                <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-2 mb-6 w-fit">
+                  <TrendingUp className="w-4 h-4 text-blue-400" />
+                  <span className="text-sm text-blue-300 font-semibold">For Travellers</span>
                 </div>
-                <h2 className="text-5xl md:text-6xl font-black text-white leading-tight mb-4">
+                
+                <h2 className="text-5xl md:text-6xl font-black mb-6 leading-tight">
                   Your journey.<br />
-                  <span className="text-cyan-400">Your income.</span>
+                  <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                    Your income.
+                  </span>
                 </h2>
-                <p className="text-white/60 text-lg leading-relaxed">
-                  Already travelling? Turn your spare luggage capacity into real earnings on every trip.
+                <p className="text-slate-400 text-lg mb-8">
+                  Transform unused luggage space into a steady income stream while you travel.
                 </p>
+                
+                <div className="flex gap-4">
+                  <button className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 flex items-center gap-2">
+                    Get Started
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+              
+              <div className="relative">
+                <div className="absolute -top-6 -right-6 w-72 h-72 bg-gradient-to-br from-blue-500/30 to-cyan-500/30 rounded-full blur-3xl"></div>
+                <div className="relative bg-slate-900/40 backdrop-blur-md p-8 rounded-2xl border border-slate-700/30 shadow-xl">
+                  <div className="text-slate-400 text-sm mb-2 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    POTENTIAL EARNINGS
+                  </div>
+                  <div className="text-5xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-4">
+                    £85–£320
+                  </div>
+                  <p className="text-slate-400 text-sm">Per trip • Instant payout</p>
+                  
+                  <div className="mt-6 pt-6 border-t border-slate-700/50 grid grid-cols-3 gap-4">
+                    <div>
+                      <div className="text-2xl font-bold text-white">10K+</div>
+                      <div className="text-xs text-slate-400">Active Users</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-white">95%</div>
+                      <div className="text-xs text-slate-400">Success Rate</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-cyan-400">Free</div>
+                      <div className="text-xs text-slate-400">To Join</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="absolute bottom-16 right-6 md:right-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-5 text-right">
-            <div className="text-xs font-bold tracking-widest text-white/50 mb-1">AVG. EARNINGS PER TRIP</div>
-            <div className="text-3xl font-black text-white">£85 — £320</div>
-          </div>
-        </div>
-
-        <div className="bg-white px-6 py-16">
-          <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-start">
+          {/* Steps */}
+          <div className="grid md:grid-cols-2 gap-12 items-start">
             <div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-10">How Booters get started</h3>
-              <div className="space-y-0">
-                {booterSteps.map((step, i) => (
-                  <div key={i} className={`flex gap-5 pb-8 relative ${i < booterSteps.length - 1 ? 'before:absolute before:left-5 before:top-11 before:w-px before:h-[calc(100%-20px)] before:bg-gradient-to-b before:from-blue-200 before:to-transparent' : ''}`}>
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-blue-200 bg-blue-50 flex items-center justify-center z-10">
-                      <span className="text-xs font-bold text-blue-600">{step.num}</span>
+              <h3 className="text-3xl font-black mb-12 flex items-center gap-3">
+                <span className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center">
+                  ✨
+                </span>
+                How it works
+              </h3>
+              
+              {booterSteps.map((s, i) => (
+                <div 
+                  key={i} 
+                  className="group flex gap-6 mb-8 p-6 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 cursor-pointer"
+                  style={{animationDelay: `${i * 100}ms`}}
+                >
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
+                      {s.icon}
                     </div>
-                    <div className="pt-2">
-                      <h4 className="font-bold text-slate-900 mb-1">{step.title}</h4>
-                      <p className="text-sm text-slate-500 leading-relaxed">{step.desc}</p>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center text-xs font-bold text-slate-900">
+                      {s.num}
                     </div>
                   </div>
-                ))}
-              </div>
+                  <div className="flex-1">
+                    <div className="font-bold text-xl mb-2 text-white group-hover:text-cyan-400 transition-colors duration-300">
+                      {s.title}
+                    </div>
+                    <div className="text-slate-400 text-sm leading-relaxed">
+                      {s.desc}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <div>
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100">
-                  <div className="text-3xl font-black text-blue-600 mb-1">£320</div>
-                  <div className="text-xs font-semibold text-blue-400 uppercase tracking-widest">Max per trip</div>
+            <div className="grid grid-cols-2 gap-6 sticky top-32">
+              {[
+                { label: '£320 max', sublabel: 'Per trip', gradient: 'from-blue-500 to-cyan-400', icon: '💎' },
+                { label: '10K users', sublabel: 'Worldwide', gradient: 'from-purple-500 to-pink-400', icon: '🌍' },
+                { label: '95% success', sublabel: 'Completion', gradient: 'from-emerald-500 to-teal-400', icon: '✓' },
+                { label: 'Free', sublabel: 'No fees', gradient: 'from-orange-500 to-yellow-400', icon: '🎁' },
+              ].map((stat, i) => (
+                <div 
+                  key={i}
+                  className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-8 hover:scale-105 transition-all duration-500 hover:shadow-2xl cursor-pointer"
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
+                  <div className="text-4xl mb-3">{stat.icon}</div>
+                  <div className="text-2xl font-black text-white mb-1">{stat.label}</div>
+                  <div className="text-sm text-slate-400">{stat.sublabel}</div>
                 </div>
-                <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                  <div className="text-3xl font-black text-slate-900 mb-1">10K+</div>
-                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Verified users</div>
-                </div>
-                <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                  <div className="text-3xl font-black text-slate-900 mb-1">95%</div>
-                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Satisfaction</div>
-                </div>
-                <div className="bg-cyan-50 rounded-2xl p-6 border border-cyan-100">
-                  <div className="text-3xl font-black text-cyan-600 mb-1">Free</div>
-                  <div className="text-xs font-semibold text-cyan-400 uppercase tracking-widest">To join</div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mb-8">
-                {['Identity Verified', 'Escrow Protected', 'Instant Pay', 'Free to Join'].map((t) => (
-                  <div key={t} className="flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-full px-4 py-2">
-                    <CheckCircle className="w-3.5 h-3.5 text-blue-500" />
-                    <span className="text-xs font-semibold text-blue-700">{t}</span>
-                  </div>
-                ))}
-              </div>
-
-              <Link href="/register?type=booter"
-                className="flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-5 rounded-2xl font-bold text-base shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all active:scale-[0.98] group">
-                <span>Start as a Booter</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── DIVIDER ── */}
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-      </div>
-
-      {/* ── HOOPER SECTION ── */}
-      <section className="overflow-hidden">
-        <div className="relative h-[520px] md:h-[600px] w-full">
-          <Image
-            src="/images/GoingonHols.jpg"
-            alt="Hooper — send packages globally"
-            fill
-            className="object-cover object-center"
-          />
-          {/* Dark overlay on LEFT — people are on right, car/dark area on left */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
-
-          {/* Text on LEFT over dark car area */}
-          <div className="absolute inset-0 flex items-center">
-            <div className="max-w-7xl mx-auto px-6 w-full">
-              <div className="max-w-lg">
-                <div className="inline-flex items-center gap-2 mb-5 px-4 py-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 backdrop-blur-sm">
-                  <span className="text-xs font-bold tracking-widest uppercase text-emerald-300">For Hoopers 📦</span>
+      {/* HOOPER SECTION */}
+      <section className="relative py-20 px-6 overflow-hidden mt-32">
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent"></div>
+        
+        <div className="max-w-7xl mx-auto relative">
+          {/* Hero Card */}
+          <div className="relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-emerald-500/10">
+            {/* Background Image */}
+            <div className="absolute inset-0">
+              <img 
+                src="/images/GoingonHols.jpg" 
+                alt="Going on Holidays" 
+                className="w-full h-full object-cover object-top"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-900/50 to-slate-950/30"></div>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-8 p-12 relative z-10">
+              <div className="relative order-2 md:order-1">
+                <div className="absolute -top-6 -left-6 w-72 h-72 bg-gradient-to-br from-emerald-500/30 to-teal-500/30 rounded-full blur-3xl"></div>
+                <div className="relative bg-slate-900/40 backdrop-blur-md p-8 rounded-2xl border border-slate-700/30 shadow-xl">
+                  <div className="text-slate-400 text-sm mb-2 flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4" />
+                    AVERAGE SAVINGS
+                  </div>
+                  <div className="text-5xl font-black bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-4">
+                    Up to 70%
+                  </div>
+                  <p className="text-slate-400 text-sm">Compared to traditional shipping</p>
+                  
+                  <div className="mt-6 pt-6 border-t border-slate-700/50 grid grid-cols-3 gap-4">
+                    <div>
+                      <div className="text-2xl font-bold text-white">50K</div>
+                      <div className="text-xs text-slate-400">Deliveries</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-white">200+</div>
+                      <div className="text-xs text-slate-400">Cities</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-emerald-400">Free</div>
+                      <div className="text-xs text-slate-400">To Start</div>
+                    </div>
+                  </div>
                 </div>
-                <h2 className="text-5xl md:text-6xl font-black text-white leading-tight mb-4">
+              </div>
+              
+              <div className="flex flex-col justify-center order-1 md:order-2">
+                <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 rounded-full px-4 py-2 mb-6 w-fit">
+                  <Globe className="w-4 h-4 text-emerald-400" />
+                  <span className="text-sm text-emerald-300 font-semibold">For Senders</span>
+                </div>
+                
+                <h2 className="text-5xl md:text-6xl font-black mb-6 leading-tight">
                   Send it.<br />
-                  <span className="text-emerald-400">They&apos;ll carry it.</span>
+                  <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                    They carry it.
+                  </span>
                 </h2>
-                <p className="text-white/60 text-lg leading-relaxed">
-                  Send packages internationally at a fraction of courier costs. Every penny protected by escrow.
+                <p className="text-slate-400 text-lg mb-8">
+                  Faster, cheaper, and more trusted delivery through our global traveller network.
                 </p>
+                
+                <div className="flex gap-4">
+                  <button className="bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center gap-2">
+                    Get Started
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Badge bottom left */}
-          <div className="absolute bottom-16 left-6 md:left-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-5">
-            <div className="text-xs font-bold tracking-widest text-white/50 mb-1">SAVE VS COURIERS</div>
-            <div className="text-3xl font-black text-white">Up to <span className="text-emerald-400">70%</span> less</div>
-          </div>
-        </div>
-
-        <div className="bg-white px-6 py-16">
-          <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-start">
-            <div>
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100">
-                  <div className="text-3xl font-black text-emerald-600 mb-1">70%</div>
-                  <div className="text-xs font-semibold text-emerald-400 uppercase tracking-widest">Cheaper</div>
+          {/* Steps */}
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            <div className="grid grid-cols-2 gap-6 sticky top-32">
+              {[
+                { label: '70% cheaper', sublabel: 'Save more', gradient: 'from-emerald-500 to-teal-400', icon: '💰' },
+                { label: '50K deliveries', sublabel: 'Completed', gradient: 'from-blue-500 to-cyan-400', icon: '📦' },
+                { label: '200 cities', sublabel: 'Worldwide', gradient: 'from-purple-500 to-pink-400', icon: '🌐' },
+                { label: 'Free', sublabel: 'No fees', gradient: 'from-orange-500 to-yellow-400', icon: '✨' },
+              ].map((stat, i) => (
+                <div 
+                  key={i}
+                  className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-8 hover:scale-105 transition-all duration-500 hover:shadow-2xl cursor-pointer"
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
+                  <div className="text-4xl mb-3">{stat.icon}</div>
+                  <div className="text-2xl font-black text-white mb-1">{stat.label}</div>
+                  <div className="text-sm text-slate-400">{stat.sublabel}</div>
                 </div>
-                <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                  <div className="text-3xl font-black text-slate-900 mb-1">50K+</div>
-                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Deliveries done</div>
-                </div>
-                <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                  <div className="text-3xl font-black text-slate-900 mb-1">200+</div>
-                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Cities</div>
-                </div>
-                <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100">
-                  <div className="text-3xl font-black text-emerald-600 mb-1">Free</div>
-                  <div className="text-xs font-semibold text-emerald-400 uppercase tracking-widest">To post</div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mb-8">
-                {['Escrow Protected', 'Verified Travellers', 'Real-time Tracking', 'Free to Post'].map((t) => (
-                  <div key={t} className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-full px-4 py-2">
-                    <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                    <span className="text-xs font-semibold text-emerald-700">{t}</span>
-                  </div>
-                ))}
-              </div>
-
-              <Link href="/register?type=hooper"
-                className="flex items-center justify-between bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-8 py-5 rounded-2xl font-bold text-base shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all active:scale-[0.98] group">
-                <span>Send Your First Item</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
+              ))}
             </div>
-
+            
             <div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-10">How Hoopers get started</h3>
-              <div className="space-y-0">
-                {hooperSteps.map((step, i) => (
-                  <div key={i} className={`flex gap-5 pb-8 relative ${i < hooperSteps.length - 1 ? 'before:absolute before:left-5 before:top-11 before:w-px before:h-[calc(100%-20px)] before:bg-gradient-to-b before:from-emerald-200 before:to-transparent' : ''}`}>
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-emerald-200 bg-emerald-50 flex items-center justify-center z-10">
-                      <span className="text-xs font-bold text-emerald-600">{step.num}</span>
+              <h3 className="text-3xl font-black mb-12 flex items-center gap-3">
+                <span className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-xl flex items-center justify-center">
+                  🎯
+                </span>
+                How it works
+              </h3>
+              
+              {hooperSteps.map((s, i) => (
+                <div 
+                  key={i} 
+                  className="group flex gap-6 mb-8 p-6 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-emerald-500/20 cursor-pointer"
+                >
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-emerald-500/50 group-hover:scale-110 transition-transform duration-300">
+                      {s.icon}
                     </div>
-                    <div className="pt-2">
-                      <h4 className="font-bold text-slate-900 mb-1">{step.title}</h4>
-                      <p className="text-sm text-slate-500 leading-relaxed">{step.desc}</p>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-400 rounded-full flex items-center justify-center text-xs font-bold text-slate-900">
+                      {s.num}
                     </div>
                   </div>
-                ))}
-              </div>
+                  <div className="flex-1">
+                    <div className="font-bold text-xl mb-2 text-white group-hover:text-emerald-400 transition-colors duration-300">
+                      {s.title}
+                    </div>
+                    <div className="text-slate-400 text-sm leading-relaxed">
+                      {s.desc}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── SAFETY ── */}
-      <section className="bg-slate-50 py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 mb-4 px-5 py-2 rounded-full bg-white border border-slate-200 shadow-sm">
-              <Shield className="w-4 h-4 text-blue-500" />
-              <span className="text-xs font-bold tracking-widest uppercase text-slate-600">Built to protect you</span>
+      {/* SAFETY */}
+      <section className="relative py-32 px-6 mt-32">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-800/30 to-transparent"></div>
+        
+        <div className="max-w-7xl mx-auto relative">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-purple-500/20 border border-purple-400/30 rounded-full px-6 py-3 mb-6">
+              <Lock className="w-4 h-4 text-purple-400" />
+              <span className="text-sm text-purple-300 font-semibold">Bank-Level Security</span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900">
-              Safety &amp; <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Security</span>
-            </h2>
+            <h2 className="text-5xl font-black mb-4">Built on trust</h2>
+            <p className="text-slate-400 text-lg">Your safety is our top priority</p>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
+          
+          <div className="grid md:grid-cols-3 gap-8">
             {[
-              { icon: <Shield className="h-6 w-6 text-blue-600" />, bg: 'bg-blue-50 border-blue-100', iconBg: 'bg-blue-100', title: 'Identity Verification', desc: 'Every user undergoes rigorous verification before their first transaction. Government ID, address check, ongoing review.', stat: '100%', statLabel: 'Verified users', statColor: 'text-blue-600' },
-              { icon: <CheckCircle className="h-6 w-6 text-emerald-600" />, bg: 'bg-emerald-50 border-emerald-100', iconBg: 'bg-emerald-100', title: 'Escrow Payments', desc: 'Funds are held securely from the moment of agreement. Released only when both parties confirm successful delivery.', stat: '£0', statLabel: 'Lost to fraud', statColor: 'text-emerald-600' },
-              { icon: <Star className="h-6 w-6 text-amber-600" />, bg: 'bg-amber-50 border-amber-100', iconBg: 'bg-amber-100', title: 'Community Rating', desc: 'Every delivery is rated by both parties. Our reputation system surfaces the best travellers and most reliable senders.', stat: '95%', statLabel: 'Satisfaction rate', statColor: 'text-amber-600' },
-            ].map((card, i) => (
-              <div key={i} className={`rounded-3xl border ${card.bg} p-8`}>
-                <div className={`w-12 h-12 rounded-2xl ${card.iconBg} flex items-center justify-center mb-6`}>{card.icon}</div>
-                <h3 className="font-bold text-slate-900 text-lg mb-3">{card.title}</h3>
-                <p className="text-sm text-slate-500 leading-relaxed mb-8">{card.desc}</p>
-                <div className="border-t border-slate-200/60 pt-6">
-                  <div className={`text-4xl font-black ${card.statColor} mb-1`}>{card.stat}</div>
-                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-widest">{card.statLabel}</div>
+              { icon: Shield, title: 'Verification', desc: 'All users verified with government ID and background checks.', color: 'blue' },
+              { icon: CheckCircle, title: 'Escrow Protection', desc: 'Funds protected until successful delivery confirmation.', color: 'emerald' },
+              { icon: Star, title: 'Rating System', desc: 'Trusted community with transparent reviews and ratings.', color: 'purple' },
+            ].map((item, i) => (
+              <div 
+                key={i}
+                className="group relative overflow-hidden bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-10 rounded-3xl hover:border-slate-600 transition-all duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer"
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br from-${item.color}-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                <div className="relative">
+                  <div className={`w-16 h-16 bg-gradient-to-br from-${item.color}-500 to-${item.color}-400 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-${item.color}-500/50 group-hover:scale-110 transition-transform duration-300`}>
+                    <item.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="font-black text-2xl mb-3 text-white">{item.title}</h3>
+                  <p className="text-slate-400 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -277,40 +395,40 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* ── FINAL CTA ── */}
-      <section className="py-20 px-6 bg-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-6xl font-black text-slate-900 leading-tight mb-6">
-            Your journey starts<br />
-            <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">right now.</span>
+      {/* CTA */}
+      <section className="relative py-32 text-center px-6">
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+        
+        <div className="max-w-4xl mx-auto relative">
+          <h2 className="text-6xl font-black mb-6 leading-tight">
+            Ready to <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">transform</span><br/>
+            your journey?
           </h2>
-          <p className="text-slate-500 text-lg mb-10 max-w-xl mx-auto">
-            Join thousands of verified travellers and senders already part of the BootHop community.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register?type=booter" className="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white px-10 py-4 rounded-2xl font-bold shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all active:scale-[0.98]">
-              I&apos;m a Traveller <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link href="/register?type=hooper" className="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-10 py-4 rounded-2xl font-bold shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all active:scale-[0.98]">
-              I need to Send <ArrowRight className="w-4 h-4" />
-            </Link>
+          <p className="text-slate-400 text-xl mb-12">Join thousands already earning and saving with BootHop</p>
+          
+          <div className="flex flex-col sm:flex-row justify-center gap-6">
+            <a 
+              href="/register?type=booter"
+              className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-10 py-5 rounded-xl text-lg font-bold hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3"
+            >
+              I'm a Traveller
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+            </a>
+            <a 
+              href="/register?type=hooper"
+              className="group bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-10 py-5 rounded-xl text-lg font-bold hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3"
+            >
+              I'm a Sender
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+            </a>
           </div>
-          <p className="text-xs text-slate-400 mt-6 tracking-widest uppercase">Free to join · No subscription · Cancel anytime</p>
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer className="border-t border-slate-100 py-8 px-6 bg-white">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center font-bold text-white text-sm">B</div>
-            <span className="font-bold text-slate-900">Boot<span className="text-blue-500">Hop</span></span>
-          </Link>
-          <p className="text-xs text-slate-400">© {new Date().getFullYear()} BootHop. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <Link href="/terms" className="text-xs text-slate-400 hover:text-slate-700 transition-colors">Terms</Link>
-            <Link href="/privacy" className="text-xs text-slate-400 hover:text-slate-700 transition-colors">Privacy</Link>
-          </div>
+      {/* Footer */}
+      <footer className="border-t border-slate-800 py-12 px-6">
+        <div className="max-w-7xl mx-auto text-center text-slate-500 text-sm">
+          © 2024 BootHop. Revolutionizing delivery, one journey at a time.
         </div>
       </footer>
     </div>

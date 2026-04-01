@@ -8,7 +8,7 @@ import {
   Users, User, Package, DollarSign, AlertTriangle, 
   CheckCircle, XCircle, Shield, Search, Filter,
   Eye, Ban, Mail, Calendar, MapPin, Loader2,
-  TrendingUp, Activity, Download, RefreshCw
+  TrendingUp, Activity, Download, RefreshCw, Clock
 } from 'lucide-react';
 
 const supabase = createClient(
