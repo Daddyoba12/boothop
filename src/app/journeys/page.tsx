@@ -28,12 +28,14 @@ export default function BrowseJourneysPage() {
   useEffect(() => { fetchJourneys(); }, []);
 
   const fetchJourneys = async () => {
+    // Same-day trips are never listed — only journeys from tomorrow onwards
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
     try {
       let query = supabase
         .from('journeys')
         .select(`*, profiles:booter_id (full_name, rating, completed_deliveries)`)
         .eq('status', 'active')
-        .gte('departure_date', new Date().toISOString().split('T')[0])
+        .gte('departure_date', tomorrow)
         .order('departure_date', { ascending: true });
 
       const { data, error } = await query;
@@ -115,6 +117,7 @@ export default function BrowseJourneysPage() {
             </span>
           </h1>
           <p className="text-slate-300 text-xl">Find verified travelers going your way</p>
+          <p className="mt-3 text-sm text-slate-500">Showing journeys from tomorrow onwards — same-day trips are not listed.</p>
         </div>
       </section>
 
