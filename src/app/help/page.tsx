@@ -1,11 +1,11 @@
+'use client';
+
 import Link from 'next/link';
-import { ChevronDown, Package, Plane, Shield, CreditCard, MessageCircle, UserCheck, Clock, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronDown, Package, Plane, Shield, CreditCard, MessageCircle, UserCheck, Clock, AlertTriangle, ArrowRight, Sparkles } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
 
-export const metadata = {
-  title: 'Help Centre – BootHop',
-  description: 'Find answers to common questions about sending and carrying items on BootHop.',
-};
+export const metadata = undefined; // metadata moved to layout for client pages
 
 const faqs = [
   {
@@ -27,7 +27,7 @@ const faqs = [
       },
       {
         q: 'How do I sign up?',
-        a: 'Simply enter your journey or delivery details on the home page and click Register. We\'ll send you a secure magic link to your email — no password needed. Once verified, your listing goes live immediately.',
+        a: "Simply enter your journey or delivery details on the home page and click Register. We'll send you a secure magic link to your email — no password needed. Once verified, your listing goes live immediately.",
       },
     ],
   },
@@ -122,7 +122,7 @@ const faqs = [
     items: [
       {
         q: 'How long does matching take?',
-        a: 'Our matching engine runs automatically when you post a listing. If a compatible match already exists, you\'ll be notified within minutes. If not, you\'ll be alerted as soon as a match comes in.',
+        a: "Our matching engine runs automatically when you post a listing. If a compatible match already exists, you'll be notified within minutes. If not, you'll be alerted as soon as a match comes in.",
       },
       {
         q: 'Can I edit my listing after posting?',
@@ -136,85 +136,130 @@ const faqs = [
   },
 ];
 
-const colorMap: Record<string, string> = {
-  blue: 'bg-blue-50 text-blue-600 border-blue-100',
-  emerald: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-  violet: 'bg-violet-50 text-violet-600 border-violet-100',
-  red: 'bg-red-50 text-red-600 border-red-100',
-  amber: 'bg-amber-50 text-amber-600 border-amber-100',
+const glowMap: Record<string, string> = {
+  blue:   'from-blue-500 to-cyan-400 shadow-blue-500/50',
+  emerald:'from-emerald-500 to-teal-400 shadow-emerald-500/50',
+  violet: 'from-violet-500 to-purple-400 shadow-violet-500/50',
+  red:    'from-red-500 to-rose-400 shadow-red-500/50',
+  amber:  'from-amber-500 to-yellow-400 shadow-amber-500/50',
+};
+
+const borderMap: Record<string, string> = {
+  blue:   'hover:border-blue-500/50 hover:shadow-blue-500/20',
+  emerald:'hover:border-emerald-500/50 hover:shadow-emerald-500/20',
+  violet: 'hover:border-violet-500/50 hover:shadow-violet-500/20',
+  red:    'hover:border-red-500/50 hover:shadow-red-500/20',
+  amber:  'hover:border-amber-500/50 hover:shadow-amber-500/20',
 };
 
 function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
   return (
-    <details className="group border-b border-slate-100 last:border-0">
-      <summary className="flex cursor-pointer items-center justify-between gap-4 py-5 pr-2 text-sm font-semibold text-slate-800 hover:text-blue-600 transition-colors list-none">
+    <div className="border-b border-white/10 last:border-0">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full cursor-pointer items-center justify-between gap-4 py-5 pr-2 text-left text-sm font-semibold text-white hover:text-cyan-400 transition-colors"
+      >
         {q}
-        <ChevronDown className="h-4 w-4 flex-shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
-      </summary>
-      <p className="pb-5 text-sm leading-relaxed text-slate-500">{a}</p>
-    </details>
+        <ChevronDown className={`h-4 w-4 flex-shrink-0 text-slate-400 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && <p className="pb-5 text-sm leading-relaxed text-slate-400">{a}</p>}
+    </div>
   );
 }
 
 export default function HelpPage() {
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden">
+
+      {/* ANIMATED BACKGROUND BLOBS */}
+      <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
+        <div className="absolute top-0 -left-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'4s'}} />
+        <div className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'6s',animationDelay:'2s'}} />
+        <div className="absolute bottom-40 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s',animationDelay:'1s'}} />
+      </div>
 
       {/* NAV */}
-      <nav className="fixed top-0 w-full z-50 border-b border-slate-100 bg-white/95 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-2xl">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/">
-            <BootHopLogo iconClass="text-slate-900" textClass="text-slate-900" />
+            <BootHopLogo iconClass="text-white" textClass="text-white" />
           </Link>
-          <Link href="/" className="text-sm text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1 group">
-            <span className="group-hover:-translate-x-1 transition-transform inline-block">←</span> Back to Home
+          <Link href="/" className="text-sm text-slate-400 hover:text-white flex items-center gap-2 transition-all duration-300 hover:gap-3">
+            ← Back
           </Link>
         </div>
       </nav>
 
-      {/* HERO */}
-      <section className="pt-32 pb-14 px-6 bg-gradient-to-b from-slate-50 to-white text-center">
-        <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 rounded-full bg-blue-50 border border-blue-100">
-          <MessageCircle className="h-4 w-4 text-blue-500" />
-          <span className="text-xs font-semibold tracking-widest uppercase text-blue-600">Help Centre</span>
+      {/* HERO — background image with parallax + gradient overlay */}
+      <section className="relative min-h-[65vh] flex items-center justify-center text-center overflow-hidden">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url(/images/GoingonHolsz.jpg)',
+            backgroundAttachment: 'fixed',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-900/55 to-slate-950/95" />
+
+        {/* Animated ping dots */}
+        <div className="absolute inset-0 opacity-50 pointer-events-none">
+          <div className="absolute top-24 left-1/4 w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
+          <div className="absolute top-44 right-1/3 w-2 h-2 bg-blue-400 rounded-full animate-ping" style={{animationDelay:'1s'}} />
+          <div className="absolute bottom-24 left-1/2 w-2 h-2 bg-purple-400 rounded-full animate-ping" style={{animationDelay:'2s'}} />
         </div>
-        <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-4">How can we help?</h1>
-        <p className="text-slate-500 text-base max-w-xl mx-auto mb-8">
-          Everything you need to know about sending and carrying items on BootHop.
-        </p>
-        <div className="flex flex-wrap justify-center gap-3">
-          <Link href="/contact" className="rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition">
-            Contact Support
-          </Link>
-          <Link href="/how-it-works" className="rounded-xl border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">
-            How It Works
-          </Link>
+
+        <div className="relative z-10 pt-36 pb-20 px-6 max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/30 rounded-full px-6 py-3 mb-8 backdrop-blur-xl">
+            <Sparkles className="w-4 h-4 text-cyan-400" />
+            <span className="text-sm text-cyan-300 font-medium">Help Centre</span>
+          </div>
+          <h1 className="text-6xl md:text-7xl font-black mb-6 leading-tight">
+            How can we{' '}
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent animate-pulse">
+              help?
+            </span>
+          </h1>
+          <p className="text-slate-300 text-xl max-w-2xl mx-auto mb-10">
+            Everything you need to know about sending and carrying items on BootHop.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/contact" className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 flex items-center gap-2">
+              Contact Support
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+            </Link>
+            <Link href="/how-it-works" className="border border-white/20 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+              How It Works
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* ALERT BOX */}
-      <div className="max-w-3xl mx-auto px-6 mb-10">
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 flex items-start gap-3 p-4">
-          <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-800">
-            <span className="font-semibold">Never carry items you haven't inspected.</span> BootHop is a peer-to-peer platform — always verify item contents before agreeing to carry anything.
+      <div className="relative z-10 max-w-3xl mx-auto px-6 mt-10 mb-6">
+        <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 backdrop-blur-sm flex items-start gap-3 p-5">
+          <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-200 leading-relaxed">
+            <span className="font-semibold text-amber-300">Never carry items you haven't inspected.</span> BootHop is a peer-to-peer platform — always verify item contents before agreeing to carry anything.
           </p>
         </div>
       </div>
 
       {/* FAQ SECTIONS */}
-      <main className="max-w-3xl mx-auto px-6 pb-24">
+      <main className="relative z-10 max-w-3xl mx-auto px-6 pb-24">
         {faqs.map((section) => {
           const Icon = section.icon;
           return (
-            <div key={section.category} className="mb-12">
-              <div className="flex items-center gap-3 mb-6">
-                <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${colorMap[section.color]}`}>
-                  <Icon className="h-5 w-5" />
+            <div key={section.category} className="mb-10">
+              <div className="flex items-center gap-3 mb-5">
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${glowMap[section.color]} flex items-center justify-center shadow-lg`}>
+                  <Icon className="h-5 w-5 text-white" />
                 </div>
-                <h2 className="text-lg font-black text-slate-900">{section.category}</h2>
+                <h2 className="text-lg font-black text-white">{section.category}</h2>
               </div>
-              <div className="rounded-2xl border border-slate-100 bg-white shadow-sm px-6">
+              <div className={`rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm px-6 transition-all duration-500 hover:border-slate-600/70 hover:shadow-xl ${borderMap[section.color]}`}>
                 {section.items.map((item) => (
                   <FaqItem key={item.q} q={item.q} a={item.a} />
                 ))}
@@ -224,17 +269,23 @@ export default function HelpPage() {
         })}
 
         {/* STILL NEED HELP */}
-        <div className="rounded-2xl border border-blue-100 bg-blue-50 p-8 text-center">
-          <h3 className="text-xl font-black text-slate-900 mb-2">Still need help?</h3>
-          <p className="text-sm text-slate-500 mb-6">Our support team typically responds within 24 hours on business days.</p>
-          <Link href="/contact" className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition">
-            <MessageCircle className="h-4 w-4" /> Get in Touch
-          </Link>
+        <div className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-sm p-10 text-center">
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl" />
+          <div className="relative">
+            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/50">
+              <MessageCircle className="h-7 w-7 text-white" />
+            </div>
+            <h3 className="text-2xl font-black text-white mb-2">Still need help?</h3>
+            <p className="text-sm text-slate-400 mb-6">Our support team typically responds within 24 hours on business days.</p>
+            <Link href="/contact" className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105">
+              <MessageCircle className="h-4 w-4" /> Get in Touch
+            </Link>
+          </div>
         </div>
       </main>
 
       {/* FOOTER */}
-      <footer className="bg-slate-950 px-6 py-10 text-center text-sm text-slate-500">
+      <footer className="relative z-10 border-t border-slate-800 px-6 py-12 text-center text-sm text-slate-500">
         <p>© {new Date().getFullYear()} BootHop. All rights reserved.</p>
         <div className="mt-3 flex justify-center gap-5">
           {[['Terms', '/terms'], ['Privacy', '/privacy'], ['Contact', '/contact']].map(([label, href]) => (
