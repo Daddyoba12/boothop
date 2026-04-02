@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Shield, Eye, Lock, Database, Globe, Mail, UserCheck, Trash2 } from 'lucide-react';
-import BootHopLogo from '@/components/BootHopLogo';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
 
 export const metadata = {
   title: 'Privacy Policy – BootHop',
@@ -11,14 +12,17 @@ function Section({ id, title, icon: Icon, children }: {
   id: string; title: string; icon: React.ElementType; children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="mb-14 scroll-mt-24">
-      <div className="flex items-center gap-3 mb-5">
-        <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-          <Icon className="h-5 w-5 text-blue-600" />
+    <section id={id} className="mb-10 scroll-mt-28">
+      <div className="group relative overflow-hidden rounded-2xl border border-white/8 bg-white/3 hover:bg-white/5 hover:border-blue-500/20 transition-all duration-300 p-7">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none" />
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/40 group-hover:scale-110 transition-transform duration-300">
+            <Icon className="h-5 w-5 text-white" />
+          </div>
+          <h2 className="text-lg font-black text-white">{title}</h2>
         </div>
-        <h2 className="text-xl font-black text-slate-900">{title}</h2>
+        <div className="relative space-y-4 text-sm text-slate-400 leading-relaxed">{children}</div>
       </div>
-      <div className="space-y-4 text-sm text-slate-600 leading-relaxed">{children}</div>
     </section>
   );
 }
@@ -32,7 +36,7 @@ function Ul({ items }: { items: string[] }) {
     <ul className="space-y-2 pl-2">
       {items.map((item, i) => (
         <li key={i} className="flex items-start gap-2.5">
-          <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-blue-400 flex-shrink-0" />
+          <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-cyan-400 flex-shrink-0" />
           <span>{item}</span>
         </li>
       ))}
@@ -44,38 +48,41 @@ export default function PrivacyPage() {
   const lastUpdated = '31 March 2026';
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white font-sans overflow-x-hidden">
 
-      {/* NAV */}
-      <nav className="fixed top-0 w-full z-50 border-b border-slate-100 bg-white/95 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/">
-            <BootHopLogo iconClass="text-slate-900" textClass="text-slate-900" />
-          </Link>
-          <Link href="/" className="text-sm text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1 group">
-            <span className="group-hover:-translate-x-1 transition-transform inline-block">←</span> Back to Home
-          </Link>
-        </div>
-      </nav>
+      {/* ANIMATED BACKGROUND BLOBS */}
+      <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
+        <div className="absolute top-0 -left-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'4s'}} />
+        <div className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'6s',animationDelay:'2s'}} />
+        <div className="absolute bottom-40 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s',animationDelay:'1s'}} />
+      </div>
+
+      <NavBar />
 
       {/* HERO */}
-      <section className="pt-32 pb-12 px-6 bg-gradient-to-b from-slate-50 to-white text-center">
-        <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 rounded-full bg-blue-50 border border-blue-100">
-          <Shield className="h-4 w-4 text-blue-500" />
-          <span className="text-xs font-semibold tracking-widest uppercase text-blue-600">Privacy Policy</span>
+      <section className="relative pt-36 pb-16 px-6 text-center z-10">
+        <div className="inline-flex items-center gap-2 mb-6 px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/30 backdrop-blur-xl">
+          <Shield className="h-4 w-4 text-cyan-400" />
+          <span className="text-xs font-semibold tracking-widest uppercase text-cyan-300">Privacy Policy</span>
         </div>
-        <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-4">Your privacy matters</h1>
-        <p className="text-slate-500 text-base max-w-xl mx-auto">
+        <h1 className="text-5xl md:text-6xl font-black text-white mb-4">
+          Your privacy{' '}
+          <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
+            matters
+          </span>
+        </h1>
+        <p className="text-slate-400 text-base max-w-xl mx-auto">
           We are committed to protecting your personal data. This policy explains what we collect, why, and how we keep it safe.
         </p>
-        <p className="text-xs text-slate-400 mt-4">Last updated: {lastUpdated} · BootHop Ltd, United Kingdom</p>
+        <p className="text-xs text-slate-500 mt-4">Last updated: {lastUpdated} · BootHop Ltd, United Kingdom</p>
       </section>
 
-      {/* TABLE OF CONTENTS */}
-      <div className="max-w-3xl mx-auto px-6 mb-10">
-        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-6">
-          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-4">Contents</p>
-          <ol className="space-y-2 text-sm text-slate-600 list-none">
+      <div className="relative z-10 max-w-3xl mx-auto px-6 pb-24">
+
+        {/* TABLE OF CONTENTS */}
+        <div className="rounded-2xl border border-white/8 bg-white/3 backdrop-blur-sm p-6 mb-12">
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">Contents</p>
+          <ol className="space-y-2 text-sm list-none">
             {[
               ['who-we-are', 'Who We Are'],
               ['data-we-collect', 'Data We Collect'],
@@ -90,23 +97,19 @@ export default function PrivacyPage() {
               ['contact-dpo', 'Contact & DPO'],
             ].map(([id, label], i) => (
               <li key={id}>
-                <a href={`#${id}`} className="flex items-center gap-2 hover:text-blue-600 transition">
-                  <span className="text-xs font-bold text-slate-300 w-5">{i + 1}.</span>
+                <a href={`#${id}`} className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors">
+                  <span className="text-xs font-bold text-slate-600 w-5">{i + 1}.</span>
                   {label}
                 </a>
               </li>
             ))}
           </ol>
         </div>
-      </div>
-
-      {/* BODY */}
-      <main className="max-w-3xl mx-auto px-6 pb-24">
 
         <Section id="who-we-are" title="Who We Are" icon={Shield}>
           <P>BootHop Ltd ("BootHop", "we", "us") is a company registered in the United Kingdom. We operate the peer-to-peer delivery platform available at boothop.co.uk and its associated applications.</P>
           <P>BootHop acts as the data controller for the personal information you provide when using our platform.</P>
-          <P>If you have questions about how we handle your data, please contact us at <a href="mailto:privacy@boothop.co.uk" className="text-blue-600 underline">privacy@boothop.co.uk</a>.</P>
+          <P>If you have questions about how we handle your data, please contact us at <a href="mailto:privacy@boothop.co.uk" className="text-cyan-400 hover:text-cyan-300 underline transition-colors">privacy@boothop.co.uk</a>.</P>
         </Section>
 
         <Section id="data-we-collect" title="Data We Collect" icon={Database}>
@@ -189,7 +192,7 @@ export default function PrivacyPage() {
             'Right to object: object to processing based on legitimate interests',
             'Right to withdraw consent: for any processing based on your consent',
           ]} />
-          <P>To exercise any of these rights, email <a href="mailto:privacy@boothop.co.uk" className="text-blue-600 underline">privacy@boothop.co.uk</a>. We will respond within 30 days. You also have the right to lodge a complaint with the UK Information Commissioner's Office (ICO) at ico.org.uk.</P>
+          <P>To exercise any of these rights, email <a href="mailto:privacy@boothop.co.uk" className="text-cyan-400 hover:text-cyan-300 underline transition-colors">privacy@boothop.co.uk</a>. We will respond within 30 days. You also have the right to lodge a complaint with the UK Information Commissioner's Office (ICO) at ico.org.uk.</P>
         </Section>
 
         <Section id="cookies" title="Cookies" icon={Eye}>
@@ -217,25 +220,17 @@ export default function PrivacyPage() {
 
         <Section id="contact-dpo" title="Contact & Data Protection" icon={Mail}>
           <P>For all privacy-related enquiries, please contact:</P>
-          <div className="rounded-xl border border-slate-100 bg-slate-50 p-5 space-y-1">
-            <p className="font-semibold text-slate-800">BootHop Ltd — Data Protection</p>
-            <p>Email: <a href="mailto:privacy@boothop.co.uk" className="text-blue-600 underline">privacy@boothop.co.uk</a></p>
+          <div className="rounded-xl border border-white/8 bg-white/3 p-5 space-y-1">
+            <p className="font-semibold text-white">BootHop Ltd — Data Protection</p>
+            <p>Email: <a href="mailto:privacy@boothop.co.uk" className="text-cyan-400 hover:text-cyan-300 underline transition-colors">privacy@boothop.co.uk</a></p>
             <p>Registered in England and Wales</p>
           </div>
           <P>We aim to respond to all privacy enquiries within 30 days. For urgent data protection concerns, mark your email with "URGENT – Data Protection".</P>
         </Section>
 
-      </main>
+      </div>
 
-      {/* FOOTER */}
-      <footer className="bg-slate-950 px-6 py-10 text-center text-sm text-slate-500">
-        <p>© {new Date().getFullYear()} BootHop. All rights reserved.</p>
-        <div className="mt-3 flex justify-center gap-5">
-          {[['Terms', '/terms'], ['Help', '/help'], ['Contact', '/contact']].map(([label, href]) => (
-            <Link key={href} href={href} className="hover:text-white transition">{label}</Link>
-          ))}
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -59,7 +59,7 @@ export default function AboutPage() {
           {/* Left Video */}
           <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-blue-500/20 shadow-2xl shadow-blue-500/20 hover:scale-[1.03] hover:shadow-blue-500/40 hover:border-blue-400/40 transition-all duration-500 cursor-pointer">
             <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
-              <source src="/videos/Aboutus_train.mp4" type="video/mp4" />
+              <source src="/videos/planex.mp4" type="video/mp4" />
             </video>
             {/* Glassmorphism overlays */}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
@@ -90,7 +90,7 @@ export default function AboutPage() {
           {/* Right Video */}
           <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-purple-500/20 shadow-2xl shadow-purple-500/20 hover:scale-[1.03] hover:shadow-purple-500/40 hover:border-purple-400/40 transition-all duration-500 cursor-pointer">
             <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
-              <source src="/videos/Aboutus_train.mp4" type="video/mp4" />
+              <source src="/videos/planex.mp4" type="video/mp4" />
             </video>
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
