@@ -17,11 +17,11 @@ const weightOptions = [
   { value: 'large',  label: 'Large (23–32kg)' },
 ];
 
-// Three images that rotate in the left panel
+// Three images that rotate in the left panel — your register page images
 const slides = [
-  { src: '/images/Handover.jpg',    alt: 'BootHop handover' },
-  { src: '/images/Traveling.jpg',   alt: 'Travelling with BootHop' },
-  { src: '/images/betterPics.jpg',  alt: 'BootHop community' },
+  { src: '/images/Handover.jpg',  alt: 'BootHop delivery handover' },
+  { src: '/images/D_login1.jpg',  alt: 'BootHop traveller' },
+  { src: '/images/D_login2.jpg',  alt: 'BootHop community' },
 ];
 
 function RegisterForm() {
@@ -162,9 +162,9 @@ function RegisterForm() {
       {/* ══════════════════════════════════════════
           LEFT PANEL — scrolling image carousel (60%)
       ══════════════════════════════════════════ */}
-      <div className="hidden lg:block lg:w-3/5 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-3/5 relative flex-col justify-between p-12 overflow-hidden">
 
-        {/* Slides */}
+        {/* Slides — stacked absolutely, cross-fading */}
         {slides.map((s, i) => (
           <div
             key={s.src}
@@ -182,61 +182,55 @@ function RegisterForm() {
           </div>
         ))}
 
-        {/* Dark gradient overlay — stronger on right so it blends into form */}
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/10 via-slate-900/30 to-slate-950/85 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-slate-950/40 pointer-events-none" />
+        {/* Same overlay as pagecpy — blue-tinted dark */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-950/85 via-slate-900/75 to-blue-900/60 pointer-events-none" />
 
         {/* Ping dots */}
         <div className="absolute inset-0 opacity-50 pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
-          <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-blue-400 rounded-full animate-ping" style={{ animationDelay: '1s' }} />
-          <div className="absolute bottom-1/3 left-1/3 w-2 h-2 bg-purple-400 rounded-full animate-ping" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-1/3 right-1/3 w-2 h-2 bg-blue-400 rounded-full animate-ping" style={{ animationDelay: '1s' }} />
+          <div className="absolute bottom-1/3 left-1/2 w-2 h-2 bg-purple-400 rounded-full animate-ping" style={{ animationDelay: '2s' }} />
         </div>
 
-        {/* Slide indicators */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setSlide(i)}
-              className={`h-1.5 rounded-full transition-all duration-500 ${i === slide ? 'w-8 bg-cyan-400' : 'w-1.5 bg-white/30 hover:bg-white/60'}`}
-            />
-          ))}
-        </div>
+        {/* Logo — top (relative z-10 matches pagecpy pattern) */}
+        <Link href="/" className="relative z-10 inline-flex group">
+          <BootHopLogo size="lg" iconClass="text-white group-hover:scale-110 transition-transform duration-300" textClass="text-white" />
+        </Link>
 
-        {/* Logo top-left */}
-        <div className="absolute top-0 left-0 p-10 z-10">
-          <Link href="/" className="inline-flex group">
-            <BootHopLogo size="lg" iconClass="text-white group-hover:scale-110 transition-transform duration-300" textClass="text-white" />
-          </Link>
-        </div>
-
-        {/* Bottom text */}
-        <div className="absolute bottom-0 left-0 p-10 pb-20 z-10 space-y-4 max-w-md">
+        {/* Bottom content — matches pagecpy justify-between bottom */}
+        <div className="relative z-10 space-y-5">
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 backdrop-blur-sm">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
             <span className="text-sm text-white/80 font-medium">Live platform · 10K+ verified users</span>
           </div>
-          <h2 className="text-white text-4xl font-black leading-tight drop-shadow-lg">
+          <h2 className="text-white text-3xl font-black leading-snug drop-shadow-lg">
             Post your trip.<br />
             <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
               Earn while you travel.
             </span>
           </h2>
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             {[
               { v: '50K+', l: 'successful deliveries' },
               { v: '200+', l: 'cities worldwide' },
               { v: '95%',  l: 'satisfaction rate' },
             ].map((s) => (
               <div key={s.l} className="flex items-center gap-3">
-                <div className="w-7 h-7 bg-cyan-500/20 border border-cyan-500/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <CheckCircle className="h-3.5 w-3.5 text-cyan-400" />
-                </div>
+                <CheckCircle className="h-5 w-5 text-cyan-400 flex-shrink-0" />
                 <span className="text-white/80 text-sm drop-shadow">
-                  <strong className="text-white font-bold">{s.v}</strong> {s.l}
+                  <strong className="text-white font-semibold">{s.v}</strong> {s.l}
                 </span>
               </div>
+            ))}
+          </div>
+          {/* Slide indicators */}
+          <div className="flex gap-2 pt-2">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setSlide(i)}
+                className={`h-1.5 rounded-full transition-all duration-500 ${i === slide ? 'w-8 bg-cyan-400 shadow-lg shadow-cyan-400/50' : 'w-2 bg-white/30 hover:bg-white/60'}`}
+              />
             ))}
           </div>
         </div>
