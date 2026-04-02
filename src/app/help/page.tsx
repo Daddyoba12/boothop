@@ -1,12 +1,13 @@
-'use client';
-
 import Link from 'next/link';
-import { useState } from 'react';
 import { ChevronDown, Package, Plane, Shield, CreditCard, MessageCircle, UserCheck, Clock, AlertTriangle, ArrowRight, Sparkles } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import FaqAccordion from './FaqAccordion';
 
-
+export const metadata = {
+  title: 'Help & Support - BootHop',
+  description: 'Everything you need to know about sending and carrying items on BootHop. Get answers to common questions about peer-to-peer delivery.',
+};
 
 const faqs = [
   {
@@ -153,22 +154,6 @@ const borderMap: Record<string, string> = {
   amber:  'hover:border-amber-500/50 hover:shadow-amber-500/20',
 };
 
-function FaqItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-white/10 last:border-0">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex w-full cursor-pointer items-center justify-between gap-4 py-5 pr-2 text-left text-sm font-semibold text-white hover:text-cyan-400 transition-colors"
-      >
-        {q}
-        <ChevronDown className={`h-4 w-4 flex-shrink-0 text-slate-400 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
-      </button>
-      {open && <p className="pb-5 text-sm leading-relaxed text-slate-400">{a}</p>}
-    </div>
-  );
-}
-
 export default function HelpPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden">
@@ -182,7 +167,7 @@ export default function HelpPage() {
 
       <NavBar />
 
-      {/* HERO — background image with parallax + gradient overlay */}
+      {/* HERO */}
       <section className="relative min-h-[65vh] flex items-center justify-center text-center overflow-hidden">
         <div
           className="absolute inset-0"
@@ -195,7 +180,6 @@ export default function HelpPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-900/55 to-slate-950/95" />
 
-        {/* Animated ping dots */}
         <div className="absolute inset-0 opacity-50 pointer-events-none">
           <div className="absolute top-24 left-1/4 w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
           <div className="absolute top-44 right-1/3 w-2 h-2 bg-blue-400 rounded-full animate-ping" style={{animationDelay:'1s'}} />
@@ -252,7 +236,7 @@ export default function HelpPage() {
               </div>
               <div className={`rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm px-6 transition-all duration-500 hover:border-slate-600/70 hover:shadow-xl ${borderMap[section.color]}`}>
                 {section.items.map((item) => (
-                  <FaqItem key={item.q} q={item.q} a={item.a} />
+                  <FaqAccordion key={item.q} q={item.q} a={item.a} />
                 ))}
               </div>
             </div>
