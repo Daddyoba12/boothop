@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Plane, ArrowRight, Shield, Clock, CheckCircle, Mail, RefreshCw } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
 
-const bgImages = ['/images/D_login1.jpg', '/images/D_login2.jpg', '/images/WBoothop.jpg'];
+const bgImages = ['/images/D_login1.jpg', '/images/D_login2.jpg'];
 
 export default function LoginPage() {
   const router   = useRouter();

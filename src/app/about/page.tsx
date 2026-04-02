@@ -12,7 +12,7 @@ const VIDEOS = [
   '/videos/planex.mp4',
   '/videos/AboutusMov.mp4',
 ];
-const SLIDES = ['/images/Customs1.jpg', '/images/Handover.jpg', '/images/meetuup2.jpg'];
+const SLIDES = ['/images/Customs1.jpg', '/images/Handover.jpg', '/images/GoingonHolsz.jpg'];
 
 export default function AboutPage() {
   const [scrollY, setScrollY] = useState(0);
@@ -82,51 +82,57 @@ export default function AboutPage() {
         {/* Three Boxes Side by Side — left/right: cycling videos, centre: image slideshow */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-3 gap-5">
 
-          {/* LEFT — cycling video: train → planex → AboutusMov */}
+          {/* LEFT — all 3 videos always playing, crossfade by opacity */}
           <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-blue-500/20 shadow-2xl shadow-blue-500/20 hover:scale-[1.03] hover:shadow-blue-500/40 hover:border-blue-400/40 transition-all duration-500 cursor-pointer">
-            <video
-              key={VIDEOS[leftIdx]}
-              autoPlay muted loop playsInline
-              className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
-            >
-              <source src={VIDEOS[leftIdx]} type="video/mp4" />
-            </video>
+            {VIDEOS.map((src, i) => (
+              <video
+                key={src}
+                autoPlay muted loop playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ opacity: i === leftIdx ? 1 : 0, transition: 'opacity 1.4s cubic-bezier(0.4,0,0.2,1)' }}
+              >
+                <source src={src} type="video/mp4" />
+              </video>
+            ))}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-blue-400/30 transition-all duration-500" />
           </div>
 
-          {/* CENTRE — image slideshow */}
+          {/* CENTRE — image slideshow, all images stacked, crossfade by opacity */}
           <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-cyan-500/25 shadow-2xl shadow-cyan-500/25 hover:scale-[1.03] hover:shadow-cyan-500/50 hover:border-cyan-400/50 transition-all duration-500 cursor-pointer">
             {SLIDES.map((src, i) => (
               <img
                 key={src}
                 src={src}
                 alt=""
-                className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-                style={{ opacity: i === slideIdx ? 1 : 0 }}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ opacity: i === slideIdx ? 1 : 0, transition: 'opacity 1.4s cubic-bezier(0.4,0,0.2,1)' }}
               />
             ))}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
             <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-cyan-400/30 transition-all duration-500" />
             {/* Slide dots */}
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 z-10">
               {SLIDES.map((_, i) => (
-                <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${i === slideIdx ? 'w-5 bg-cyan-400' : 'w-1.5 bg-white/30'}`} />
+                <div key={i} className={`h-1.5 rounded-full transition-all duration-700 ${i === slideIdx ? 'w-5 bg-cyan-400' : 'w-1.5 bg-white/30'}`} />
               ))}
             </div>
           </div>
 
-          {/* RIGHT — cycling video: AboutusMov → train → planex */}
+          {/* RIGHT — all 3 videos always playing, crossfade by opacity (offset sequence) */}
           <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-purple-500/20 shadow-2xl shadow-purple-500/20 hover:scale-[1.03] hover:shadow-purple-500/40 hover:border-purple-400/40 transition-all duration-500 cursor-pointer">
-            <video
-              key={VIDEOS[rightIdx]}
-              autoPlay muted loop playsInline
-              className="absolute inset-0 w-full h-full object-cover"
-            >
-              <source src={VIDEOS[rightIdx]} type="video/mp4" />
-            </video>
+            {VIDEOS.map((src, i) => (
+              <video
+                key={src}
+                autoPlay muted loop playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ opacity: i === rightIdx ? 1 : 0, transition: 'opacity 1.4s cubic-bezier(0.4,0,0.2,1)' }}
+              >
+                <source src={src} type="video/mp4" />
+              </video>
+            ))}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-purple-400/30 transition-all duration-500" />

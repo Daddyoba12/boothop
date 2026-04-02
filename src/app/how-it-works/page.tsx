@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { ArrowRight, Shield, CheckCircle, Star, Sparkles, TrendingUp, Globe, Lock, ArrowUp } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
@@ -115,10 +116,10 @@ export default function HowItWorksPage() {
                 </p>
                 
                 <div className="flex gap-4">
-                  <button className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 flex items-center gap-2">
+                  <Link href="/register" className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 flex items-center gap-2">
                     Get Started
                     <ArrowRight className="w-5 h-5" />
-                  </button>
+                  </Link>
                 </div>
               </div>
               
@@ -244,10 +245,10 @@ export default function HowItWorksPage() {
                   Faster, cheaper, and more trusted delivery through our global traveller network.
                 </p>
                 <div className="flex gap-4">
-                  <button className="bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center gap-2">
+                  <Link href="/register" className="bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center gap-2">
                     Get Started
                     <ArrowRight className="w-5 h-5" />
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
