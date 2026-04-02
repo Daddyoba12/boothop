@@ -91,7 +91,7 @@ export default function HowItWorksPage() {
             {/* Background Image */}
             <div className="absolute inset-0">
               <img
-                src="/images/boothopeveryd.jpg"
+                src="/images/Delivery.jpg"
                 alt="Delivery" 
                 className="w-full h-full object-cover"
               />

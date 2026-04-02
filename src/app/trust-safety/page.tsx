@@ -108,6 +108,18 @@ export default function TrustSafetyPage() {
 
       {/* HERO */}
       <section className="relative pt-40 pb-28 px-6 text-center overflow-hidden">
+        {/* Background image with parallax */}
+        <div
+          className="absolute inset-0"
+          style={{ transform:`translateY(${scrollY*0.25}px)` }}
+        >
+          <img
+            src="/images/boothopeveryd.jpg"
+            alt=""
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-900/70 to-slate-950/95" />
+        </div>
         <div className="absolute inset-0 opacity-30 pointer-events-none" style={{transform:`translateY(${scrollY*0.4}px)`}}>
           <div className="absolute top-20 left-1/4 w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
           <div className="absolute top-40 right-1/3 w-2 h-2 bg-blue-400 rounded-full animate-ping" style={{animationDelay:'1s'}} />

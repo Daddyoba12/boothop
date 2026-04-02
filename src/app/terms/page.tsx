@@ -480,25 +480,6 @@ export default function TermsPage() {
           <P>For questions about these Terms, contact us at <a href="mailto:legal@boothop.com" className="text-cyan-400 hover:text-cyan-300 underline transition-colors">legal@boothop.com</a>.</P>
         </Section>
 
-        {/* ACCEPTANCE */}
-        <div className="relative overflow-hidden rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-sm p-8 mt-8">
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="relative">
-            <h2 className="text-xl font-black text-white mb-3">Your acceptance</h2>
-            <p className="text-sm text-slate-400 leading-relaxed mb-6">
-              By using BootHop — whether as a Sender, Traveller, or visitor — you confirm that you have read, understood, and agree to be bound by these Terms &amp; Conditions in their entirety. If you do not agree, you must not use the Platform.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/login" className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-blue-500/40 hover:scale-105 active:scale-[0.97] transition-all duration-200">
-                I Agree — Get Started
-              </Link>
-              <Link href="/trust-safety" className="inline-flex items-center gap-2 border border-white/20 text-slate-300 text-sm font-semibold px-6 py-3 rounded-xl hover:bg-white/10 hover:scale-105 active:scale-[0.97] transition-all duration-200">
-                Trust &amp; Safety
-              </Link>
-            </div>
-          </div>
-        </div>
-
       </div>
 
       <Footer />

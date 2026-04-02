@@ -56,6 +56,7 @@ export default function HooperDashboard() {
   const [profile,  setProfile]  = useState<Profile | null>(null);
   const [requests, setRequests] = useState<DeliveryRequest[]>([]);
   const [matches,  setMatches]  = useState<DeliveryMatch[]>([]);
+  const [trips,    setTrips]    = useState<any[]>([]);
   const [loading,  setLoading]  = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -65,15 +66,17 @@ export default function HooperDashboard() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { router.push('/login'); return; }
 
-        const [{ data: prof }, { data: reqs }, { data: mtchs }] = await Promise.all([
+        const [{ data: prof }, { data: reqs }, { data: mtchs }, { data: myTrips }] = await Promise.all([
           supabase.from('profiles').select('*').eq('id', user.id).single(),
           supabase.from('delivery_requests').select('*').eq('hooper_id', user.id).order('preferred_pickup_date', { ascending: true }),
           supabase.from('delivery_matches').select('*').eq('hooper_id', user.id).order('created_at', { ascending: false }),
+          supabase.from('trips').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
         ]);
 
         setProfile(prof);
         setRequests(reqs ?? []);
         setMatches(mtchs ?? []);
+        setTrips(myTrips ?? []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -263,6 +266,57 @@ export default function HooperDashboard() {
                       <div className="text-xs text-slate-400">offered</div>
                     </div>
                     <ArrowRight className="h-4 w-4 text-slate-300" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* My Posted Journeys (from trips table) */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <h2 className="font-bold text-slate-900">My Posted Journeys</h2>
+            <span className="text-xs text-slate-400">{trips.length} trip{trips.length !== 1 ? 's' : ''} registered</span>
+          </div>
+          {trips.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center px-4">
+              <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mb-3">
+                <Plane className="h-7 w-7 text-slate-400" />
+              </div>
+              <p className="text-slate-600 font-medium mb-1">No journeys posted yet</p>
+              <p className="text-slate-400 text-sm">Journeys you register from the home page will appear here</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {trips.map((t) => (
+                <div key={t.id} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${t.type === 'travel' ? 'bg-blue-50' : 'bg-emerald-50'}`}>
+                      {t.type === 'travel'
+                        ? <Plane className="h-5 w-5 text-blue-600" />
+                        : <Package className="h-5 w-5 text-emerald-600" />}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-medium text-slate-900 text-sm truncate">
+                        {t.from_city} → {t.to_city}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {t.travel_date ? new Date(t.travel_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                        {t.weight ? ` · ${t.weight} kg` : ''}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${t.type === 'travel' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-700'}`}>
+                      {t.type === 'travel' ? 'Booter' : 'Hooper'}
+                    </span>
+                    {t.price && (
+                      <div className="text-right hidden sm:block">
+                        <div className="text-sm font-bold text-slate-800">£{Number(t.price).toFixed(2)}</div>
+                        <div className="text-xs text-slate-400">agreed</div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
