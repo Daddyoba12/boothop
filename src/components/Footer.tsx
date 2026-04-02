@@ -23,7 +23,7 @@ export default function Footer() {
             <div className="flex gap-3 mt-6">
               {/* Instagram */}
               <a
-                href="https://www.instagram.com/boothop"
+                href="https://www.instagram.com/boothop.com1"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="BootHop on Instagram"

@@ -12,7 +12,7 @@ function Section({ id, title, icon: Icon, children }: {
 }) {
   return (
     <section id={id} className="mb-10 scroll-mt-28">
-      <div className="group relative overflow-hidden rounded-2xl border border-white/8 bg-white/3 hover:bg-white/5 hover:border-blue-500/20 transition-all duration-300 p-7">
+      <div className="group relative overflow-hidden rounded-2xl border border-white/8 bg-white/3 hover:bg-white/5 hover:border-blue-500/20 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/10 active:scale-[0.97] transition-all duration-300 p-7 cursor-pointer">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none" />
         <div className="flex items-center gap-3 mb-5">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/40 group-hover:scale-110 transition-transform duration-300">

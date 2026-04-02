@@ -143,14 +143,20 @@ export default function TrustSafetyPage() {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {pipeline.map((step, i) => (
-              <div key={step.label} className="group relative rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-5 text-center hover:scale-105 transition-all duration-500 hover:border-slate-600 hover:shadow-xl cursor-pointer">
-                <span className="text-slate-500 text-xs font-mono mb-2 block">{String(i+1).padStart(2,'0')}</span>
-                <span className={`inline-block px-2 py-1 rounded-full text-white text-[10px] font-bold uppercase tracking-wider mb-3 bg-gradient-to-r ${step.color}`}>
-                  {step.label}
-                </span>
-                <p className="text-slate-400 text-xs leading-relaxed">{step.desc}</p>
+              <div key={step.label} className="group relative rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-5 text-center hover:scale-[1.06] active:scale-[0.97] transition-all duration-300 hover:shadow-2xl cursor-pointer overflow-hidden">
+                {/* Colour glow on hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${step.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-2xl`} />
+                {/* Top edge light bar */}
+                <div className={`absolute top-0 left-4 right-4 h-px bg-gradient-to-r ${step.color} opacity-0 group-hover:opacity-60 transition-opacity duration-300`} />
+                <div className="relative">
+                  <span className="text-slate-500 text-xs font-mono mb-2 block group-hover:text-slate-400 transition-colors">{String(i+1).padStart(2,'0')}</span>
+                  <span className={`inline-block px-2 py-1 rounded-full text-white text-[10px] font-bold uppercase tracking-wider mb-3 bg-gradient-to-r ${step.color} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    {step.label}
+                  </span>
+                  <p className="text-slate-400 text-xs leading-relaxed group-hover:text-slate-300 transition-colors duration-300">{step.desc}</p>
+                </div>
                 {i < pipeline.length-1 && (
-                  <div className="hidden md:block absolute -right-2 top-1/2 -translate-y-1/2 text-slate-600 text-lg">→</div>
+                  <div className="hidden md:block absolute -right-2 top-1/2 -translate-y-1/2 text-slate-600 text-lg group-hover:text-slate-400 transition-colors">→</div>
                 )}
               </div>
             ))}
