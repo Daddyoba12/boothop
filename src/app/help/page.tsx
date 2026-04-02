@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ChevronDown, Package, Plane, Shield, CreditCard, MessageCircle, UserCheck, Clock, AlertTriangle, ArrowRight, Sparkles } from 'lucide-react';
+import { Package, Plane, Shield, CreditCard, MessageCircle, UserCheck, Clock, AlertTriangle, ArrowRight, Sparkles } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import FaqAccordion from './FaqAccordion';
@@ -157,8 +157,6 @@ const borderMap: Record<string, string> = {
 export default function HelpPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden">
-
-      {/* ANIMATED BACKGROUND BLOBS */}
       <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
         <div className="absolute top-0 -left-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'4s'}} />
         <div className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'6s',animationDelay:'2s'}} />
@@ -167,25 +165,14 @@ export default function HelpPage() {
 
       <NavBar />
 
-      {/* HERO */}
       <section className="relative min-h-[65vh] flex items-center justify-center text-center overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: 'url(/images/GoingonHolsz.jpg)',
-            backgroundAttachment: 'fixed',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
+        <div className="absolute inset-0" style={{backgroundImage: 'url(/images/GoingonHolsz.jpg)', backgroundAttachment: 'fixed', backgroundSize: 'cover', backgroundPosition: 'center'}} />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-900/55 to-slate-950/95" />
-
         <div className="absolute inset-0 opacity-50 pointer-events-none">
           <div className="absolute top-24 left-1/4 w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
           <div className="absolute top-44 right-1/3 w-2 h-2 bg-blue-400 rounded-full animate-ping" style={{animationDelay:'1s'}} />
           <div className="absolute bottom-24 left-1/2 w-2 h-2 bg-purple-400 rounded-full animate-ping" style={{animationDelay:'2s'}} />
         </div>
-
         <div className="relative z-10 pt-36 pb-20 px-6 max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/30 rounded-full px-6 py-3 mb-8 backdrop-blur-xl">
             <Sparkles className="w-4 h-4 text-cyan-400" />
@@ -193,26 +180,19 @@ export default function HelpPage() {
           </div>
           <h1 className="text-6xl md:text-7xl font-black mb-6 leading-tight">
             How can we{' '}
-            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent animate-pulse">
-              help?
-            </span>
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent animate-pulse">help?</span>
           </h1>
-          <p className="text-slate-300 text-xl max-w-2xl mx-auto mb-10">
-            Everything you need to know about sending and carrying items on BootHop.
-          </p>
+          <p className="text-slate-300 text-xl max-w-2xl mx-auto mb-10">Everything you need to know about sending and carrying items on BootHop.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/contact" className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 active:scale-[0.96] flex items-center gap-2">
               Contact Support
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
-            <Link href="/how-it-works" className="border border-white/20 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
-              How It Works
-            </Link>
+            <Link href="/how-it-works" className="border border-white/20 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all duration-300 hover:scale-105 backdrop-blur-sm">How It Works</Link>
           </div>
         </div>
       </section>
 
-      {/* ALERT BOX */}
       <div className="relative z-10 max-w-3xl mx-auto px-6 mt-10 mb-6">
         <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 backdrop-blur-sm flex items-start gap-3 p-5">
           <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
@@ -222,7 +202,6 @@ export default function HelpPage() {
         </div>
       </div>
 
-      {/* FAQ SECTIONS */}
       <main className="relative z-10 max-w-3xl mx-auto px-6 pb-24">
         {faqs.map((section) => {
           const Icon = section.icon;
@@ -243,7 +222,6 @@ export default function HelpPage() {
           );
         })}
 
-        {/* STILL NEED HELP */}
         <div className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-sm p-10 text-center">
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl" />
           <div className="relative">
