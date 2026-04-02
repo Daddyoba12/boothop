@@ -87,11 +87,11 @@ export default function HowItWorksPage() {
         
         <div className="max-w-7xl mx-auto relative">
           {/* Hero Card */}
-          <div className="relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/10">
+          <div className="relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/10 hover:scale-[1.015] active:scale-[0.99] hover:shadow-blue-500/25 transition-all duration-500 cursor-pointer">
             {/* Background Image */}
             <div className="absolute inset-0">
-              <img 
-                src="/images/Delivery.jpg" 
+              <img
+                src="/images/boothopeveryd.jpg"
                 alt="Delivery" 
                 className="w-full h-full object-cover"
               />
@@ -199,7 +199,7 @@ export default function HowItWorksPage() {
               ].map((stat, i) => (
                 <div 
                   key={i}
-                  className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-8 hover:scale-105 transition-all duration-500 hover:shadow-2xl cursor-pointer"
+                  className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-8 hover:scale-105 active:scale-[0.95] transition-all duration-300 hover:shadow-2xl cursor-pointer"
                 >
                   <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
                   <div className="text-4xl mb-3">{stat.icon}</div>
@@ -218,10 +218,10 @@ export default function HowItWorksPage() {
         
         <div className="max-w-7xl mx-auto relative">
           {/* Hero Card */}
-          <div className="relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-emerald-500/10">
+          <div className="relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-emerald-500/10 hover:scale-[1.015] active:scale-[0.99] hover:shadow-emerald-500/25 transition-all duration-500 cursor-pointer">
             {/* Background Image */}
             <div className="absolute inset-0">
-              <img 
+              <img
                 src="/images/GoingonHols.jpg" 
                 alt="Going on Holidays" 
                 className="w-full h-full object-cover object-top"
@@ -265,7 +265,7 @@ export default function HowItWorksPage() {
               ].map((stat, i) => (
                 <div 
                   key={i}
-                  className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-8 hover:scale-105 transition-all duration-500 hover:shadow-2xl cursor-pointer"
+                  className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-8 hover:scale-105 active:scale-[0.95] transition-all duration-300 hover:shadow-2xl cursor-pointer"
                 >
                   <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
                   <div className="text-4xl mb-3">{stat.icon}</div>
