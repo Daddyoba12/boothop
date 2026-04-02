@@ -182,15 +182,15 @@ function RegisterForm() {
           </div>
         ))}
 
-        {/* Same overlay as pagecpy — blue-tinted dark */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-950/85 via-slate-900/75 to-blue-900/60 pointer-events-none" />
-
-        {/* Ping dots */}
-        <div className="absolute inset-0 opacity-50 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
-          <div className="absolute top-1/3 right-1/3 w-2 h-2 bg-blue-400 rounded-full animate-ping" style={{ animationDelay: '1s' }} />
-          <div className="absolute bottom-1/3 left-1/2 w-2 h-2 bg-purple-400 rounded-full animate-ping" style={{ animationDelay: '2s' }} />
-        </div>
+        {/* Premium multi-layer overlay */}
+        {/* 1. Deep colour wash — pulls image into brand palette */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950/70 via-blue-950/50 to-slate-900/60 pointer-events-none" />
+        {/* 2. Bottom vignette — makes text legible without killing the photo */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/30 to-transparent pointer-events-none" />
+        {/* 3. Top vignette — logo area stays readable */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-transparent to-transparent pointer-events-none" />
+        {/* 4. Subtle left edge glow — adds depth */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-transparent to-transparent pointer-events-none" />
 
         {/* Logo — top (relative z-10 matches pagecpy pattern) */}
         <Link href="/" className="relative z-10 inline-flex group">
