@@ -11,7 +11,13 @@
       "Read(//c/Users/babso/desktop/boothop/**)",
       "Bash(done)",
       "Bash(python3:*)",
-      "Bash(NEXT_TURBOPACK=0 npx next build)"
+      "Bash(NEXT_TURBOPACK=0 npx next build)",
+      "Bash(do)",
+      "Read(//c/Users/babso/desktop/boothop/public/images/**)",
+      "Bash(echo \"OK: $f\")",
+      "Bash(echo \"MISSING: $f\")",
+      "Bash(ls public/images/how-it-works*)",
+      "Bash(git restore:*)"
     ]
   }
 }

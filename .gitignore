@@ -44,3 +44,5 @@ next-env.d.ts
 
 # Large video files — serve from CDN, not git
 public/videos/
+
+.vercel
