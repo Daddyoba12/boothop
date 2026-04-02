@@ -7,12 +7,38 @@ import BootHopLogo from '@/components/BootHopLogo';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 
+const VIDEOS = [
+  '/videos/Aboutus_train.mp4',
+  '/videos/planex.mp4',
+  '/videos/AboutusMov.mp4',
+];
+const SLIDES = ['/images/Customs1.jpg', '/images/Handover.jpg', '/images/meetuup2.jpg'];
+
 export default function AboutPage() {
   const [scrollY, setScrollY] = useState(0);
+  const [leftIdx, setLeftIdx]  = useState(0);           // train → planex → AboutusMov
+  const [rightIdx, setRightIdx] = useState(2);          // AboutusMov → train → planex
+  const [slideIdx, setSlideIdx] = useState(0);
+
   useEffect(() => {
     const h = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', h);
     return () => window.removeEventListener('scroll', h);
+  }, []);
+
+  // Cycle side videos every 6 s
+  useEffect(() => {
+    const t = setInterval(() => {
+      setLeftIdx(p  => (p + 1) % 3);
+      setRightIdx(p => (p + 1) % 3);
+    }, 6000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Cycle centre images every 4 s
+  useEffect(() => {
+    const t = setInterval(() => setSlideIdx(p => (p + 1) % 3), 4000);
+    return () => clearInterval(t);
   }, []);
 
   return (
@@ -53,44 +79,53 @@ export default function AboutPage() {
           </p>
         </div>
 
-        {/* Three Videos Side by Side — square glassmorphism boxes */}
+        {/* Three Boxes Side by Side — left/right: cycling videos, centre: image slideshow */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-3 gap-5">
 
-          {/* Left Video */}
+          {/* LEFT — cycling video: train → planex → AboutusMov */}
           <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-blue-500/20 shadow-2xl shadow-blue-500/20 hover:scale-[1.03] hover:shadow-blue-500/40 hover:border-blue-400/40 transition-all duration-500 cursor-pointer">
-            <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
-              <source src="/videos/planex.mp4" type="video/mp4" />
+            <video
+              key={VIDEOS[leftIdx]}
+              autoPlay muted loop playsInline
+              className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+            >
+              <source src={VIDEOS[leftIdx]} type="video/mp4" />
             </video>
-            {/* Glassmorphism overlays */}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            {/* Inner glow border */}
             <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-blue-400/30 transition-all duration-500" />
           </div>
 
-          {/* Center Video (Main) */}
+          {/* CENTRE — image slideshow */}
           <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-cyan-500/25 shadow-2xl shadow-cyan-500/25 hover:scale-[1.03] hover:shadow-cyan-500/50 hover:border-cyan-400/50 transition-all duration-500 cursor-pointer">
-            <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" style={{objectPosition:'center center'}}>
-              <source src="/videos/about-us.mp4" type="video/mp4" />
-            </video>
+            {SLIDES.map((src, i) => (
+              <img
+                key={src}
+                src={src}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+                style={{ opacity: i === slideIdx ? 1 : 0 }}
+              />
+            ))}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
             <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-cyan-400/30 transition-all duration-500" />
-            {/* Badge overlay */}
-            <div className="absolute bottom-5 left-5 bg-slate-950/80 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/10 shadow-lg">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-md flex items-center justify-center flex-shrink-0">
-                  <Package className="h-3 w-3 text-white" />
-                </div>
-                <span className="font-semibold text-white text-xs tracking-wide">About BootHop</span>
-              </div>
+            {/* Slide dots */}
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
+              {SLIDES.map((_, i) => (
+                <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${i === slideIdx ? 'w-5 bg-cyan-400' : 'w-1.5 bg-white/30'}`} />
+              ))}
             </div>
           </div>
 
-          {/* Right Video */}
+          {/* RIGHT — cycling video: AboutusMov → train → planex */}
           <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-purple-500/20 shadow-2xl shadow-purple-500/20 hover:scale-[1.03] hover:shadow-purple-500/40 hover:border-purple-400/40 transition-all duration-500 cursor-pointer">
-            <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
-              <source src="/videos/planex.mp4" type="video/mp4" />
+            <video
+              key={VIDEOS[rightIdx]}
+              autoPlay muted loop playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+            >
+              <source src={VIDEOS[rightIdx]} type="video/mp4" />
             </video>
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

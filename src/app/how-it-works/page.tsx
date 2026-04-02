@@ -229,36 +229,7 @@ export default function HowItWorksPage() {
             </div>
             
             <div className="grid md:grid-cols-2 gap-8 p-12 relative z-10">
-              <div className="relative order-2 md:order-1">
-                <div className="absolute -top-6 -left-6 w-72 h-72 bg-gradient-to-br from-emerald-500/30 to-teal-500/30 rounded-full blur-3xl"></div>
-                <div className="relative bg-slate-900/40 backdrop-blur-md p-8 rounded-2xl border border-slate-700/30 shadow-xl">
-                  <div className="text-slate-400 text-sm mb-2 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4" />
-                    AVERAGE SAVINGS
-                  </div>
-                  <div className="text-5xl font-black bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-4">
-                    Up to 70%
-                  </div>
-                  <p className="text-slate-400 text-sm">Compared to traditional shipping</p>
-                  
-                  <div className="mt-6 pt-6 border-t border-slate-700/50 grid grid-cols-3 gap-4">
-                    <div>
-                      <div className="text-2xl font-bold text-white">50K</div>
-                      <div className="text-xs text-slate-400">Deliveries</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-white">200+</div>
-                      <div className="text-xs text-slate-400">Cities</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-emerald-400">Free</div>
-                      <div className="text-xs text-slate-400">To Start</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col justify-center order-1 md:order-2">
+              <div className="flex flex-col justify-center">
                 <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 rounded-full px-4 py-2 mb-6 w-fit">
                   <Globe className="w-4 h-4 text-emerald-400" />
                   <span className="text-sm text-emerald-300 font-semibold">For Senders</span>
@@ -279,6 +250,35 @@ export default function HowItWorksPage() {
                     Get Started
                     <ArrowRight className="w-5 h-5" />
                   </button>
+                </div>
+              </div>
+
+              {/* UP TO 70% — right column, glass see-through */}
+              <div className="relative flex items-center justify-end">
+                <div className="absolute -top-6 -right-6 w-72 h-72 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="relative w-full bg-white/5 backdrop-blur-md p-8 rounded-2xl border border-white/10 shadow-xl">
+                  <div className="text-slate-300 text-sm mb-2 flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-emerald-400" />
+                    AVERAGE SAVINGS
+                  </div>
+                  <div className="text-5xl font-black bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-4">
+                    Up to 70%
+                  </div>
+                  <p className="text-slate-400 text-sm">Compared to traditional shipping</p>
+                  <div className="mt-6 pt-6 border-t border-white/10 grid grid-cols-3 gap-4">
+                    <div>
+                      <div className="text-2xl font-bold text-white">50K</div>
+                      <div className="text-xs text-slate-400">Deliveries</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-white">200+</div>
+                      <div className="text-xs text-slate-400">Cities</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-emerald-400">Free</div>
+                      <div className="text-xs text-slate-400">To Start</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
