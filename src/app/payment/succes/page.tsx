@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import {
@@ -26,7 +26,7 @@ const STAGES = [
   { label: 'Released'     },
 ];
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const matchId      = searchParams?.get('match_id');
   const [processing, setProcessing] = useState(true);
@@ -162,5 +162,22 @@ export default function PaymentSuccessPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense 
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-16 h-16 text-blue-400 mx-auto mb-4 animate-spin" />
+            <p className="text-white/70">Loading...</p>
+          </div>
+        </div>
+      }
+    >
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }

@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { ChevronDown, Package, Plane, Shield, CreditCard, MessageCircle, UserCheck, Clock, AlertTriangle, ArrowRight, Sparkles } from 'lucide-react';
-import BootHopLogo from '@/components/BootHopLogo';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
 
 
 
@@ -179,17 +180,7 @@ export default function HelpPage() {
         <div className="absolute bottom-40 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s',animationDelay:'1s'}} />
       </div>
 
-      {/* NAV */}
-      <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/">
-            <BootHopLogo iconClass="text-white" textClass="text-white" />
-          </Link>
-          <Link href="/" className="text-sm text-slate-400 hover:text-white flex items-center gap-2 transition-all duration-300 hover:gap-3">
-            ← Back
-          </Link>
-        </div>
-      </nav>
+      <NavBar />
 
       {/* HERO — background image with parallax + gradient overlay */}
       <section className="relative min-h-[65vh] flex items-center justify-center text-center overflow-hidden">
@@ -226,7 +217,7 @@ export default function HelpPage() {
             Everything you need to know about sending and carrying items on BootHop.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/contact" className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 flex items-center gap-2">
+            <Link href="/contact" className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 active:scale-[0.96] flex items-center gap-2">
               Contact Support
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
@@ -284,15 +275,7 @@ export default function HelpPage() {
         </div>
       </main>
 
-      {/* FOOTER */}
-      <footer className="relative z-10 border-t border-slate-800 px-6 py-12 text-center text-sm text-slate-500">
-        <p>© {new Date().getFullYear()} BootHop. All rights reserved.</p>
-        <div className="mt-3 flex justify-center gap-5">
-          {[['Terms', '/terms'], ['Privacy', '/privacy'], ['Contact', '/contact']].map(([label, href]) => (
-            <Link key={href} href={href} className="hover:text-white transition">{label}</Link>
-          ))}
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

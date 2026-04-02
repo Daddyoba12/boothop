@@ -19,9 +19,9 @@ const weightOptions = [
 
 // Three images that rotate in the left panel — your register page images
 const slides = [
-  { src: '/images/Handover.jpg',  alt: 'BootHop delivery handover' },
-  { src: '/images/D_login1.jpg',  alt: 'BootHop traveller' },
-  { src: '/images/D_login2.jpg',  alt: 'BootHop community' },
+  { src: '/images/register_a.jpg',  alt: 'BootHop delivery handover' },
+  { src: '/images/register_b.jpg',  alt: 'BootHop traveller' },
+  { src: '/images/register_c.jpg',  alt: 'BootHop community' },
 ];
 
 function RegisterForm() {

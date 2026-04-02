@@ -1,3 +1,7 @@
+'use client';
+
+import { useState } from 'react';
+
 interface BootHopLogoProps {
   className?: string;
   textClass?: string;
@@ -11,6 +15,8 @@ export default function BootHopLogo({
   iconClass = '',
   size = 'md',
 }: BootHopLogoProps) {
+  const [pressed, setPressed] = useState(false);
+
   const sizeMap = {
     sm: { svg: 'h-7 w-7', text: 'text-lg' },
     md: { svg: 'h-9 w-9', text: 'text-2xl' },
@@ -19,7 +25,14 @@ export default function BootHopLogo({
   const s = sizeMap[size];
 
   return (
-    <span className={`inline-flex items-center gap-3 ${className}`}>
+    <span
+      className={`inline-flex items-center gap-3 select-none transition-transform duration-150 ease-out ${pressed ? 'scale-[0.88]' : 'scale-100'} ${className}`}
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => setPressed(false)}
+      onMouseLeave={() => setPressed(false)}
+      onTouchStart={() => setPressed(true)}
+      onTouchEnd={() => setPressed(false)}
+    >
       {/* Premium icon: stylised boot with motion lines + hop arc */}
       <svg
         viewBox="0 0 44 44"

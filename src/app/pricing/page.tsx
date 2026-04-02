@@ -1,427 +1,251 @@
+'use client';
+
 import Link from 'next/link';
-import { Package, DollarSign, Shield, Check, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Check, Shield, Package, DollarSign, Sparkles, ArrowRight, Lock, Zap, ChevronDown } from 'lucide-react';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
+
+const faqData = [
+  { q: 'When do I pay?', a: 'Hoopers pay when they accept a Booter\'s offer. Booters receive payment after both parties confirm the delivery is complete.' },
+  { q: 'What if the delivery isn\'t completed?', a: 'If both parties don\'t confirm completion, the payment stays in escrow. Our team will investigate and resolve the issue fairly.' },
+  { q: 'Can I negotiate the price?', a: 'Yes! Booters and Hoopers can message each other to negotiate before locking in the price. Once agreed, the price is locked.' },
+  { q: 'How do I receive my payment as a Booter?', a: 'Payments are automatically transferred to your bank account after both confirmations — typically 2–5 business days.' },
+  { q: 'Are there any additional costs?', a: 'No hidden fees from BootHop. However, you may be responsible for customs duties or taxes imposed by authorities.' },
+  { q: 'What payment methods do you accept?', a: 'All major credit/debit cards (Visa, Mastercard, Amex) and digital wallets, processed securely via Stripe.' },
+];
 
 export default function PricingPage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center space-x-2">
-              <Package className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">BootHop</span>
-            </Link>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/about" className="text-gray-600 hover:text-gray-900">
-                About Us
-              </Link>
-              <Link href="/how-it-works" className="text-gray-600 hover:text-gray-900">
-                How It Works
-              </Link>
-              <Link href="/pricing" className="text-blue-600 font-semibold">
-                Pricing
-              </Link>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden font-sans">
 
-            <div className="flex items-center space-x-4">
-              <Link href="/login" className="text-gray-600 hover:text-gray-900">
-                Login
-              </Link>
-              <Link 
-                href="/register" 
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-              >
-                Get Started
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* ANIMATED BLOBS */}
+      <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
+        <div className="absolute top-0 -left-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'4s'}} />
+        <div className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'6s',animationDelay:'2s'}} />
+        <div className="absolute bottom-40 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s',animationDelay:'1s'}} />
+      </div>
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-12 px-4 bg-gradient-to-b from-green-50 to-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="flex justify-center mb-6">
-            <div className="p-4 bg-green-100 rounded-full">
-              <DollarSign className="h-12 w-12 text-green-600" />
-            </div>
+      <NavBar />
+
+      {/* HERO */}
+      <section className="relative pt-40 pb-24 px-6 text-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-600/5 via-transparent to-transparent pointer-events-none" />
+        <div className="relative max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/30 rounded-full px-6 py-3 mb-8 backdrop-blur-xl">
+            <Sparkles className="w-4 h-4 text-cyan-400" />
+            <span className="text-sm text-cyan-300 font-medium">Transparent Pricing</span>
           </div>
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">Pricing & Fees</h1>
-          <p className="text-xl text-gray-600">
-            Transparent, fair pricing for everyone. No hidden fees.
+          <h1 className="text-6xl md:text-8xl font-black mb-6 leading-tight">
+            Simple,{' '}
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
+              fair fees.
+            </span>
+          </h1>
+          <p className="text-slate-400 text-xl max-w-2xl mx-auto leading-relaxed">
+            No hidden charges. No monthly plans. Pay only when you transact — everyone wins.
           </p>
         </div>
       </section>
 
-      {/* How Pricing Works */}
-      <section className="py-12 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">How Pricing Works</h2>
-            <p className="text-gray-600">Simple, transparent fees for both parties</p>
-          </div>
+      {/* PRICING CARDS */}
+      <section className="relative py-16 px-6">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Hooper Pricing */}
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-8">
-              <div className="flex items-center justify-center mb-6">
-                <div className="p-4 bg-blue-100 rounded-full">
-                  <Package className="h-10 w-10 text-blue-600" />
-                </div>
+          {/* Hooper Card */}
+          <div className="group relative overflow-hidden rounded-3xl border border-blue-500/25 bg-gradient-to-br from-blue-600/15 to-slate-900/40 backdrop-blur-sm p-10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20 hover:border-blue-400/40 transition-all duration-500 cursor-default active:scale-[0.98]">
+            <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-500/15 rounded-full blur-3xl group-hover:opacity-80 transition-opacity" />
+            <div className="relative">
+              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
+                <Package className="h-7 w-7 text-white" />
               </div>
-              
-              <h3 className="text-2xl font-bold text-center text-gray-900 mb-4">
-                For Hoopers (Senders)
-              </h3>
-              
-              <div className="bg-white rounded-lg p-6 mb-6">
-                <div className="text-center mb-4">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">+3%</div>
-                  <div className="text-gray-600">Service Fee</div>
-                </div>
-                
-                <div className="border-t pt-4">
-                  <p className="text-gray-700 mb-4">When you agree on a delivery price with a Booter:</p>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Agreed Price:</span>
-                      <span className="font-semibold">£100.00</span>
-                    </div>
-                    <div className="flex justify-between text-blue-600">
-                      <span>+ Service Fee (3%):</span>
-                      <span className="font-semibold">£3.00</span>
-                    </div>
-                    <div className="border-t pt-2 flex justify-between text-lg font-bold">
-                      <span>You Pay:</span>
-                      <span className="text-blue-600">£103.00</span>
-                    </div>
+              <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-1 mb-4">
+                <span className="text-xs font-bold uppercase tracking-widest text-blue-400">For Hoopers · Senders</span>
+              </div>
+              <div className="flex items-end gap-2 mb-2">
+                <span className="text-7xl font-black bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">+3%</span>
+              </div>
+              <p className="text-slate-400 mb-8 text-sm">Service fee on top of the agreed price</p>
+
+              {/* Example breakdown */}
+              <div className="bg-slate-900/60 rounded-2xl p-5 mb-8 border border-white/8">
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">Example · £100 delivery</p>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Agreed price</span>
+                    <span className="text-white font-semibold">£100.00</span>
+                  </div>
+                  <div className="flex justify-between text-blue-400">
+                    <span>+ Service fee (3%)</span>
+                    <span className="font-semibold">£3.00</span>
+                  </div>
+                  <div className="border-t border-white/10 pt-2 flex justify-between text-base font-black">
+                    <span className="text-white">You pay</span>
+                    <span className="text-cyan-400">£103.00</span>
                   </div>
                 </div>
               </div>
 
               <ul className="space-y-3">
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Pay only when a Booter accepts</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Funds held securely in escrow</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Released only after confirmation</span>
-                </li>
+                {['Pay only when a Booter accepts', 'Funds held securely in escrow', 'Released only after dual confirmation'].map((t) => (
+                  <li key={t} className="flex items-start gap-3">
+                    <div className="w-5 h-5 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="h-3 w-3 text-white" />
+                    </div>
+                    <span className="text-slate-400 text-sm">{t}</span>
+                  </li>
+                ))}
               </ul>
             </div>
+          </div>
 
-            {/* Booter Pricing */}
-            <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-8">
-              <div className="flex items-center justify-center mb-6">
-                <div className="p-4 bg-green-100 rounded-full">
-                  <DollarSign className="h-10 w-10 text-green-600" />
-                </div>
+          {/* Booter Card */}
+          <div className="group relative overflow-hidden rounded-3xl border border-emerald-500/25 bg-gradient-to-br from-emerald-600/15 to-slate-900/40 backdrop-blur-sm p-10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-emerald-500/20 hover:border-emerald-400/40 transition-all duration-500 cursor-default active:scale-[0.98]">
+            <div className="absolute -top-12 -right-12 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl group-hover:opacity-80 transition-opacity" />
+            <div className="relative">
+              <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/50 group-hover:scale-110 transition-transform duration-300">
+                <DollarSign className="h-7 w-7 text-white" />
               </div>
-              
-              <h3 className="text-2xl font-bold text-center text-gray-900 mb-4">
-                For Booters (Travelers)
-              </h3>
-              
-              <div className="bg-white rounded-lg p-6 mb-6">
-                <div className="text-center mb-4">
-                  <div className="text-4xl font-bold text-green-600 mb-2">-5%</div>
-                  <div className="text-gray-600">Service Fee</div>
-                </div>
-                
-                <div className="border-t pt-4">
-                  <p className="text-gray-700 mb-4">When you complete a delivery:</p>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Agreed Price:</span>
-                      <span className="font-semibold">£100.00</span>
-                    </div>
-                    <div className="flex justify-between text-red-600">
-                      <span>- Service Fee (5%):</span>
-                      <span className="font-semibold">£5.00</span>
-                    </div>
-                    <div className="border-t pt-2 flex justify-between text-lg font-bold">
-                      <span>You Receive:</span>
-                      <span className="text-green-600">£95.00</span>
-                    </div>
+              <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-3 py-1 mb-4">
+                <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">For Booters · Travellers</span>
+              </div>
+              <div className="flex items-end gap-2 mb-2">
+                <span className="text-7xl font-black bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">−5%</span>
+              </div>
+              <p className="text-slate-400 mb-8 text-sm">Deducted from the agreed price on payout</p>
+
+              <div className="bg-slate-900/60 rounded-2xl p-5 mb-8 border border-white/8">
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">Example · £100 delivery</p>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Agreed price</span>
+                    <span className="text-white font-semibold">£100.00</span>
+                  </div>
+                  <div className="flex justify-between text-red-400">
+                    <span>− Service fee (5%)</span>
+                    <span className="font-semibold">£5.00</span>
+                  </div>
+                  <div className="border-t border-white/10 pt-2 flex justify-between text-base font-black">
+                    <span className="text-white">You receive</span>
+                    <span className="text-emerald-400">£95.00</span>
                   </div>
                 </div>
               </div>
 
               <ul className="space-y-3">
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Earn money on your travels</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Fee covers identity verification</span>
-                </li>
-                <li className="flex items-start">
-                                <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Payment after both confirmations</span>
-                </li>
+                {['Earn money on your existing travels', 'Fee covers identity verification & escrow', 'Automatic payout after both confirmations'].map((t) => (
+                  <li key={t} className="flex items-start gap-3">
+                    <div className="w-5 h-5 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="h-3 w-3 text-white" />
+                    </div>
+                    <span className="text-slate-400 text-sm">{t}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Fee Breakdown */}
-      <section className="py-12 px-4 bg-gray-50">
+      {/* FEE TABLE */}
+      <section className="relative py-16 px-6">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Complete Fee Breakdown
-          </h2>
-          
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2">
-                    <th className="text-left py-4 px-4">Agreed Price</th>
-                    <th className="text-right py-4 px-4">Hooper Pays<br/><span className="text-sm font-normal text-gray-500">(+3%)</span></th>
-                    <th className="text-right py-4 px-4">Booter Receives<br/><span className="text-sm font-normal text-gray-500">(-5%)</span></th>
-                    <th className="text-right py-4 px-4">Platform Fee</th>
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-2 mb-4">
+              <Zap className="w-4 h-4 text-purple-400" />
+              <span className="text-xs font-bold uppercase tracking-widest text-purple-400">Fee Breakdown</span>
+            </div>
+            <h2 className="text-4xl font-black text-white">At a glance</h2>
+          </div>
+          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th className="text-left py-5 px-6 text-slate-400 font-semibold">Agreed Price</th>
+                  <th className="text-right py-5 px-6 text-blue-400 font-semibold">Hooper Pays<br/><span className="text-xs font-normal text-slate-500">(+3%)</span></th>
+                  <th className="text-right py-5 px-6 text-emerald-400 font-semibold">Booter Receives<br/><span className="text-xs font-normal text-slate-500">(−5%)</span></th>
+                  <th className="text-right py-5 px-6 text-slate-500 font-semibold">Platform Fee</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { agreed: 50,  hooper: 51.50, booter: 47.50, fee: 4 },
+                  { agreed: 100, hooper: 103,   booter: 95,    fee: 8 },
+                  { agreed: 200, hooper: 206,   booter: 190,   fee: 16 },
+                  { agreed: 500, hooper: 515,   booter: 475,   fee: 40 },
+                ].map((row, i) => (
+                  <tr key={row.agreed} className={`border-b border-white/5 hover:bg-white/3 transition-colors duration-200 ${i % 2 === 0 ? '' : 'bg-white/2'}`}>
+                    <td className="py-4 px-6 font-bold text-white">£{row.agreed}</td>
+                    <td className="py-4 px-6 text-right text-blue-400 font-bold">£{row.hooper.toFixed(2)}</td>
+                    <td className="py-4 px-6 text-right text-emerald-400 font-bold">£{row.booter.toFixed(2)}</td>
+                    <td className="py-4 px-6 text-right text-slate-500">£{row.fee.toFixed(2)}</td>
                   </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {[
-                    { agreed: 50, hooper: 51.50, booter: 47.50, platform: 4 },
-                    { agreed: 100, hooper: 103, booter: 95, platform: 8 },
-                    { agreed: 200, hooper: 206, booter: 190, platform: 16 },
-                    { agreed: 500, hooper: 515, booter: 475, platform: 40 },
-                  ].map((row) => (
-                    <tr key={row.agreed} className="hover:bg-gray-50">
-                      <td className="py-4 px-4 font-semibold">£{row.agreed}</td>
-                      <td className="py-4 px-4 text-right text-blue-600 font-semibold">£{row.hooper.toFixed(2)}</td>
-                      <td className="py-4 px-4 text-right text-green-600 font-semibold">£{row.booter.toFixed(2)}</td>
-                      <td className="py-4 px-4 text-right text-gray-600">£{row.platform.toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
 
-      {/* Escrow System */}
-      <section className="py-12 px-4 bg-white">
+      {/* ESCROW PIPELINE */}
+      <section className="relative py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <Shield className="h-12 w-12 text-purple-600 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Secure Escrow Process</h2>
-            <p className="text-gray-600">Your money is protected every step of the way</p>
+            <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-2 mb-4">
+              <Lock className="w-4 h-4 text-amber-400" />
+              <span className="text-xs font-bold uppercase tracking-widest text-amber-400">Secure Escrow</span>
+            </div>
+            <h2 className="text-4xl font-black text-white mb-2">How your money is protected</h2>
+            <p className="text-slate-400">Every penny secured, every step of the way</p>
           </div>
 
-          <div className="space-y-6">
-            <div className="flex items-start">
-              <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                <span className="text-xl font-bold text-blue-600">1</span>
+          <div className="space-y-4">
+            {[
+              { num: '01', title: 'Agreement & Lock-In', desc: 'Both parties agree on the price. Once locked in, the price cannot change.', gradient: 'from-blue-500 to-cyan-400', glow: 'shadow-blue-500/40' },
+              { num: '02', title: 'Payment to Escrow', desc: 'Hooper pays (agreed + 3%). Funds held securely — Booter cannot touch them yet.', gradient: 'from-amber-500 to-yellow-400', glow: 'shadow-amber-500/40' },
+              { num: '03', title: 'Delivery', desc: 'Booter delivers the item safely to the agreed destination.', gradient: 'from-purple-500 to-pink-400', glow: 'shadow-purple-500/40' },
+              { num: '04', title: 'Dual Confirmation Required', desc: 'BOTH parties must confirm: Booter confirms delivery, Hooper confirms receipt & condition.', gradient: 'from-orange-500 to-red-400', glow: 'shadow-orange-500/40' },
+              { num: '05', title: 'Automatic Release', desc: 'Once both confirm, payment releases automatically to the Booter. Fair for everyone.', gradient: 'from-emerald-500 to-teal-400', glow: 'shadow-emerald-500/40' },
+            ].map((step, i) => (
+              <div key={i} className="group flex gap-5 p-6 rounded-2xl border border-white/8 bg-white/3 hover:bg-white/6 hover:border-white/15 hover:scale-[1.01] transition-all duration-400 cursor-default active:scale-[0.99]">
+                <div className={`w-14 h-14 bg-gradient-to-br ${step.gradient} rounded-2xl flex items-center justify-center font-black text-white shadow-lg ${step.glow} flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+                  {step.num}
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-black text-white text-lg mb-1 group-hover:text-cyan-400 transition-colors duration-300">{step.title}</h3>
+                  <p className="text-slate-400 text-sm leading-relaxed">{step.desc}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-lg mb-1">Agreement & Lock-In</h3>
-                <p className="text-gray-600">
-                  Both parties agree on the price. Once locked in (like eBay), the price cannot change.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start">
-              <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                <span className="text-xl font-bold text-blue-600">2</span>
-              </div>
-              <div>
-                <h3 className="font-bold text-lg mb-1">Payment to Escrow</h3>
-                <p className="text-gray-600">
-                  Hooper pays their amount (agreed price + 3%). Funds are held securely in escrow—safe and protected.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start">
-              <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                <span className="text-xl font-bold text-blue-600">3</span>
-              </div>
-              <div>
-                <h3 className="font-bold text-lg mb-1">Delivery</h3>
-                <p className="text-gray-600">
-                  Booter delivers the item safely to the agreed destination.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start">
-              <div className="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
-                <span className="text-xl font-bold text-purple-600">4</span>
-              </div>
-              <div>
-                <h3 className="font-bold text-lg mb-1">Dual Confirmation Required ⚡</h3>
-                <p className="text-gray-600 mb-2">
-                  <strong>BOTH parties must confirm:</strong>
-                </p>
-                <ul className="space-y-1 text-gray-600 ml-4">
-                  <li>✅ Booter confirms: "I delivered the item"</li>
-                  <li>✅ Hooper confirms: "I received the item in good condition"</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="flex items-start">
-              <div className="flex-shrink-0 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
-                <span className="text-xl font-bold text-green-600">5</span>
-              </div>
-              <div>
-                <h3 className="font-bold text-lg mb-1">Automatic Payment Release</h3>
-                <p className="text-gray-600">
-                  Once BOTH confirmations are received, payment is automatically released to the Booter. Fair and secure for everyone! 🎉
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8 bg-purple-50 border-2 border-purple-200 rounded-lg p-6">
-            <div className="flex items-start">
-              <Shield className="h-6 w-6 text-purple-600 mr-3 flex-shrink-0 mt-1" />
-              <div>
-                <h4 className="font-bold text-purple-900 mb-2">Why Dual Confirmation?</h4>
-                <p className="text-purple-800">
-                  This protects both parties. Hoopers confirm they received their item, and Booters confirm they 
-                  completed the delivery. Only when both are satisfied is the payment released—ensuring fairness and trust.
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* What the Fee Covers */}
-      <section className="py-12 px-4 bg-gray-50">
+      {/* NO HIDDEN FEES */}
+      <section className="relative py-16 px-6">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            What Do the Fees Cover?
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="font-bold text-lg mb-4 text-gray-900">Platform Services</h3>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Secure matching system</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Messaging and communication</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Rating and review system</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Customer support</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="font-bold text-lg mb-4 text-gray-900">Security & Trust</h3>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Identity verification</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Secure escrow payments</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Fraud prevention</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Dispute resolution</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="font-bold text-lg mb-4 text-gray-900">Payment Processing</h3>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Secure card processing</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">International transfers</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Automatic payouts</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Transaction records</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="font-bold text-lg mb-4 text-gray-900">Platform Maintenance</h3>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Server infrastructure</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Security updates</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Feature improvements</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Mobile app development</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* No Hidden Fees */}
-      <section className="py-12 px-4 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-8 text-center">
-            <Check className="h-16 w-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">No Hidden Fees</h2>
-            <p className="text-xl text-gray-700 mb-6">
-              What you see is what you pay. No surprises, no additional charges.
-            </p>
-            <div className="grid md:grid-cols-3 gap-4 text-left">
-              <div className="bg-white rounded-lg p-4">
-                <p className="font-semibold text-gray-900 mb-1">❌ No Listing Fees</p>
-                <p className="text-sm text-gray-600">Post journeys or requests for free</p>
+          <div className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-600/10 to-slate-900/40 backdrop-blur-sm p-12 text-center">
+            <div className="absolute -top-10 -right-10 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/50">
+                <Check className="h-8 w-8 text-white" />
               </div>
-              <div className="bg-white rounded-lg p-4">
-                <p className="font-semibold text-gray-900 mb-1">❌ No Monthly Fees</p>
-                <p className="text-sm text-gray-600">Pay only when you transact</p>
-              </div>
-              <div className="bg-white rounded-lg p-4">
-                <p className="font-semibold text-gray-900 mb-1">❌ No Cancellation Fees</p>
-                <p className="text-sm text-gray-600">Cancel anytime before acceptance</p>
+              <h2 className="text-4xl font-black text-white mb-3">No Hidden Fees</h2>
+              <p className="text-slate-400 text-lg mb-10 max-w-lg mx-auto">What you see is what you pay. No surprises, no additional charges.</p>
+              <div className="grid md:grid-cols-3 gap-4">
+                {[
+                  { icon: '❌', title: 'No Listing Fees', desc: 'Post journeys or requests for free' },
+                  { icon: '❌', title: 'No Monthly Fees', desc: 'Pay only when you transact' },
+                  { icon: '❌', title: 'No Cancellation Fees', desc: 'Cancel anytime before acceptance' },
+                ].map((item) => (
+                  <div key={item.title} className="bg-white/5 rounded-2xl p-5 border border-white/8 hover:bg-white/8 hover:scale-105 transition-all duration-300 active:scale-[0.98]">
+                    <div className="text-2xl mb-2">{item.icon}</div>
+                    <p className="font-bold text-white mb-1 text-sm">{item.title}</p>
+                    <p className="text-xs text-slate-500">{item.desc}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -429,135 +253,68 @@ export default function PricingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-12 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Frequently Asked Questions
-          </h2>
-
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="font-bold text-lg mb-2">When do I pay?</h3>
-              <p className="text-gray-600">
-                <strong>Hoopers</strong> pay when they accept a Booter's offer. <strong>Booters</strong> receive payment 
-                after both parties confirm the delivery is complete.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="font-bold text-lg mb-2">What if the delivery isn't completed?</h3>
-              <p className="text-gray-600">
-                If both parties don't confirm completion, the payment remains in escrow. Our support team will 
-                investigate and resolve the issue fairly.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="font-bold text-lg mb-2">Can I negotiate the price?</h3>
-              <p className="text-gray-600">
-                Yes! Booters and Hoopers can message each other to negotiate before locking in the price. 
-                Once agreed, the price is locked.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="font-bold text-lg mb-2">How do I receive my payment as a Booter?</h3>
-              <p className="text-gray-600">
-                Payments are automatically transferred to your bank account after both confirmations. 
-                Processing typically takes 2-5 business days.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="font-bold text-lg mb-2">Are there any additional costs?</h3>
-              <p className="text-gray-600">
-                No hidden fees from BootHop. However, you may be responsible for customs duties, taxes, 
-                or fees imposed by government authorities.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="font-bold text-lg mb-2">What payment methods do you accept?</h3>
-              <p className="text-gray-600">
-                We accept all major credit/debit cards (Visa, Mastercard, Amex) and digital wallets. 
-                All payments are processed securely through Stripe.
-              </p>
-            </div>
+      <section className="relative py-16 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-4xl font-black text-white mb-2">FAQ</h2>
+            <p className="text-slate-400">Everything you need to know</p>
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-12 px-4 bg-blue-600">
-        <div className="max-w-4xl mx-auto text-center text-white">
-          <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-xl mb-8">
-            Fair, transparent pricing. Join thousands already using BootHop.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/register?type=booter"
-              className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition"
-            >
-              Become a Booter
-            </Link>
-            <Link 
-              href="/register?type=hooper"
-              className="bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-800 transition border-2 border-white"
-            >
-              Become a Hooper
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Package className="h-8 w-8 text-blue-400" />
-                <span className="text-xl font-bold text-white">BootHop</span>
+          <div className="space-y-3">
+            {faqData.map((item, i) => (
+              <div
+                key={i}
+                className={`overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer ${openFaq === i ? 'border-cyan-500/30 bg-cyan-500/5' : 'border-white/8 bg-white/3 hover:bg-white/5 hover:border-white/15'}`}
+                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+              >
+                <div className="flex items-center justify-between px-6 py-5">
+                  <h3 className={`font-bold text-sm md:text-base transition-colors duration-300 ${openFaq === i ? 'text-cyan-400' : 'text-white'}`}>{item.q}</h3>
+                  <ChevronDown className={`h-5 w-5 flex-shrink-0 ml-4 text-slate-500 transition-transform duration-300 ${openFaq === i ? 'rotate-180 text-cyan-400' : ''}`} />
+                </div>
+                {openFaq === i && (
+                  <div className="px-6 pb-5">
+                    <p className="text-slate-400 text-sm leading-relaxed">{item.a}</p>
+                  </div>
+                )}
               </div>
-              <p className="text-sm">
-                Connecting the world, one journey at a time.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-white mb-4">Platform</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/how-it-works" className="hover:text-white">How It Works</Link></li>
-                <li><Link href="/pricing" className="hover:text-white">Pricing & Fees</Link></li>
-                <li><Link href="/trust-safety" className="hover:text-white">Trust & Safety</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-white mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/terms" className="hover:text-white">Terms of Service</Link></li>
-                <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-white mb-4">Support</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/help" className="hover:text-white">Help Center</Link></li>
-                <li><Link href="/contact" className="hover:text-white">Contact Us</Link></li>
-                <li><Link href="/about" className="hover:text-white">About Us</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 pt-8 text-center text-sm">
-            <p>© 2024 BootHop. All rights reserved.</p>
+            ))}
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* CTA */}
+      <section className="relative py-24 px-6 text-center">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-cyan-600/10 to-purple-600/10 pointer-events-none" />
+        <div className="relative max-w-4xl mx-auto">
+          <div className="relative overflow-hidden rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-600/15 to-purple-600/10 backdrop-blur-sm p-16">
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute -top-10 -left-10 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl" />
+              <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl" />
+            </div>
+            <div className="relative">
+              <h2 className="text-5xl font-black text-white mb-4">Ready to get started?</h2>
+              <p className="text-slate-400 text-xl mb-10">Fair, transparent pricing. Join thousands already using BootHop.</p>
+              <div className="flex flex-col sm:flex-row gap-5 justify-center">
+                <Link
+                  href="/register?type=booter"
+                  className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-10 py-5 rounded-2xl text-base font-bold hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-105 active:scale-[0.97] transition-all duration-200 inline-flex items-center justify-center gap-3"
+                >
+                  Become a Booter
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                </Link>
+                <Link
+                  href="/register?type=hooper"
+                  className="group border border-white/20 text-white px-10 py-5 rounded-2xl text-base font-bold hover:bg-white/10 hover:border-white/40 hover:scale-105 active:scale-[0.97] transition-all duration-200 inline-flex items-center justify-center gap-3 backdrop-blur-sm"
+                >
+                  Become a Hooper
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   );
 }
-

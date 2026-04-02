@@ -6,7 +6,8 @@ import {
   Shield, CheckCircle, Lock, Eye, EyeOff, CreditCard,
   FileText, AlertTriangle, ArrowRight, UserCheck, Banknote, Sparkles,
 } from 'lucide-react';
-import BootHopLogo from '@/components/BootHopLogo';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
 
 const pipeline = [
   { label: 'CREATED',      desc: 'Trip or delivery posted',               color: 'from-slate-500 to-slate-400' },
@@ -103,17 +104,7 @@ export default function TrustSafetyPage() {
         <div className="absolute bottom-40 left-20 w-96 h-96 bg-violet-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'6s',animationDelay:'1s'}} />
       </div>
 
-      {/* NAV */}
-      <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/">
-            <BootHopLogo iconClass="text-white" textClass="text-white" />
-          </Link>
-          <Link href="/" className="text-sm text-slate-400 hover:text-white flex items-center gap-2 transition-all duration-300 hover:gap-3">
-            ← Back
-          </Link>
-        </div>
-      </nav>
+      <NavBar />
 
       {/* HERO */}
       <section className="relative pt-40 pb-28 px-6 text-center overflow-hidden">
@@ -313,15 +304,7 @@ export default function TrustSafetyPage() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="border-t border-slate-800 py-10 px-6 text-center text-sm text-slate-500">
-        <p>© {new Date().getFullYear()} BootHop Ltd. All rights reserved.</p>
-        <div className="flex justify-center gap-6 mt-3">
-          <Link href="/how-it-works" className="hover:text-white transition">How It Works</Link>
-          <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
-          <Link href="/about" className="hover:text-white transition">About</Link>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

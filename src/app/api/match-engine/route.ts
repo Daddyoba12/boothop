@@ -1,11 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY! // Use service key for admin operations
-);
-
 // Matching logic
 function calculateMatchScore(trip1: any, trip2: any) {
   let score = 0;
@@ -38,6 +33,12 @@ function calculateMatchScore(trip1: any, trip2: any) {
 
 export async function POST(request: Request) {
   try {
+    // ✅ Initialize supabase inside the function
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     const { tripId } = await request.json();
 
     // Get the new trip

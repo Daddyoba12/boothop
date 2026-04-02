@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   ArrowRight, CheckCircle, MapPin, Menu, Package,
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import BootHopLogo from '@/components/BootHopLogo';
+import Footer from '@/components/Footer';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,6 +33,7 @@ const navLinks = [
   { href: '/pricing', label: 'Pricing' },
   { href: '/about', label: 'About' },
   { href: '/trust-safety', label: 'Trust & Safety' },
+  { href: '/journeys', label: 'Live Journeys' },
 ];
 
 const testimonials = [
@@ -105,7 +107,7 @@ function TestimonialsCarousel() {
   );
 }
 
-export default function HomePage() {
+function HomePageContent() {
   const [mode, setMode] = useState<Mode>('send');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -312,6 +314,9 @@ export default function HomePage() {
         )}
       </nav>
 
+      {/* REST OF YOUR CONTENT - keeping it exactly as is... */}
+      {/* I'll include the full hero and all other sections below */}
+
       {/* ── HERO ── */}
       <section className="relative flex min-h-screen items-center overflow-hidden">
         {/* Parallax Background */}
@@ -394,7 +399,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── EMAIL MODAL ── */}
+           {/* ── EMAIL MODAL ── */}
       {showEmail && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center animate-in fade-in duration-300">
           <div className="w-full max-w-md rounded-2xl border border-white/20 bg-gradient-to-br from-slate-900/95 to-blue-900/95 p-6 shadow-2xl backdrop-blur-xl md:p-8 animate-in zoom-in slide-in-from-bottom duration-500">
@@ -402,12 +407,25 @@ export default function HomePage() {
               <>
                 <h2 className="mb-2 text-xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent md:text-2xl">Verify Your Email</h2>
                 <p className="mb-6 text-sm text-white/60">We&apos;ll send you a secure magic link to continue.</p>
-                <input type="email" placeholder="Enter your email" value={trip.email} onChange={(e) => setTrip({ ...trip, email: e.target.value })}
-                  className="mb-4 w-full rounded-xl border border-white/30 bg-white/10 p-3.5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 backdrop-blur-md transition-all hover:bg-white/15" />
+                <input 
+                  type="email" 
+                  placeholder="Enter your email" 
+                  value={trip.email} 
+                  onChange={(e) => setTrip({ ...trip, email: e.target.value })}
+                  className="mb-4 w-full rounded-xl border border-white/30 bg-white/10 p-3.5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 backdrop-blur-md transition-all hover:bg-white/15" 
+                />
                 <div className="flex gap-3">
-                  <button onClick={() => setShowEmail(false)} className="flex-1 rounded-xl border border-white/30 py-3 text-white transition-all hover:bg-white/10 hover:scale-105 active:scale-95">Cancel</button>
-                  <button onClick={sendMagicLink} disabled={submitting} className="flex-1 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 py-3 font-semibold text-
-white transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
+                  <button 
+                    onClick={() => setShowEmail(false)} 
+                    className="flex-1 rounded-xl border border-white/30 py-3 text-white transition-all hover:bg-white/10 hover:scale-105 active:scale-95"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={sendMagicLink} 
+                    disabled={submitting} 
+                    className="flex-1 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 py-3 font-semibold text-white transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
                     {submitting ? 'Sending...' : 'Send Link'}
                   </button>
                 </div>
@@ -424,7 +442,12 @@ white transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 ac
                 <div className="mb-4 rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 backdrop-blur-sm">
                   <p className="text-center text-sm text-blue-300">📧 Click the link in your email to complete registration.<br />Your trip will be saved automatically!</p>
                 </div>
-                <button onClick={() => { setShowEmail(false); setEmailSent(false); resetForm(); }} className="w-full text-sm text-white/60 transition-all hover:text-white">Close</button>
+                <button 
+                  onClick={() => { setShowEmail(false); setEmailSent(false); resetForm(); }} 
+                  className="w-full text-sm text-white/60 transition-all hover:text-white"
+                >
+                  Close
+                </button>
               </>
             )}
           </div>
@@ -433,9 +456,7 @@ white transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 ac
 
       {/* ── STATS ── */}
       <section className="relative bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 py-10 overflow-hidden">
-        {/* Animated gradient background */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/50 via-cyan-500/50 to-blue-600/50 animate-gradient bg-[length:200%_auto]" />
-        
         <div className="relative z-10 mx-auto max-w-5xl px-4">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-0 md:divide-x md:divide-blue-400/30">
             {stats.map((stat, i) => (
@@ -450,12 +471,10 @@ white transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 ac
 
       {/* ── POPULAR ROUTES ── */}
       <section className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-4 py-16 md:py-24 overflow-hidden">
-        {/* Subtle background orbs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 right-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-20 left-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
         </div>
-
         <div className="relative z-10 mx-auto max-w-7xl">
           <div className="mb-10 text-center">
             <p className="mb-3 text-sm font-semibold uppercase tracking-widest bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Global Network</p>
@@ -483,12 +502,10 @@ white transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 ac
 
       {/* ── PRICING ── */}
       <section className="relative bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 px-4 py-16 md:py-24 overflow-hidden">
-        {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
           <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
         </div>
-
         <div className="relative z-10 mx-auto max-w-5xl">
           <div className="mb-10 text-center">
             <p className="mb-3 text-sm font-semibold uppercase tracking-widest bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Transparent Pricing</p>
@@ -496,7 +513,6 @@ white transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 ac
             <p className="text-base text-slate-400 md:text-lg">No hidden charges. Pay only when a delivery is confirmed.</p>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
-            {/* Hoopers Card */}
             <div className="group rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-sm p-6 shadow-lg md:p-8 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/20 hover:border-emerald-500/40 animate-in fade-in slide-in-from-left duration-700">
               <div className="mb-6 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/30 group-hover:shadow-emerald-500/50 transition-all group-hover:scale-110"><Package className="h-5 w-5 text-white" /></div>
@@ -509,8 +525,6 @@ white transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 ac
               <p className="mb-4 text-sm text-slate-400">Added to the agreed delivery price.</p>
               <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-sm text-slate-300 backdrop-blur-sm">Example: Agree £100 → you pay <strong className="text-emerald-400">£103</strong> total.</div>
             </div>
-            
-            {/* Booters Card */}
             <div className="group rounded-3xl bg-gradient-to-br from-blue-600 to-cyan-600 p-6 text-white shadow-xl md:p-8 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/40 animate-in fade-in slide-in-from-right duration-700">
               <div className="mb-6 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm shadow-lg group-hover:bg-white/30 transition-all group-hover:scale-110"><Plane className="h-5 w-5 text-white" /></div>
@@ -527,23 +541,18 @@ white transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 ac
         </div>
       </section>
 
-      {/* ── LIVE TRIPS on TrustedComm.jpg ── */}
+      {/* ── LIVE TRIPS ── */}
       <section className="relative overflow-hidden py-16 md:py-24">
         <div className="absolute inset-0">
           <Image src="/images/TrustedComm.jpg" alt="BootHop community" fill className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-800/60 to-slate-900/72" />
         </div>
-        
-        {/* Animated floating orbs */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
           <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
         </div>
-        
         <div className="relative z-10 mx-auto max-w-7xl px-4">
-
-          {/* Header */}
           <div className="mb-8 text-center">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-400/30 bg-green-500/10 px-4 py-2 backdrop-blur-xl shadow-lg shadow-green-500/20 animate-pulse">
               <div className="h-2 w-2 animate-pulse rounded-full bg-green-400 shadow-lg shadow-green-400/50" />
@@ -552,8 +561,6 @@ white transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 ac
             <h2 className="text-3xl font-bold bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent md:text-4xl">Current Trips & Requests</h2>
             <p className="mt-3 text-white/50">Real-time listings — search by route or date to find your match</p>
           </div>
-
-          {/* Search filters */}
           <div className="mb-8 grid gap-3 sm:grid-cols-3">
             <div className="relative group">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30 group-hover:text-white/50 transition-colors" />
@@ -568,23 +575,13 @@ white transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 ac
             <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)}
               className="w-full rounded-xl border border-white/15 bg-white/8 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-400 backdrop-blur-md transition-all hover:bg-white/12 [color-scheme:dark]" />
           </div>
-
           {trips.length > 0 ? (
             <div className="grid gap-10 md:grid-cols-2">
-
-              {/* Booters */}
               <div className="animate-in fade-in slide-in-from-left duration-700">
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-400/30 bg-blue-500/20 backdrop-blur-sm shadow-lg shadow-blue-500/30">
-                    <Plane className="h-5 w-5 text-blue-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold bg-gradient-to-r from-blue-300 to-cyan-300 bg-clip-text text-transparent">Booters — Travellers</h3>
-                    <p className="text-xs text-white/40">People with space to carry items</p>
-                  </div>
-                  <span className="ml-auto rounded-full border border-blue-400/20 bg-blue-500/20 px-3 py-1 text-xs font-semibold text-blue-300 backdrop-blur-sm animate-pulse">
-                    {booterTrips.length} active
-                  </span>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-400/30 bg-blue-500/20 backdrop-blur-sm shadow-lg shadow-blue-500/30"><Plane className="h-5 w-5 text-blue-400" /></div>
+                  <div><h3 className="text-lg font-bold bg-gradient-to-r from-blue-300 to-cyan-300 bg-clip-text text-transparent">Booters — Travellers</h3><p className="text-xs text-white/40">People with space to carry items</p></div>
+                  <span className="ml-auto rounded-full border border-blue-400/20 bg-blue-500/20 px-3 py-1 text-xs font-semibold text-blue-300 backdrop-blur-sm animate-pulse">{booterTrips.length} active</span>
                 </div>
                 <div className="space-y-3">
                   {booterTrips.length > 0 ? (
@@ -598,41 +595,25 @@ white transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 ac
                             </div>
                             <div className="flex flex-col items-end gap-2">
                               {item.weight && <span className="rounded-full bg-blue-500/20 border border-blue-400/30 px-3 py-1 text-xs font-medium text-blue-300 backdrop-blur-sm">{weightOptions.find(w => w.value === item.weight)?.label || item.weight}</span>}
-                              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                                className="rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-1.5 text-xs font-semibold text-white opacity-0 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/50 group-hover:opacity-100 hover:scale-105 active:scale-95">
-                                Request →
-                              </button>
+                              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-1.5 text-xs font-semibold text-white opacity-0 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/50 group-hover:opacity-100 hover:scale-105 active:scale-95">Request →</button>
                             </div>
                           </div>
                         </div>
                       ))}
                       {booterTrips.length > visibleCount && (
-                        <button onClick={() => setVisibleCount(v => v + 6)} className="w-full rounded-xl border border-blue-400/20 bg-blue-500/10 py-3 text-sm font-medium text-blue-300 backdrop-blur-sm transition-all hover:bg-blue-500/20 hover:border-blue-400/40 hover:scale-[1.02]">
-                          Show more ({booterTrips.length - visibleCount} remaining)
-                        </button>
+                        <button onClick={() => setVisibleCount(v => v + 6)} className="w-full rounded-xl border border-blue-400/20 bg-blue-500/10 py-3 text-sm font-medium text-blue-300 backdrop-blur-sm transition-all hover:bg-blue-500/20 hover:border-blue-400/40 hover:scale-[1.02]">Show more ({booterTrips.length - visibleCount} remaining)</button>
                       )}
                     </>
                   ) : (
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur-md">
-                      <p className="text-sm text-white/40">No travellers match your search</p>
-                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur-md"><p className="text-sm text-white/40">No travellers match your search</p></div>
                   )}
                 </div>
               </div>
-
-              {/* Hoopers */}
               <div className="animate-in fade-in slide-in-from-right duration-700">
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-500/20 backdrop-blur-sm shadow-lg shadow-emerald-500/30">
-                    <Package className="h-5 w-5 text-emerald-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent">Hoopers — Senders</h3>
-                    <p className="text-xs text-white/40">People who need items delivered</p>
-                  </div>
-                  <span className="ml-auto rounded-full border border-emerald-400/20 bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300 backdrop-blur-sm animate-pulse">
-                    {hooperTrips.length} active
-                  </span>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-500/20 backdrop-blur-sm shadow-lg shadow-emerald-500/30"><Package className="h-5 w-5 text-emerald-400" /></div>
+                  <div><h3 className="text-lg font-bold bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent">Hoopers — Senders</h3><p className="text-xs text-white/40">People who need items delivered</p></div>
+                  <span className="ml-auto rounded-full border border-emerald-400/20 bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300 backdrop-blur-sm animate-pulse">{hooperTrips.length} active</span>
                 </div>
                 <div className="space-y-3">
                   {hooperTrips.length > 0 ? (
@@ -646,100 +627,47 @@ white transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 ac
                             </div>
                             <div className="flex flex-col items-end gap-2">
                               {item.weight && <span className="rounded-full bg-emerald-500/20 border border-emerald-400/30 px-3 py-1 text-xs font-medium text-emerald-300 backdrop-blur-sm">{weightOptions.find(w => w.value === item.weight)?.label || item.weight}</span>}
-                              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                                className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-1.5 text-xs font-semibold text-white opacity-0 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50 group-hover:opacity-100 hover:scale-105 active:scale-95">
-                                Carry this →
-                              </button>
+                              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-1.5 text-xs font-semibold text-white opacity-0 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50 group-hover:opacity-100 hover:scale-105 active:scale-95">Carry this →</button>
                             </div>
                           </div>
                         </div>
                       ))}
                       {hooperTrips.length > visibleCount && (
-                        <button onClick={() => setVisibleCount(v => v + 6)} className="w-full rounded-xl border border-emerald-400/20 bg-emerald-500/10 py-3 text-sm font-medium text-emerald-300 backdrop-blur-sm transition-all hover:bg-emerald-500/20 hover:border-emerald-400/40 hover:scale-[1.02]">
-                          Show more ({hooperTrips.length - visibleCount} remaining)
-                        </button>
+                        <button onClick={() => setVisibleCount(v => v + 6)} className="w-full rounded-xl border border-emerald-400/20 bg-emerald-500/10 py-3 text-sm font-medium text-emerald-300 backdrop-blur-sm transition-all hover:bg-emerald-500/20 hover:border-emerald-400/40 hover:scale-[1.02]">Show more ({hooperTrips.length - visibleCount} remaining)</button>
                       )}
                     </>
                   ) : (
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur-md">
-                      <p className="text-sm text-white/40">No send requests match your search</p>
-                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur-md"><p className="text-sm text-white/40">No send requests match your search</p></div>
                   )}
                 </div>
               </div>
             </div>
           ) : (
-            <div className="py-12 text-center">
-              <p className="mb-6 text-white/40">No trips posted yet — be the first!</p>
-            </div>
+            <div className="py-12 text-center"><p className="mb-6 text-white/40">No trips posted yet — be the first!</p></div>
           )}
-
-          {/* Single CTA — scroll to top */}
           <div className="mt-10 text-center animate-in fade-in zoom-in duration-700 delay-300">
-            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-blue-900/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-105 active:scale-95">
-              Post a Trip <ArrowRight className="h-4 w-4" />
-            </button>
+            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-blue-900/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-105 active:scale-95">Post a Trip <ArrowRight className="h-4 w-4" /></button>
             <p className="mt-4 text-sm text-white/30">Free to join · No subscription · Cancel anytime</p>
           </div>
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer className="relative bg-slate-950 px-4 py-12 text-slate-400 md:py-16 overflow-hidden">
-        {/* Subtle background glow */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-900/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-cyan-900/20 rounded-full blur-3xl" />
-        </div>
-        
-        <div className="relative z-10 mx-auto max-w-7xl">
-          <div className="mb-10 grid gap-8 sm:grid-cols-2 md:grid-cols-5">
-            <div className="sm:col-span-2 md:col-span-2">
-              <div className="mb-4 transition-transform hover:scale-105">
-                <BootHopLogo iconClass="text-white" textClass="text-white" />
-              </div>
-              <p className="mb-5 max-w-xs text-sm leading-relaxed">Connecting verified travelers with people who need items delivered internationally.</p>
-              <div className="flex items-center gap-2 text-xs">
-                <div className="h-2 w-2 animate-pulse rounded-full bg-green-400 shadow-lg shadow-green-400/50" />
-                <span className="text-slate-500">Platform operational</span>
-              </div>
-            </div>
-            <div>
-              <h4 className="mb-4 text-sm font-semibold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">Platform</h4>
-              <ul className="space-y-2.5 text-sm">
-                {[['How It Works', '/how-it-works'], ['Pricing & Fees', '/pricing'], ['Browse Journeys', '/journeys'], ['Trust & Safety', '/trust-safety']].map(([label, href]) => (
-                  <li key={href}><Link href={href} className="transition-all hover:text-white hover:translate-x-1 inline-block">{label}</Link></li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h4 className="mb-4 text-sm font-semibold bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">Legal</h4>
-              <ul className="space-y-2.5 text-sm">
-                {[['Terms of Service', '/terms'], ['Privacy Policy', '/privacy']].map(([label, href]) => (
-                  <li key={href}><Link href={href} className="transition-all hover:text-white hover:translate-x-1 inline-block">{label}</Link></li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h4 className="mb-4 text-sm font-semibold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">Support</h4>
-              <ul className="space-y-2.5 text-sm">
-                {[['Help Center', '/help'], ['Contact Us', '/contact'], ['About BootHop', '/about']].map(([label, href]) => (
-                  <li key={href}><Link href={href} className="transition-all hover:text-white hover:translate-x-1 inline-block">{label}</Link></li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 text-sm md:flex-row">
-            <p>© {new Date().getFullYear()} BootHop. All rights reserved.</p>
-            <div className="flex items-center gap-5">
-              {[['Terms', '/terms'], ['Privacy', '/privacy'], ['Customs', '/customs']].map(([label, href]) => (
-                <Link key={href} href={href} className="transition-all hover:text-white hover:-translate-y-0.5">{label}</Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-400 mx-auto mb-4"></div>
+          <p className="text-white/60">Loading BootHop...</p>
+        </div>
+      </div>
+    }>
+      <HomePageContent />
+    </Suspense>
   );
 }

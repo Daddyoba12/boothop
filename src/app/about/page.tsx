@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Package, Users, Globe, Shield, Star, ArrowRight, CheckCircle, Sparkles, TrendingUp } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
 
 export default function AboutPage() {
   const [scrollY, setScrollY] = useState(0);
@@ -23,19 +25,7 @@ export default function AboutPage() {
         <div className="absolute bottom-40 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s',animationDelay:'1s'}} />
       </div>
 
-      {/* NAV */}
-      <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/">
-            <BootHopLogo iconClass="text-white" textClass="text-white" />
-          </Link>
-          <div className="hidden md:flex items-center gap-6 text-sm text-slate-400">
-            <Link href="/how-it-works" className="hover:text-white transition">How It Works</Link>
-            <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
-          </div>
-          <Link href="/login" className="text-sm text-slate-400 hover:text-white transition-all duration-300">Log in</Link>
-        </div>
-      </nav>
+      <NavBar />
 
       {/* VIDEO HERO — three videos floating */}
       <section className="relative pt-32 pb-0 overflow-hidden">
@@ -63,40 +53,48 @@ export default function AboutPage() {
           </p>
         </div>
 
-        {/* Three Videos Side by Side — with premium floating cards */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-3 gap-4 h-[500px]">
+        {/* Three Videos Side by Side — square glassmorphism boxes */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-3 gap-5">
 
           {/* Left Video */}
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-blue-500/20 border border-white/10 hover:scale-[1.02] transition-all duration-500 hover:shadow-blue-500/30 hover:border-white/20">
-            <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+          <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-blue-500/20 shadow-2xl shadow-blue-500/20 hover:scale-[1.03] hover:shadow-blue-500/40 hover:border-blue-400/40 transition-all duration-500 cursor-pointer">
+            <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
               <source src="/videos/Aboutus_train.mp4" type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
+            {/* Glassmorphism overlays */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            {/* Inner glow border */}
+            <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-blue-400/30 transition-all duration-500" />
           </div>
 
           {/* Center Video (Main) */}
-          <div className="relative h-[400px] md:h-[500px] rounded-3xl overflow-hidden shadow-2xl shadow-cyan-500/20 border border-cyan-500/20 hover:scale-[1.02] transition-all duration-500 hover:shadow-cyan-500/30">
-            <video autoPlay muted loop playsInline className="w-full h-full object-contain" style={{objectPosition:'center center'}}>
+          <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-cyan-500/25 shadow-2xl shadow-cyan-500/25 hover:scale-[1.03] hover:shadow-cyan-500/50 hover:border-cyan-400/50 transition-all duration-500 cursor-pointer">
+            <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" style={{objectPosition:'center center'}}>
               <source src="/videos/about-us.mp4" type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-cyan-400/30 transition-all duration-500" />
             {/* Badge overlay */}
-            <div className="absolute bottom-6 left-6 bg-slate-900/80 backdrop-blur-md px-5 py-3 rounded-xl border border-white/10 shadow-lg">
+            <div className="absolute bottom-5 left-5 bg-slate-950/80 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/10 shadow-lg">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center">
-                  <Package className="h-3.5 w-3.5 text-white" />
+                <div className="w-5 h-5 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-md flex items-center justify-center flex-shrink-0">
+                  <Package className="h-3 w-3 text-white" />
                 </div>
-                <span className="font-semibold text-white text-sm">About BootHop</span>
+                <span className="font-semibold text-white text-xs tracking-wide">About BootHop</span>
               </div>
             </div>
           </div>
 
           {/* Right Video */}
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-purple-500/20 border border-white/10 hover:scale-[1.02] transition-all duration-500 hover:shadow-purple-500/30 hover:border-white/20">
-            <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+          <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-purple-500/20 shadow-2xl shadow-purple-500/20 hover:scale-[1.03] hover:shadow-purple-500/40 hover:border-purple-400/40 transition-all duration-500 cursor-pointer">
+            <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
               <source src="/videos/Aboutus_train.mp4" type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-purple-400/30 transition-all duration-500" />
           </div>
         </div>
       </section>
@@ -272,43 +270,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="border-t border-slate-800 py-12 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8 text-sm text-slate-500">
-            <div>
-              <BootHopLogo iconClass="text-white" textClass="text-white" className="mb-4" />
-              <p>Connecting the world, one journey at a time.</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Platform</h4>
-              <ul className="space-y-2">
-                <li><Link href="/how-it-works" className="hover:text-white transition">How It Works</Link></li>
-                <li><Link href="/pricing" className="hover:text-white transition">Pricing & Fees</Link></li>
-                <li><Link href="/trust-safety" className="hover:text-white transition">Trust & Safety</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Legal</h4>
-              <ul className="space-y-2">
-                <li><Link href="/terms" className="hover:text-white transition">Terms of Service</Link></li>
-                <li><Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Support</h4>
-              <ul className="space-y-2">
-                <li><Link href="/help" className="hover:text-white transition">Help Center</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition">Contact Us</Link></li>
-                <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-slate-800 pt-8 text-center text-sm text-slate-500">
-            <p>© {new Date().getFullYear()} BootHop. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

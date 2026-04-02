@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Shield, CheckCircle, Star, Sparkles, TrendingUp, Globe, Lock, ArrowUp } from 'lucide-react';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
 
 export default function HowItWorksPage() {
   const [scrollY, setScrollY] = useState(0);
@@ -47,25 +49,7 @@ export default function HowItWorksPage() {
         <div className="absolute -bottom-8 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration: '5s', animationDelay: '1s'}}></div>
       </div>
 
-      {/* NAV */}
-      <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center font-black text-white shadow-lg shadow-blue-500/50">
-              BH
-            </div>
-            <span className="text-2xl font-black bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-              BootHop
-            </span>
-          </div>
-          <a 
-            href="/"
-            className="text-sm text-slate-400 hover:text-white flex items-center gap-2 transition-all duration-300 hover:gap-3"
-          >
-            ← Back
-          </a>
-        </div>
-      </nav>
+      <NavBar />
 
       {/* HERO */}
       <section className="relative pt-40 pb-32 px-6 text-center overflow-hidden">
@@ -425,12 +409,7 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800 py-12 px-6">
-        <div className="max-w-7xl mx-auto text-center text-slate-500 text-sm">
-          © 2024 BootHop. Revolutionizing delivery, one journey at a time.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
