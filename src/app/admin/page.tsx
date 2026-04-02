@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
+import { createSupabaseClient } from '@/lib/supabase';
 import Link from 'next/link';
 import {
   Users, User, Package, DollarSign, AlertTriangle, 
@@ -11,12 +11,8 @@ import {
   TrendingUp, Activity, Download, RefreshCw, Clock
 } from 'lucide-react';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 export default function AdminDashboard() {
+  const supabase = createSupabaseClient();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
