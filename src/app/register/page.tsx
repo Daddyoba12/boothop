@@ -261,8 +261,8 @@ function RegisterForm() {
         <div className="fixed top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '4s' }} />
         <div className="fixed bottom-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '6s', animationDelay: '2s' }} />
 
-        {/* Mobile top bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 lg:hidden relative z-10">
+        {/* Top bar — always visible */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 relative z-10">
           <Link href="/">
             <BootHopLogo size="sm" iconClass="text-white" textClass="text-white" />
           </Link>
