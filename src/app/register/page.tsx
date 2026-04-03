@@ -46,14 +46,30 @@ function RegisterForm() {
   const [toSugg, setToSugg]         = useState<string[]>([]);
   const [fromOk, setFromOk]         = useState(false);
   const [toOk, setToOk]             = useState(false);
+  const [mapsReady, setMapsReady]   = useState(false);
   const sessionTokenRef             = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
 
-  // Init currency + session token
+  // Init currency
   useEffect(() => {
     const lang = navigator.language || '';
     setCurrency(lang === 'en-GB' || lang.startsWith('en-GB') ? '£' : '$');
-    if (window.google?.maps?.places)
+  }, []);
+
+  // Poll until Google Maps Places is ready
+  useEffect(() => {
+    if (window.google?.maps?.places) {
       sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+      setMapsReady(true);
+      return;
+    }
+    const check = setInterval(() => {
+      if (window.google?.maps?.places) {
+        sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+        setMapsReady(true);
+        clearInterval(check);
+      }
+    }, 300);
+    return () => clearInterval(check);
   }, []);
 
   // Slideshow — cross-fade every 4 s
@@ -70,29 +86,29 @@ function RegisterForm() {
 
   // From city autocomplete
   useEffect(() => {
-    if (fromOk) return;
+    if (fromOk || !mapsReady) return;
     const t = setTimeout(() => {
-      if (!fromQuery || fromQuery.length < 3 || !window.google?.maps?.places) { setFromSugg([]); return; }
+      if (!fromQuery || fromQuery.length < 3) { setFromSugg([]); return; }
       new google.maps.places.AutocompleteService().getPlacePredictions(
         { input: fromQuery, types: ['(cities)'], sessionToken: sessionTokenRef.current || undefined },
         (p) => setFromSugg(p ? p.map((x) => x.description) : [])
       );
     }, 350);
     return () => clearTimeout(t);
-  }, [fromQuery, fromOk]);
+  }, [fromQuery, fromOk, mapsReady]);
 
   // To city autocomplete
   useEffect(() => {
-    if (toOk) return;
+    if (toOk || !mapsReady) return;
     const t = setTimeout(() => {
-      if (!toQuery || toQuery.length < 3 || !window.google?.maps?.places) { setToSugg([]); return; }
+      if (!toQuery || toQuery.length < 3) { setToSugg([]); return; }
       new google.maps.places.AutocompleteService().getPlacePredictions(
         { input: toQuery, types: ['(cities)'], sessionToken: sessionTokenRef.current || undefined },
         (p) => setToSugg(p ? p.map((x) => x.description) : [])
       );
     }, 350);
     return () => clearTimeout(t);
-  }, [toQuery, toOk]);
+  }, [toQuery, toOk, mapsReady]);
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((p) => ({ ...p, [field]: e.target.value }));

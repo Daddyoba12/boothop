@@ -127,6 +127,7 @@ function HomePageContent() {
   const [fromSelected, setFromSelected] = useState(false);
   const [toSelected, setToSelected] = useState(false);
   const [sessionToken, setSessionToken] = useState<google.maps.places.AutocompleteSessionToken | null>(null);
+  const [mapsReady, setMapsReady] = useState(false);
 
   const [trip, setTrip] = useState<TripForm>({ from: '', to: '', date: '', price: '', email: '', weight: '' });
 
@@ -141,36 +142,46 @@ function HomePageContent() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Poll until Google Maps Places is ready
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.google?.maps?.places)
+    if (window.google?.maps?.places) {
+      setMapsReady(true);
       setSessionToken(new google.maps.places.AutocompleteSessionToken());
+      return;
+    }
+    const check = setInterval(() => {
+      if (window.google?.maps?.places) {
+        setMapsReady(true);
+        setSessionToken(new google.maps.places.AutocompleteSessionToken());
+        clearInterval(check);
+      }
+    }, 300);
+    return () => clearInterval(check);
   }, []);
 
   useEffect(() => {
-    if (fromSelected) return;
+    if (fromSelected || !mapsReady) return;
     const timer = setTimeout(() => {
       if (!queryFrom || queryFrom.length < 3) { setFromSuggestions([]); return; }
-      if (typeof window === 'undefined' || !window.google?.maps?.places) return;
       new google.maps.places.AutocompleteService().getPlacePredictions(
         { input: queryFrom, types: ['(cities)'], sessionToken: sessionToken || undefined },
         (p) => setFromSuggestions(p ? p.map((x) => x.description) : [])
       );
-    }, 400);
+    }, 350);
     return () => clearTimeout(timer);
-  }, [queryFrom, sessionToken, fromSelected]);
+  }, [queryFrom, sessionToken, fromSelected, mapsReady]);
 
   useEffect(() => {
-    if (toSelected) return;
+    if (toSelected || !mapsReady) return;
     const timer = setTimeout(() => {
       if (!queryTo || queryTo.length < 3) { setToSuggestions([]); return; }
-      if (typeof window === 'undefined' || !window.google?.maps?.places) return;
       new google.maps.places.AutocompleteService().getPlacePredictions(
         { input: queryTo, types: ['(cities)'], sessionToken: sessionToken || undefined },
         (p) => setToSuggestions(p ? p.map((x) => x.description) : [])
       );
-    }, 400);
+    }, 350);
     return () => clearTimeout(timer);
-  }, [queryTo, sessionToken, toSelected]);
+  }, [queryTo, sessionToken, toSelected, mapsReady]);
 
   const trustItems = useMemo(() => ['Identity verified', 'Secure escrow', '95% satisfaction', 'Free to join'], []);
 
