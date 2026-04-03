@@ -97,12 +97,8 @@ export default function TrustSafetyPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden font-sans">
 
-      {/* ANIMATED BLOBS */}
-      <div className="fixed inset-0 opacity-15 pointer-events-none z-0">
-        <div className="absolute top-0 -left-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s'}} />
-        <div className="absolute top-0 -right-4 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'7s',animationDelay:'2s'}} />
-        <div className="absolute bottom-40 left-20 w-96 h-96 bg-violet-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'6s',animationDelay:'1s'}} />
-      </div>
+      {/* BG */}
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(139,92,246,0.07),transparent_35%)]" />
 
       <NavBar />
 
@@ -271,6 +267,63 @@ export default function TrustSafetyPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* UK → NIGERIA CORRIDOR */}
+      <section className="relative py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400">
+              <Shield className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-white">Sending on the UK → Nigeria corridor?</h2>
+              <p className="text-sm text-slate-400">Here&apos;s what both sides need to know</p>
+            </div>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* For senders */}
+            <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-6">
+              <p className="mb-4 text-xs font-bold uppercase tracking-widest text-blue-400">For Senders</p>
+              <ul className="space-y-3">
+                {[
+                  'You are responsible for ensuring your item complies with Nigerian Customs Service (NCS) import rules',
+                  'Personal effects and gifts up to a reasonable quantity are typically duty-free',
+                  'Electronics must be declared honestly — import duties may apply on arrival',
+                  'Food items must be factory-sealed and NAFDAC compliant to clear customs',
+                  'You sign a declaration confirming contents — false declarations lead to permanent ban',
+                ].map((pt) => (
+                  <li key={pt} className="flex items-start gap-2.5 text-sm text-white/65">
+                    <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-400/70" />{pt}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {/* For travellers */}
+            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-6">
+              <p className="mb-4 text-xs font-bold uppercase tracking-widest text-emerald-400">For Travellers (Booters)</p>
+              <ul className="space-y-3">
+                {[
+                  'You are never liable for contents you did not pack and were not informed of',
+                  'You have the right to inspect any item before accepting the match',
+                  'Refuse any item you are uncomfortable with — no penalty applies',
+                  'BootHop\'s customs declaration places legal responsibility on the sender',
+                  'UK travellers: personal effects carried for others may be questioned at Nigerian customs — carry the BootHop match confirmation',
+                ].map((pt) => (
+                  <li key={pt} className="flex items-start gap-2.5 text-sm text-white/65">
+                    <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400/70" />{pt}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="mt-4 rounded-xl border border-white/8 bg-white/3 px-5 py-4">
+            <p className="text-xs text-white/40">
+              <span className="font-semibold text-white/60">Need more guidance?</span> The Nigerian Customs Service (customs.gov.ng) publishes the current passenger baggage allowances and prohibited items list.
+              UK export restrictions are governed by HMRC and the Export Control Joint Unit.
+            </p>
           </div>
         </div>
       </section>

@@ -43,12 +43,8 @@ export default function HowItWorksPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white font-sans overflow-x-hidden">
       
-      {/* Animated background */}
-      <div className="fixed inset-0 opacity-20">
-        <div className="absolute top-0 -left-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration: '4s'}}></div>
-        <div className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration: '6s', animationDelay: '2s'}}></div>
-        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration: '5s', animationDelay: '1s'}}></div>
-      </div>
+      {/* BG */}
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.07),transparent_35%)]" />
 
       <NavBar />
 
@@ -66,17 +62,18 @@ export default function HowItWorksPage() {
         <div className="relative">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/30 rounded-full px-6 py-3 mb-8 backdrop-blur-xl">
             <Sparkles className="w-4 h-4 text-cyan-400" />
-            <span className="text-sm text-cyan-300 font-medium">The Future of Delivery</span>
+            <span className="text-sm text-cyan-300 font-medium">How BootHop Works</span>
           </div>
-          
+
           <h1 className="text-6xl md:text-8xl font-black mb-6 leading-tight">
             Delivery,<br />
-            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent animate-pulse">
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
               reimagined.
             </span>
           </h1>
           <p className="text-slate-400 text-xl max-w-2xl mx-auto leading-relaxed">
-            A revolutionary trusted network connecting travellers and senders worldwide.
+            Someone is already flying London→Lagos, Manchester→Lagos, or Birmingham→Accra.
+            They have space. You have something to send. We connect you — safely, cheaply, fast.
           </p>
         </div>
       </section>
@@ -306,6 +303,86 @@ export default function HowItWorksPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* WHAT CAN I SEND — CUSTOMS CALLOUT */}
+      <section className="relative py-20 px-6 mt-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="rounded-3xl border border-white/10 bg-white/3 overflow-hidden">
+            {/* Header */}
+            <div className="border-b border-white/8 px-8 py-6 flex items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
+                <Globe className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white">What can I send? — Customs guide</h2>
+                <p className="text-sm text-white/45">Sending to Nigeria, Ghana or West Africa? Read this first.</p>
+              </div>
+            </div>
+            <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/8">
+              {/* Accepted */}
+              <div className="p-6">
+                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-emerald-400">Typically accepted</p>
+                <ul className="space-y-2.5">
+                  {[
+                    'Clothes & shoes (personal use)',
+                    'Letters & documents',
+                    'Phones & small electronics',
+                    'Gifts & household items',
+                    'Food (sealed, non-perishable)',
+                    'Books & magazines',
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-2.5 text-sm text-white/65">
+                      <CheckCircle className="h-3.5 w-3.5 shrink-0 text-emerald-400/80" />{item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {/* Not accepted */}
+              <div className="p-6">
+                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-red-400">Never accepted</p>
+                <ul className="space-y-2.5">
+                  {[
+                    'Cash or monetary instruments',
+                    'Controlled substances / drugs',
+                    'Weapons or ammunition',
+                    'Counterfeit goods',
+                    'Hazardous materials',
+                    'Anything misrepresented',
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-2.5 text-sm text-white/65">
+                      <span className="h-3.5 w-3.5 shrink-0 text-red-400/80 font-bold text-base leading-none">✗</span>{item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {/* Customs tips */}
+              <div className="p-6">
+                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-blue-400">Customs tips for Nigeria</p>
+                <ul className="space-y-3">
+                  {[
+                    { tip: 'Personal effects are duty-free up to a reasonable quantity', note: 'FIRS guidance' },
+                    { tip: 'Electronics may attract import duty — declare honestly', note: 'NCS rules' },
+                    { tip: 'Food items must be factory-sealed, clearly labelled', note: 'NAFDAC compliance' },
+                    { tip: 'Traveller signs a customs declaration — sender is responsible for accuracy', note: 'BootHop policy' },
+                  ].map((item) => (
+                    <li key={item.tip} className="text-sm">
+                      <p className="text-white/65">{item.tip}</p>
+                      <p className="text-[11px] text-white/30 mt-0.5">{item.note}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            {/* Footer note */}
+            <div className="border-t border-white/8 bg-amber-500/5 px-8 py-4">
+              <p className="text-xs text-amber-300/70">
+                <span className="font-semibold text-amber-300">Important:</span> The sender is solely responsible for ensuring items comply with UK export and Nigerian import regulations.
+                BootHop facilitates the connection — we do not inspect packages. Travellers are not liable for undeclared or misrepresented contents.
+              </p>
             </div>
           </div>
         </div>

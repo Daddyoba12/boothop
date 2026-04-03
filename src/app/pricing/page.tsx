@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Check, Shield, Package, DollarSign, Sparkles, ArrowRight, Lock, Zap, ChevronDown } from 'lucide-react';
+import { Check, CheckCircle, Shield, Package, DollarSign, Sparkles, ArrowRight, Lock, Zap, ChevronDown } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 
@@ -21,12 +21,8 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden font-sans">
 
-      {/* ANIMATED BLOBS */}
-      <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
-        <div className="absolute top-0 -left-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'4s'}} />
-        <div className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'6s',animationDelay:'2s'}} />
-        <div className="absolute bottom-40 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s',animationDelay:'1s'}} />
-      </div>
+      {/* BG */}
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.07),transparent_35%)]" />
 
       <NavBar />
 
@@ -47,6 +43,52 @@ export default function PricingPage() {
           <p className="text-slate-400 text-xl max-w-2xl mx-auto leading-relaxed">
             No hidden charges. No monthly plans. Pay only when you transact — everyone wins.
           </p>
+        </div>
+      </section>
+
+      {/* COURIER COMPARISON */}
+      <section className="relative py-8 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6 text-center">
+            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-2">Why BootHop?</p>
+            <h2 className="text-2xl font-black text-white">How we compare — London to Lagos, 2kg</h2>
+            <p className="mt-2 text-sm text-slate-400">Indicative prices. Courier rates vary by size, weight, and season.</p>
+          </div>
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/3">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/8 bg-white/5">
+                  <th className="py-4 px-6 text-left font-semibold text-white/60">Service</th>
+                  <th className="py-4 px-6 text-center font-semibold text-white/60">Est. Cost (2kg)</th>
+                  <th className="py-4 px-6 text-center font-semibold text-white/60">Delivery Time</th>
+                  <th className="py-4 px-6 text-center font-semibold text-white/60">Personal Touch</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { name: 'DHL Express', cost: '£90–£140', time: '2–4 days', personal: false, highlight: false },
+                  { name: 'UPS Standard', cost: '£80–£130', time: '3–5 days', personal: false, highlight: false },
+                  { name: 'Parcel Force', cost: '£55–£90', time: '5–8 days', personal: false, highlight: false },
+                  { name: 'BootHop', cost: '£20–£55', time: '1–5 days', personal: true, highlight: true },
+                ].map((row) => (
+                  <tr key={row.name} className={`border-b border-white/5 transition-colors ${row.highlight ? 'bg-blue-500/8 border-blue-500/15' : 'hover:bg-white/3'}`}>
+                    <td className="py-4 px-6">
+                      <span className={`font-bold ${row.highlight ? 'text-blue-300' : 'text-white/80'}`}>{row.name}</span>
+                      {row.highlight && <span className="ml-2 rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-300">Best value</span>}
+                    </td>
+                    <td className={`py-4 px-6 text-center font-bold ${row.highlight ? 'text-blue-300' : 'text-white/65'}`}>{row.cost}</td>
+                    <td className="py-4 px-6 text-center text-white/50">{row.time}</td>
+                    <td className="py-4 px-6 text-center">
+                      {row.personal
+                        ? <span className="inline-flex items-center gap-1 text-emerald-400 text-xs font-semibold"><CheckCircle className="h-3.5 w-3.5" />Verified person</span>
+                        : <span className="text-white/25 text-xs">No</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3 text-center text-xs text-white/25">BootHop prices are negotiated between sender and traveller. Savings of 40–70% vs traditional couriers are typical on UK→Nigeria routes.</p>
         </div>
       </section>
 
