@@ -9,6 +9,7 @@ import {
   CheckCircle, AlertCircle, Mail, Home, PlusCircle,
 } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
+import NavBar from '@/components/NavBar';
 
 const weightOptions = [
   { value: 'letter', label: 'Letter (<1kg)' },
@@ -173,7 +174,11 @@ function RegisterForm() {
   const inputCls = 'w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:bg-white/10 backdrop-blur-sm';
 
   return (
-    <div className="min-h-screen flex text-white overflow-hidden">
+    <div className="min-h-screen flex flex-col text-white overflow-hidden">
+      <NavBar />
+
+      {/* Split-screen panels — below fixed NavBar */}
+      <div className="flex flex-1 pt-20">
 
       {/* ══════════════════════════════════════════
           LEFT PANEL — scrolling image carousel (60%)
@@ -261,13 +266,6 @@ function RegisterForm() {
         <div className="fixed top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '4s' }} />
         <div className="fixed bottom-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '6s', animationDelay: '2s' }} />
 
-        {/* Top bar — always visible */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 relative z-10">
-          <Link href="/">
-            <BootHopLogo size="sm" iconClass="text-white" textClass="text-white" />
-          </Link>
-          <Link href="/login" className="text-sm text-slate-400 hover:text-white transition">Sign in</Link>
-        </div>
 
         <div className="relative z-10 flex-1 flex items-center justify-center px-6 py-12">
           <div className="w-full max-w-sm">
@@ -493,6 +491,7 @@ function RegisterForm() {
           </div>
         </div>
       </div>
+      </div>{/* end pt-20 wrapper */}
     </div>
   );
 }

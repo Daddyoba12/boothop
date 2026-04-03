@@ -76,7 +76,7 @@ function TestimonialsSection() {
   }, []);
 
   return (
-    <section className="relative py-20 md:py-28 bg-[#07111f]">
+    <section id="testimonials" className="relative py-20 md:py-28 bg-[#07111f]">
       <div className="mx-auto max-w-7xl px-6 md:px-8">
         <div className="mb-12 text-center">
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400">Community Stories</p>

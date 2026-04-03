@@ -7,11 +7,11 @@ import { Menu, X } from 'lucide-react';
 import BootHopLogo from './BootHopLogo';
 
 const links = [
-  { href: '/about',        label: 'About Us' },
-  { href: '/how-it-works', label: 'How It Works' },
-  { href: '/pricing',      label: 'Pricing' },
-  { href: '/trust-safety', label: 'Trust & Safety' },
-  { href: '/journeys',     label: 'Live Journeys' },
+  { href: '/how-it-works',    label: 'How It Works' },
+  { href: '/pricing',         label: 'Pricing' },
+  { href: '/about',           label: 'About' },
+  { href: '/trust-safety',    label: 'Trust & Safety' },
+  { href: '/#testimonials',   label: 'Testimonials' },
 ];
 
 export default function NavBar() {
