@@ -624,79 +624,26 @@ function HomePageContent() {
       {/* ── TESTIMONIALS ── */}
       <TestimonialsSection />
 
-      {/* ── TRUST ── */}
-      <section className="relative py-20 md:py-28 bg-[#07111f]">
-        <div className="mx-auto max-w-7xl px-6 md:px-8">
-          <div className="mb-12 text-center">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400">Safety First</p>
-            <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Built on trust, backed by technology</h2>
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {[
-              { icon: <Shield className="h-6 w-6" />, title: 'Identity Checks', body: 'Every user is verified via government ID and Stripe Identity before making any transactions.' },
-              { icon: <Zap className="h-6 w-6" />, title: 'Route-Based Matching', body: 'Our algorithm matches senders and travellers on the same route — no strangers, no guesswork.' },
-              { icon: <Users className="h-6 w-6" />, title: 'Delivery Confirmation', body: 'Funds are held in escrow and released only once the recipient confirms safe arrival.' },
-            ].map((item) => (
-              <div key={item.title} className="group rounded-3xl border border-white/8 bg-white/3 p-7 transition-all duration-300 hover:border-blue-500/25 hover:bg-white/5 hover:-translate-y-1">
-                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-400">
-                  {item.icon}
-                </div>
-                <h3 className="mb-3 text-base font-semibold text-white">{item.title}</h3>
-                <p className="text-sm leading-relaxed text-white/50">{item.body}</p>
+      {/* ── QUICK LINK CARDS ── */}
+      <section className="py-8 bg-[#07111f]">
+        <div className="mx-auto max-w-4xl px-6 md:px-8">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Link href="/trust-safety"
+              className="group flex items-center justify-between rounded-2xl border border-white/8 bg-white/3 px-6 py-5 transition-all duration-200 hover:border-blue-500/25 hover:bg-white/5">
+              <div>
+                <p className="text-sm font-semibold text-white">ID verified · Escrow payments · 8-stage pipeline</p>
+                <p className="mt-0.5 text-xs text-white/40">How we keep every match safe →</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── PRICING ── */}
-      <section className="relative py-20 md:py-28">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05),transparent_60%)]" />
-        <div className="mx-auto max-w-5xl px-6 md:px-8">
-          <div className="mb-12 text-center">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400">Transparent Pricing</p>
-            <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Simple, honest fees</h2>
-            <p className="mt-4 text-base text-white/50">No hidden charges. Pay only when a delivery is confirmed.</p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="group rounded-3xl border border-white/8 bg-white/3 p-8 transition-all duration-300 hover:border-emerald-500/20 hover:bg-white/5 hover:-translate-y-1">
-              <div className="mb-6 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-400">
-                  <Package className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="font-semibold text-white">Hoopers (Senders)</p>
-                  <p className="text-sm text-white/40">People sending items</p>
-                </div>
+              <ArrowRight className="h-4 w-4 shrink-0 text-white/25 transition-transform group-hover:translate-x-1 group-hover:text-blue-400" />
+            </Link>
+            <Link href="/pricing"
+              className="group flex items-center justify-between rounded-2xl border border-white/8 bg-white/3 px-6 py-5 transition-all duration-200 hover:border-emerald-500/25 hover:bg-white/5">
+              <div>
+                <p className="text-sm font-semibold text-white">Senders +3% · Travellers −5% · No hidden fees</p>
+                <p className="mt-0.5 text-xs text-white/40">See full pricing & courier comparison →</p>
               </div>
-              <div className="mb-2 flex items-baseline gap-1">
-                <span className="text-4xl font-bold text-emerald-400 md:text-5xl">+3%</span>
-                <span className="ml-1 text-white/40">service fee</span>
-              </div>
-              <p className="mb-5 text-sm text-white/40">Added to the agreed delivery price.</p>
-              <div className="rounded-xl border border-emerald-500/15 bg-emerald-500/8 p-4 text-sm text-white/65">
-                Example: Agree £100 → you pay <strong className="text-emerald-400">£103</strong> total.
-              </div>
-            </div>
-            <div className="group rounded-3xl border border-white/8 bg-white/3 p-8 transition-all duration-300 hover:border-blue-500/20 hover:bg-white/5 hover:-translate-y-1">
-              <div className="mb-6 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-400">
-                  <Plane className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="font-semibold text-white">Booters (Travellers)</p>
-                  <p className="text-sm text-white/40">People carrying items</p>
-                </div>
-              </div>
-              <div className="mb-2 flex items-baseline gap-1">
-                <span className="text-4xl font-bold text-blue-400 md:text-5xl">Earn</span>
-                <span className="ml-2 text-white/40">per delivery</span>
-              </div>
-              <p className="mb-5 text-sm text-white/40">Set your own price. Platform fee of ~5% applies.</p>
-              <div className="rounded-xl border border-blue-500/15 bg-blue-500/8 p-4 text-sm text-white/65">
-                Example: Agreed £100 → you receive approximately <strong className="text-blue-400">£95</strong> after fees.
-              </div>
-            </div>
+              <ArrowRight className="h-4 w-4 shrink-0 text-white/25 transition-transform group-hover:translate-x-1 group-hover:text-emerald-400" />
+            </Link>
           </div>
         </div>
       </section>

@@ -3,135 +3,69 @@ import BootHopLogo from './BootHopLogo';
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-white/8 bg-slate-950/90 backdrop-blur-xl overflow-hidden">
-      {/* Subtle background glow */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute bottom-0 left-1/4 w-96 h-48 bg-blue-600/8 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-48 bg-cyan-600/8 rounded-full blur-3xl" />
-      </div>
+    <footer className="border-t border-white/8 bg-[#07111f]">
+      <div className="mx-auto max-w-7xl px-6 py-8 md:px-8">
 
-      <div className="relative max-w-7xl mx-auto px-6 py-16">
-        {/* Top row */}
-        <div className="grid md:grid-cols-5 gap-10 mb-12">
+        {/* Single row: logo | links | social */}
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
 
-          {/* Brand col */}
-          <div className="md:col-span-2">
-            <BootHopLogo textClass="text-white" iconClass="text-white" className="mb-4" />
-            <p className="text-sm text-slate-500 leading-relaxed max-w-xs">
-              Connecting travellers and senders worldwide. Your journey, your income — delivered with trust.
-            </p>
-            <div className="flex gap-3 mt-6">
-              {/* Instagram */}
-              <a
-                href="https://www.instagram.com/boothop.com1"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="BootHop on Instagram"
-                className="w-9 h-9 rounded-xl border border-white/10 bg-white/5 hover:bg-gradient-to-br hover:from-purple-600/40 hover:to-pink-500/40 hover:border-pink-500/30 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-200 hover:scale-110"
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-              </a>
-              {/* TikTok */}
-              <a
-                href="https://www.tiktok.com/@boothop"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="BootHop on TikTok"
-                className="w-9 h-9 rounded-xl border border-white/10 bg-white/5 hover:bg-slate-800/60 hover:border-white/20 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-200 hover:scale-110"
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                  <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.55V6.79a4.85 4.85 0 01-1.04-.1z"/>
-                </svg>
-              </a>
-              {/* Facebook */}
-              <a
-                href="https://www.facebook.com/boothop"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="BootHop on Facebook"
-                className="w-9 h-9 rounded-xl border border-white/10 bg-white/5 hover:bg-blue-700/30 hover:border-blue-500/30 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-200 hover:scale-110"
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-              </a>
-            </div>
+          {/* Logo + tagline */}
+          <div className="flex items-center gap-4">
+            <BootHopLogo textClass="text-white" iconClass="text-white" size="sm" />
+            <span className="hidden text-xs text-white/30 md:block">People-powered delivery</span>
           </div>
 
-          {/* Platform */}
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Platform</h4>
-            <ul className="space-y-3 text-sm">
-              {[
-                ['How It Works', '/how-it-works'],
-                ['Pricing & Fees', '/pricing'],
-                ['Live Journeys', '/journeys'],
-                ['Trust & Safety', '/trust-safety'],
-              ].map(([label, href]) => (
-                <li key={href}>
-                  <Link href={href} className="text-slate-500 hover:text-white transition-colors duration-200 hover:translate-x-0.5 inline-block">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Nav links */}
+          <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/40">
+            {[
+              ['How It Works', '/how-it-works'],
+              ['Pricing', '/pricing'],
+              ['Trust & Safety', '/trust-safety'],
+              ['Live Journeys', '/journeys'],
+              ['About', '/about'],
+              ['Help', '/help'],
+              ['Contact', '/contact'],
+            ].map(([label, href]) => (
+              <Link key={href} href={href} className="hover:text-white transition-colors duration-200">
+                {label}
+              </Link>
+            ))}
+          </nav>
 
-          {/* Legal */}
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Legal</h4>
-            <ul className="space-y-3 text-sm">
-              {[
-                ['Terms of Service', '/terms'],
-                ['Privacy Policy', '/privacy'],
-                ['Cookie Policy', '/cookie-policy'],
-              ].map(([label, href]) => (
-                <li key={label}>
-                  <Link href={href} className="text-slate-500 hover:text-white transition-colors duration-200 hover:translate-x-0.5 inline-block">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Support */}
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Support</h4>
-            <ul className="space-y-3 text-sm">
-              {[
-                ['Help Center', '/help'],
-                ['Contact Us', '/contact'],
-                ['About Us', '/about'],
-              ].map(([label, href]) => (
-                <li key={label}>
-                  <Link href={href} className="text-slate-500 hover:text-white transition-colors duration-200 hover:translate-x-0.5 inline-block">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6">
-              <a
-                href="mailto:support@boothop.co.uk"
-                className="text-xs text-cyan-500 hover:text-cyan-400 transition-colors duration-200"
-              >
-                support@boothop.co.uk
-              </a>
-            </div>
+          {/* Social icons */}
+          <div className="flex items-center gap-2">
+            <a href="https://www.instagram.com/boothop.com1" target="_blank" rel="noopener noreferrer" aria-label="Instagram"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/8 bg-white/3 text-white/40 transition-all duration-200 hover:border-white/20 hover:text-white">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+            </a>
+            <a href="https://www.tiktok.com/@boothop" target="_blank" rel="noopener noreferrer" aria-label="TikTok"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/8 bg-white/3 text-white/40 transition-all duration-200 hover:border-white/20 hover:text-white">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
+                <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.55V6.79a4.85 4.85 0 01-1.04-.1z"/>
+              </svg>
+            </a>
+            <a href="https://www.facebook.com/boothop" target="_blank" rel="noopener noreferrer" aria-label="Facebook"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/8 bg-white/3 text-white/40 transition-all duration-200 hover:border-white/20 hover:text-white">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </a>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-white/8 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-slate-600">
-            © {new Date().getFullYear()} BootHop Ltd. All rights reserved.
-          </p>
-          <div className="flex items-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs text-slate-600">All systems operational</span>
+        {/* Bottom row: copyright | legal | status */}
+        <div className="mt-6 flex flex-col gap-3 border-t border-white/5 pt-6 md:flex-row md:items-center md:justify-between">
+          <p className="text-xs text-white/25">© {new Date().getFullYear()} BootHop Ltd. All rights reserved.</p>
+          <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-white/30">
+            {[['Terms', '/terms'], ['Privacy', '/privacy'], ['Cookies', '/cookie-policy']].map(([label, href]) => (
+              <Link key={href} href={href} className="hover:text-white/60 transition-colors">{label}</Link>
+            ))}
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            <span className="text-xs text-white/25">All systems operational</span>
           </div>
         </div>
       </div>

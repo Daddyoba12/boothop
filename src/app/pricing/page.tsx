@@ -231,37 +231,21 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* ESCROW PIPELINE */}
-      <section className="relative py-16 px-6">
+      {/* TRUST LINK */}
+      <section className="relative py-8 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-2 mb-4">
-              <Lock className="w-4 h-4 text-amber-400" />
-              <span className="text-xs font-bold uppercase tracking-widest text-amber-400">Secure Escrow</span>
-            </div>
-            <h2 className="text-4xl font-black text-white mb-2">How your money is protected</h2>
-            <p className="text-slate-400">Every penny secured, every step of the way</p>
-          </div>
-
-          <div className="space-y-4">
-            {[
-              { num: '01', title: 'Agreement & Lock-In', desc: 'Both parties agree on the price. Once locked in, the price cannot change.', gradient: 'from-blue-500 to-cyan-400', glow: 'shadow-blue-500/40' },
-              { num: '02', title: 'Payment to Escrow', desc: 'Hooper pays (agreed + 3%). Funds held securely — Booter cannot touch them yet.', gradient: 'from-amber-500 to-yellow-400', glow: 'shadow-amber-500/40' },
-              { num: '03', title: 'Delivery', desc: 'Booter delivers the item safely to the agreed destination.', gradient: 'from-purple-500 to-pink-400', glow: 'shadow-purple-500/40' },
-              { num: '04', title: 'Dual Confirmation Required', desc: 'BOTH parties must confirm: Booter confirms delivery, Hooper confirms receipt & condition.', gradient: 'from-orange-500 to-red-400', glow: 'shadow-orange-500/40' },
-              { num: '05', title: 'Automatic Release', desc: 'Once both confirm, payment releases automatically to the Booter. Fair for everyone.', gradient: 'from-emerald-500 to-teal-400', glow: 'shadow-emerald-500/40' },
-            ].map((step, i) => (
-              <div key={i} className="group flex gap-5 p-6 rounded-2xl border border-white/8 bg-white/3 hover:bg-white/6 hover:border-white/15 hover:scale-[1.01] transition-all duration-400 cursor-default active:scale-[0.99]">
-                <div className={`w-14 h-14 bg-gradient-to-br ${step.gradient} rounded-2xl flex items-center justify-center font-black text-white shadow-lg ${step.glow} flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
-                  {step.num}
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-black text-white text-lg mb-1 group-hover:text-cyan-400 transition-colors duration-300">{step.title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{step.desc}</p>
-                </div>
+          <Link href="/trust-safety" className="group flex items-center justify-between rounded-2xl border border-white/8 bg-white/3 px-6 py-5 transition-all duration-200 hover:border-white/20 hover:bg-white/5">
+            <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
+                <Lock className="h-5 w-5" />
               </div>
-            ))}
-          </div>
+              <div>
+                <p className="text-sm font-semibold text-white">ID verified · Escrow payments · 8-stage pipeline</p>
+                <p className="mt-0.5 text-xs text-white/40">See how every payment is protected →</p>
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 shrink-0 text-white/25 transition-transform group-hover:translate-x-1 group-hover:text-amber-400" />
+          </Link>
         </div>
       </section>
 

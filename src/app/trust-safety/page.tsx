@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
-  Shield, CheckCircle, Lock, Eye, EyeOff, CreditCard,
-  FileText, AlertTriangle, ArrowRight, UserCheck, Banknote, Sparkles,
+  Shield, CheckCircle, Lock,
+  FileText, AlertTriangle, ArrowRight, UserCheck, Sparkles,
 } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
@@ -205,46 +205,6 @@ export default function TrustSafetyPage() {
         </div>
       </section>
 
-      {/* DETAILS REVEAL RULE */}
-      <section className="relative py-20 px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent pointer-events-none" />
-        <div className="relative max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
-            <Eye className="h-4 w-4 text-cyan-400" />
-            <span className="text-xs font-semibold tracking-widest uppercase text-cyan-300">The Golden Rule</span>
-          </div>
-          <h2 className="text-3xl md:text-5xl font-black text-white mb-8">
-            Zero exposure<br />before trust is earned.
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6 text-left mt-10">
-            <div className="group relative overflow-hidden rounded-2xl border border-red-500/30 bg-red-500/5 backdrop-blur-sm p-6 hover:scale-105 transition-all duration-500 hover:border-red-500/50 hover:shadow-xl hover:shadow-red-500/10">
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <p className="relative text-red-400 font-bold text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                <EyeOff className="h-4 w-4" /> Before KYC + Payment
-              </p>
-              <ul className="relative space-y-2 text-sm text-white/70">
-                <li>✗ No phone numbers</li>
-                <li>✗ No exact address or airport gate</li>
-                <li>✗ No personal social profiles</li>
-                <li>✗ No direct contact outside BootHop</li>
-              </ul>
-            </div>
-            <div className="group relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-emerald-500/5 backdrop-blur-sm p-6 hover:scale-105 transition-all duration-500 hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10">
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <p className="relative text-emerald-400 font-bold text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                <Eye className="h-4 w-4" /> After KYC + Payment Held
-              </p>
-              <ul className="relative space-y-2 text-sm text-white/70">
-                <li>✓ Verified phone numbers shared</li>
-                <li>✓ Meeting point confirmed</li>
-                <li>✓ Full name displayed</li>
-                <li>✓ In-app messaging unlocked</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* PROHIBITED ITEMS */}
       <section className="relative py-20 px-6">
         <div className="max-w-4xl mx-auto">
@@ -324,34 +284,6 @@ export default function TrustSafetyPage() {
               <span className="font-semibold text-white/60">Need more guidance?</span> The Nigerian Customs Service (customs.gov.ng) publishes the current passenger baggage allowances and prohibited items list.
               UK export restrictions are governed by HMRC and the Export Control Joint Unit.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* PAYMENT ESCROW */}
-      <section className="relative py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-2 mb-4 mx-auto flex justify-center w-fit">
-            <span className="text-xs font-semibold uppercase tracking-widest text-amber-400">Escrow</span>
-          </div>
-          <h2 className="text-center text-3xl md:text-4xl font-black text-white mb-12">
-            Your money is never at risk
-          </h2>
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            {[
-              { icon: CreditCard, label: 'Sender Pays', desc: 'Funds go to Stripe escrow — not the traveller', gradient: 'from-blue-500 to-cyan-400', glow: 'shadow-blue-500/50' },
-              { icon: Lock, label: 'Money Locked', desc: 'Held securely until delivery is confirmed by both', gradient: 'from-amber-500 to-yellow-400', glow: 'shadow-amber-500/50' },
-              { icon: Banknote, label: 'Payment Released', desc: 'Auto-released on confirmation or after timeout', gradient: 'from-emerald-500 to-teal-400', glow: 'shadow-emerald-500/50' },
-            ].map(({ icon: Icon, label, desc, gradient, glow }, i) => (
-              <div key={label} className="group flex-1 flex flex-col items-center text-center rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-8 hover:scale-105 transition-all duration-500 hover:shadow-xl">
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg ${glow} group-hover:scale-110 transition-transform duration-300`}>
-                  <Icon className="h-7 w-7 text-white" />
-                </div>
-                <p className="font-black text-white mb-1">{label}</p>
-                <p className="text-sm text-slate-400">{desc}</p>
-                {i < 2 && <ArrowRight className="h-5 w-5 text-slate-600 mt-4 md:hidden" />}
-              </div>
-            ))}
           </div>
         </div>
       </section>

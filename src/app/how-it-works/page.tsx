@@ -2,27 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Shield, CheckCircle, Star, Sparkles, TrendingUp, Globe, Lock, ArrowUp } from 'lucide-react';
+import { ArrowRight, Shield, CheckCircle, Sparkles, TrendingUp, Globe } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 
 export default function HowItWorksPage() {
   const [scrollY, setScrollY] = useState(0);
-  const [activeSection, setActiveSection] = useState('booter');
-  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-      setShowScrollTop(window.scrollY > 500);
-    };
+    const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   const booterSteps = [
     { num: '01', title: 'Post Your Journey', desc: 'Share your route, travel dates, and available luggage capacity. Takes under 60 seconds.', icon: '✈️' },
@@ -152,59 +143,38 @@ export default function HowItWorksPage() {
           </div>
 
           {/* Steps */}
-          <div className="grid md:grid-cols-2 gap-12 items-start">
-            <div>
-              <h3 className="text-3xl font-black mb-12 flex items-center gap-3">
-                <span className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center">
-                  ✨
-                </span>
-                How it works
-              </h3>
-              
-              {booterSteps.map((s, i) => (
-                <div 
-                  key={i} 
-                  className="group flex gap-6 mb-8 p-6 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 cursor-pointer"
-                  style={{animationDelay: `${i * 100}ms`}}
-                >
-                  <div className="relative">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
-                      {s.icon}
-                    </div>
-                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center text-xs font-bold text-slate-900">
-                      {s.num}
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-bold text-xl mb-2 text-white group-hover:text-cyan-400 transition-colors duration-300">
-                      {s.title}
-                    </div>
-                    <div className="text-slate-400 text-sm leading-relaxed">
-                      {s.desc}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="max-w-2xl">
+            <h3 className="text-3xl font-black mb-12 flex items-center gap-3">
+              <span className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center">
+                ✨
+              </span>
+              How it works
+            </h3>
 
-            <div className="grid grid-cols-2 gap-6 sticky top-32">
-              {[
-                { label: '£320 max', sublabel: 'Per trip', gradient: 'from-blue-500 to-cyan-400', icon: '💎' },
-                { label: '10K users', sublabel: 'Worldwide', gradient: 'from-purple-500 to-pink-400', icon: '🌍' },
-                { label: '95% success', sublabel: 'Completion', gradient: 'from-emerald-500 to-teal-400', icon: '✓' },
-                { label: 'Free', sublabel: 'No fees', gradient: 'from-orange-500 to-yellow-400', icon: '🎁' },
-              ].map((stat, i) => (
-                <div 
-                  key={i}
-                  className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-8 hover:scale-105 active:scale-[0.95] transition-all duration-300 hover:shadow-2xl cursor-pointer"
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
-                  <div className="text-4xl mb-3">{stat.icon}</div>
-                  <div className="text-2xl font-black text-white mb-1">{stat.label}</div>
-                  <div className="text-sm text-slate-400">{stat.sublabel}</div>
+            {booterSteps.map((s, i) => (
+              <div
+                key={i}
+                className="group flex gap-6 mb-8 p-6 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 cursor-pointer"
+                style={{animationDelay: `${i * 100}ms`}}
+              >
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
+                    {s.icon}
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center text-xs font-bold text-slate-900">
+                    {s.num}
+                  </div>
                 </div>
-              ))}
-            </div>
+                <div className="flex-1">
+                  <div className="font-bold text-xl mb-2 text-white group-hover:text-cyan-400 transition-colors duration-300">
+                    {s.title}
+                  </div>
+                  <div className="text-slate-400 text-sm leading-relaxed">
+                    {s.desc}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -252,58 +222,37 @@ export default function HowItWorksPage() {
           </div>
 
           {/* Steps */}
-          <div className="grid md:grid-cols-2 gap-12 items-start">
-            <div className="grid grid-cols-2 gap-6 sticky top-32">
-              {[
-                { label: '70% cheaper', sublabel: 'Save more', gradient: 'from-emerald-500 to-teal-400', icon: '💰' },
-                { label: '50K deliveries', sublabel: 'Completed', gradient: 'from-blue-500 to-cyan-400', icon: '📦' },
-                { label: '200 cities', sublabel: 'Worldwide', gradient: 'from-purple-500 to-pink-400', icon: '🌐' },
-                { label: 'Free', sublabel: 'No fees', gradient: 'from-orange-500 to-yellow-400', icon: '✨' },
-              ].map((stat, i) => (
-                <div 
-                  key={i}
-                  className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-8 hover:scale-105 active:scale-[0.95] transition-all duration-300 hover:shadow-2xl cursor-pointer"
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
-                  <div className="text-4xl mb-3">{stat.icon}</div>
-                  <div className="text-2xl font-black text-white mb-1">{stat.label}</div>
-                  <div className="text-sm text-slate-400">{stat.sublabel}</div>
-                </div>
-              ))}
-            </div>
-            
-            <div>
-              <h3 className="text-3xl font-black mb-12 flex items-center gap-3">
-                <span className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-xl flex items-center justify-center">
-                  🎯
-                </span>
-                How it works
-              </h3>
-              
-              {hooperSteps.map((s, i) => (
-                <div 
-                  key={i} 
-                  className="group flex gap-6 mb-8 p-6 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-emerald-500/20 cursor-pointer"
-                >
-                  <div className="relative">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-emerald-500/50 group-hover:scale-110 transition-transform duration-300">
-                      {s.icon}
-                    </div>
-                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-400 rounded-full flex items-center justify-center text-xs font-bold text-slate-900">
-                      {s.num}
-                    </div>
+          <div className="max-w-2xl">
+            <h3 className="text-3xl font-black mb-12 flex items-center gap-3">
+              <span className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-xl flex items-center justify-center">
+                🎯
+              </span>
+              How it works
+            </h3>
+
+            {hooperSteps.map((s, i) => (
+              <div
+                key={i}
+                className="group flex gap-6 mb-8 p-6 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-emerald-500/20 cursor-pointer"
+              >
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-emerald-500/50 group-hover:scale-110 transition-transform duration-300">
+                    {s.icon}
                   </div>
-                  <div className="flex-1">
-                    <div className="font-bold text-xl mb-2 text-white group-hover:text-emerald-400 transition-colors duration-300">
-                      {s.title}
-                    </div>
-                    <div className="text-slate-400 text-sm leading-relaxed">
-                      {s.desc}
-                    </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-400 rounded-full flex items-center justify-center text-xs font-bold text-slate-900">
+                    {s.num}
                   </div>
                 </div>
-              ))}
-            </div>
+                <div className="flex-1">
+                  <div className="font-bold text-xl mb-2 text-white group-hover:text-emerald-400 transition-colors duration-300">
+                    {s.title}
+                  </div>
+                  <div className="text-slate-400 text-sm leading-relaxed">
+                    {s.desc}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -388,41 +337,21 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* SAFETY */}
-      <section className="relative py-32 px-6 mt-32">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-800/30 to-transparent"></div>
-        
-        <div className="max-w-7xl mx-auto relative">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-purple-500/20 border border-purple-400/30 rounded-full px-6 py-3 mb-6">
-              <Lock className="w-4 h-4 text-purple-400" />
-              <span className="text-sm text-purple-300 font-semibold">Bank-Level Security</span>
-            </div>
-            <h2 className="text-5xl font-black mb-4">Built on trust</h2>
-            <p className="text-slate-400 text-lg">Your safety is our top priority</p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { icon: Shield, title: 'Verification', desc: 'All users verified with government ID and background checks.', color: 'blue' },
-              { icon: CheckCircle, title: 'Escrow Protection', desc: 'Funds protected until successful delivery confirmation.', color: 'emerald' },
-              { icon: Star, title: 'Rating System', desc: 'Trusted community with transparent reviews and ratings.', color: 'purple' },
-            ].map((item, i) => (
-              <div 
-                key={i}
-                className="group relative overflow-hidden bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-10 rounded-3xl hover:border-slate-600 transition-all duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br from-${item.color}-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
-                <div className="relative">
-                  <div className={`w-16 h-16 bg-gradient-to-br from-${item.color}-500 to-${item.color}-400 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-${item.color}-500/50 group-hover:scale-110 transition-transform duration-300`}>
-                    <item.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="font-black text-2xl mb-3 text-white">{item.title}</h3>
-                  <p className="text-slate-400 leading-relaxed">{item.desc}</p>
-                </div>
+      {/* TRUST LINK CARD */}
+      <section className="px-6 py-8">
+        <div className="max-w-5xl mx-auto">
+          <Link href="/trust-safety" className="group flex items-center justify-between rounded-2xl border border-white/8 bg-white/3 px-6 py-5 transition-all duration-200 hover:border-white/20 hover:bg-white/5">
+            <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400">
+                <Shield className="h-5 w-5" />
               </div>
-            ))}
-          </div>
+              <div>
+                <p className="text-sm font-semibold text-white">ID verified · Escrow payments · 8-stage pipeline</p>
+                <p className="mt-0.5 text-xs text-white/40">How we keep every match safe →</p>
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 shrink-0 text-white/25 transition-transform group-hover:translate-x-1 group-hover:text-purple-400" />
+          </Link>
         </div>
       </section>
 
