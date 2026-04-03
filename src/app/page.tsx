@@ -504,29 +504,39 @@ function HomePageContent() {
 
       {/* ── HOW IT WORKS ── */}
       <section className="relative py-20 md:py-28 bg-[#07111f]">
-        <div className="mx-auto max-w-7xl px-6 md:px-8">
+        <div className="mx-auto max-w-4xl px-6 md:px-8">
           <div className="mb-12 text-center">
             <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400">Simple Process</p>
             <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">How BootHop works</h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-white/50">Three steps from post to delivery — fully verified and insured.</p>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="space-y-4">
             {[
-              { icon: <Package className="h-6 w-6" />, step: '01', title: 'Post your trip or request', body: 'Register your journey dates and route, or submit a delivery request with weight and budget.' },
-              { icon: <Zap className="h-6 w-6" />, step: '02', title: 'Get matched securely', body: 'Our engine finds verified matches on the same route. Both sides confirm before any payment.' },
-              { icon: <CheckCircle className="h-6 w-6" />, step: '03', title: 'Deliver and confirm', body: 'Funds are held in escrow and released only after the recipient confirms safe delivery.' },
+              { emoji: '✈️', step: '01', title: 'Post your trip or request', body: 'Register your journey dates and route, or submit a delivery request with weight and budget.', gradient: 'from-blue-500 to-cyan-400', badge: 'bg-cyan-400', shadow: 'shadow-blue-500/50', hover: 'hover:border-blue-500/40 hover:shadow-blue-500/15' },
+              { emoji: '⚡', step: '02', title: 'Get matched securely', body: 'Our engine finds verified matches on the same route. Both sides confirm before any payment.', gradient: 'from-violet-500 to-purple-400', badge: 'bg-purple-400', shadow: 'shadow-violet-500/50', hover: 'hover:border-violet-500/40 hover:shadow-violet-500/15' },
+              { emoji: '💸', step: '03', title: 'Deliver and get paid', body: 'Funds are held in escrow and released only after the recipient confirms safe delivery.', gradient: 'from-emerald-500 to-teal-400', badge: 'bg-teal-400', shadow: 'shadow-emerald-500/50', hover: 'hover:border-emerald-500/40 hover:shadow-emerald-500/15' },
             ].map((item) => (
-              <div key={item.step} className="group relative rounded-3xl border border-white/8 bg-white/3 p-7 transition-all duration-300 hover:border-blue-500/25 hover:bg-white/5 hover:shadow-[0_20px_60px_rgba(59,130,246,0.08)]">
-                <div className="mb-5 flex items-center justify-between">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-400 transition-all duration-300 group-hover:bg-blue-500/25">
-                    {item.icon}
+              <div key={item.step} className={`group flex items-center gap-6 rounded-2xl border border-white/8 bg-white/3 p-6 transition-all duration-500 hover:bg-white/5 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer ${item.hover}`}>
+                <div className="relative flex-shrink-0">
+                  <div className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} text-2xl shadow-lg ${item.shadow} group-hover:scale-110 transition-transform duration-300`}>
+                    {item.emoji}
                   </div>
-                  <span className="text-3xl font-bold text-white/8 group-hover:text-white/12 transition-colors">{item.step}</span>
+                  <div className={`absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full ${item.badge} text-xs font-bold text-slate-900`}>
+                    {item.step}
+                  </div>
                 </div>
-                <h3 className="mb-3 text-base font-semibold text-white">{item.title}</h3>
-                <p className="text-sm leading-relaxed text-white/50">{item.body}</p>
+                <div className="flex-1 min-w-0">
+                  <h3 className={`mb-1.5 text-base font-bold text-white transition-colors duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:${item.gradient}`}>{item.title}</h3>
+                  <p className="text-sm leading-relaxed text-white/50">{item.body}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-white/15 transition-all duration-300 group-hover:text-white/40 group-hover:translate-x-1" />
               </div>
             ))}
+          </div>
+          <div className="mt-8 text-center">
+            <Link href="/how-it-works" className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-6 py-3 text-sm font-medium text-white/60 transition-all duration-200 hover:border-white/20 hover:bg-white/8 hover:text-white">
+              See the full process <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>
@@ -756,30 +766,6 @@ function HomePageContent() {
             </button>
             <p className="mt-4 text-xs text-white/30">Free to join · No subscription · Cancel anytime</p>
           </div>
-        </div>
-      </section>
-
-      {/* ── FINAL CTA ── */}
-      <section className="relative py-24 md:py-32 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.15),transparent_60%)]" />
-        <div className="mx-auto max-w-3xl px-6 text-center md:px-8">
-          <h2 className="mb-5 text-3xl font-semibold tracking-tight text-white md:text-5xl md:leading-[1.05]">
-            Ready to send smarter or earn while you travel?
-          </h2>
-          <p className="mb-10 text-base text-white/50 md:text-lg">
-            Join thousands of verified users already on the platform.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link href="/register?type=hooper"
-              className="inline-flex items-center gap-2 rounded-full bg-blue-500 px-7 py-3.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(59,130,246,0.45)]">
-              Send a Package <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link href="/register?type=booter"
-              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/10 hover:border-white/25">
-              I&apos;m Travelling
-            </Link>
-          </div>
-          <p className="mt-8 text-xs text-white/25">No credit card required · Free to join · Cancel anytime</p>
         </div>
       </section>
 

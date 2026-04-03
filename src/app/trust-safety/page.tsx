@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
-  Shield, CheckCircle, Lock,
+  Shield, CheckCircle, Lock, EyeOff,
   FileText, AlertTriangle, ArrowRight, UserCheck, Sparkles,
 } from 'lucide-react';
 import NavBar from '@/components/NavBar';

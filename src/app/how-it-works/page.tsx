@@ -16,19 +16,19 @@ export default function HowItWorksPage() {
   }, []);
 
   const booterSteps = [
-    { num: '01', title: 'Post Your Journey', desc: 'Share your route, travel dates, and available luggage capacity. Takes under 60 seconds.', icon: '✈️' },
-    { num: '02', title: 'Browse Requests', desc: 'See curated delivery requests along your exact route from verified senders.', icon: '🔍' },
-    { num: '03', title: 'Agree on Terms', desc: 'Confirm price and compliance through secure messaging.', icon: '🤝' },
-    { num: '04', title: 'Collect & Deliver', desc: 'Meet sender, carry item, deliver safely.', icon: '📦' },
-    { num: '05', title: 'Get Paid', desc: 'Payment released instantly after confirmation.', icon: '💰' },
+    { num: '01', title: 'Post Your Journey', desc: 'Share your route, travel dates, and available luggage capacity. Takes under 60 seconds.', icon: '✈️', image: '/images/Traveling.jpg' },
+    { num: '02', title: 'Browse Requests', desc: 'See curated delivery requests along your exact route from verified senders.', icon: '🔍', image: '/images/GoingonHols.jpg' },
+    { num: '03', title: 'Agree on Terms', desc: 'Confirm price and compliance through secure messaging.', icon: '🤝', image: '/images/meetup1.jpg' },
+    { num: '04', title: 'Collect & Deliver', desc: 'Meet sender, carry item, deliver safely.', icon: '📦', image: '/images/Handover.jpg' },
+    { num: '05', title: 'Get Paid', desc: 'Payment released instantly after confirmation.', icon: '💰', image: '/images/TrustedComm.jpg' },
   ];
 
   const hooperSteps = [
-    { num: '01', title: 'Post Your Request', desc: 'Describe item, route, and budget.', icon: '📝' },
-    { num: '02', title: 'Find Traveller', desc: 'Browse or get matched automatically.', icon: '🎯' },
-    { num: '03', title: 'Pay Securely', desc: 'Funds held safely in escrow.', icon: '🔒' },
-    { num: '04', title: 'Track Delivery', desc: 'Stay connected in real time.', icon: '📍' },
-    { num: '05', title: 'Confirm Receipt', desc: 'Release payment and rate experience.', icon: '⭐' },
+    { num: '01', title: 'Post Your Request', desc: 'Describe item, route, and budget.', icon: '📝', image: '/images/WBoothop.jpg' },
+    { num: '02', title: 'Find Traveller', desc: 'Browse or get matched automatically.', icon: '🎯', image: '/images/boothopeveryd.jpg' },
+    { num: '03', title: 'Pay Securely', desc: 'Funds held safely in escrow.', icon: '🔒', image: '/images/D_login1.jpg' },
+    { num: '04', title: 'Track Delivery', desc: 'Stay connected in real time.', icon: '📍', image: '/images/Traveling.jpg' },
+    { num: '05', title: 'Confirm Receipt', desc: 'Release payment and rate experience.', icon: '⭐', image: '/images/meetuup2.jpg' },
   ];
 
   return (
@@ -154,24 +154,26 @@ export default function HowItWorksPage() {
             {booterSteps.map((s, i) => (
               <div
                 key={i}
-                className="group flex gap-6 mb-8 p-6 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 cursor-pointer"
-                style={{animationDelay: `${i * 100}ms`}}
+                className="group flex gap-5 mb-6 p-5 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/20 hover:-translate-y-0.5 cursor-pointer"
               >
-                <div className="relative">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
+                <div className="relative flex-shrink-0">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
                     {s.icon}
                   </div>
                   <div className="absolute -top-2 -right-2 w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center text-xs font-bold text-slate-900">
                     {s.num}
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="font-bold text-xl mb-2 text-white group-hover:text-cyan-400 transition-colors duration-300">
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-lg mb-1.5 text-white group-hover:text-cyan-400 transition-colors duration-300">
                     {s.title}
                   </div>
                   <div className="text-slate-400 text-sm leading-relaxed">
                     {s.desc}
                   </div>
+                </div>
+                <div className="hidden md:block w-28 h-28 rounded-xl overflow-hidden flex-shrink-0 border border-white/8">
+                  <img src={s.image} alt={s.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 </div>
               </div>
             ))}
@@ -233,23 +235,26 @@ export default function HowItWorksPage() {
             {hooperSteps.map((s, i) => (
               <div
                 key={i}
-                className="group flex gap-6 mb-8 p-6 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-emerald-500/20 cursor-pointer"
+                className="group flex gap-5 mb-6 p-5 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-500 hover:shadow-xl hover:shadow-emerald-500/20 hover:-translate-y-0.5 cursor-pointer"
               >
-                <div className="relative">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-emerald-500/50 group-hover:scale-110 transition-transform duration-300">
+                <div className="relative flex-shrink-0">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-emerald-500/50 group-hover:scale-110 transition-transform duration-300">
                     {s.icon}
                   </div>
                   <div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-400 rounded-full flex items-center justify-center text-xs font-bold text-slate-900">
                     {s.num}
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="font-bold text-xl mb-2 text-white group-hover:text-emerald-400 transition-colors duration-300">
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-lg mb-1.5 text-white group-hover:text-emerald-400 transition-colors duration-300">
                     {s.title}
                   </div>
                   <div className="text-slate-400 text-sm leading-relaxed">
                     {s.desc}
                   </div>
+                </div>
+                <div className="hidden md:block w-28 h-28 rounded-xl overflow-hidden flex-shrink-0 border border-white/8">
+                  <img src={s.image} alt={s.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 </div>
               </div>
             ))}
