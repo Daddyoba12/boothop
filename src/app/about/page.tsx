@@ -2,8 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Package, Users, Globe, Shield, Star, ArrowRight, CheckCircle, Sparkles, TrendingUp } from 'lucide-react';
-import BootHopLogo from '@/components/BootHopLogo';
+import { Package, Shield, ArrowRight, CheckCircle, Users, Globe } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 
@@ -15,18 +14,10 @@ const VIDEOS = [
 const SLIDES = ['/images/Customs1.jpg', '/images/Handover.jpg', '/images/GoingonHolsz.jpg'];
 
 export default function AboutPage() {
-  const [scrollY, setScrollY] = useState(0);
-  const [leftIdx, setLeftIdx]  = useState(0);           // train → planex → AboutusMov
-  const [rightIdx, setRightIdx] = useState(2);          // AboutusMov → train → planex
+  const [leftIdx, setLeftIdx]   = useState(0);
+  const [rightIdx, setRightIdx] = useState(2);
   const [slideIdx, setSlideIdx] = useState(0);
 
-  useEffect(() => {
-    const h = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', h);
-    return () => window.removeEventListener('scroll', h);
-  }, []);
-
-  // Cycle side videos every 6 s
   useEffect(() => {
     const t = setInterval(() => {
       setLeftIdx(p  => (p + 1) % 3);
@@ -35,254 +26,131 @@ export default function AboutPage() {
     return () => clearInterval(t);
   }, []);
 
-  // Cycle centre images every 4 s
   useEffect(() => {
     const t = setInterval(() => setSlideIdx(p => (p + 1) % 3), 4000);
     return () => clearInterval(t);
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden font-sans">
-
-      {/* ANIMATED BLOBS */}
-      <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
-        <div className="absolute top-0 -left-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'4s'}} />
-        <div className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'6s',animationDelay:'2s'}} />
-        <div className="absolute bottom-40 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s',animationDelay:'1s'}} />
-      </div>
-
+    <div className="min-h-screen bg-[#07111f] text-white overflow-x-hidden">
       <NavBar />
 
-      {/* VIDEO HERO — three videos floating */}
-      <section className="relative pt-32 pb-0 overflow-hidden">
-        {/* Parallax ping dots */}
-        <div className="absolute inset-0 opacity-30 pointer-events-none z-10" style={{transform:`translateY(${scrollY*0.3}px)`}}>
-          <div className="absolute top-24 left-1/4 w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
-          <div className="absolute top-44 right-1/3 w-2 h-2 bg-blue-400 rounded-full animate-ping" style={{animationDelay:'1s'}} />
-          <div className="absolute bottom-20 left-1/2 w-2 h-2 bg-purple-400 rounded-full animate-ping" style={{animationDelay:'2s'}} />
-        </div>
+      {/* ── HERO ── */}
+      <section className="relative pt-28 pb-10 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.15),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.08),transparent_35%)]" />
 
-        {/* Badge + heading above videos */}
-        <div className="relative z-20 text-center px-6 mb-10">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/30 rounded-full px-6 py-3 mb-6 backdrop-blur-xl">
-            <Sparkles className="w-4 h-4 text-cyan-400" />
-            <span className="text-sm text-cyan-300 font-medium">About BootHop</span>
-          </div>
-          <h1 className="text-6xl md:text-8xl font-black leading-tight mb-4">
-            Connecting<br />
-            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent animate-pulse">
-              the world.
-            </span>
-          </h1>
-          <p className="text-slate-400 text-xl max-w-2xl mx-auto">
-            One journey at a time.
-          </p>
-        </div>
-
-        {/* Three Boxes Side by Side — left/right: cycling videos, centre: image slideshow */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-3 gap-5">
-
-          {/* LEFT — all 3 videos always playing, crossfade by opacity */}
-          <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-blue-500/20 shadow-2xl shadow-blue-500/20 hover:scale-[1.03] hover:shadow-blue-500/40 hover:border-blue-400/40 transition-all duration-500 cursor-pointer">
-            {VIDEOS.map((src, i) => (
-              <video
-                key={src}
-                autoPlay muted loop playsInline
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ opacity: i === leftIdx ? 1 : 0, transition: 'opacity 1.4s cubic-bezier(0.4,0,0.2,1)' }}
-              >
-                <source src={src} type="video/mp4" />
-              </video>
-            ))}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-blue-400/30 transition-all duration-500" />
-          </div>
-
-          {/* CENTRE — image slideshow, all images stacked, crossfade by opacity */}
-          <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-cyan-500/25 shadow-2xl shadow-cyan-500/25 hover:scale-[1.03] hover:shadow-cyan-500/50 hover:border-cyan-400/50 transition-all duration-500 cursor-pointer">
-            {SLIDES.map((src, i) => (
-              <img
-                key={src}
-                src={src}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ opacity: i === slideIdx ? 1 : 0, transition: 'opacity 1.4s cubic-bezier(0.4,0,0.2,1)' }}
-              />
-            ))}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-cyan-400/30 transition-all duration-500" />
-            {/* Slide dots */}
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 z-10">
-              {SLIDES.map((_, i) => (
-                <div key={i} className={`h-1.5 rounded-full transition-all duration-700 ${i === slideIdx ? 'w-5 bg-cyan-400' : 'w-1.5 bg-white/30'}`} />
-              ))}
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          {/* Label + headline */}
+          <div className="mb-10 text-center">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur">
+              <span className="text-xs font-medium text-white/60">About BootHop</span>
             </div>
+            <h1 className="mb-4 text-4xl font-semibold tracking-tight text-white md:text-6xl md:leading-[1.05]">
+              Keeping families connected,<br />
+              <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">one journey at a time</span>
+            </h1>
+            <p className="mx-auto max-w-2xl text-base text-white/50 md:text-lg">
+              We started BootHop because sending things home shouldn&apos;t cost a fortune or take weeks.
+              There are already thousands of people making the same journey — we just connect them.
+            </p>
           </div>
 
-          {/* RIGHT — all 3 videos always playing, crossfade by opacity (offset sequence) */}
-          <div className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-purple-500/20 shadow-2xl shadow-purple-500/20 hover:scale-[1.03] hover:shadow-purple-500/40 hover:border-purple-400/40 transition-all duration-500 cursor-pointer">
-            {VIDEOS.map((src, i) => (
-              <video
-                key={src}
-                autoPlay muted loop playsInline
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ opacity: i === rightIdx ? 1 : 0, transition: 'opacity 1.4s cubic-bezier(0.4,0,0.2,1)' }}
-              >
-                <source src={src} type="video/mp4" />
-              </video>
-            ))}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-purple-400/30 transition-all duration-500" />
+          {/* Three media boxes */}
+          <div className="grid grid-cols-3 gap-4 md:gap-5">
+            {/* LEFT — cycling video */}
+            <div className="relative aspect-square overflow-hidden rounded-2xl border border-white/8 bg-slate-900/60">
+              {VIDEOS.map((src, i) => (
+                <video key={src} autoPlay muted loop playsInline
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ opacity: i === leftIdx ? 1 : 0, transition: 'opacity 1.4s cubic-bezier(0.4,0,0.2,1)' }}>
+                  <source src={src} type="video/mp4" />
+                </video>
+              ))}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+            </div>
+
+            {/* CENTRE — image slideshow */}
+            <div className="relative aspect-square overflow-hidden rounded-2xl border border-white/8 bg-slate-900/60">
+              {SLIDES.map((src, i) => (
+                <img key={src} src={src} alt=""
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ opacity: i === slideIdx ? 1 : 0, transition: 'opacity 1.4s cubic-bezier(0.4,0,0.2,1)' }}
+                />
+              ))}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10">
+                {SLIDES.map((_, i) => (
+                  <div key={i} className={`h-1 rounded-full transition-all duration-700 ${i === slideIdx ? 'w-5 bg-white/70' : 'w-1 bg-white/25'}`} />
+                ))}
+              </div>
+            </div>
+
+            {/* RIGHT — cycling video (offset) */}
+            <div className="relative aspect-square overflow-hidden rounded-2xl border border-white/8 bg-slate-900/60">
+              {VIDEOS.map((src, i) => (
+                <video key={src} autoPlay muted loop playsInline
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ opacity: i === rightIdx ? 1 : 0, transition: 'opacity 1.4s cubic-bezier(0.4,0,0.2,1)' }}>
+                  <source src={src} type="video/mp4" />
+                </video>
+              ))}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* OUR STORY */}
-      <section className="relative py-24 px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
-        <div className="relative max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            {/* Left — premium highlight box */}
-            <div className="group relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-br from-blue-600/20 to-purple-600/10 backdrop-blur-sm p-12 hover:scale-[1.02] transition-all duration-500 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/20">
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl group-hover:opacity-80 transition-opacity" />
-              <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-3xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
-                  <Package className="h-10 w-10 text-white" />
-                </div>
-                <h3 className="text-3xl font-black text-white mb-4">Redundant Boot Space</h3>
-                <p className="text-lg text-blue-200 leading-relaxed">
-                  Every journey has the potential to move items. Why travel with empty space?
-                </p>
-              </div>
-            </div>
+      {/* ── OUR STORY + MISSION (combined) ── */}
+      <section className="py-20 md:py-28">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <div className="grid gap-12 md:grid-cols-2 md:gap-20 items-center">
 
-            {/* Right — story content */}
+            {/* Left — the story */}
             <div>
-              <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-6">
-                <TrendingUp className="w-4 h-4 text-blue-400" />
-                <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">Our Story</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-6">Our Story</h2>
-              <div className="space-y-5 text-lg text-slate-400 leading-relaxed">
-                <p>We started with a simple idea: <strong className="text-white">use redundant boot space to transport goods</strong> to their destination. Every journey has the potential to move items.</p>
-                <p className="text-2xl font-black bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                  Why drive an empty car? Why drive with an empty boot?
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400">Our Story</p>
+              <h2 className="mb-6 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+                Born from a real problem
+              </h2>
+              <div className="space-y-4 text-base text-white/55 leading-relaxed">
+                <p>
+                  Sending a parcel from London to Lagos could cost £80–£200 with a courier. It could take weeks.
+                  And there was no guarantee it would arrive safely.
                 </p>
-                <p>Documents are even more convenient to transport. They easily fit into hand luggage, and you'd be helping someone else out.</p>
-                <p className="font-bold text-white">We're helping to connect the world, one journey at a time.</p>
+                <p>
+                  Meanwhile, thousands of people were flying that exact route every week — with empty luggage space
+                  and no way to connect with people who needed things sent.
+                </p>
+                <p className="text-white/80 font-medium">
+                  BootHop closes that gap. We match senders with verified travellers already making the journey,
+                  so packages move faster, cheaper, and with someone who cares.
+                </p>
+              </div>
+              <div className="mt-8 flex flex-wrap gap-3">
+                {['London → Lagos', 'Manchester → Lagos', 'Birmingham → Accra', 'UK → Nigeria'].map((route) => (
+                  <span key={route} className="rounded-full border border-blue-500/20 bg-blue-500/8 px-3 py-1.5 text-xs font-medium text-blue-300">
+                    {route}
+                  </span>
+                ))}
               </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* OUR MISSION */}
-      <section className="relative py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-2 mb-6">
-            <Sparkles className="w-4 h-4 text-cyan-400" />
-            <span className="text-xs font-semibold uppercase tracking-widest text-cyan-400">Our Mission</span>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-8">Our Mission</h2>
-
-          <div className="relative overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-12 mb-8 hover:border-slate-600 hover:shadow-2xl transition-all duration-500">
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="relative">
-              <p className="text-xl text-slate-300 mb-6 leading-relaxed">
-                We love little things, small and medium-sized packages—actually anything that can be carried on an existing journey. We specialize in{' '}
-                <span className="font-bold text-cyan-400">personal effects, letters, and small parcels</span>.
-              </p>
-              <p className="text-lg text-slate-400 mb-8">
-                Courier services are great, but they're not one-size-fits-all. We are an alternative service that's flexible and convenient.
-              </p>
-              <div className="relative overflow-hidden rounded-2xl border border-blue-500/30 bg-gradient-to-r from-blue-600/30 to-cyan-600/20 backdrop-blur-sm p-8">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/5 pointer-events-none" />
-                <p className="relative text-3xl font-black text-white mb-2">You are already going to make that journey</p>
-                <p className="relative text-2xl text-cyan-300">—why not make it count?</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Key Features */}
-          <div className="grid md:grid-cols-3 gap-6 mt-12">
-            {[
-              { label: 'Personal Effects', desc: 'Small personal items delivered with care', gradient: 'from-blue-500 to-cyan-400', glow: 'shadow-blue-500/50', hover: 'hover:border-blue-500/50 hover:shadow-blue-500/20' },
-              { label: 'Letters & Documents', desc: 'Important papers delivered securely', gradient: 'from-emerald-500 to-teal-400', glow: 'shadow-emerald-500/50', hover: 'hover:border-emerald-500/50 hover:shadow-emerald-500/20' },
-              { label: 'Small Parcels', desc: 'Compact packages sent worldwide', gradient: 'from-purple-500 to-pink-400', glow: 'shadow-purple-500/50', hover: 'hover:border-purple-500/50 hover:shadow-purple-500/20' },
-            ].map((f) => (
-              <div key={f.label} className={`group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:scale-105 transition-all duration-500 hover:shadow-xl ${f.hover} cursor-pointer`}>
-                <div className={`absolute inset-0 bg-gradient-to-br ${f.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
-                <div className="relative">
-                  <div className={`w-14 h-14 bg-gradient-to-br ${f.gradient} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg ${f.glow} group-hover:scale-110 transition-transform duration-300`}>
-                    <CheckCircle className="h-7 w-7 text-white" />
-                  </div>
-                  <h3 className="font-black text-lg text-white mb-2 group-hover:text-cyan-400 transition-colors duration-300">{f.label}</h3>
-                  <p className="text-slate-400 text-sm">{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* OUR VALUES */}
-      <section className="relative py-20 px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent pointer-events-none" />
-        <div className="relative max-w-7xl mx-auto">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-2 mb-4">
-              <Star className="w-4 h-4 text-purple-400" />
-              <span className="text-xs font-semibold uppercase tracking-widest text-purple-400">Our Values</span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Our Values</h2>
-            <p className="text-xl text-slate-400">The principles that guide everything we do at BootHop</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { icon: Users, label: 'Community First', desc: 'We believe in the power of people helping people. Our platform connects communities and creates meaningful interactions between travelers and senders.', gradient: 'from-blue-500 to-cyan-400', glow: 'shadow-blue-500/50', hover: 'hover:border-blue-500/50 hover:shadow-blue-500/20' },
-              { icon: Globe, label: 'Efficiency', desc: 'We maximize the potential of every journey by utilizing existing transportation capacity, reducing waste and environmental impact.', gradient: 'from-emerald-500 to-teal-400', glow: 'shadow-emerald-500/50', hover: 'hover:border-emerald-500/50 hover:shadow-emerald-500/20' },
-              { icon: Shield, label: 'Trust & Safety', desc: 'Safety and trust are at the core of our platform. We provide secure transactions and verified user profiles to ensure peace of mind.', gradient: 'from-purple-500 to-pink-400', glow: 'shadow-purple-500/50', hover: 'hover:border-purple-500/50 hover:shadow-purple-500/20' },
-            ].map(({ icon: Icon, label, desc, gradient, glow, hover }) => (
-              <div key={label} className={`group relative overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-10 text-center hover:scale-105 transition-all duration-500 hover:shadow-2xl ${hover} cursor-pointer`}>
-                <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
-                <div className="relative">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${gradient} rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg ${glow} group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className="h-10 w-10 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-black text-white mb-4 group-hover:text-cyan-400 transition-colors duration-300">{label}</h3>
-                  <p className="text-slate-400 leading-relaxed">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* STATS */}
-      <section className="relative py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="relative overflow-hidden rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-600/20 to-purple-600/10 backdrop-blur-sm p-16">
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute -top-10 -left-10 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl" />
-              <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl" />
-            </div>
-            <div className="relative text-center mb-12">
-              <h2 className="text-4xl font-black text-white mb-2">BootHop by the Numbers</h2>
-              <p className="text-slate-400">Making a real impact on communities worldwide</p>
-            </div>
-            <div className="relative grid md:grid-cols-4 gap-8 text-center">
+            {/* Right — what we carry */}
+            <div className="space-y-3">
+              <p className="mb-5 text-sm font-medium text-white/40">What people send with BootHop</p>
               {[
-                { value: '10K+', label: 'Happy Users', gradient: 'from-blue-400 to-cyan-300' },
-                { value: '50K+', label: 'Successful Deliveries', gradient: 'from-emerald-400 to-teal-300' },
-                { value: '200+', label: 'Cities Covered', gradient: 'from-purple-400 to-pink-300' },
-                { value: '95%', label: 'Satisfaction Rate', gradient: 'from-amber-400 to-yellow-300' },
-              ].map((s) => (
-                <div key={s.label} className="group">
-                  <div className={`text-6xl font-black mb-2 bg-gradient-to-r ${s.gradient} bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300 inline-block`}>{s.value}</div>
-                  <div className="text-slate-400">{s.label}</div>
+                { icon: <Package className="h-4 w-4" />, title: 'Personal effects & gifts', desc: 'Clothes, shoes, homemade food, family gifts — things that matter.' },
+                { icon: <CheckCircle className="h-4 w-4" />, title: 'Documents & letters', desc: 'Passports, certificates, legal papers — delivered securely by hand.' },
+                { icon: <Globe className="h-4 w-4" />, title: 'Small parcels', desc: 'Anything hand-luggage sized that fits within airline weight limits.' },
+                { icon: <Shield className="h-4 w-4" />, title: 'Not accepted', desc: 'No cash, no prohibited items, no anything that wouldn\'t clear customs.', muted: true },
+              ].map((item) => (
+                <div key={item.title} className={`flex items-start gap-4 rounded-2xl border p-4 ${item.muted ? 'border-white/5 bg-white/2' : 'border-white/8 bg-white/3 hover:border-white/15 hover:bg-white/5'} transition-all duration-200`}>
+                  <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${item.muted ? 'bg-red-500/10 text-red-400/60' : 'bg-blue-500/15 text-blue-400'}`}>
+                    {item.icon}
+                  </div>
+                  <div>
+                    <p className={`text-sm font-semibold ${item.muted ? 'text-white/30' : 'text-white'}`}>{item.title}</p>
+                    <p className={`text-xs mt-0.5 ${item.muted ? 'text-white/20' : 'text-white/45'}`}>{item.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -290,22 +158,49 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="relative py-24 text-center px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-5xl md:text-6xl font-black mb-6 leading-tight">
-            Ready to{' '}
-            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
-              get started?
-            </span>
+      {/* ── VALUES ── */}
+      <section className="py-20 md:py-28 bg-white/2 border-y border-white/5">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <div className="mb-12 text-center">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400">What We Stand For</p>
+            <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Built on trust</h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {[
+              { icon: <Users className="h-6 w-6" />, title: 'Community first', body: 'People helping people on journeys they\'re already making. No strangers — verified identities, real connections.' },
+              { icon: <Shield className="h-6 w-6" />, title: 'Safety & escrow', body: 'Funds are held securely until the recipient confirms delivery. No money changes hands until the job is done.' },
+              { icon: <Globe className="h-6 w-6" />, title: 'Efficient & affordable', body: 'Use the space that already exists on existing journeys. Better for your wallet, better for the environment.' },
+            ].map((item) => (
+              <div key={item.title} className="rounded-3xl border border-white/8 bg-white/3 p-7 transition-all duration-300 hover:border-blue-500/20 hover:bg-white/5 hover:-translate-y-1">
+                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-400">
+                  {item.icon}
+                </div>
+                <h3 className="mb-3 text-base font-semibold text-white">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-white/50">{item.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ── */}
+      <section className="relative py-24 md:py-32 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.12),transparent_60%)]" />
+        <div className="mx-auto max-w-2xl px-6 text-center md:px-8">
+          <h2 className="mb-4 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+            Ready to send something home?
           </h2>
-          <p className="text-xl text-slate-400 mb-12">Join thousands of travelers and senders already using BootHop</p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Link href="/register" className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-10 py-5 rounded-2xl text-lg font-bold hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 inline-flex items-center justify-center gap-3">
-              Sign Up Now <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+          <p className="mb-10 text-base text-white/50">
+            Register your trip or delivery in under 2 minutes. Free to join.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Link href="/register"
+              className="inline-flex items-center gap-2 rounded-full bg-blue-500 px-7 py-3.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(59,130,246,0.4)]">
+              Get Started <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/how-it-works" className="border border-white/20 text-white px-10 py-5 rounded-2xl text-lg font-bold hover:bg-white/10 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
-              Learn More
+            <Link href="/how-it-works"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition-all duration-200 hover:bg-white/10 hover:border-white/25 hover:-translate-y-0.5">
+              How It Works
             </Link>
           </div>
         </div>
