@@ -17,7 +17,9 @@
       "Bash(echo \"OK: $f\")",
       "Bash(echo \"MISSING: $f\")",
       "Bash(ls public/images/how-it-works*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(curl -s \"https://maps.googleapis.com/maps/api/place/autocomplete/json?input=London&types=%28cities%29&key=AIzaSyAWCIeNnw0mFe7clEhC7U6m08-wtQitAWM\")",
+      "Bash(python -m json.tool)"
     ]
   }
 }
