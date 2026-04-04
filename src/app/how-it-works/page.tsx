@@ -154,7 +154,7 @@ export default function HowItWorksPage() {
             {booterSteps.map((s, i) => (
               <div
                 key={i}
-                className="group flex gap-5 mb-6 p-5 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/20 hover:-translate-y-0.5 cursor-pointer"
+                className="group flex gap-5 mb-6 p-5 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/20 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 cursor-pointer"
               >
                 <div className="relative flex-shrink-0">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
@@ -235,7 +235,7 @@ export default function HowItWorksPage() {
             {hooperSteps.map((s, i) => (
               <div
                 key={i}
-                className="group flex gap-5 mb-6 p-5 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-500 hover:shadow-xl hover:shadow-emerald-500/20 hover:-translate-y-0.5 cursor-pointer"
+                className="group flex gap-5 mb-6 p-5 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/20 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 cursor-pointer"
               >
                 <div className="relative flex-shrink-0">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-emerald-500/50 group-hover:scale-110 transition-transform duration-300">

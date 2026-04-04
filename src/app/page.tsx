@@ -477,11 +477,15 @@ function HomePageContent() {
                   <h2 className="mb-2 text-xl font-semibold text-white md:text-2xl">Check Your Email</h2>
                   <p className="text-sm text-white/50">We&apos;ve sent a link to <span className="font-medium text-blue-400">{trip.email}</span></p>
                 </div>
-                <div className="mb-4 rounded-xl border border-blue-500/20 bg-blue-500/8 p-4">
+                <div className="mb-5 rounded-xl border border-blue-500/20 bg-blue-500/8 p-4">
                   <p className="text-center text-sm text-blue-300/85">Click the link in your email to complete registration. Your trip will be saved automatically.</p>
                 </div>
-                <button onClick={() => { setShowEmail(false); setEmailSent(false); resetForm(); }}
-                  className="w-full text-sm text-white/45 transition-all hover:text-white/80">Close</button>
+                <Link
+                  href="/"
+                  onClick={() => { setShowEmail(false); setEmailSent(false); resetForm(); }}
+                  className="block w-full rounded-xl bg-blue-500 py-3.5 text-center text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)] active:translate-y-0">
+                  Done — back to home
+                </Link>
               </>
             )}
           </div>
@@ -516,7 +520,7 @@ function HomePageContent() {
               { emoji: '⚡', step: '02', title: 'Get matched securely', body: 'Our engine finds verified matches on the same route. Both sides confirm before any payment.', gradient: 'from-violet-500 to-purple-400', badge: 'bg-purple-400', shadow: 'shadow-violet-500/50', hover: 'hover:border-violet-500/40 hover:shadow-violet-500/15' },
               { emoji: '💸', step: '03', title: 'Deliver and get paid', body: 'Funds are held in escrow and released only after the recipient confirms safe delivery.', gradient: 'from-emerald-500 to-teal-400', badge: 'bg-teal-400', shadow: 'shadow-emerald-500/50', hover: 'hover:border-emerald-500/40 hover:shadow-emerald-500/15' },
             ].map((item) => (
-              <div key={item.step} className={`group flex items-center gap-6 rounded-2xl border border-white/8 bg-white/3 p-6 transition-all duration-500 hover:bg-white/5 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer ${item.hover}`}>
+              <div key={item.step} className={`group flex items-center gap-6 rounded-2xl border border-white/8 bg-white/3 p-6 transition-all duration-300 hover:bg-white/5 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 cursor-pointer ${item.hover}`}>
                 <div className="relative flex-shrink-0">
                   <div className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} text-2xl shadow-lg ${item.shadow} group-hover:scale-110 transition-transform duration-300`}>
                     {item.emoji}

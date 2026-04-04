@@ -65,11 +65,11 @@ export async function POST(req: NextRequest) {
         <!-- BODY -->
         <tr><td style="background:#132030;padding:40px;border-radius:0 0 16px 16px;">
 
-          <h2 style="color:#ffffff;font-size:24px;font-weight:800;margin:0 0 8px;">You're one tap away 🚀</h2>
-          <p style="color:#7dd3e8;font-size:15px;margin:0 0 4px;">Hi there,</p>
+          <h2 style="color:#ffffff;font-size:24px;font-weight:800;margin:0 0 8px;">Confirm your email</h2>
+          <p style="color:#7dd3e8;font-size:15px;margin:0 0 4px;">This is a confirmation from BootHop.</p>
           <p style="color:#a8c5d6;font-size:15px;line-height:1.7;margin:0 0 20px;">
-            We've received your trip registration on <strong style="color:#ffffff;">BootHop</strong>.
-            Click the button below to verify your email and go live — your listing will be posted automatically the moment you confirm.
+            We received your registration on <strong style="color:#ffffff;">boothop.com</strong>.
+            Tap the button below to verify your email — your listing will be posted automatically the moment you confirm.
           </p>
 
           ${tripSummary}
@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
     await resend.emails.send({
       from: FROM,
       to: email,
-      subject: '✈️ Confirm your BootHop trip',
+      subject: 'Confirm your email — BootHop',
       html,
     });
 
