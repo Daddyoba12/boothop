@@ -16,6 +16,12 @@ export default function PWAInstallBanner() {
     // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(() => {});
+
+      // When a new SW takes over (after a Vercel deploy), reload so users
+      // always get the latest version without needing to reinstall the PWA.
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+      });
     }
 
     const handler = (e: Event) => {

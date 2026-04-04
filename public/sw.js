@@ -1,4 +1,4 @@
-const CACHE_NAME = 'boothop-v4';
+const CACHE_NAME = 'boothop-v1775289382118';
 const STATIC_ASSETS = ['/', '/manifest.json'];
 
 self.addEventListener('install', (event) => {
