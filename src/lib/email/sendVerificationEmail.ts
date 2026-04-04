@@ -7,7 +7,7 @@ export async function sendVerificationEmail(params: {
   code: string;
   verifyUrl: string;
 }) {
-  const from = process.env.AUTH_FROM_EMAIL || 'BootHop <onboarding@updates.boothop.com>';
+  const from = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.co.uk>';
 
   const { error } = await resend.emails.send({
     from,

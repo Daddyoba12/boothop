@@ -32,6 +32,7 @@ function RegisterForm() {
   const [mode, setMode]         = useState<'travel' | 'send'>(initialMode as 'travel' | 'send');
   const [form, setForm]         = useState({ from: '', to: '', date: '', weight: '', price: '', email: '' });
   const [step, setStep]         = useState<'trip' | 'email' | 'sent'>('trip');
+  const [codeInput, setCodeInput] = useState('');
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState<string | null>(null);
   const [currency, setCurrency] = useState('£');
@@ -146,26 +147,41 @@ function RegisterForm() {
     if (!form.email) { setError('Please enter your email address.'); return; }
     setLoading(true);
 
-    // Save trip so auth/callback can post it
-    localStorage.setItem('pendingTrip', JSON.stringify({
-      from: form.from, to: form.to, date: form.date,
-      weight: form.weight, price: form.price, mode,
-    }));
+    const journeyPayload = { from: form.from, to: form.to, date: form.date, weight: form.weight, price: `${currency}${form.price}`, mode };
 
     try {
-      const res = await fetch('/api/send-magic-link', {
+      const res = await fetch('/api/auth/request-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: form.email,
-          tripData: { from: form.from, to: form.to, date: form.date, weight: form.weight, price: `${currency}${form.price}`, mode },
-        }),
+        body: JSON.stringify({ email: form.email, journeyPayload }),
       });
-      if (!res.ok) throw new Error((await res.json()).error || 'Failed to send link');
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed to send code');
       setStep('sent');
-    } catch (err: any) {
-      localStorage.removeItem('pendingTrip');
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to send code');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    const trimmed = codeInput.trim().toUpperCase();
+    if (trimmed.length < 5) { setError('Please enter the full 5-character code.'); return; }
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/auth/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email, code: trimmed }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Verification failed');
+      window.location.href = data.redirectTo || '/intent';
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Verification failed');
     } finally {
       setLoading(false);
     }
@@ -270,33 +286,45 @@ function RegisterForm() {
         <div className="relative z-10 flex-1 flex items-center justify-center px-6 py-12">
           <div className="w-full max-w-sm">
 
-            {/* ── SENT STATE ── */}
+            {/* ── SENT STATE — code input ── */}
             {step === 'sent' && (
-              <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl p-10 text-center shadow-2xl">
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-xl p-10 shadow-2xl">
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
                 <div className="relative">
-                  <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-400 shadow-xl shadow-emerald-500/50">
-                    <CheckCircle className="h-8 w-8 text-white" />
+                  <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 shadow-xl shadow-blue-500/50">
+                    <Mail className="h-8 w-8 text-white" />
                   </div>
-                  <h2 className="text-3xl font-black text-white mb-2">Check your email</h2>
-                  <p className="text-slate-400 text-sm mb-2">We sent a BootHop magic link to</p>
-                  <p className="text-cyan-400 font-bold mb-6">{form.email}</p>
-                  <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-300 mb-8 text-left space-y-1.5">
-                    <p>✅ Click the link in your email to verify</p>
-                    <p>🚀 Your trip will be posted automatically</p>
-                    <p>🔍 We'll instantly scan for matches</p>
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    <Link href="/"
-                      className="group flex items-center justify-center gap-2 w-full bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 py-3.5 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-slate-500/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
-                      <Home className="h-4 w-4" /> Return to Home
-                    </Link>
-                    <button onClick={() => { setStep('trip'); resetForm(); }}
-                      className="group flex items-center justify-center gap-2 w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-3.5 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
-                      <PlusCircle className="h-4 w-4 group-hover:rotate-90 transition-transform duration-300" /> Post Another Trip
+                  <h2 className="text-2xl font-black text-white mb-1 text-center">Enter your code</h2>
+                  <p className="text-slate-400 text-sm mb-1 text-center">We sent a 5-character code to</p>
+                  <p className="text-cyan-400 font-bold mb-6 text-center">{form.email}</p>
+
+                  {error && (
+                    <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300 flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 shrink-0" />{error}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleVerifyCode} className="space-y-4">
+                    <input
+                      type="text"
+                      value={codeInput}
+                      onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
+                      maxLength={5}
+                      placeholder="4827A"
+                      className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-4 text-center text-2xl font-bold tracking-[0.35em] uppercase text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all"
+                      required
+                    />
+                    <button type="submit" disabled={loading || codeInput.trim().length < 5}
+                      className="group w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-4 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-blue-500/50 disabled:opacity-60 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
+                      {loading ? 'Verifying…' : (<>Verify & continue <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" /></>)}
                     </button>
-                  </div>
+                  </form>
+
+                  <button onClick={() => { setStep('email'); setCodeInput(''); setError(null); }}
+                    className="mt-4 w-full text-sm text-slate-500 hover:text-slate-300 transition text-center">
+                    ← Resend code
+                  </button>
                 </div>
               </div>
             )}
@@ -349,7 +377,7 @@ function RegisterForm() {
                   </div>
                   <button type="submit" disabled={loading}
                     className="group w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-4 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-blue-500/50 disabled:opacity-60 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
-                    {loading ? 'Sending…' : (<>Send magic link <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" /></>)}
+                    {loading ? 'Sending…' : (<>Send verification code <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" /></>)}
                   </button>
                   <p className="text-xs text-slate-600 text-center">No password needed · Free to join · Cancel anytime</p>
                 </form>

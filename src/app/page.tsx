@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import {
   ArrowRight, CheckCircle, MapPin, Menu, Package,
@@ -112,11 +113,13 @@ function TestimonialsSection() {
 
 function HomePageContent() {
   useScrollReveal();
+  const router = useRouter();
   const [mode, setMode] = useState<Mode>('send');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [codeInput, setCodeInput] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [trips, setTrips] = useState<RecentTrip[]>([]);
   const [filterFrom, setFilterFrom] = useState('');
@@ -231,13 +234,31 @@ function HomePageContent() {
   const sendMagicLink = async () => {
     if (!trip.email) { alert('Please enter your email.'); return; }
     setSubmitting(true);
-    localStorage.setItem('pendingTrip', JSON.stringify({ from: trip.from, to: trip.to, date: trip.date, price: trip.price, weight: trip.weight, mode }));
-    const { error } = await supabase.auth.signInWithOtp({
-      email: trip.email, options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    const journeyPayload = { from: trip.from, to: trip.to, date: trip.date, price: trip.price, weight: trip.weight, mode };
+    const res = await fetch('/api/auth/request-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: trip.email, journeyPayload }),
     });
     setSubmitting(false);
-    if (error) { localStorage.removeItem('pendingTrip'); alert(error.message); return; }
+    if (!res.ok) { const d = await res.json(); alert(d.error || 'Unable to send code.'); return; }
     setEmailSent(true);
+  };
+
+  const verifyModalCode = async () => {
+    const trimmed = codeInput.trim().toUpperCase();
+    if (trimmed.length < 5) { alert('Please enter the full 5-character code.'); return; }
+    setSubmitting(true);
+    const res = await fetch('/api/auth/verify-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: trip.email, code: trimmed }),
+    });
+    const data = await res.json();
+    setSubmitting(false);
+    if (!res.ok) { alert(data.error || 'Invalid code. Please try again.'); return; }
+    setShowEmail(false); setEmailSent(false); setCodeInput('');
+    router.push(data.redirectTo || '/intent');
   };
 
   const saveTrip = async () => {
@@ -467,28 +488,32 @@ function HomePageContent() {
                   </button>
                   <button onClick={sendMagicLink} disabled={submitting}
                     className="flex-1 rounded-xl bg-blue-500 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(59,130,246,0.4)] disabled:opacity-60 disabled:cursor-not-allowed">
-                    {submitting ? 'Sending...' : 'Send Link'}
+                    {submitting ? 'Sending...' : 'Send Code'}
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <div className="mb-6 text-center">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-500/15">
-                    <CheckCircle className="h-7 w-7 text-green-400" />
-                  </div>
-                  <h2 className="mb-2 text-xl font-semibold text-white md:text-2xl">Check Your Email</h2>
-                  <p className="text-sm text-white/50">We&apos;ve sent a link to <span className="font-medium text-blue-400">{trip.email}</span></p>
+                <h2 className="mb-1 text-xl font-semibold text-white md:text-2xl">Enter your code</h2>
+                <p className="mb-5 text-sm text-white/50">We sent a 5-character code to <span className="font-medium text-blue-400">{trip.email}</span></p>
+                <input
+                  type="text"
+                  value={codeInput}
+                  onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
+                  maxLength={5}
+                  placeholder="4827A"
+                  className="mb-4 w-full rounded-xl border border-white/12 bg-white/5 p-3.5 text-center text-2xl font-bold tracking-[0.35em] uppercase text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                />
+                <div className="flex gap-3">
+                  <button onClick={() => { setEmailSent(false); setCodeInput(''); }}
+                    className="flex-1 rounded-xl border border-white/12 py-3 text-sm text-white/65 transition-all hover:bg-white/5 hover:text-white">
+                    ← Resend
+                  </button>
+                  <button onClick={verifyModalCode} disabled={submitting || codeInput.trim().length < 5}
+                    className="flex-1 rounded-xl bg-blue-500 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(59,130,246,0.4)] disabled:opacity-60 disabled:cursor-not-allowed">
+                    {submitting ? 'Verifying...' : 'Verify & continue'}
+                  </button>
                 </div>
-                <div className="mb-5 rounded-xl border border-blue-500/20 bg-blue-500/8 p-4">
-                  <p className="text-center text-sm text-blue-300/85">Click the link in your email to complete registration. Your trip will be saved automatically.</p>
-                </div>
-                <Link
-                  href="/"
-                  onClick={() => { setShowEmail(false); setEmailSent(false); resetForm(); }}
-                  className="block w-full rounded-xl bg-blue-500 py-3.5 text-center text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)] active:translate-y-0">
-                  Done — back to home
-                </Link>
               </>
             )}
           </div>

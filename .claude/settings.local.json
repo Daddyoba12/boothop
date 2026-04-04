@@ -41,7 +41,10 @@
       "Read(//tmp/auth-extract/boothop-auth-system/components/auth/**)",
       "Read(//tmp/auth-extract/boothop-auth-system/lib/email/**)",
       "Read(//tmp/auth-extract/boothop-auth-system/**)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(ls:*)",
+      "Bash(node:*)",
+      "Bash(wc -l /c/Users/babso/desktop/boothop/schema/*.sql)"
     ]
   }
 }
