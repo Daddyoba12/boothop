@@ -32,6 +32,11 @@ type MatchDetails = {
   booter_confirmed_at: string | null;
   hooper_confirmed_at: string | null;
   payment_released_at: string | null;
+  contact_unlocked: boolean;
+  sender_kyc_status: string;
+  traveler_kyc_status: string;
+  negotiation_status: string | null;
+  proposed_price: number | null;
   sender_trip: {
     from_city: string;
     to_city: string;
@@ -71,6 +76,20 @@ export default function MatchDetailsPage() {
     loadMatch();
     loadUser();
   }, [matchId]);
+
+  // Auto-unlock contact details when all conditions are met
+  useEffect(() => {
+    if (!match || match.contact_unlocked) return;
+    const bothAcceptedNow = match.sender_accepted && match.traveler_accepted;
+    const kycOk = match.sender_kyc_status === 'verified' && match.traveler_kyc_status === 'verified';
+    if (bothAcceptedNow && match.payment_status === 'escrowed' && kycOk) {
+      fetch('/api/matches/unlock-contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matchId: match.id }),
+      }).then(() => loadMatch()).catch(console.error);
+    }
+  }, [match]);
 
   const loadUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -284,11 +303,17 @@ export default function MatchDetailsPage() {
   const myAccepted = isSender ? match.sender_accepted : match.traveler_accepted;
   const theirAccepted = isSender ? match.traveler_accepted : match.sender_accepted;
   const bothAccepted = match.sender_accepted && match.traveler_accepted;
-  
+
   const canConfirm = match.status === 'accepted' && match.payment_status === 'escrowed';
   const booterConfirmed = match.booter_confirmed_delivery;
   const hooperConfirmed = match.hooper_confirmed_receipt && match.hooper_confirmed_condition;
   const deliveryComplete = booterConfirmed && hooperConfirmed;
+
+  const bothKycOk =
+    match.sender_kyc_status === 'verified' && match.traveler_kyc_status === 'verified';
+  const contactConditionsMet =
+    bothAccepted && match.payment_status === 'escrowed' && bothKycOk;
+  const showContactDetails = match.contact_unlocked;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950 relative overflow-hidden">
@@ -568,6 +593,67 @@ export default function MatchDetailsPage() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* CONTACT DETAILS SECTION */}
+        {bothAccepted && (
+          <div className="relative group mb-12">
+            <div className={`absolute inset-0 rounded-3xl blur-xl group-hover:blur-2xl transition-all ${showContactDetails ? 'bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-emerald-500/20' : 'bg-gradient-to-r from-slate-500/10 to-slate-600/10'}`} />
+            <div className={`relative backdrop-blur-2xl border rounded-3xl p-8 shadow-2xl ${showContactDetails ? 'bg-gradient-to-br from-white/10 to-white/5 border-emerald-400/30' : 'bg-gradient-to-br from-white/5 to-white/3 border-white/10'}`}>
+
+              <div className="flex items-center gap-4 mb-8">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg ${showContactDetails ? 'bg-gradient-to-br from-emerald-500 to-teal-500 shadow-emerald-500/50' : 'bg-slate-700'}`}>
+                  {showContactDetails
+                    ? <MessageSquare className="w-7 h-7 text-white" />
+                    : <Shield className="w-7 h-7 text-slate-400" />}
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-white">Contact Details</h3>
+                  <p className="text-white/50 text-sm mt-1">
+                    {showContactDetails ? 'Unlocked — contact each other directly' : 'Locked until all conditions are met'}
+                  </p>
+                </div>
+              </div>
+
+              {showContactDetails ? (
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Sender contact */}
+                  <div className="p-6 bg-white/5 rounded-2xl border border-white/10 space-y-3">
+                    <p className="text-purple-300 font-semibold text-sm uppercase tracking-wider">Sender (Hooper)</p>
+                    <p className="text-white font-bold text-xl">{(match.sender_profile as any)?.full_name || 'Unknown'}</p>
+                    <p className="text-slate-300 text-sm">{(match.sender_profile as any)?.email || '—'}</p>
+                  </div>
+                  {/* Traveler contact */}
+                  <div className="p-6 bg-white/5 rounded-2xl border border-white/10 space-y-3">
+                    <p className="text-blue-300 font-semibold text-sm uppercase tracking-wider">Traveler (Booter)</p>
+                    <p className="text-white font-bold text-xl">{(match.traveler_profile as any)?.full_name || 'Unknown'}</p>
+                    <p className="text-slate-300 text-sm">{(match.traveler_profile as any)?.email || '—'}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="p-6 bg-slate-800/50 rounded-2xl border border-white/5">
+                    <p className="text-slate-400 text-sm mb-4 font-medium">Contact details are revealed when all of the following are complete:</p>
+                    <ul className="space-y-3 text-sm">
+                      {[
+                        { label: 'Both parties accept the match', done: bothAccepted },
+                        { label: 'Payment held in escrow', done: match.payment_status === 'escrowed' },
+                        { label: 'Sender KYC verified', done: match.sender_kyc_status === 'verified' },
+                        { label: 'Traveler KYC verified', done: match.traveler_kyc_status === 'verified' },
+                      ].map(({ label, done }) => (
+                        <li key={label} className="flex items-center gap-3">
+                          {done
+                            ? <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                            : <Clock className="w-5 h-5 text-slate-500 flex-shrink-0" />}
+                          <span className={done ? 'text-green-300' : 'text-slate-400'}>{label}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

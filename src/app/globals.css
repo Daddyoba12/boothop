@@ -26,6 +26,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Video fade-in (about page single-video swap) ── */
+@keyframes videoFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.video-fade-in { animation: videoFadeIn 1.2s cubic-bezier(0.4,0,0.2,1) forwards; }
+
 /* ── Image Slider ── */
 @keyframes fadeInOut {
   0%, 45%  { opacity: 1; z-index: 2; }
@@ -103,29 +110,43 @@ body {
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* Base state — hidden until JS adds .visible */
-.reveal {
+/* Base state — hidden until JS adds .visible
+   Safety fallback: after 1.2s auto-show anything the observer missed
+   (happens in PWA when everything is in-viewport on first render)       */
+.reveal,
+.reveal-left,
+.reveal-scale {
   opacity: 0;
   will-change: opacity, transform;
+  animation: slideInUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) 1.2s both;
 }
+.reveal-left { animation-name: slideInLeft; animation-duration: 0.55s; }
+.reveal-scale { animation-name: scaleIn;    animation-duration: 0.55s; }
 
-/* Triggered state */
+/* When JS triggers it, override the fallback immediately */
 .reveal.visible {
-  animation: slideInUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: slideInUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
 }
 .reveal-left.visible {
-  animation: slideInLeft 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: slideInLeft 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
 }
 .reveal-scale.visible {
-  animation: scaleIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: scaleIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
 }
 
-/* Stagger delays */
-.reveal.visible.d1 { animation-delay: 0.05s; }
-.reveal.visible.d2 { animation-delay: 0.13s; }
-.reveal.visible.d3 { animation-delay: 0.21s; }
-.reveal.visible.d4 { animation-delay: 0.29s; }
-.reveal.visible.d5 { animation-delay: 0.37s; }
+/* Stagger delays — only on JS-triggered state */
+.reveal.visible.d1 { animation-delay: 0.05s !important; }
+.reveal.visible.d2 { animation-delay: 0.13s !important; }
+.reveal.visible.d3 { animation-delay: 0.21s !important; }
+.reveal.visible.d4 { animation-delay: 0.29s !important; }
+.reveal.visible.d5 { animation-delay: 0.37s !important; }
+
+/* Fallback stagger for non-JS path */
+.reveal.d1 { animation-delay: 1.20s; }
+.reveal.d2 { animation-delay: 1.35s; }
+.reveal.d3 { animation-delay: 1.50s; }
+.reveal.d4 { animation-delay: 1.65s; }
+.reveal.d5 { animation-delay: 1.80s; }
 
 /* ═══════════════════════════════════════════
    TOUCH DEVICE OVERRIDES
@@ -133,7 +154,29 @@ body {
    look flat. These rules make the "active" card
    appearance always visible on touch screens.
 ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   PWA STANDALONE — extra polish when running
+   as an installed app (no browser chrome)
+═══════════════════════════════════════════ */
+@media all and (display-mode: standalone) {
+  /* Ensure full-bleed dark background with no white flash */
+  html, body { background: #07111f; }
+
+  /* Make "Request →" and "Carry this →" buttons always visible
+     (they use group-hover:opacity-100 which never fires on touch) */
+  .pwa-btn-always { opacity: 1 !important; }
+
+  /* Cards always show their lifted state */
+  .pwa-card-lift {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  }
+}
+
 @media (hover: none) {
+
+  /* Make trip action buttons always visible on touch devices */
+  [class*="group-hover:opacity-100"] { opacity: 1 !important; }
 
   /* Blue step cards (traveller / main page) */
   .touch-blue {

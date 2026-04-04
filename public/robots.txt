@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Block private/auth routes from indexing
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /admin
+Disallow: /admin/
+Disallow: /profile
+Disallow: /kyc/
+Disallow: /checkout/
+Disallow: /payment/
+Disallow: /matches/
+Disallow: /messages/
+Disallow: /api/
+Disallow: /confirm
+Disallow: /verify
+Disallow: /intent
+
+Sitemap: https://boothop.co.uk/sitemap.xml

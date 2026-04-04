@@ -9,22 +9,34 @@ import { useEffect } from 'react';
  */
 export function useScrollReveal() {
   useEffect(() => {
-    const selector = '.reveal, .reveal-left, .reveal-scale';
-    const elements = document.querySelectorAll<HTMLElement>(selector);
+    // Defer slightly so the browser has finished layout/paint before we start
+    // observing. This matters in PWA standalone mode where everything renders
+    // in a single frame on launch.
+    const raf = requestAnimationFrame(() => {
+      const selector = '.reveal, .reveal-left, .reveal-scale';
+      const elements = document.querySelectorAll<HTMLElement>(selector);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
-    );
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.08, rootMargin: '0px 0px -20px 0px' }
+      );
 
-    elements.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+      elements.forEach((el) => observer.observe(el));
+
+      // Cleanup stored on the window so it can be called from the RAF callback
+      (window as any).__scrollRevealCleanup = () => observer.disconnect();
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      (window as any).__scrollRevealCleanup?.();
+    };
   }, []);
 }

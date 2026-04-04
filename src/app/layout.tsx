@@ -14,8 +14,17 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+const APP_URL = 'https://boothop.co.uk';
+
+// ─── Replace G-XXXXXXXXXX with your real GA4 Measurement ID ───────────────
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX';
+
 export const metadata: Metadata = {
-  title: 'BootHop – Ship Anything. Anywhere. With a Verified Traveler.',
+  metadataBase: new URL(APP_URL),
+  title: {
+    default: 'BootHop – Ship Anything. Anywhere. With a Verified Traveler.',
+    template: '%s | BootHop',
+  },
   description:
     'BootHop connects verified travelers with people who need personal effects, letters, and parcels delivered internationally. Safe, secure, peer-to-peer logistics.',
   keywords: [
@@ -24,6 +33,11 @@ export const metadata: Metadata = {
     'send parcels abroad',
     'travelers carrying packages',
     'affordable international logistics',
+    'send package to Nigeria',
+    'London to Lagos delivery',
+    'peer delivery UK',
+    'luggage sharing',
+    'travel courier',
   ],
   manifest: '/manifest.json',
   appleWebApp: {
@@ -32,19 +46,86 @@ export const metadata: Metadata = {
     title: 'BootHop',
   },
   formatDetection: { telephone: false },
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     title: 'BootHop – Peer-to-Peer International Delivery',
     description:
       'Connect with verified travelers to send items worldwide at a fraction of courier costs.',
     type: 'website',
     siteName: 'BootHop',
+    url: APP_URL,
+    images: [
+      {
+        url: '/images/boothop.png',
+        width: 512,
+        height: 512,
+        alt: 'BootHop – Ship Anything. Anywhere.',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'BootHop – Ship Anything. Anywhere.',
     description:
       'The peer-to-peer logistics platform that connects travellers with senders worldwide.',
+    images: ['/images/boothop.png'],
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
+  },
+};
+
+// JSON-LD structured data — helps Google understand the business
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${APP_URL}/#org`,
+      name: 'BootHop',
+      url: APP_URL,
+      logo: `${APP_URL}/images/boothop.png`,
+      description:
+        'BootHop connects verified travellers with people who need parcels delivered internationally, at a fraction of courier costs.',
+      sameAs: [
+        'https://www.instagram.com/boothop',
+        'https://www.tiktok.com/@boothop',
+        'https://www.facebook.com/boothop',
+      ],
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        email: 'support@boothop.co.uk',
+        availableLanguage: 'English',
+      },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${APP_URL}/#website`,
+      url: APP_URL,
+      name: 'BootHop',
+      publisher: { '@id': `${APP_URL}/#org` },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: `${APP_URL}/journeys?q={search_term_string}`,
+        'query-input': 'required name=search_term_string',
+      },
+    },
+    {
+      '@type': 'Service',
+      '@id': `${APP_URL}/#service`,
+      name: 'Peer-to-Peer International Delivery',
+      provider: { '@id': `${APP_URL}/#org` },
+      serviceType: 'Logistics',
+      areaServed: { '@type': 'Country', name: 'Worldwide' },
+      description:
+        'Verified travellers carry parcels on their existing journeys, connecting senders with affordable international delivery.',
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -60,6 +141,33 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/images/boothop.png" />
+        <link rel="canonical" href={APP_URL} />
+
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+
+        {/* Google Analytics 4 — replace G-XXXXXXXXXX with your real ID in .env.local */}
+        {GA_ID !== 'G-XXXXXXXXXX' && (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_ID}', { page_path: window.location.pathname });
+                `,
+              }}
+            />
+          </>
+        )}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 min-h-screen`}

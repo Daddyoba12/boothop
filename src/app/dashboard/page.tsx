@@ -5,9 +5,9 @@ import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  Package, Plane, CheckCircle, Clock, XCircle, 
+  Package, Plane, CheckCircle, Clock, XCircle,
   ArrowRight, DollarSign, MapPin, Calendar, TrendingUp,
-  User, Shield, AlertCircle
+  User, Shield, AlertCircle, FileEdit, Rocket
 } from 'lucide-react';
 
 const supabase = createClient(
@@ -27,7 +27,9 @@ export default function DashboardPage() {
     pendingPayments: 0
   });
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'matches' | 'trips'>('matches');
+  const [drafts, setDrafts] = useState<any[]>([]);
+  const [publishingDraft, setPublishingDraft] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'matches' | 'trips' | 'drafts'>('matches');
 
   useEffect(() => {
     loadDashboard();
@@ -84,9 +86,39 @@ export default function DashboardPage() {
       });
 
       setLoading(false);
+
+      // Load journey drafts (uses session cookie, independent of supabase auth)
+      fetch('/api/drafts')
+        .then(r => r.json())
+        .then(d => {
+          setDrafts(d.drafts || []);
+          if ((d.drafts || []).length > 0) setActiveTab('drafts');
+        })
+        .catch(() => {});
+
     } catch (error) {
       console.error('Error loading dashboard:', error);
       setLoading(false);
+    }
+  };
+
+  const publishDraft = async (draftId: string) => {
+    setPublishingDraft(draftId);
+    try {
+      const res = await fetch('/api/trips/publish-draft', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ draftId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to publish');
+      setDrafts(prev => prev.filter(d => d.id !== draftId));
+      setActiveTab('trips');
+      loadDashboard();
+    } catch (err: any) {
+      alert(err.message || 'Could not publish draft');
+    } finally {
+      setPublishingDraft(null);
     }
   };
 
@@ -264,6 +296,20 @@ export default function DashboardPage() {
           >
             ✈️ My Trips ({trips.length})
           </button>
+          {drafts.length > 0 && (
+            <button
+              onClick={() => setActiveTab('drafts')}
+              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+                activeTab === 'drafts'
+                  ? 'bg-gradient-to-r from-amber-600 to-orange-500 text-white shadow-lg'
+                  : 'bg-amber-500/10 text-amber-300 hover:text-white border border-amber-500/30'
+              }`}
+            >
+              <FileEdit className="w-4 h-4" />
+              Drafts
+              <span className="bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{drafts.length}</span>
+            </button>
+          )}
         </div>
 
         {/* MATCHES LIST */}
@@ -425,6 +471,64 @@ export default function DashboardPage() {
                 </div>
               ))
             )}
+          </div>
+        )}
+
+        {/* DRAFTS LIST */}
+        {activeTab === 'drafts' && (
+          <div className="space-y-4">
+            <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-sm flex items-start gap-3">
+              <FileEdit className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <p>You have saved journey drafts from your recent registration. Publish them to go live and get matched.</p>
+            </div>
+            {drafts.map(draft => (
+              <div key={draft.id} className="bg-white/5 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${draft.type === 'travel' ? 'bg-blue-500/20' : 'bg-purple-500/20'}`}>
+                      {draft.type === 'travel'
+                        ? <Plane className="w-5 h-5 text-blue-400" />
+                        : <Package className="w-5 h-5 text-purple-400" />}
+                    </div>
+                    <div>
+                      <p className="text-white font-semibold">{draft.from_city} → {draft.to_city}</p>
+                      <p className="text-white/50 text-xs">{draft.type === 'travel' ? 'Travelling — will carry packages' : 'Sending a package'}</p>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">Draft</span>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm mb-5">
+                  <div>
+                    <p className="text-white/50">Date</p>
+                    <p className="text-white">{draft.travel_date ? new Date(draft.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/50">Weight</p>
+                    <p className="text-white">{draft.weight || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/50">Price</p>
+                    <p className="text-white">{draft.price ? `£${Number(draft.price).toFixed(2)}` : '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/50">Expires</p>
+                    <p className="text-white">{new Date(draft.expires_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => publishDraft(draft.id)}
+                  disabled={publishingDraft === draft.id}
+                  className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 text-white rounded-xl font-semibold transition-all disabled:opacity-60"
+                >
+                  {publishingDraft === draft.id
+                    ? <Clock className="w-4 h-4 animate-spin" />
+                    : <Rocket className="w-4 h-4" />}
+                  {publishingDraft === draft.id ? 'Publishing…' : 'Publish Journey & Start Matching'}
+                </button>
+              </div>
+            ))}
           </div>
         )}
 

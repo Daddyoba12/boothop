@@ -55,25 +55,16 @@ export default function AboutPage() {
             </p>
           </div>
 
-          {/* Three media boxes */}
-          <div className="grid grid-cols-3 gap-4 md:gap-5">
-            {/* LEFT — cycling video */}
-            <div className="relative aspect-square overflow-hidden rounded-2xl border border-white/8 bg-slate-900/60">
-              {VIDEOS.map((src, i) => (
-                <video key={src} autoPlay muted loop playsInline
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{ opacity: i === leftIdx ? 1 : 0, transition: 'opacity 1.4s cubic-bezier(0.4,0,0.2,1)' }}>
-                  <source src={src} type="video/mp4" />
-                </video>
-              ))}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-            </div>
+          {/* Three media boxes
+              Mobile: stacked (1 col), Tablet+: 3 columns
+              Centre image is featured (larger on mobile)                */}
+          <div className="flex flex-col gap-4 md:grid md:grid-cols-3 md:gap-5">
 
-            {/* CENTRE — image slideshow */}
-            <div className="relative aspect-square overflow-hidden rounded-2xl border border-white/8 bg-slate-900/60">
+            {/* CENTRE — image slideshow (shown first and larger on mobile) */}
+            <div className="relative overflow-hidden rounded-2xl border border-white/8 bg-slate-900/60 aspect-video md:aspect-square order-first md:order-none">
               {SLIDES.map((src, i) => (
-                <img key={src} src={src} alt=""
-                  className="absolute inset-0 w-full h-full object-cover"
+                <img key={src} src={src} alt="" loading={i === 0 ? 'eager' : 'lazy'}
+                  className="absolute inset-0 w-full h-full object-cover object-center"
                   style={{ opacity: i === slideIdx ? 1 : 0, transition: 'opacity 1.4s cubic-bezier(0.4,0,0.2,1)' }}
                 />
               ))}
@@ -85,16 +76,33 @@ export default function AboutPage() {
               </div>
             </div>
 
-            {/* RIGHT — cycling video (offset) */}
-            <div className="relative aspect-square overflow-hidden rounded-2xl border border-white/8 bg-slate-900/60">
-              {VIDEOS.map((src, i) => (
-                <video key={src} autoPlay muted loop playsInline
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{ opacity: i === rightIdx ? 1 : 0, transition: 'opacity 1.4s cubic-bezier(0.4,0,0.2,1)' }}>
-                  <source src={src} type="video/mp4" />
+            {/* TWO VIDEOS — side by side on mobile, split left/right on desktop */}
+            <div className="grid grid-cols-2 gap-4 md:contents">
+
+              {/* LEFT — active video only */}
+              <div className="relative overflow-hidden rounded-2xl border border-white/8 bg-slate-900/60 aspect-square md:order-first">
+                <video
+                  key={VIDEOS[leftIdx]}
+                  autoPlay muted loop playsInline preload="auto"
+                  className="absolute inset-0 w-full h-full object-cover video-fade-in"
+                >
+                  <source src={VIDEOS[leftIdx]} type="video/mp4" />
                 </video>
-              ))}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              </div>
+
+              {/* RIGHT — active video (offset index) */}
+              <div className="relative overflow-hidden rounded-2xl border border-white/8 bg-slate-900/60 aspect-square md:order-last">
+                <video
+                  key={VIDEOS[rightIdx]}
+                  autoPlay muted loop playsInline preload="auto"
+                  className="absolute inset-0 w-full h-full object-cover video-fade-in"
+                >
+                  <source src={VIDEOS[rightIdx]} type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              </div>
+
             </div>
           </div>
         </div>

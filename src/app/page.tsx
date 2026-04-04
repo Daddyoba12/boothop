@@ -358,9 +358,27 @@ function HomePageContent() {
               <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">or earn from your luggage space</span>
             </h1>
 
-            <p className="mb-8 max-w-lg text-base text-white/60 md:text-lg">
+            <p className="mb-6 max-w-lg text-base text-white/60 md:text-lg">
               BootHop connects senders with verified travellers already heading the same way. Save on delivery costs or turn spare luggage space into extra income.
             </p>
+
+            {/* Hero image — mobile only (desktop version is in the right column) */}
+            <div className="relative mb-6 md:hidden mx-auto w-full max-w-sm">
+              <div className="relative overflow-hidden rounded-2xl border border-white/10 shadow-[0_16px_48px_rgba(0,0,0,0.4)]" style={{ aspectRatio: '4/3' }}>
+                <Image src="/images/drealboothop.jpg" alt="BootHop delivery community" fill priority className="object-cover object-center" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              </div>
+              {/* Floating trust badge on mobile image */}
+              <div className="absolute -bottom-3 left-4 rounded-xl border border-green-500/20 bg-[#0b1829]/95 px-3 py-2 shadow-xl backdrop-blur-xl flex items-center gap-2">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-500/20">
+                  <CheckCircle className="h-3.5 w-3.5 text-green-400" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-white leading-none">ID Verified</p>
+                  <p className="text-[10px] text-white/45 leading-none mt-0.5">Secure escrow held</p>
+                </div>
+              </div>
+            </div>
 
             {/* Mode toggle */}
             <div className="mb-5 inline-flex rounded-xl border border-white/10 bg-white/5 p-1 backdrop-blur">
@@ -738,7 +756,7 @@ function HomePageContent() {
                             </div>
                             <div className="flex flex-col items-end gap-2">
                               {item.weight && <span className="rounded-full bg-blue-500/12 border border-blue-400/15 px-2.5 py-1 text-xs text-blue-300">{weightOptions.find(w => w.value === item.weight)?.label || item.weight}</span>}
-                              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="rounded-xl bg-blue-500 px-3.5 py-1.5 text-xs font-semibold text-white opacity-0 transition-all group-hover:opacity-100 hover:shadow-lg hover:shadow-blue-500/30">Request →</button>
+                              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="rounded-xl bg-blue-500 px-3.5 py-1.5 text-xs font-semibold text-white transition-all opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 hover:shadow-lg hover:shadow-blue-500/30">Request →</button>
                             </div>
                           </div>
                         </div>
@@ -773,7 +791,7 @@ function HomePageContent() {
                             </div>
                             <div className="flex flex-col items-end gap-2">
                               {item.weight && <span className="rounded-full bg-emerald-500/12 border border-emerald-400/15 px-2.5 py-1 text-xs text-emerald-300">{weightOptions.find(w => w.value === item.weight)?.label || item.weight}</span>}
-                              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="rounded-xl bg-emerald-500 px-3.5 py-1.5 text-xs font-semibold text-white opacity-0 transition-all group-hover:opacity-100 hover:shadow-lg hover:shadow-emerald-500/30">Carry this →</button>
+                              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="rounded-xl bg-emerald-500 px-3.5 py-1.5 text-xs font-semibold text-white transition-all opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 hover:shadow-lg hover:shadow-emerald-500/30">Carry this →</button>
                             </div>
                           </div>
                         </div>

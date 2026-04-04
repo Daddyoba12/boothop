@@ -63,9 +63,37 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 24 * 7,
     });
 
+    // Save journey draft if the user came from the register form with trip details
+    let hasDraft = false;
+    if (record.journey_payload) {
+      try {
+        const { data: authUser } = await (supabase.auth.admin as any).getUserByEmail(email).catch(() => ({ data: null }));
+        const userId = authUser?.user?.id || null;
+        const p = record.journey_payload as any;
+        const priceNum = parseFloat(String(p.price || '0').replace(/[^0-9.]/g, '')) || null;
+        await supabase.from('journey_drafts').insert({
+          email,
+          user_id:     userId,
+          type:        p.mode || 'send',
+          from_city:   p.from || '',
+          to_city:     p.to  || '',
+          travel_date: p.date || null,
+          weight:      p.weight || null,
+          price:       priceNum,
+          interested_in: p.interestedIn || null,
+          status:      'draft',
+          expires_at:  new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        });
+        hasDraft = true;
+      } catch (draftErr) {
+        console.error('Draft save failed (non-blocking):', draftErr);
+      }
+    }
+
     return NextResponse.json({
       ok: true,
       email,
+      hasDraft,
       journeyPayload: record.journey_payload,
       redirectTo: '/dashboard',
     });
