@@ -2,29 +2,23 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-// Validate environment variables at module load
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
-
-if (!STRIPE_SECRET_KEY) {
-  throw new Error('Missing STRIPE_SECRET_KEY in environment variables');
-}
-
-if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2026-02-25.clover',  // ← Keep this version!
-});
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
 const INSURANCE_RATE = 0.075; // 7.5%
 const MINIMUM_PAYMENT = 30; // 30 pence minimum for Stripe
 
 export async function POST(request: Request) {
+  const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!STRIPE_SECRET_KEY || !SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
+  }
+
+  const stripe = new Stripe(STRIPE_SECRET_KEY, {
+    apiVersion: '2026-02-25.clover',  // ← Keep this version!
+  });
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
   try {
     const { matchId, amount, goodsValue, termsAccepted, insuranceAccepted } = await request.json();
 
