@@ -11,6 +11,7 @@ import {
 import { createClient } from '@supabase/supabase-js';
 import BootHopLogo from '@/components/BootHopLogo';
 import Footer from '@/components/Footer';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -109,6 +110,7 @@ function TestimonialsSection() {
 }
 
 function HomePageContent() {
+  useScrollReveal();
   const [mode, setMode] = useState<Mode>('send');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -516,11 +518,11 @@ function HomePageContent() {
           </div>
           <div className="space-y-4">
             {[
-              { emoji: '✈️', step: '01', title: 'Post your trip or request', body: 'Register your journey dates and route, or submit a delivery request with weight and budget.', gradient: 'from-blue-500 to-cyan-400', badge: 'bg-cyan-400', shadow: 'shadow-blue-500/50', hover: 'hover:border-blue-500/40 hover:shadow-blue-500/15' },
-              { emoji: '⚡', step: '02', title: 'Get matched securely', body: 'Our engine finds verified matches on the same route. Both sides confirm before any payment.', gradient: 'from-violet-500 to-purple-400', badge: 'bg-purple-400', shadow: 'shadow-violet-500/50', hover: 'hover:border-violet-500/40 hover:shadow-violet-500/15' },
-              { emoji: '💸', step: '03', title: 'Deliver and get paid', body: 'Funds are held in escrow and released only after the recipient confirms safe delivery.', gradient: 'from-emerald-500 to-teal-400', badge: 'bg-teal-400', shadow: 'shadow-emerald-500/50', hover: 'hover:border-emerald-500/40 hover:shadow-emerald-500/15' },
+              { emoji: '✈️', step: '01', title: 'Post your trip or request', body: 'Register your journey dates and route, or submit a delivery request with weight and budget.', gradient: 'from-blue-500 to-cyan-400', badge: 'bg-cyan-400', shadow: 'shadow-blue-500/50', hover: 'hover:border-blue-500/40 hover:shadow-blue-500/15', touch: 'touch-blue', delay: 'd1' },
+              { emoji: '⚡', step: '02', title: 'Get matched securely', body: 'Our engine finds verified matches on the same route. Both sides confirm before any payment.', gradient: 'from-violet-500 to-purple-400', badge: 'bg-purple-400', shadow: 'shadow-violet-500/50', hover: 'hover:border-violet-500/40 hover:shadow-violet-500/15', touch: 'touch-violet', delay: 'd2' },
+              { emoji: '💸', step: '03', title: 'Deliver and get paid', body: 'Funds are held in escrow and released only after the recipient confirms safe delivery.', gradient: 'from-emerald-500 to-teal-400', badge: 'bg-teal-400', shadow: 'shadow-emerald-500/50', hover: 'hover:border-emerald-500/40 hover:shadow-emerald-500/15', touch: 'touch-emerald', delay: 'd3' },
             ].map((item) => (
-              <div key={item.step} className={`group flex items-center gap-6 rounded-2xl border border-white/8 bg-white/3 p-6 transition-all duration-300 hover:bg-white/5 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 cursor-pointer ${item.hover}`}>
+              <div key={item.step} className={`reveal ${item.delay} group flex items-center gap-6 rounded-2xl border border-white/8 bg-white/3 p-6 transition-all duration-300 hover:bg-white/5 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 cursor-pointer ${item.hover} ${item.touch}`}>
                 <div className="relative flex-shrink-0">
                   <div className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} text-2xl shadow-lg ${item.shadow} group-hover:scale-110 transition-transform duration-300`}>
                     {item.emoji}
@@ -555,7 +557,7 @@ function HomePageContent() {
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             {/* Senders */}
-            <div className="group rounded-3xl border border-white/8 bg-white/3 p-8 transition-all duration-300 hover:border-emerald-500/25 hover:bg-white/5 hover:shadow-[0_24px_60px_rgba(16,185,129,0.08)] hover:-translate-y-1">
+            <div className="reveal d1 group rounded-3xl border border-white/8 bg-white/3 p-8 transition-all duration-300 hover:border-emerald-500/25 hover:bg-white/5 hover:shadow-[0_24px_60px_rgba(16,185,129,0.08)] hover:-translate-y-1 touch-emerald">
               <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-400">
                 <Package className="h-6 w-6" />
               </div>
@@ -575,7 +577,7 @@ function HomePageContent() {
             </div>
 
             {/* Travellers */}
-            <div className="group rounded-3xl border border-white/8 bg-white/3 p-8 transition-all duration-300 hover:border-blue-500/25 hover:bg-white/5 hover:shadow-[0_24px_60px_rgba(59,130,246,0.08)] hover:-translate-y-1">
+            <div className="reveal d2 group rounded-3xl border border-white/8 bg-white/3 p-8 transition-all duration-300 hover:border-blue-500/25 hover:bg-white/5 hover:shadow-[0_24px_60px_rgba(59,130,246,0.08)] hover:-translate-y-1 touch-blue">
               <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-400">
                 <Plane className="h-6 w-6" />
               </div>

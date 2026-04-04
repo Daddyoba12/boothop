@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Shield, CheckCircle, Sparkles, TrendingUp, Globe } from 'lucide-react';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 
 export default function HowItWorksPage() {
+  useScrollReveal();
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
@@ -75,7 +77,7 @@ export default function HowItWorksPage() {
         
         <div className="max-w-7xl mx-auto relative">
           {/* Hero Card */}
-          <div className="relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/10 hover:scale-[1.015] active:scale-[0.99] hover:shadow-blue-500/25 transition-all duration-500 cursor-pointer">
+          <div className="reveal reveal-scale relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/10 hover:scale-[1.015] active:scale-[0.99] hover:shadow-blue-500/25 transition-all duration-500 cursor-pointer touch-blue">
             {/* Background Image */}
             <div className="absolute inset-0">
               <img
@@ -154,7 +156,7 @@ export default function HowItWorksPage() {
             {booterSteps.map((s, i) => (
               <div
                 key={i}
-                className="group flex gap-5 mb-6 p-5 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/20 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 cursor-pointer"
+                className={`reveal d${i + 1} group flex gap-5 mb-6 p-5 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/20 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 cursor-pointer touch-blue`}
               >
                 <div className="relative flex-shrink-0">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
@@ -187,7 +189,7 @@ export default function HowItWorksPage() {
         
         <div className="max-w-7xl mx-auto relative">
           {/* Hero Card */}
-          <div className="relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-emerald-500/10 hover:scale-[1.015] active:scale-[0.99] hover:shadow-emerald-500/25 transition-all duration-500 cursor-pointer">
+          <div className="reveal reveal-scale relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-emerald-500/10 hover:scale-[1.015] active:scale-[0.99] hover:shadow-emerald-500/25 transition-all duration-500 cursor-pointer touch-emerald">
             {/* Background Image */}
             <div className="absolute inset-0">
               <img
@@ -235,7 +237,7 @@ export default function HowItWorksPage() {
             {hooperSteps.map((s, i) => (
               <div
                 key={i}
-                className="group flex gap-5 mb-6 p-5 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/20 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 cursor-pointer"
+                className={`reveal d${i + 1} group flex gap-5 mb-6 p-5 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/20 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 cursor-pointer touch-emerald`}
               >
                 <div className="relative flex-shrink-0">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-emerald-500/50 group-hover:scale-110 transition-transform duration-300">

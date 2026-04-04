@@ -19,7 +19,8 @@ html {
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -84,13 +85,92 @@ body {
 /* ── Dot indicator ── */
 .dot-active   { background: #2563eb; transform: scale(1.3); }
 .dot-inactive { background: #cbd5e1; }
-body {
-  background: linear-gradient(135deg, #0a0a0a 0%, #001a33 50%, #0a0a0a 100%);
-  background-attachment: fixed;
-}
-/* Your existing CSS stays the same, just make sure this is at the bottom: */
 
-body {
-  background: linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%);
-  background-attachment: fixed;
+/* ═══════════════════════════════════════════
+   SCROLL REVEAL — elements animate in as they
+   enter the viewport via IntersectionObserver
+═══════════════════════════════════════════ */
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Base state — hidden until JS adds .visible */
+.reveal {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+/* Triggered state */
+.reveal.visible {
+  animation: slideInUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.reveal-left.visible {
+  animation: slideInLeft 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.reveal-scale.visible {
+  animation: scaleIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Stagger delays */
+.reveal.visible.d1 { animation-delay: 0.05s; }
+.reveal.visible.d2 { animation-delay: 0.13s; }
+.reveal.visible.d3 { animation-delay: 0.21s; }
+.reveal.visible.d4 { animation-delay: 0.29s; }
+.reveal.visible.d5 { animation-delay: 0.37s; }
+
+/* ═══════════════════════════════════════════
+   TOUCH DEVICE OVERRIDES
+   On mobile/PWA, :hover never fires so cards
+   look flat. These rules make the "active" card
+   appearance always visible on touch screens.
+═══════════════════════════════════════════ */
+@media (hover: none) {
+
+  /* Blue step cards (traveller / main page) */
+  .touch-blue {
+    border-color: rgba(59, 130, 246, 0.35) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 4px 24px rgba(59, 130, 246, 0.14), inset 0 0 0 1px rgba(59,130,246,0.1) !important;
+  }
+
+  /* Emerald step cards (sender) */
+  .touch-emerald {
+    border-color: rgba(16, 185, 129, 0.35) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 4px 24px rgba(16, 185, 129, 0.14), inset 0 0 0 1px rgba(16,185,129,0.1) !important;
+  }
+
+  /* Violet cards (trust/safety etc.) */
+  .touch-violet {
+    border-color: rgba(139, 92, 246, 0.35) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 4px 24px rgba(139, 92, 246, 0.14), inset 0 0 0 1px rgba(139,92,246,0.1) !important;
+  }
+
+  /* Amber */
+  .touch-amber {
+    border-color: rgba(245, 158, 11, 0.35) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 4px 24px rgba(245, 158, 11, 0.14), inset 0 0 0 1px rgba(245,158,11,0.1) !important;
+  }
+
+  /* Generic card elevated look */
+  .touch-lift {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25) !important;
+  }
+
+  /* Icons always show full glow */
+  .touch-icon-glow {
+    filter: drop-shadow(0 0 8px currentColor);
+  }
 }
