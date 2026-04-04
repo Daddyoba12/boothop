@@ -21,7 +21,27 @@
       "Bash(curl -s \"https://maps.googleapis.com/maps/api/place/autocomplete/json?input=London&types=%28cities%29&key=AIzaSyAWCIeNnw0mFe7clEhC7U6m08-wtQitAWM\")",
       "Bash(python -m json.tool)",
       "WebFetch(domain:www.boothop.com)",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "Bash(cd /tmp)",
+      "Bash(unzip -q \"C:\\\\Users\\\\babso\\\\Downloads\\\\boothop-auth-system \\(1\\).zip\")",
+      "Bash(unzip -l \"C:\\\\Users\\\\babso\\\\Downloads\\\\boothop-auth-system \\(1\\).zip\")",
+      "Bash(grep -E \"\\\\.\\(js|ts|jsx|tsx|json|html|css|yaml|yml|md|txt|env\\)$\")",
+      "Bash(unzip -q 'C:\\\\Users\\\\babso\\\\Downloads\\\\boothop-auth-system \\(1\\).zip')",
+      "Bash(grep -v \"\\\\.tmp$\\\\|Diagnostics\\\\|CTXReceiverLogs\\\\|\\\\.etl$\\\\|CitrixAutoUpdate\\\\|BackendConfigLocalFile\\\\|\\\\.ses$\")",
+      "Bash(unzip -q \"C:\\\\Users\\\\babso\\\\Downloads\\\\boothop-auth-system \\(1\\).zip\" -d \"C:\\\\Users\\\\babso\\\\Downloads\\\\extracted\")",
+      "Read(//c/Users/babso/Downloads/extracted/**)",
+      "Bash(xargs ls:*)",
+      "Read(//tmp/auth-extract/boothop-auth-system/lib/auth/**)",
+      "Read(//tmp/auth-extract/boothop-auth-system/lib/supabase/**)",
+      "Read(//tmp/auth-extract/boothop-auth-system/app/api/auth/request-code/**)",
+      "Read(//tmp/auth-extract/boothop-auth-system/app/api/auth/verify-code/**)",
+      "Read(//tmp/auth-extract/boothop-auth-system/app/api/auth/me/**)",
+      "Read(//tmp/auth-extract/boothop-auth-system/app/api/auth/logout/**)",
+      "Read(//tmp/auth-extract/boothop-auth-system/app/verify/**)",
+      "Read(//tmp/auth-extract/boothop-auth-system/components/auth/**)",
+      "Read(//tmp/auth-extract/boothop-auth-system/lib/email/**)",
+      "Read(//tmp/auth-extract/boothop-auth-system/**)",
+      "Bash(npm install:*)"
     ]
   }
 }

@@ -46,6 +46,7 @@ const testimonials = [
 const featuredRoutes = [
   { from: 'London', to: 'Lagos', tag: 'Most Popular', color: 'from-blue-500/20 to-blue-600/10', border: 'border-blue-500/20', badge: 'bg-blue-500/20 text-blue-300' },
   { from: 'Manchester', to: 'Lagos', tag: 'High Demand', color: 'from-emerald-500/20 to-emerald-600/10', border: 'border-emerald-500/20', badge: 'bg-emerald-500/20 text-emerald-300' },
+  { from: 'Abuja', to: 'Lagos', tag: 'Domestic Route', color: 'from-green-500/20 to-green-600/10', border: 'border-green-500/20', badge: 'bg-green-500/20 text-green-300' },
   { from: 'Nottingham', to: 'Lagos', tag: 'Growing Route', color: 'from-purple-500/20 to-purple-600/10', border: 'border-purple-500/20', badge: 'bg-purple-500/20 text-purple-300' },
   { from: 'London', to: 'New York', tag: 'Transatlantic', color: 'from-cyan-500/20 to-cyan-600/10', border: 'border-cyan-500/20', badge: 'bg-cyan-500/20 text-cyan-300' },
   { from: 'Birmingham', to: 'Lagos', tag: 'New Corridor', color: 'from-amber-500/20 to-amber-600/10', border: 'border-amber-500/20', badge: 'bg-amber-500/20 text-amber-300' },

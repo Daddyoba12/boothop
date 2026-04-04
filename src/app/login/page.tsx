@@ -4,23 +4,22 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Plane, ArrowRight, Shield, Clock, CheckCircle, Mail, RefreshCw } from 'lucide-react';
-import { createSupabaseClient } from '@/lib/supabase';
+import { ArrowRight, Shield, Clock, CheckCircle, Mail, RefreshCw } from 'lucide-react';
+import BootHopLogo from '@/components/BootHopLogo';
 
 const bgImages = ['/images/D_login1.jpg', '/images/D_login2.jpg'];
 
 export default function LoginPage() {
-  const router   = useRouter();
-  const supabase = createSupabaseClient();
+  const router = useRouter();
 
-  const [email, setEmail]           = useState('');
-  const [otp, setOtp]               = useState(['', '', '', '', '', '']);
-  const [step, setStep]             = useState<'email' | 'otp'>('email');
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState<string | null>(null);
+  const [email, setEmail]             = useState('');
+  const [code, setCode]               = useState('');
+  const [step, setStep]               = useState<'email' | 'code'>('email');
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState<string | null>(null);
   const [resendTimer, setResendTimer] = useState(0);
-  const [bgIdx, setBgIdx]           = useState(0);
-  const inputRefs                   = useRef<(HTMLInputElement | null)[]>([]);
+  const [bgIdx, setBgIdx]             = useState(0);
+  const codeRef                       = useRef<HTMLInputElement>(null);
 
   // Rotate background images
   useEffect(() => {
@@ -35,48 +34,47 @@ export default function LoginPage() {
     return () => clearInterval(t);
   }, [resendTimer]);
 
-  const sendOtp = async (e?: React.FormEvent) => {
+  // Focus code input when step changes
+  useEffect(() => {
+    if (step === 'code') codeRef.current?.focus();
+  }, [step]);
+
+  const sendCode = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!email) { setError('Please enter your email address.'); return; }
     setLoading(true);
     setError(null);
-    const { error: err } = await supabase.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: true },
+
+    const res = await fetch('/api/auth/request-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
     });
+    const data = await res.json();
     setLoading(false);
-    if (err) { setError(err.message); return; }
-    setStep('otp');
+
+    if (!res.ok) { setError(data.error || 'Unable to send code.'); return; }
+    setStep('code');
     setResendTimer(60);
   };
 
-  const handleOtpChange = (i: number, val: string) => {
-    if (!/^\d?$/.test(val)) return;
-    const next = [...otp];
-    next[i] = val;
-    setOtp(next);
-    if (val && i < 5) inputRefs.current[i + 1]?.focus();
-    if (!val && i > 0) inputRefs.current[i - 1]?.focus();
-  };
-
-  const handleOtpPaste = (e: React.ClipboardEvent) => {
-    const paste = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    if (paste.length === 6) {
-      setOtp(paste.split(''));
-      inputRefs.current[5]?.focus();
-    }
-  };
-
-  const verifyOtp = async (e: React.FormEvent) => {
+  const verifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token = otp.join('');
-    if (token.length < 6) { setError('Please enter all 6 digits.'); return; }
+    const trimmed = code.trim().toUpperCase();
+    if (trimmed.length < 5) { setError('Please enter the full 5-character code.'); return; }
     setLoading(true);
     setError(null);
-    const { error: err } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
+
+    const res = await fetch('/api/auth/verify-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code: trimmed }),
+    });
+    const data = await res.json();
     setLoading(false);
-    if (err) { setError('Invalid or expired code. Please try again.'); return; }
-    router.push('/intent');
+
+    if (!res.ok) { setError(data.error || 'Invalid or expired code. Please try again.'); return; }
+    router.push(data.redirectTo || '/intent');
   };
 
   return (
@@ -95,13 +93,8 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-blue-950/70 to-slate-900/60" />
 
         <div className="relative z-10">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Plane className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-white tracking-tight">
-              Boot<span className="text-blue-400">Hop</span>
-            </span>
+          <Link href="/">
+            <BootHopLogo iconClass="text-white" textClass="text-white" />
           </Link>
         </div>
 
@@ -120,13 +113,8 @@ export default function LoginPage() {
       <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 bg-white">
         {/* Mobile logo */}
         <div className="lg:hidden mb-8">
-          <Link href="/" className="flex items-center gap-2 justify-center">
-            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
-              <Plane className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-slate-900 tracking-tight">
-              Boot<span className="text-blue-600">Hop</span>
-            </span>
+          <Link href="/">
+            <BootHopLogo iconClass="text-slate-800" textClass="text-slate-900" />
           </Link>
         </div>
 
@@ -144,7 +132,7 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <form onSubmit={sendOtp} className="space-y-5">
+              <form onSubmit={sendCode} className="space-y-5">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">
                     Email address
@@ -181,14 +169,14 @@ export default function LoginPage() {
             <>
               <div className="mb-8">
                 <button
-                  onClick={() => { setStep('email'); setOtp(['', '', '', '', '', '']); setError(null); }}
+                  onClick={() => { setStep('email'); setCode(''); setError(null); }}
                   className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 mb-4"
                 >
                   ← Change email
                 </button>
                 <h1 className="text-3xl font-bold text-slate-900 mb-2">Check your inbox</h1>
                 <p className="text-slate-500">
-                  We sent a 6-digit code to <span className="font-medium text-slate-700">{email}</span>
+                  We sent a 5-character code to <span className="font-medium text-slate-700">{email}</span>
                 </p>
               </div>
 
@@ -198,31 +186,26 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <form onSubmit={verifyOtp} className="space-y-6">
-                {/* 6-digit input */}
+              <form onSubmit={verifyCode} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-3">
                     Verification code
                   </label>
-                  <div className="flex gap-2" onPaste={handleOtpPaste}>
-                    {otp.map((digit, i) => (
-                      <input
-                        key={i}
-                        ref={(el) => { inputRefs.current[i] = el; }}
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={1}
-                        value={digit}
-                        onChange={(e) => handleOtpChange(i, e.target.value)}
-                        className="flex-1 h-14 text-center text-xl font-bold rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                      />
-                    ))}
-                  </div>
+                  <input
+                    ref={codeRef}
+                    type="text"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.toUpperCase())}
+                    maxLength={5}
+                    placeholder="4827A"
+                    className="w-full h-16 text-center text-2xl font-bold tracking-[0.35em] uppercase rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition placeholder-slate-300"
+                  />
+                  <p className="text-xs text-slate-400 mt-2 text-center">4 digits + 1 letter, e.g. 4827A</p>
                 </div>
 
                 <button
                   type="submit"
-                  disabled={loading || otp.join('').length < 6}
+                  disabled={loading || code.trim().length < 5}
                   className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-60 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-sm hover:shadow-md"
                 >
                   {loading ? 'Verifying…' : 'Verify & continue'}
@@ -237,7 +220,7 @@ export default function LoginPage() {
                   </p>
                 ) : (
                   <button
-                    onClick={() => sendOtp()}
+                    onClick={() => sendCode()}
                     disabled={loading}
                     className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1.5 mx-auto"
                   >
