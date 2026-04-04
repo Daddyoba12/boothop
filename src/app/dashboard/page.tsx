@@ -116,6 +116,38 @@ export default function DashboardPage() {
     );
   }
 
+  // Empty state — no trips and no matches → guide user to create first journey
+  if (!loading && trips.length === 0 && matches.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex flex-col items-center justify-center px-6 text-center">
+        <div className="mb-6 w-20 h-20 rounded-2xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center">
+          <Package className="w-10 h-10 text-blue-400" />
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2">No journeys or matches yet</h2>
+        <p className="text-slate-400 text-sm mb-8 max-w-sm">
+          Create your first journey to get matched with senders or travellers on your route.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link
+            href="/register?type=travel"
+            className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl transition-all"
+          >
+            <Plane className="h-4 w-4" /> I&apos;m Travelling
+          </Link>
+          <Link
+            href="/register?type=send"
+            className="flex items-center justify-center gap-2 border border-white/12 hover:bg-white/5 text-white font-semibold px-6 py-3 rounded-xl transition-all"
+          >
+            <Package className="h-4 w-4" /> I Want to Send
+          </Link>
+        </div>
+        <Link href="/journeys" className="mt-6 text-sm text-slate-500 hover:text-cyan-400 transition-colors">
+          Or browse live journeys →
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
       

@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Search, Plane, Calendar, Package, Star, ArrowRight, X, Filter } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, Plane, Calendar, Package, ArrowRight, X, Filter, Sparkles, CheckCircle } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
@@ -20,8 +21,10 @@ type Trip = {
 
 export default function LiveJourneysPage() {
   const supabase = createSupabaseClient();
+  const router   = useRouter();
 
-  const [trips, setTrips]         = useState<Trip[]>([]);
+  const [trips, setTrips]               = useState<Trip[]>([]);
+  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -111,6 +114,19 @@ export default function LiveJourneysPage() {
 
   const clearFilters = () => { setSearchTerm(''); setFromCity(''); setToCity(''); setDateFilter(''); };
   const hasFilters = !!(searchTerm || fromCity || toCity || dateFilter);
+
+  // Role reversal: if trip is 'travel' they need a sender; if 'send' they need a traveller
+  const handleInterest = (trip: Trip) => {
+    const myRole = trip.type === 'travel' ? 'send' : 'travel';
+    const params = new URLSearchParams({
+      type:           myRole,
+      from:           trip.from_city,
+      to:             trip.to_city,
+      date:           trip.travel_date || '',
+      interestedIn:   trip.id,
+    });
+    router.push(`/register?${params.toString()}`);
+  };
 
   /* ── Animated field wrapper ── */
   const Field = ({
@@ -292,6 +308,7 @@ export default function LiveJourneysPage() {
               {filtered.map((trip, i) => (
                 <div
                   key={trip.id}
+                  onClick={() => setSelectedTrip(trip)}
                   className="group relative flex flex-col sm:flex-row sm:items-center gap-4 px-6 py-5 border-b border-white/6 hover:bg-white/4 hover:border-white/10 transition-all duration-300 cursor-pointer first:rounded-t-2xl last:rounded-b-2xl last:border-b-0"
                   style={{ animationDelay: `${i * 40}ms` }}
                 >
@@ -357,6 +374,85 @@ export default function LiveJourneysPage() {
       </div>
 
       <Footer />
+
+      {/* ── INTERESTED? POPUP ── */}
+      {selectedTrip && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 shadow-2xl p-7 animate-in slide-in-from-bottom-4 duration-300">
+
+            {/* Header */}
+            <div className="flex items-start justify-between mb-5">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Sparkles className="h-4 w-4 text-cyan-400" />
+                  <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">Live Journey</span>
+                </div>
+                <h2 className="text-xl font-black text-white">
+                  {selectedTrip.from_city} → {selectedTrip.to_city}
+                </h2>
+              </div>
+              <button
+                onClick={() => setSelectedTrip(null)}
+                className="p-2 text-slate-500 hover:text-white transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Journey details */}
+            <div className="rounded-2xl border border-white/8 bg-white/4 p-4 mb-6 space-y-3">
+              {selectedTrip.travel_date && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-400 flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> Date</span>
+                  <span className="text-white font-semibold">
+                    {new Date(selectedTrip.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </span>
+                </div>
+              )}
+              {selectedTrip.weight && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-400 flex items-center gap-1.5"><Package className="h-3.5 w-3.5" /> Capacity</span>
+                  <span className="text-white font-semibold">{selectedTrip.weight}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-slate-400 flex items-center gap-1.5"><Plane className="h-3.5 w-3.5" /> Type</span>
+                <span className={`font-bold uppercase text-xs px-2.5 py-1 rounded-full ${selectedTrip.type === 'travel' ? 'bg-blue-500/15 text-blue-400' : 'bg-emerald-500/15 text-emerald-400'}`}>
+                  {selectedTrip.type === 'travel' ? 'Traveller' : 'Sender'}
+                </span>
+              </div>
+              {selectedTrip.price && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-400">Budget</span>
+                  <span className="text-cyan-400 font-black text-lg">£{Number(selectedTrip.price).toFixed(0)}</span>
+                </div>
+              )}
+            </div>
+
+            <p className="text-slate-300 text-sm mb-1 font-semibold text-center">Are you interested in this journey?</p>
+            <p className="text-slate-500 text-xs text-center mb-6">
+              {selectedTrip.type === 'travel'
+                ? 'You\'ll register as a sender — this traveller could carry your package.'
+                : 'You\'ll register as a traveller — this sender is looking for someone like you.'}
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setSelectedTrip(null)}
+                className="flex-1 rounded-xl border border-white/10 py-3.5 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+              >
+                Maybe later
+              </button>
+              <button
+                onClick={() => handleInterest(selectedTrip)}
+                className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-3.5 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              >
+                <CheckCircle className="h-4 w-4" /> Yes, I&apos;m interested!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

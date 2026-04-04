@@ -26,11 +26,15 @@ const slides = [
 ];
 
 function RegisterForm() {
-  const searchParams = useSearchParams();
-  const initialMode  = searchParams.get('type') === 'booter' ? 'travel' : 'send';
+  const searchParams  = useSearchParams();
+  const initialMode   = searchParams.get('type') === 'travel' ? 'travel' : 'send';
+  const prefillFrom   = searchParams.get('from')  || '';
+  const prefillTo     = searchParams.get('to')    || '';
+  const prefillDate   = searchParams.get('date')  || '';
+  const interestedIn  = searchParams.get('interestedIn') || '';
 
   const [mode, setMode]         = useState<'travel' | 'send'>(initialMode as 'travel' | 'send');
-  const [form, setForm]         = useState({ from: '', to: '', date: '', weight: '', price: '', email: '' });
+  const [form, setForm]         = useState({ from: prefillFrom, to: prefillTo, date: prefillDate, weight: '', price: '', email: '' });
   const [step, setStep]         = useState<'trip' | 'email' | 'sent'>('trip');
   const [codeInput, setCodeInput] = useState('');
   const [loading, setLoading]   = useState(false);
@@ -42,12 +46,12 @@ function RegisterForm() {
   const [fading, setFading]   = useState(false);
 
   // Google Places
-  const [fromQuery, setFromQuery]   = useState('');
-  const [toQuery, setToQuery]       = useState('');
+  const [fromQuery, setFromQuery]   = useState(prefillFrom);
+  const [toQuery, setToQuery]       = useState(prefillTo);
   const [fromSugg, setFromSugg]     = useState<string[]>([]);
   const [toSugg, setToSugg]         = useState<string[]>([]);
-  const [fromOk, setFromOk]         = useState(false);
-  const [toOk, setToOk]             = useState(false);
+  const [fromOk, setFromOk]         = useState(!!prefillFrom);
+  const [toOk, setToOk]             = useState(!!prefillTo);
   const [mapsReady, setMapsReady]   = useState(false);
   const sessionTokenRef             = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
 
@@ -147,7 +151,7 @@ function RegisterForm() {
     if (!form.email) { setError('Please enter your email address.'); return; }
     setLoading(true);
 
-    const journeyPayload = { from: form.from, to: form.to, date: form.date, weight: form.weight, price: `${currency}${form.price}`, mode };
+    const journeyPayload = { from: form.from, to: form.to, date: form.date, weight: form.weight, price: `${currency}${form.price}`, mode, ...(interestedIn ? { interestedIn } : {}) };
 
     try {
       const res = await fetch('/api/auth/request-code', {
