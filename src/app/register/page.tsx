@@ -233,12 +233,7 @@ function RegisterForm() {
         {/* 4. Subtle left edge glow — adds depth */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-transparent to-transparent pointer-events-none" />
 
-        {/* Logo — top (relative z-10 matches pagecpy pattern) */}
-        <Link href="/" className="relative z-10 inline-flex group">
-          <BootHopLogo size="lg" iconClass="text-white group-hover:scale-110 transition-transform duration-300" textClass="text-white" />
-        </Link>
-
-        {/* Bottom content — matches pagecpy justify-between bottom */}
+        {/* Bottom content */}
         <div className="relative z-10 space-y-5">
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 backdrop-blur-sm">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
