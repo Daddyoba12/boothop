@@ -77,7 +77,7 @@ export default function HowItWorksPage() {
         
         <div className="max-w-7xl mx-auto relative">
           {/* Hero Card */}
-          <div className="reveal reveal-scale relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/10 hover:scale-[1.015] active:scale-[0.99] hover:shadow-blue-500/25 transition-all duration-500 cursor-pointer touch-blue">
+          <div className="reveal reveal-scale relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/10 hover:scale-[1.015] active:scale-[0.98] active:shadow-blue-500/10 hover:shadow-blue-500/25 transition-all duration-500 cursor-pointer touch-blue">
             {/* Background Image */}
             <div className="absolute inset-0">
               <img
@@ -189,7 +189,7 @@ export default function HowItWorksPage() {
         
         <div className="max-w-7xl mx-auto relative">
           {/* Hero Card */}
-          <div className="reveal reveal-scale relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-emerald-500/10 hover:scale-[1.015] active:scale-[0.99] hover:shadow-emerald-500/25 transition-all duration-500 cursor-pointer touch-emerald">
+          <div className="reveal reveal-scale relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-emerald-500/10 hover:scale-[1.015] active:scale-[0.98] active:shadow-emerald-500/10 hover:shadow-emerald-500/25 transition-all duration-500 cursor-pointer touch-emerald">
             {/* Background Image */}
             <div className="absolute inset-0">
               <img

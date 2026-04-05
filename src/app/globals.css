@@ -178,6 +178,13 @@ body {
   /* Make trip action buttons always visible on touch devices */
   [class*="group-hover:opacity-100"] { opacity: 1 !important; }
 
+  /* Step card images: always show a subtle scale so they look alive on touch */
+  [class*="group-hover:scale-110"] { transform: scale(1.06) !important; }
+
+  /* Step card titles: always show the accent colour */
+  [class*="group-hover:text-cyan-400"]   { color: rgb(34 211 238) !important; }
+  [class*="group-hover:text-emerald-400"]{ color: rgb(52 211 153) !important; }
+
   /* Blue step cards (traveller / main page) */
   .touch-blue {
     border-color: rgba(59, 130, 246, 0.35) !important;

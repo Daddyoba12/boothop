@@ -12,26 +12,39 @@ export function useScrollReveal() {
     // Defer slightly so the browser has finished layout/paint before we start
     // observing. This matters in PWA standalone mode where everything renders
     // in a single frame on launch.
+    // Double rAF: first frame starts layout, second frame is after paint —
+    // needed in PWA standalone where everything renders in a single burst.
     const raf = requestAnimationFrame(() => {
-      const selector = '.reveal, .reveal-left, .reveal-scale';
-      const elements = document.querySelectorAll<HTMLElement>(selector);
+      requestAnimationFrame(() => {
+        const selector = '.reveal, .reveal-left, .reveal-scale';
+        const elements = document.querySelectorAll<HTMLElement>(selector);
 
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('visible');
-              observer.unobserve(entry.target);
-            }
-          });
-        },
-        { threshold: 0.08, rootMargin: '0px 0px -20px 0px' }
-      );
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.05, rootMargin: '0px 0px -10px 0px' }
+        );
 
-      elements.forEach((el) => observer.observe(el));
+        elements.forEach((el) => observer.observe(el));
 
-      // Cleanup stored on the window so it can be called from the RAF callback
-      (window as any).__scrollRevealCleanup = () => observer.disconnect();
+        // Safety net: any element still not visible after 800ms gets forced visible.
+        // Catches PWA cases where IntersectionObserver fires but callback is delayed.
+        const fallback = setTimeout(() => {
+          document.querySelectorAll<HTMLElement>('.reveal:not(.visible), .reveal-left:not(.visible), .reveal-scale:not(.visible)')
+            .forEach((el) => el.classList.add('visible'));
+        }, 800);
+
+        (window as any).__scrollRevealCleanup = () => {
+          observer.disconnect();
+          clearTimeout(fallback);
+        };
+      });
     });
 
     return () => {
