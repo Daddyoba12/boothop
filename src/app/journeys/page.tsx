@@ -1,11 +1,44 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Plane, Calendar, Package, ArrowRight, X, Filter, Sparkles, CheckCircle } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+
+/* useSearchParams must live in a component wrapped by <Suspense> */
+function ListingBanner() {
+  const searchParams = useSearchParams();
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('listing') === 'new') {
+      setShow(true);
+      const t = setTimeout(() => setShow(false), 6000);
+      return () => clearTimeout(t);
+    }
+  }, [searchParams]);
+
+  if (!show) return null;
+
+  return (
+    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
+      <div className="relative flex items-center gap-4 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-teal-900/95 border border-emerald-500/40 rounded-2xl px-5 py-4 shadow-2xl shadow-emerald-500/20 backdrop-blur-xl">
+        <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/40">
+          <CheckCircle className="h-5 w-5 text-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-white font-bold text-sm">Your new listing is now live!</p>
+          <p className="text-emerald-300/80 text-xs mt-0.5">It&apos;s visible to travellers and senders below.</p>
+        </div>
+        <button onClick={() => setShow(false)} className="text-emerald-400/60 hover:text-white transition-colors flex-shrink-0">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 type Trip = {
   id: string;
@@ -22,7 +55,6 @@ type Trip = {
 export default function LiveJourneysPage() {
   const supabase = createSupabaseClient();
   const router   = useRouter();
-  const searchParams = useSearchParams();
 
   const [trips, setTrips]               = useState<Trip[]>([]);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
@@ -33,16 +65,6 @@ export default function LiveJourneysPage() {
   const [toCity, setToCity]       = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [focusedField, setFocusedField] = useState<string | null>(null);
-  const [showListingBanner, setShowListingBanner] = useState(false);
-
-  useEffect(() => {
-    if (searchParams.get('listing') === 'new') {
-      setShowListingBanner(true);
-      // Auto-dismiss after 6 seconds
-      const t = setTimeout(() => setShowListingBanner(false), 6000);
-      return () => clearTimeout(t);
-    }
-  }, [searchParams]);
 
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
@@ -171,29 +193,10 @@ export default function LiveJourneysPage() {
 
       <NavBar />
 
-      {/* NEW LISTING BANNER */}
-      {showListingBanner && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
-          <div className="relative flex items-center gap-4 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-teal-900/95 border border-emerald-500/40 rounded-2xl px-5 py-4 shadow-2xl shadow-emerald-500/20 backdrop-blur-xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/40">
-              <CheckCircle className="h-5 w-5 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-sm">Your new listing is now live!</p>
-              <p className="text-emerald-300/80 text-xs mt-0.5">It's visible to travellers and senders below.</p>
-            </div>
-            <button
-              onClick={() => setShowListingBanner(false)}
-              className="text-emerald-400/60 hover:text-white transition-colors flex-shrink-0"
-            >
-              <X className="h-4 w-4" />
-            </button>
-            {/* animated progress bar */}
-            <div className="absolute bottom-0 left-0 h-0.5 bg-emerald-400/30 rounded-b-2xl w-full" />
-            <div className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-b-2xl animate-[shrink_6s_linear_forwards]" style={{width:'100%'}} />
-          </div>
-        </div>
-      )}
+      {/* NEW LISTING BANNER — Suspense required by Next.js for useSearchParams */}
+      <Suspense>
+        <ListingBanner />
+      </Suspense>
 
       {/* HERO */}
       <section className="relative min-h-[60vh] flex flex-col items-center justify-center text-center overflow-hidden">
