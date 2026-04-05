@@ -148,6 +148,18 @@ body {
 .reveal.d4 { animation-delay: 1.65s; }
 .reveal.d5 { animation-delay: 1.80s; }
 
+/* Step-enter: plays immediately on mount — used for step cards that are
+   either always visible or rendered by user action (no IntersectionObserver
+   needed). Each re-mount of the element restarts the animation. */
+.step-enter {
+  animation: slideInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.step-enter.d1 { animation-delay: 0.04s; }
+.step-enter.d2 { animation-delay: 0.10s; }
+.step-enter.d3 { animation-delay: 0.16s; }
+.step-enter.d4 { animation-delay: 0.22s; }
+.step-enter.d5 { animation-delay: 0.28s; }
+
 /* ═══════════════════════════════════════════
    TOUCH DEVICE OVERRIDES
    On mobile/PWA, :hover never fires so cards

@@ -8,7 +8,6 @@ import {
   Package, Plane, MapPin, Calendar, ArrowRight,
   CheckCircle, AlertCircle, Mail, Home, PlusCircle,
 } from 'lucide-react';
-import BootHopLogo from '@/components/BootHopLogo';
 import NavBar from '@/components/NavBar';
 
 const weightOptions = [
@@ -203,7 +202,7 @@ function RegisterForm() {
       {/* ══════════════════════════════════════════
           LEFT PANEL — scrolling image carousel (60%)
       ══════════════════════════════════════════ */}
-      <div className="hidden lg:flex lg:w-3/5 relative flex-col justify-between p-12 overflow-hidden">
+      <div className="hidden lg:flex lg:w-3/5 relative flex-col justify-end p-12 overflow-hidden">
 
         {/* Slides — stacked absolutely, cross-fading */}
         {slides.map((s, i) => (

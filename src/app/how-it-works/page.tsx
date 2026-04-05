@@ -7,6 +7,76 @@ import { useScrollReveal } from '@/hooks/useScrollReveal';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 
+// ─── StepCard must live OUTSIDE the page component so React keeps the same
+//     component type across renders — if it were inside, every state change
+//     would create a new type reference, unmounting/remounting all cards and
+//     stripping the CSS animation that makes them visible. ─────────────────
+function StepCard({
+  s, i, color,
+}: {
+  s: { num: string; title: string; desc: string; icon: string; image: string };
+  i: number;
+  color: 'blue' | 'emerald';
+}) {
+  const isBlue = color === 'blue';
+  return (
+    <div className={`step-enter d${Math.min(i + 1, 5)} group flex gap-5 mb-6 p-5 rounded-2xl
+      bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50
+      ${isBlue
+        ? 'hover:border-blue-500/50 hover:shadow-blue-500/20 touch-blue'
+        : 'hover:border-emerald-500/50 hover:shadow-emerald-500/20 touch-emerald'}
+      transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5
+      active:scale-[0.98] active:translate-y-0 cursor-pointer`}
+    >
+      {/* Icon badge */}
+      <div className="relative flex-shrink-0">
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-lg
+          group-hover:scale-110 transition-transform duration-300
+          ${isBlue
+            ? 'bg-gradient-to-br from-blue-500 to-cyan-400 shadow-blue-500/50'
+            : 'bg-gradient-to-br from-emerald-500 to-teal-400 shadow-emerald-500/50'}`}
+        >
+          {s.icon}
+        </div>
+        <div className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-slate-900
+          ${isBlue ? 'bg-cyan-400' : 'bg-teal-400'}`}
+        >
+          {s.num}
+        </div>
+      </div>
+
+      {/* Text */}
+      <div className="flex-1 min-w-0">
+        <div className={`font-bold text-lg mb-1.5 text-white transition-colors duration-300
+          ${isBlue ? 'group-hover:text-cyan-400' : 'group-hover:text-emerald-400'}`}>
+          {s.title}
+        </div>
+        <div className="text-slate-400 text-sm leading-relaxed">{s.desc}</div>
+      </div>
+
+      {/* Image thumbnail — with glow border matching the card colour */}
+      <div className={`relative w-16 h-16 md:w-28 md:h-28 rounded-xl overflow-hidden flex-shrink-0
+        border shadow-lg transition-all duration-300
+        ${isBlue
+          ? 'border-blue-500/25 shadow-blue-500/20 group-hover:border-blue-500/55 group-hover:shadow-blue-500/40'
+          : 'border-emerald-500/25 shadow-emerald-500/20 group-hover:border-emerald-500/55 group-hover:shadow-emerald-500/40'}`}
+      >
+        <img
+          src={s.image}
+          alt={s.title}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+        />
+        {/* Colour overlay on hover */}
+        <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300
+          ${isBlue
+            ? 'bg-gradient-to-br from-blue-500/20 to-cyan-500/10'
+            : 'bg-gradient-to-br from-emerald-500/20 to-teal-500/10'}`}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function HowItWorksPage() {
   useScrollReveal();
   const [scrollY, setScrollY] = useState(0);
@@ -54,71 +124,6 @@ export default function HowItWorksPage() {
     { num: '04', title: 'Track Delivery',    desc: 'Stay connected in real time.', icon: '📍', image: '/images/Traveling.jpg' },
     { num: '05', title: 'Confirm Receipt',   desc: 'Release payment and rate experience.', icon: '⭐', image: '/images/meetuup2.jpg' },
   ];
-
-  const StepCard = ({
-    s, i, color,
-  }: {
-    s: typeof booterSteps[0]; i: number;
-    color: 'blue' | 'emerald';
-  }) => {
-    const isBlue = color === 'blue';
-    return (
-      <div className={`reveal d${Math.min(i + 1, 5)} group flex gap-5 mb-6 p-5 rounded-2xl
-        bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50
-        ${isBlue
-          ? 'hover:border-blue-500/50 hover:shadow-blue-500/20 touch-blue'
-          : 'hover:border-emerald-500/50 hover:shadow-emerald-500/20 touch-emerald'}
-        transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5
-        active:scale-[0.98] active:translate-y-0 cursor-pointer`}
-      >
-        {/* Icon badge */}
-        <div className="relative flex-shrink-0">
-          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-lg
-            group-hover:scale-110 transition-transform duration-300
-            ${isBlue
-              ? 'bg-gradient-to-br from-blue-500 to-cyan-400 shadow-blue-500/50'
-              : 'bg-gradient-to-br from-emerald-500 to-teal-400 shadow-emerald-500/50'}`}
-          >
-            {s.icon}
-          </div>
-          <div className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-slate-900
-            ${isBlue ? 'bg-cyan-400' : 'bg-teal-400'}`}
-          >
-            {s.num}
-          </div>
-        </div>
-
-        {/* Text */}
-        <div className="flex-1 min-w-0">
-          <div className={`font-bold text-lg mb-1.5 text-white transition-colors duration-300
-            ${isBlue ? 'group-hover:text-cyan-400' : 'group-hover:text-emerald-400'}`}>
-            {s.title}
-          </div>
-          <div className="text-slate-400 text-sm leading-relaxed">{s.desc}</div>
-        </div>
-
-        {/* Image thumbnail — with glow effect matching the card */}
-        <div className={`relative w-16 h-16 md:w-28 md:h-28 rounded-xl overflow-hidden flex-shrink-0
-          border shadow-lg transition-all duration-300
-          ${isBlue
-            ? 'border-blue-500/25 shadow-blue-500/20 group-hover:border-blue-500/55 group-hover:shadow-blue-500/40'
-            : 'border-emerald-500/25 shadow-emerald-500/20 group-hover:border-emerald-500/55 group-hover:shadow-emerald-500/40'}`}
-        >
-          <img
-            src={s.image}
-            alt={s.title}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-          />
-          {/* Colour overlay that appears on hover */}
-          <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300
-            ${isBlue
-              ? 'bg-gradient-to-br from-blue-500/20 to-cyan-500/10'
-              : 'bg-gradient-to-br from-emerald-500/20 to-teal-500/10'}`}
-          />
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white font-sans overflow-x-hidden">
@@ -314,7 +319,8 @@ export default function HowItWorksPage() {
       {/* ── WHAT CAN I SEND ── */}
       <section className="relative py-20 px-6 mt-8">
         <div className="max-w-5xl mx-auto">
-          <div className="reveal group cursor-pointer rounded-3xl border border-white/10 bg-gradient-to-br from-slate-800/30 to-slate-900/30 overflow-hidden hover:border-amber-500/30 hover:shadow-2xl hover:shadow-amber-500/10 hover:-translate-y-1 transition-all duration-300 active:scale-[0.99] touch-amber">
+          <div className="reveal group cursor-pointer rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/30 to-slate-900/30 overflow-hidden hover:border-amber-500/40 hover:shadow-2xl hover:shadow-amber-500/15 hover:scale-[1.008] hover:-translate-y-1 transition-all duration-300 active:scale-[0.99] touch-amber relative">
+            <div className="pointer-events-none absolute -top-10 -right-10 w-40 h-40 bg-amber-500/15 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             {/* Header */}
             <div className="border-b border-white/8 px-8 py-6 flex items-center gap-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-yellow-400 text-white shadow-lg shadow-amber-500/40 group-hover:scale-110 transition-transform duration-300">

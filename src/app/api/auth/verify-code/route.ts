@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       .update({ used: true, used_at: new Date().toISOString() })
       .eq('id', record.id);
 
-    // Save journey draft if the user came from the register form with trip details
+    // Save journey and publish as a live trip if the user came from the register form
     let hasDraft = false;
     if (record.journey_payload) {
       try {
@@ -59,6 +59,8 @@ export async function POST(request: Request) {
         const userId = authUser?.user?.id || null;
         const p = record.journey_payload as any;
         const priceNum = parseFloat(String(p.price || '0').replace(/[^0-9.]/g, '')) || null;
+
+        // Keep journey_drafts for match-engine reference
         await supabase.from('journey_drafts').insert({
           email,
           user_id:       userId,
@@ -71,7 +73,24 @@ export async function POST(request: Request) {
           interested_in: p.interestedIn || null,
           status:        'draft',
           expires_at:    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        }).then(() => {}).catch(() => {}); // best-effort
+
+        // Publish the trip as a live listing so it appears on /journeys
+        const { error: tripErr } = await supabase.from('trips').insert({
+          email,
+          user_id:      userId,
+          type:         p.mode || 'send',
+          from_city:    p.from || '',
+          to_city:      p.to  || '',
+          travel_date:  p.date || null,
+          weight:       p.weight || null,
+          price:        priceNum,
         });
+
+        if (tripErr) {
+          console.error('Trip insert error:', tripErr);
+        }
+
         hasDraft = true;
       } catch (draftErr) {
         console.error('Draft save failed (non-blocking):', draftErr);
@@ -79,11 +98,13 @@ export async function POST(request: Request) {
     }
 
     // Decide redirect:
-    // - Has a draft → dashboard (auto-shows draft tab)
+    // - Has a draft → journeys page (listing is now live)
     // - Has existing trips → dashboard
     // - Brand new user with no trips → intent page
     let redirectTo = '/dashboard';
-    if (!hasDraft) {
+    if (hasDraft) {
+      redirectTo = '/journeys?listing=new';
+    } else {
       const { count: tripCount } = await supabase
         .from('trips')
         .select('id', { count: 'exact', head: true })

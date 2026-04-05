@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import { createSupabaseClient } from '@/lib/supabase';
 import Link from 'next/link';
 import {
-  Users, User, Package, DollarSign, AlertTriangle, 
+  Users, User, Package, DollarSign, AlertTriangle,
   CheckCircle, XCircle, Shield, Search, Filter,
   Eye, Ban, Mail, Calendar, MapPin, Loader2,
-  TrendingUp, Activity, Download, RefreshCw, Clock
+  TrendingUp, Activity, Download, RefreshCw, Clock,
+  Video, Camera, ThumbsUp, ThumbsDown, Play
 } from 'lucide-react';
 
 export default function AdminDashboard({ serverSession }: { serverSession: any }) {
@@ -16,7 +17,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState<'users' | 'matches' | 'escrow' | 'disputes'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'matches' | 'escrow' | 'disputes' | 'video_kyc'>('users');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   
@@ -24,6 +25,10 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   const [matches, setMatches] = useState<any[]>([]);
   const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
   const [disputes, setDisputes] = useState<any[]>([]);
+  const [videoKycRecords, setVideoKycRecords] = useState<any[]>([]);
+  const [selectedKyc, setSelectedKyc] = useState<any>(null);
+  const [kycSignedUrls, setKycSignedUrls] = useState<{ video: string; photo: string } | null>(null);
+  const [kycActionLoading, setKycActionLoading] = useState(false);
 
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -99,6 +104,14 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
         .eq('payment_status', 'escrowed');
 
       setEscrowPayments(escrowData || []);
+
+      // Load video KYC records
+      const { data: vkycData } = await supabase
+        .from('video_kyc')
+        .select('*')
+        .order('submitted_at', { ascending: false });
+
+      setVideoKycRecords(vkycData || []);
 
       // Calculate advanced stats
       const verifiedCount = usersData?.filter(u => u.verified).length || 0;
@@ -198,6 +211,44 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
     } catch (error) {
       console.error('Error releasing escrow:', error);
       alert('❌ Failed to release escrow');
+    }
+  };
+
+  const openKycRecord = async (record: any) => {
+    setSelectedKyc(record);
+    setKycSignedUrls(null);
+    try {
+      const [{ data: vd }, { data: pd }] = await Promise.all([
+        supabase.storage.from('video-kyc').createSignedUrl(record.video_path, 3600),
+        supabase.storage.from('video-kyc').createSignedUrl(record.photo_path, 3600),
+      ]);
+      setKycSignedUrls({
+        video: vd?.signedUrl || '',
+        photo: pd?.signedUrl || '',
+      });
+    } catch (e) {
+      console.error('Signed URL error:', e);
+    }
+  };
+
+  const handleKycDecision = async (record: any, decision: 'approved' | 'rejected') => {
+    if (!confirm(`${decision === 'approved' ? '✅ Approve' : '❌ Reject'} video KYC for ${record.email}?`)) return;
+    setKycActionLoading(true);
+    try {
+      const res = await fetch('/api/admin/kyc/video-approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matchId: record.match_id, email: record.email, decision }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Failed');
+      alert(`${decision === 'approved' ? '✅ Approved' : '❌ Rejected'} successfully`);
+      setSelectedKyc(null);
+      loadDashboardData();
+    } catch (err: any) {
+      alert('Error: ' + err.message);
+    } finally {
+      setKycActionLoading(false);
     }
   };
 
@@ -376,7 +427,8 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
             { key: 'users', label: 'Users', icon: Users, count: users.length },
             { key: 'matches', label: 'Matches', icon: Package, count: matches.length },
             { key: 'escrow', label: 'Escrow', icon: Shield, count: escrowPayments.length },
-            { key: 'disputes', label: 'Disputes', icon: AlertTriangle, count: disputes.length }
+            { key: 'disputes', label: 'Disputes', icon: AlertTriangle, count: disputes.length },
+            { key: 'video_kyc', label: 'Video KYC', icon: Video, count: videoKycRecords.filter(r => r.status === 'pending_review').length }
           ].map((tab) => {
             const Icon = tab.icon;
             return (
@@ -745,6 +797,83 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
           </div>
         )}
 
+        {/* VIDEO KYC TAB */}
+        {activeTab === 'video_kyc' && (
+          <div className="space-y-4">
+            {videoKycRecords.length === 0 ? (
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-12 text-center">
+                <Video className="w-16 h-16 text-white/40 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">No Video KYC Submissions</h3>
+                <p className="text-white/60">Submissions will appear here once users complete video verification.</p>
+              </div>
+            ) : (
+              <>
+                {/* Status summary */}
+                <div className="grid grid-cols-3 gap-4 mb-2">
+                  {(['pending_review', 'approved', 'rejected'] as const).map((s) => {
+                    const cnt = videoKycRecords.filter(r => r.status === s).length;
+                    const colors: Record<string, string> = {
+                      pending_review: 'from-yellow-600 to-orange-600',
+                      approved: 'from-emerald-600 to-green-500',
+                      rejected: 'from-red-600 to-rose-600',
+                    };
+                    const labels: Record<string, string> = { pending_review: 'Pending Review', approved: 'Approved', rejected: 'Rejected' };
+                    return (
+                      <div key={s} className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4">
+                        <div className={`w-10 h-10 bg-gradient-to-br ${colors[s]} rounded-lg flex items-center justify-center`}>
+                          <Video className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-white/60 text-xs">{labels[s]}</p>
+                          <p className="text-2xl font-bold text-white">{cnt}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Records list */}
+                {videoKycRecords.map((rec) => (
+                  <div key={`${rec.match_id}-${rec.email}`} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+                    <div className="flex items-center justify-between flex-wrap gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                          <Camera className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-white font-semibold">{rec.email}</p>
+                          <p className="text-white/50 text-xs mt-0.5">Match: {rec.match_id?.slice(0, 12)}...</p>
+                          {rec.submitted_at && (
+                            <p className="text-white/40 text-xs">
+                              Submitted {new Date(rec.submitted_at).toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                          rec.status === 'approved' ? 'bg-green-500/20 text-green-300 border-green-400/30' :
+                          rec.status === 'rejected' ? 'bg-red-500/20 text-red-300 border-red-400/30' :
+                          'bg-yellow-500/20 text-yellow-300 border-yellow-400/30'
+                        }`}>
+                          {rec.status === 'pending_review' ? 'Pending Review' : rec.status}
+                        </span>
+                        <button
+                          onClick={() => openKycRecord(rec)}
+                          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all"
+                        >
+                          <Play className="w-4 h-4" />
+                          Review
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        )}
+
         {/* DISPUTES TAB */}
         {activeTab === 'disputes' && (
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-12 text-center">
@@ -768,6 +897,141 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
         )}
 
       </div>
+
+      {/* VIDEO KYC REVIEW MODAL */}
+      {selectedKyc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-slate-700/50 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                  <Video className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-white font-bold text-lg">Video KYC Review</h2>
+                  <p className="text-white/50 text-sm">{selectedKyc.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => { setSelectedKyc(null); setKycSignedUrls(null); }}
+                className="p-2 text-white/40 hover:text-white transition-colors"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Match details */}
+              <div className="bg-white/5 rounded-xl p-4 text-sm space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-white/60">Match ID</span>
+                  <span className="text-white font-mono">{selectedKyc.match_id}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/60">Status</span>
+                  <span className={`font-bold ${selectedKyc.status === 'approved' ? 'text-green-400' : selectedKyc.status === 'rejected' ? 'text-red-400' : 'text-yellow-400'}`}>
+                    {selectedKyc.status}
+                  </span>
+                </div>
+                {selectedKyc.submitted_name && (
+                  <div className="flex justify-between">
+                    <span className="text-white/60">Name submitted</span>
+                    <span className="text-cyan-300 font-semibold">{selectedKyc.submitted_name}</span>
+                  </div>
+                )}
+                {selectedKyc.expires_at && (
+                  <div className="flex justify-between">
+                    <span className="text-white/60">Expires</span>
+                    <span className="text-white/80">{new Date(selectedKyc.expires_at).toLocaleDateString()}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Media */}
+              {!kycSignedUrls ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
+                  <span className="ml-3 text-white/60">Loading media...</span>
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Video */}
+                  <div>
+                    <p className="text-white/60 text-xs font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                      <Video className="w-3.5 h-3.5" /> Recorded Video
+                    </p>
+                    {kycSignedUrls.video ? (
+                      <video
+                        src={kycSignedUrls.video}
+                        controls
+                        className="w-full rounded-2xl border border-white/10 bg-black"
+                        style={{ maxHeight: '280px' }}
+                      />
+                    ) : (
+                      <div className="w-full h-40 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center">
+                        <p className="text-white/40 text-sm">Video unavailable</p>
+                      </div>
+                    )}
+                  </div>
+                  {/* Photo */}
+                  <div>
+                    <p className="text-white/60 text-xs font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                      <Camera className="w-3.5 h-3.5" /> Selfie Photo
+                    </p>
+                    {kycSignedUrls.photo ? (
+                      <img
+                        src={kycSignedUrls.photo}
+                        alt="KYC selfie"
+                        className="w-full rounded-2xl border border-white/10 object-cover"
+                        style={{ maxHeight: '280px' }}
+                      />
+                    ) : (
+                      <div className="w-full h-40 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center">
+                        <p className="text-white/40 text-sm">Photo unavailable</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Auto-check notice */}
+              <div className="bg-blue-500/10 border border-blue-400/20 rounded-xl p-4 text-sm text-blue-200">
+                <p className="font-semibold mb-1 flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-blue-400" /> Automated Checks
+                </p>
+                <ul className="space-y-1 text-blue-300/80 text-xs">
+                  <li>• Face comparison: verify the selfie photo matches the recorded video frame</li>
+                  <li>• Name check: confirm name spoken in video matches submitted name and Stripe Identity document</li>
+                  <li>• Upon approval, ID received status is set and expires in 30 days</li>
+                </ul>
+              </div>
+
+              {/* Action buttons */}
+              {selectedKyc.status === 'pending_review' && (
+                <div className="flex gap-4">
+                  <button
+                    disabled={kycActionLoading}
+                    onClick={() => handleKycDecision(selectedKyc, 'rejected')}
+                    className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-red-600/80 hover:bg-red-700 text-white rounded-2xl font-bold transition-all disabled:opacity-50"
+                  >
+                    <ThumbsDown className="w-5 h-5" />
+                    Reject
+                  </button>
+                  <button
+                    disabled={kycActionLoading}
+                    onClick={() => handleKycDecision(selectedKyc, 'approved')}
+                    className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-emerald-600 to-green-500 hover:shadow-xl hover:shadow-emerald-500/40 text-white rounded-2xl font-bold transition-all disabled:opacity-50"
+                  >
+                    {kycActionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ThumbsUp className="w-5 h-5" />}
+                    Approve & Set ID Verified
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

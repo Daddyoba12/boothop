@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BootHop — Engine Process Flow & Business Logic</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0f1e;
+      color: #e2e8f0;
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 2.4rem; font-weight: 900; background: linear-gradient(135deg, #60a5fa, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.4rem; }
+    .subtitle { color: #64748b; font-size: 1rem; margin-bottom: 3rem; }
+    h2 { font-size: 1.4rem; font-weight: 800; color: #f1f5f9; margin: 2.5rem 0 1rem; border-left: 4px solid #3b82f6; padding-left: 1rem; }
+    h3 { font-size: 1.05rem; font-weight: 700; color: #94a3b8; margin: 1.5rem 0 0.5rem; }
+    p { margin-bottom: 0.8rem; color: #cbd5e1; }
+    ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+    li { margin-bottom: 0.4rem; color: #cbd5e1; }
+    .phase {
+      background: linear-gradient(135deg, rgba(30,41,59,0.8), rgba(15,23,42,0.8));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-blue { background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
+    .badge-cyan { background: rgba(6,182,212,0.2); color: #67e8f9; border: 1px solid rgba(6,182,212,0.3); }
+    .badge-emerald { background: rgba(16,185,129,0.2); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+    .badge-amber { background: rgba(245,158,11,0.2); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+    .badge-purple { background: rgba(139,92,246,0.2); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.3); }
+    .badge-red { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+    .step-num {
+      width: 2rem; height: 2rem;
+      background: linear-gradient(135deg, #3b82f6, #22d3ee);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 0.85rem; color: #fff;
+      flex-shrink: 0;
+    }
+    .flow-arrow { text-align: center; color: #334155; font-size: 1.5rem; margin: 0.5rem 0; }
+    code {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 0.1rem 0.4rem;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.85em;
+      color: #7dd3fc;
+    }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+    th { text-align: left; padding: 0.6rem 1rem; background: rgba(255,255,255,0.05); color: #94a3b8; font-weight: 700; }
+    td { padding: 0.6rem 1rem; border-top: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; }
+    .divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 2rem 0; }
+    .note {
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      font-size: 0.9rem;
+      color: #93c5fd;
+      margin: 1rem 0;
+    }
+    .warning {
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      font-size: 0.9rem;
+      color: #fcd34d;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>BootHop Engine</h1>
+  <p class="subtitle">Process Flow &amp; Business Logic — Internal Reference Document</p>
+
+  <p>This document describes the full end-to-end engine behind BootHop: from a visitor landing on the site to a completed, paid, and verified delivery. It covers every major subsystem: authentication, trip matching, payments, identity verification, and admin oversight.</p>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <h2>1. Overview — What BootHop Does</h2>
+
+  <p>BootHop is a peer-to-peer delivery marketplace. It connects:</p>
+  <ul>
+    <li><strong>Booters (Travellers)</strong> — people who are already travelling between cities and have spare luggage capacity</li>
+    <li><strong>Hoopers (Senders)</strong> — people who want to ship a small item along an existing travel route without using a courier</li>
+  </ul>
+  <p>The platform orchestrates matching, payment escrow, identity verification, and delivery confirmation so that neither party has to trust the other blindly.</p>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <h2>2. Authentication Flow</h2>
+
+  <p>BootHop uses a <strong>passwordless OTP email flow</strong> — no passwords are ever set or stored.</p>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="step-num">1</div>
+      <span class="badge badge-blue">Registration / Login Entry</span>
+    </div>
+    <p>A user arrives at <code>/register</code> or <code>/login</code>. They enter their email address (and optionally a journey intent on the register page — from/to city, date, role, weight, price).</p>
+    <p>The journey intent form data is captured in URL query params and pre-filled on the register form.</p>
+  </div>
+
+  <div class="flow-arrow">↓</div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="step-num">2</div>
+      <span class="badge badge-cyan">OTP Dispatch — <code>POST /api/auth/send-code</code></span>
+    </div>
+    <p>The form submits to <code>/api/auth/send-code</code>. The API:</p>
+    <ol>
+      <li>Normalises the email (lowercase, trimmed)</li>
+      <li>Generates a 6-character alphanumeric code and its SHA-256 hash</li>
+      <li>Stores the hash in <code>email_login_codes</code> table with a 15-minute expiry, <code>used = false</code>, and the optional <code>journey_payload</code> (trip details the user filled in)</li>
+      <li>Sends the code via <strong>Resend</strong> (transactional email) to the user's inbox</li>
+    </ol>
+    <p>The raw code is <strong>never</strong> stored — only the hash. This means even a full DB dump cannot reveal valid codes.</p>
+  </div>
+
+  <div class="flow-arrow">↓</div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="step-num">3</div>
+      <span class="badge badge-cyan">OTP Verification — <code>POST /api/auth/verify-code</code></span>
+    </div>
+    <p>User enters the 6-character code. The API:</p>
+    <ol>
+      <li>Looks up the most recent non-expired, unused code for that email</li>
+      <li>Checks attempt count (&lt; max_attempts, usually 5) — rate-limiting</li>
+      <li>Hashes the incoming code and compares to stored hash</li>
+      <li>On match: marks code as <code>used = true</code></li>
+      <li>If a <code>journey_payload</code> exists on the code record: inserts a <code>journey_drafts</code> row with the trip details and sets <code>hasDraft = true</code></li>
+      <li>Signs an <strong>httpOnly session cookie</strong> (JWT via <code>signAppSession</code>) and attaches it to the response</li>
+    </ol>
+    <p><strong>Redirect logic:</strong></p>
+    <ul>
+      <li>Has a fresh draft → <code>/journeys?listing=new</code> (banner shown: "Your new listing is now live")</li>
+      <li>No draft, has existing trips → <code>/dashboard</code></li>
+      <li>No draft, no trips → <code>/intent</code> (onboarding wizard)</li>
+    </ul>
+  </div>
+
+  <div class="flow-arrow">↓</div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="step-num">4</div>
+      <span class="badge badge-emerald">Session Cookie</span>
+    </div>
+    <p>All subsequent authenticated requests read the <code>boothop_session</code> httpOnly cookie. API routes parse it manually from the <code>Cookie</code> header and call <code>verifyAppSession(token)</code> to get the user's email. This is used instead of Supabase Auth sessions because Next.js 15 Route Handlers cannot write cookies via the <code>cookies()</code> helper — so the JWT is set directly on the <code>NextResponse</code>.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <h2>3. Journey Creation Flow</h2>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="step-num">1</div>
+      <span class="badge badge-blue">Intent Capture</span>
+    </div>
+    <p>New users land on <code>/intent</code>. They choose their role (Booter = traveller / Hooper = sender) and fill in route, date, weight, and price. The intent wizard stores data in React state and eventually navigates to <code>/register</code> pre-filled.</p>
+  </div>
+
+  <div class="flow-arrow">↓</div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="step-num">2</div>
+      <span class="badge badge-cyan">Journey Draft → Trip</span>
+    </div>
+    <p>After OTP verification with a <code>journey_payload</code>, a <code>journey_drafts</code> row is created. The <strong>match engine</strong> (or a background job) converts this draft into a live <code>trips</code> record when it detects a potential match or when the user confirms on the dashboard.</p>
+    <p>The <code>trips</code> table stores: <code>from_city</code>, <code>to_city</code>, <code>travel_date</code>, <code>weight</code>, <code>price</code>, <code>type</code> (travel/send), <code>email</code>, <code>user_id</code>.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <h2>4. Match Engine</h2>
+
+  <p>The match engine is the core of BootHop. It finds complementary trip pairs and creates a <code>matches</code> record.</p>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="step-num">1</div>
+      <span class="badge badge-purple">Match Criteria</span>
+    </div>
+    <p>A Booter (travel) trip and a Hooper (send) trip are matched when:</p>
+    <ul>
+      <li><strong>Route overlap</strong>: same origin and destination cities (case-insensitive)</li>
+      <li><strong>Date compatibility</strong>: Booter travel date is on or before Hooper required date (within a configurable window)</li>
+      <li><strong>Weight capacity</strong>: Booter's available weight ≥ Hooper's item weight</li>
+      <li><strong>Price agreement</strong>: price negotiation happens after match notification</li>
+    </ul>
+  </div>
+
+  <div class="flow-arrow">↓</div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="step-num">2</div>
+      <span class="badge badge-purple">Match Record Creation</span>
+    </div>
+    <p>The engine creates a <code>matches</code> row with:</p>
+    <ul>
+      <li><code>booter_email</code> / <code>hooper_email</code> — the two parties</li>
+      <li><code>booter_user_id</code> / <code>hooper_user_id</code> — linked Supabase Auth user IDs</li>
+      <li><code>sender_trip_id</code> / <code>traveler_trip_id</code></li>
+      <li><code>status</code>: starts as <code>pending</code></li>
+      <li><code>agreed_price</code>, <code>hooper_pays</code>, <code>booter_receives</code> — set after price negotiation</li>
+    </ul>
+    <p>Both parties receive <strong>Resend notification emails</strong> when a match is found.</p>
+  </div>
+
+  <div class="flow-arrow">↓</div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="step-num">3</div>
+      <span class="badge badge-amber">Match Acceptance</span>
+    </div>
+    <p>Both the Booter and Hooper must accept the match from their dashboards. The match status moves from <code>pending</code> → <code>accepted</code>. Once accepted, the Hooper is directed to pay into escrow.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <h2>5. Identity Verification (KYC)</h2>
+
+  <p>BootHop runs a two-layer identity verification to ensure both parties are who they claim to be.</p>
+
+  <h3>Layer 1 — Stripe Identity (Document KYC)</h3>
+  <div class="phase">
+    <p>Triggered via <code>/api/stripe/identity</code>. The user is directed to Stripe's hosted identity flow where they:</p>
+    <ol>
+      <li>Upload a government-issued ID (passport, driving licence)</li>
+      <li>Take a selfie for facial comparison</li>
+    </ol>
+    <p>Stripe returns a <code>VerificationSession</code> with extracted fields: <code>first_name</code>, <code>last_name</code>, <code>dob</code>, <code>id_number</code>. On success, the user's profile is marked <code>verified = true</code>.</p>
+    <div class="note">Stripe Identity webhooks update the <code>profiles</code> table automatically via <code>/api/webhooks/stripe/identity</code>.</div>
+  </div>
+
+  <h3>Layer 2 — Video KYC (In-Person Liveness)</h3>
+  <div class="phase">
+    <p>After a match is accepted, each party must complete a short video verification at <code>/kyc/video?matchId=...</code>:</p>
+    <ol>
+      <li><strong>Intro</strong>: User enters their full name (as it appears on their ID)</li>
+      <li><strong>Recording</strong>: 3-second countdown, then up to 20 seconds of video. A script prompt is shown: <em>"My name is [name]"</em></li>
+      <li><strong>Photo</strong>: After recording, a live selfie snapshot is taken from the camera</li>
+      <li><strong>Submission</strong>: Video (<code>.webm</code>) + photo (<code>.jpg</code>) uploaded to Supabase Storage bucket <code>video-kyc</code> via <code>POST /api/kyc/video-submit</code></li>
+    </ol>
+    <p>The API stores paths in the <code>matches</code> table (<code>booter_video_kyc_path</code>, <code>hooper_video_kyc_path</code>, etc.) and upserts into the <code>video_kyc</code> table with <code>status = 'pending_review'</code>.</p>
+    <p><strong>Expiry</strong>: Video KYC is valid for 30 days (<code>expires_at = now + 30d</code>). After expiry, the user must re-verify before their next match.</p>
+  </div>
+
+  <h3>Admin Video KYC Review</h3>
+  <div class="phase">
+    <p>Admins review pending submissions in the <strong>Admin Control Centre → Video KYC</strong> tab:</p>
+    <ol>
+      <li>Admin clicks "Review" on a pending record</li>
+      <li>Signed storage URLs are generated for the video and photo (1-hour expiry)</li>
+      <li>Admin watches the video, inspects the photo, checks the submitted name</li>
+      <li>Admin clicks <strong>Approve</strong> or <strong>Reject</strong></li>
+      <li>Approve: sets <code>video_kyc.status = 'approved'</code>, <code>matches.booter/hooper_video_kyc_status = 'approved'</code>, <code>matches.booter/hooper_id_received = true</code>, <code>profiles.id_verified = true</code></li>
+      <li>Reject: sets status to <code>'rejected'</code> — user is prompted to re-record</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <h2>6. Payment & Escrow Flow</h2>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="step-num">1</div>
+      <span class="badge badge-amber">Checkout</span>
+    </div>
+    <p>The Hooper (sender) pays via Stripe Checkout. The amount is <code>agreed_price × (1 + platform_fee%)</code>. A pre-payment confirmation page shows the full cost breakdown, Terms &amp; Conditions, and insurance disclosure before the user is taken to Stripe.</p>
+    <p>The Stripe session is created with <code>payment_intent_data.capture_method = 'automatic'</code> and funds are captured into BootHop's Stripe account.</p>
+  </div>
+
+  <div class="flow-arrow">↓</div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="step-num">2</div>
+      <span class="badge badge-amber">Escrow Hold</span>
+    </div>
+    <p>On Stripe webhook <code>checkout.session.completed</code>:</p>
+    <ul>
+      <li><code>matches.payment_status</code> is set to <code>'escrowed'</code></li>
+      <li><code>matches.stripe_payment_intent_id</code> is stored</li>
+      <li>Both parties receive a confirmation email via Resend</li>
+    </ul>
+    <p>Funds are held in BootHop's Stripe balance — <strong>not</strong> released until both parties confirm delivery.</p>
+  </div>
+
+  <div class="flow-arrow">↓</div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="step-num">3</div>
+      <span class="badge badge-emerald">Dual Confirmation &amp; Release</span>
+    </div>
+    <p>After the item is physically delivered:</p>
+    <ol>
+      <li>Booter confirms delivery: sets <code>booter_confirmed_delivery = true</code></li>
+      <li>Hooper confirms receipt: sets <code>hooper_confirmed_receipt = true</code></li>
+    </ol>
+    <p>When <strong>both</strong> confirmations are present, a backend trigger (or webhook handler) calls <code>stripe.transfers.create</code> to send <code>booter_receives</code> to the Booter's connected Stripe account. The match status moves to <code>'completed'</code>.</p>
+    <div class="note"><strong>Admin override</strong>: Admins can manually release escrow from the Escrow tab in the Admin Control Centre — this bypasses dual confirmation and should only be used in exceptional circumstances.</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <h2>7. Fee Structure</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Party</th>
+        <th>What they pay / receive</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Hooper (sender)</td>
+        <td><code>agreed_price × 1.03</code> (+ Stripe fees)</td>
+        <td>3% platform fee on top of agreed price</td>
+      </tr>
+      <tr>
+        <td>Booter (traveller)</td>
+        <td><code>agreed_price × 0.97</code></td>
+        <td>Receives 97% of agreed price after platform cut</td>
+      </tr>
+      <tr>
+        <td>BootHop</td>
+        <td>~6% of <code>agreed_price</code></td>
+        <td>3% charged to sender + 3% retained from traveller payout</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <h2>8. Email Notifications (Resend)</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Trigger</th>
+        <th>Recipients</th>
+        <th>Content</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>OTP login code</td>
+        <td>User</td>
+        <td>6-digit code, expires in 15 minutes</td>
+      </tr>
+      <tr>
+        <td>Match found</td>
+        <td>Booter + Hooper</td>
+        <td>Match details, route, date, instructions to accept</td>
+      </tr>
+      <tr>
+        <td>Payment confirmed</td>
+        <td>Booter + Hooper</td>
+        <td>Escrow confirmation, delivery instructions</td>
+      </tr>
+      <tr>
+        <td>Delivery confirmed</td>
+        <td>Both parties</td>
+        <td>Payout initiated notification</td>
+      </tr>
+      <tr>
+        <td>KYC status</td>
+        <td>User</td>
+        <td>Verification approved / rejected / expiry warning</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <h2>9. Admin Control Centre</h2>
+
+  <p>Accessible at <code>/admin</code> — requires <code>profiles.role = 'admin'</code> set directly in Supabase.</p>
+
+  <table>
+    <thead>
+      <tr><th>Tab</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Users</td><td>View all profiles, manually verify or suspend accounts</td></tr>
+      <tr><td>Matches</td><td>Browse all match records, see status and route details</td></tr>
+      <tr><td>Escrow</td><td>View payments currently held in escrow, manually release if needed</td></tr>
+      <tr><td>Disputes</td><td>Future: user-reported delivery issues requiring intervention</td></tr>
+      <tr><td>Video KYC</td><td>Review pending video + selfie submissions, approve or reject</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <h2>10. Data Model Summary</h2>
+
+  <table>
+    <thead>
+      <tr><th>Table</th><th>Key columns</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>profiles</code></td><td>id, email, role, verified, id_verified, suspended</td><td>User profile + access control</td></tr>
+      <tr><td><code>email_login_codes</code></td><td>email, code_hash, journey_payload, used, expires_at, attempts</td><td>OTP codes for passwordless login</td></tr>
+      <tr><td><code>trips</code></td><td>id, email, user_id, from_city, to_city, travel_date, type, weight, price</td><td>Individual trip listings</td></tr>
+      <tr><td><code>journey_drafts</code></td><td>email, user_id, type, from_city, to_city, travel_date, weight, price, status</td><td>Pre-login trip intents, converted to trips on match</td></tr>
+      <tr><td><code>matches</code></td><td>id, booter_email, hooper_email, status, payment_status, agreed_price, hooper_pays, booter_receives, booter_confirmed_delivery, hooper_confirmed_receipt, *_video_kyc_* columns</td><td>The core business transaction record</td></tr>
+      <tr><td><code>video_kyc</code></td><td>match_id, email, video_path, photo_path, submitted_name, status, expires_at, reviewed_by</td><td>Video liveness KYC submissions</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <h2>11. Technology Stack</h2>
+
+  <ul>
+    <li><strong>Frontend</strong>: Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS 4</li>
+    <li><strong>Backend / API</strong>: Next.js Route Handlers (serverless functions on Vercel)</li>
+    <li><strong>Database</strong>: Supabase (PostgreSQL) — auth, profiles, trips, matches, video_kyc</li>
+    <li><strong>Storage</strong>: Supabase Storage — <code>video-kyc</code> bucket for video/photo files</li>
+    <li><strong>Payments</strong>: Stripe Checkout + Stripe Connect for payouts + Stripe Identity for KYC</li>
+    <li><strong>Email</strong>: Resend — transactional emails (OTP, match, payment, KYC)</li>
+    <li><strong>Hosting</strong>: Vercel (PWA-enabled, service worker)</li>
+    <li><strong>Session</strong>: Custom httpOnly JWT cookie (<code>boothop_session</code>), signed with <code>jsonwebtoken</code></li>
+  </ul>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <h2>12. End-to-End Happy Path</h2>
+
+  <ol>
+    <li>Booter visits <code>/register</code>, fills in London → Paris, 5 June, 10 kg available, £30 price → submits email</li>
+    <li>Receives OTP → enters code → session cookie set → redirected to <code>/journeys?listing=new</code> with success banner</li>
+    <li>Hooper visits <code>/journeys</code>, sees London → Paris trip, clicks "I'm interested!" → enters own details → receives OTP → logs in</li>
+    <li>Match engine finds pair → creates <code>matches</code> record → both receive notification emails</li>
+    <li>Both accept the match from their dashboards → status → <code>accepted</code></li>
+    <li>Stripe Identity KYC triggered for both → documents verified by Stripe</li>
+    <li>Video KYC: both record short video + selfie → admin reviews and approves → <code>id_received = true</code></li>
+    <li>Hooper pays £30.90 via Stripe Checkout → funds escrowed in BootHop's Stripe account</li>
+    <li>Travel date arrives → Booter carries item → hands over to Hooper</li>
+    <li>Booter confirms delivery + Hooper confirms receipt (both via dashboard)</li>
+    <li>Stripe transfer: Booter receives £29.10 → match marked <code>completed</code></li>
+    <li>Both receive completion confirmation emails</li>
+  </ol>
+
+  <div class="warning">
+    <strong>Note on current state:</strong> Some steps (e.g. automatic trip draft → live trip conversion, dual-confirmation Stripe payout trigger) are partially manual / admin-assisted in the current implementation. These are identified as next engineering milestones.
+  </div>
+
+  <hr class="divider" />
+  <p style="color:#334155; font-size:0.85rem; text-align:center;">BootHop Internal Engine Document — Generated April 2026</p>
+
+</div>
+</body>
+</html>

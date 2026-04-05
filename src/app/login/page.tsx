@@ -6,7 +6,7 @@ import Image from 'next/image';
 import {
   ArrowRight, Shield, Clock, CheckCircle, Mail,
   RefreshCw, Package, Plane, PlusCircle, AlertCircle,
-  MapPin, X, Home,
+  MapPin, X, Home, Sparkles,
 } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
 
@@ -56,7 +56,6 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    // 1. Check listings
     const tripsRes = await fetch('/api/auth/user-trips', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -66,13 +65,11 @@ export default function LoginPage() {
     const found: Trip[] = tripsData.trips || [];
 
     if (found.length === 0) {
-      // No listings — show popup, do NOT send OTP
       setLoading(false);
       setShowNoListingModal(true);
       return;
     }
 
-    // 2. Listings exist — now send OTP
     const codeRes = await fetch('/api/auth/request-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -91,7 +88,6 @@ export default function LoginPage() {
     setResendTimer(60);
   };
 
-  // Resend OTP (only available on verify step where listings already confirmed)
   const resendCode = async () => {
     setLoading(true);
     setError(null);
@@ -106,7 +102,6 @@ export default function LoginPage() {
     setResendTimer(60);
   };
 
-  // ── Step 2: verify OTP — hard redirect so session cookie is read ─────────
   const verifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = code.trim().toUpperCase();
@@ -137,40 +132,73 @@ export default function LoginPage() {
     setTrips([]);
   };
 
-  return (
-    <div className="min-h-screen flex">
+  const inputCls = "w-full py-3 rounded-xl border border-slate-700/50 bg-slate-800/50 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/70 focus:border-transparent backdrop-blur-sm transition text-sm";
 
-      {/* ── Left panel ── */}
+  return (
+    <div className="min-h-screen flex bg-slate-950">
+
+      {/* ── Left panel — image carousel ── */}
       <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 overflow-hidden">
         {bgImages.map((src, i) => (
           <div key={src} className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: i === bgIdx ? 1 : 0 }}>
             <Image src={src} alt="" fill className="object-cover" priority={i === 0} />
           </div>
         ))}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-blue-950/70 to-slate-900/60" />
+        {/* Multi-layer overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950/85 via-blue-950/70 to-slate-900/60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+
+        {/* Floating accent orbs */}
+        <div className="absolute top-1/4 right-1/4 w-56 h-56 bg-blue-500/15 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '5s' }} />
+        <div className="absolute bottom-1/3 left-1/4 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '7s', animationDelay: '2s' }} />
+
         <div className="relative z-10">
           <Link href="/"><BootHopLogo iconClass="text-white" textClass="text-white" /></Link>
         </div>
-        <div className="relative z-10">
-          <blockquote className="text-white text-2xl font-bold leading-snug mb-4">
-            &quot;Ship anything, anywhere —<br />with someone already going there.&quot;
+
+        <div className="relative z-10 space-y-5">
+          {/* Live indicator */}
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-4 py-2 backdrop-blur-sm">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            <span className="text-sm text-white/80 font-medium">Live platform · 10K+ verified users</span>
+          </div>
+
+          <blockquote className="text-white text-2xl font-black leading-snug">
+            &quot;Ship anything, anywhere —<br />
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              with someone already going.
+            </span>&quot;
           </blockquote>
-          <div className="flex items-center gap-4 text-white/60 text-sm">
-            <span className="flex items-center gap-1.5"><CheckCircle className="h-4 w-4 text-green-400" /> 10K+ verified users</span>
-            <span className="flex items-center gap-1.5"><Shield className="h-4 w-4 text-blue-400" /> Stripe escrow</span>
+
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { icon: <CheckCircle className="h-4 w-4 text-emerald-400" />, text: '10K+ verified users' },
+              { icon: <Shield className="h-4 w-4 text-blue-400" />, text: 'Stripe escrow' },
+              { icon: <Sparkles className="h-4 w-4 text-cyan-400" />, text: '95% success rate' },
+              { icon: <Clock className="h-4 w-4 text-amber-400" />, text: '1–2 day delivery' },
+            ].map(({ icon, text }) => (
+              <div key={text} className="flex items-center gap-2 text-white/65 text-sm">
+                {icon} {text}
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* ── Right panel ── */}
-      <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 bg-white relative">
+      {/* ── Right panel — dark luxury form ── */}
+      <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
+
+        {/* Background glow blobs */}
+        <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_45%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.06),transparent_40%)]" />
+        <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500/8 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/6 rounded-full blur-3xl pointer-events-none" />
 
         {/* Mobile logo */}
-        <div className="lg:hidden mb-8">
-          <Link href="/"><BootHopLogo iconClass="text-slate-800" textClass="text-slate-900" /></Link>
+        <div className="lg:hidden mb-8 relative z-10">
+          <Link href="/"><BootHopLogo iconClass="text-white" textClass="text-white" /></Link>
         </div>
 
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-sm relative z-10">
 
           {/* ══════════════════════════
               STEP 1 — Email
@@ -178,31 +206,35 @@ export default function LoginPage() {
           {step === 'email' && (
             <>
               <div className="mb-8">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome back</h1>
-                <p className="text-slate-500 text-sm">Enter your email to access your listings.</p>
+                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/25 rounded-full px-4 py-1.5 mb-4 backdrop-blur-sm">
+                  <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
+                  <span className="text-xs text-cyan-300 font-semibold">Sign in to BootHop</span>
+                </div>
+                <h1 className="text-3xl font-black text-white mb-2">Welcome back</h1>
+                <p className="text-slate-400 text-sm">Enter your email to access your listings.</p>
               </div>
 
               {error && (
-                <div className="mb-4 flex items-start gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
+                <div className="mb-4 flex items-start gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
                   <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />{error}
                 </div>
               )}
 
               <form onSubmit={handleEmailSubmit} className="space-y-5">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">Email address</label>
+                  <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1.5">Email address</label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                     <input
                       id="email" type="email" value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required autoFocus placeholder="you@example.com"
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm"
+                      className={`${inputCls} pl-10`}
                     />
                   </div>
                 </div>
                 <button type="submit" disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-60 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-sm hover:shadow-md">
+                  className="group w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold py-3 px-4 rounded-xl transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60">
                   {loading ? (
                     <span className="flex items-center gap-2">
                       <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
@@ -212,14 +244,14 @@ export default function LoginPage() {
                       Checking…
                     </span>
                   ) : (
-                    <>Continue <ArrowRight className="h-4 w-4" /></>
+                    <>Continue <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" /></>
                   )}
                 </button>
               </form>
 
               <p className="text-center text-sm text-slate-500 mt-6">
                 Don&apos;t have a listing?{' '}
-                <Link href="/register" className="text-blue-600 hover:text-blue-700 font-medium">Create one →</Link>
+                <Link href="/register" className="text-cyan-400 hover:text-cyan-300 font-medium transition">Create one →</Link>
               </p>
             </>
           )}
@@ -229,7 +261,7 @@ export default function LoginPage() {
           ══════════════════════════ */}
           {step === 'verify' && (
             <>
-              <button onClick={resetToEmail} className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 mb-6">
+              <button onClick={resetToEmail} className="text-sm text-cyan-400 hover:text-cyan-300 flex items-center gap-1 mb-6 transition">
                 ← Change email
               </button>
 
@@ -240,40 +272,42 @@ export default function LoginPage() {
                 </p>
                 <div className="space-y-2">
                   {trips.map((t) => (
-                    <div key={t.id} className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+                    <div key={t.id} className="flex items-center gap-3 rounded-xl border border-slate-700/50 bg-slate-800/40 px-4 py-3 backdrop-blur-sm">
                       <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
-                        t.type === 'travel' || t.type === 'booter' ? 'bg-blue-100 text-blue-600' : 'bg-emerald-100 text-emerald-600'
+                        t.type === 'travel' || t.type === 'booter'
+                          ? 'bg-blue-500/20 text-blue-400'
+                          : 'bg-emerald-500/20 text-emerald-400'
                       }`}>
                         {t.type === 'travel' || t.type === 'booter' ? <Plane className="h-4 w-4" /> : <Package className="h-4 w-4" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-800 truncate">{t.from_city} → {t.to_city}</p>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-sm font-semibold text-white truncate">{t.from_city} → {t.to_city}</p>
+                        <p className="text-xs text-slate-400">
                           {t.travel_date ? new Date(t.travel_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Date TBC'}
                           {t.weight ? ` · ${t.weight}` : ''}
                           {' · '}
                           <span className={`font-medium ${
-                            t.status === 'active' ? 'text-green-600' :
-                            t.status === 'matched' ? 'text-blue-600' :
-                            t.status === 'completed' ? 'text-slate-400' : 'text-amber-600'
+                            t.status === 'active'     ? 'text-emerald-400' :
+                            t.status === 'matched'    ? 'text-blue-400'    :
+                            t.status === 'completed'  ? 'text-slate-500'   : 'text-amber-400'
                           }`}>{t.status}</span>
                         </p>
                       </div>
-                      <MapPin className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+                      <MapPin className="h-3.5 w-3.5 text-slate-600 shrink-0" />
                     </div>
                   ))}
                 </div>
               </div>
 
               <div className="mb-1">
-                <h2 className="text-xl font-bold text-slate-900 mb-1">Enter your code</h2>
-                <p className="text-sm text-slate-500">
-                  We sent a 5-character code to <span className="font-medium text-slate-700">{email}</span>
+                <h2 className="text-xl font-black text-white mb-1">Enter your code</h2>
+                <p className="text-sm text-slate-400">
+                  We sent a 5-character code to <span className="font-medium text-cyan-400">{email}</span>
                 </p>
               </div>
 
               {error && (
-                <div className="my-3 flex items-start gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
+                <div className="my-3 flex items-start gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
                   <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />{error}
                 </div>
               )}
@@ -283,25 +317,25 @@ export default function LoginPage() {
                   <input ref={codeRef} type="text" value={code}
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     maxLength={5} placeholder="4827A"
-                    className="w-full h-14 text-center text-2xl font-bold tracking-[0.35em] uppercase rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition placeholder-slate-300"
+                    className="w-full h-14 text-center text-2xl font-bold tracking-[0.35em] uppercase rounded-xl border border-slate-700/50 bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/70 focus:border-transparent transition placeholder:text-slate-700 backdrop-blur-sm"
                   />
-                  <p className="text-xs text-slate-400 mt-1.5 text-center">4 digits + 1 letter · e.g. 4827A</p>
+                  <p className="text-xs text-slate-600 mt-1.5 text-center">4 digits + 1 letter · e.g. 4827A</p>
                 </div>
                 <button type="submit" disabled={loading || code.trim().length < 5}
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-60 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-sm hover:shadow-md">
+                  className="group w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold py-3 px-4 rounded-xl transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60">
                   {loading ? 'Verifying…' : 'Verify & continue'}
-                  {!loading && <ArrowRight className="h-4 w-4" />}
+                  {!loading && <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />}
                 </button>
               </form>
 
               <div className="mt-5 text-center">
                 {resendTimer > 0 ? (
-                  <p className="text-sm text-slate-400 flex items-center justify-center gap-1.5">
+                  <p className="text-sm text-slate-500 flex items-center justify-center gap-1.5">
                     <Clock className="h-3.5 w-3.5" /> Resend in {resendTimer}s
                   </p>
                 ) : (
                   <button onClick={resendCode} disabled={loading}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1.5 mx-auto">
+                    className="text-sm text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1.5 mx-auto transition">
                     <RefreshCw className="h-3.5 w-3.5" /> Resend code
                   </button>
                 )}
@@ -310,52 +344,58 @@ export default function LoginPage() {
           )}
 
           {/* Trust strip */}
-          <div className="flex justify-center gap-5 mt-8 text-slate-400 text-xs">
-            <span className="flex items-center gap-1"><Shield className="h-3.5 w-3.5" /> Secure login</span>
-            <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> 24/7 support</span>
-            <span className="flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5" /> Verified</span>
+          <div className="flex justify-center gap-5 mt-8 text-slate-600 text-xs">
+            <span className="flex items-center gap-1 text-slate-500"><Shield className="h-3.5 w-3.5 text-blue-500/70" /> Secure login</span>
+            <span className="flex items-center gap-1 text-slate-500"><Clock className="h-3.5 w-3.5 text-cyan-500/70" /> 24/7 support</span>
+            <span className="flex items-center gap-1 text-slate-500"><CheckCircle className="h-3.5 w-3.5 text-emerald-500/70" /> Verified</span>
           </div>
         </div>
 
         {/* ══════════════════════════════════════════════════════
-            NO-LISTING MODAL — shown when email has no listings
+            NO-LISTING MODAL — luxury dark theme
         ══════════════════════════════════════════════════════ */}
         {showNoListingModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
               onClick={() => setShowNoListingModal(false)}
             />
 
             {/* Modal card */}
-            <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="relative w-full max-w-sm bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-slate-700/50 rounded-3xl shadow-2xl shadow-black/50 overflow-hidden">
 
-              {/* Top accent bar */}
-              <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 to-cyan-400" />
+              {/* Top gradient accent bar */}
+              <div className="h-1 w-full bg-gradient-to-r from-amber-500 via-orange-400 to-yellow-400" />
+
+              {/* Glow blob */}
+              <div className="absolute -top-12 -right-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/8 rounded-full blur-3xl pointer-events-none" />
 
               {/* Close button */}
               <button
                 onClick={() => setShowNoListingModal(false)}
-                className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+                className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800/60 transition z-10"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
               </button>
 
-              <div className="px-7 py-7">
-                {/* Icon */}
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-500 mb-5">
-                  <Mail className="h-6 w-6" />
+              <div className="relative px-7 py-7">
+                {/* Gradient icon */}
+                <div className="flex h-13 w-13 mb-5">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-yellow-400 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/40">
+                    <Mail className="h-6 w-6 text-white" />
+                  </div>
                 </div>
 
-                <h2 className="text-xl font-bold text-slate-900 mb-2">No listings found</h2>
-                <p className="text-sm text-slate-500 leading-relaxed mb-1">
+                <h2 className="text-xl font-black text-white mb-2">No listings found</h2>
+                <p className="text-sm text-slate-400 leading-relaxed mb-1">
                   We couldn&apos;t find any journeys or delivery requests linked to
                 </p>
-                <p className="text-sm font-semibold text-slate-800 mb-5 break-all">{email}</p>
+                <p className="text-sm font-bold text-cyan-400 mb-4 break-all">{email}</p>
 
-                <p className="text-sm text-slate-500 mb-6">
+                <p className="text-sm text-slate-400 mb-6 leading-relaxed">
                   To log in, you need an active listing. Would you like to create one?
                 </p>
 
@@ -363,19 +403,20 @@ export default function LoginPage() {
                 <div className="flex flex-col gap-3">
                   <Link
                     href="/register"
-                    className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-sm hover:shadow-md text-sm"
+                    className="group flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] text-white font-semibold py-3 px-4 rounded-xl transition-all text-sm"
                   >
-                    <PlusCircle className="h-4 w-4" /> Create a journey
+                    <PlusCircle className="h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
+                    Create a journey
                   </Link>
                   <Link
                     href="/"
-                    className="flex items-center justify-center gap-2 border border-slate-200 text-slate-700 hover:bg-slate-50 font-medium py-3 px-4 rounded-xl transition text-sm"
+                    className="flex items-center justify-center gap-2 border border-slate-700/60 text-slate-300 hover:bg-slate-800/60 hover:border-slate-600 hover:text-white font-medium py-3 px-4 rounded-xl transition text-sm"
                   >
                     <Home className="h-4 w-4" /> Go to home page
                   </Link>
                   <button
                     onClick={() => setShowNoListingModal(false)}
-                    className="text-sm text-slate-400 hover:text-slate-600 transition py-1"
+                    className="text-sm text-slate-600 hover:text-slate-400 transition py-1"
                   >
                     Try a different email
                   </button>

@@ -56,39 +56,71 @@ export default function PricingPage() {
             <h2 className="text-2xl font-black text-white">How we compare — London to Lagos, 2kg</h2>
             <p className="mt-2 text-sm text-slate-400">Indicative prices. Courier rates vary by size, weight, and season.</p>
           </div>
-          <div className="reveal overflow-hidden rounded-3xl border border-white/10 bg-white/3">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-white/8 bg-white/5">
-                  <th className="py-4 px-6 text-left font-semibold text-white/60">Service</th>
-                  <th className="py-4 px-6 text-center font-semibold text-white/60">Est. Cost (2kg)</th>
-                  <th className="py-4 px-6 text-center font-semibold text-white/60">Delivery Time</th>
-                  <th className="py-4 px-6 text-center font-semibold text-white/60">Personal Touch</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { name: 'DHL Express', cost: '£90–£140', time: '2–4 days', personal: false, highlight: false },
-                  { name: 'UPS Standard', cost: '£80–£130', time: '3–5 days', personal: false, highlight: false },
-                  { name: 'Parcel Force', cost: '£55–£90', time: '5–8 days', personal: false, highlight: false },
-                  { name: 'BootHop', cost: '£20–£55', time: '1–5 days', personal: true, highlight: true },
-                ].map((row) => (
-                  <tr key={row.name} className={`border-b border-white/5 transition-colors ${row.highlight ? 'bg-blue-500/8 border-blue-500/15' : 'hover:bg-white/3'}`}>
-                    <td className="py-4 px-6">
-                      <span className={`font-bold ${row.highlight ? 'text-blue-300' : 'text-white/80'}`}>{row.name}</span>
-                      {row.highlight && <span className="ml-2 rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-300">Best value</span>}
-                    </td>
-                    <td className={`py-4 px-6 text-center font-bold ${row.highlight ? 'text-blue-300' : 'text-white/65'}`}>{row.cost}</td>
-                    <td className="py-4 px-6 text-center text-white/50">{row.time}</td>
-                    <td className="py-4 px-6 text-center">
-                      {row.personal
-                        ? <span className="inline-flex items-center gap-1 text-emerald-400 text-xs font-semibold"><CheckCircle className="h-3.5 w-3.5" />Verified person</span>
-                        : <span className="text-white/25 text-xs">No</span>}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+          {/* Column headers */}
+          <div className="reveal hidden md:grid grid-cols-4 gap-2 mb-2 px-2">
+            <p className="text-xs font-semibold uppercase tracking-widest text-white/40 pl-4">Service</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-white/40 text-center">Est. Cost (2kg)</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-white/40 text-center">Delivery Time</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-white/40 text-center">Personal Touch</p>
+          </div>
+
+          {/* Card rows */}
+          <div className="space-y-3">
+            {[
+              { name: 'DHL Express',  cost: '£90–£140', time: '2–4 days', personal: false, highlight: false, delay: 'd1' },
+              { name: 'UPS Standard', cost: '£80–£130', time: '3–5 days', personal: false, highlight: false, delay: 'd2' },
+              { name: 'Parcel Force', cost: '£55–£90',  time: '5–8 days', personal: false, highlight: false, delay: 'd3' },
+              { name: 'BootHop',      cost: '£20–£55',  time: '1–2 days', personal: true,  highlight: true,  delay: 'd4' },
+            ].map((row) => (
+              <div
+                key={row.name}
+                className={`reveal ${row.delay} group relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-default
+                  ${row.highlight
+                    ? 'border-blue-500/30 bg-gradient-to-br from-blue-600/15 to-slate-900/40 hover:border-blue-400/50 hover:shadow-xl hover:shadow-blue-500/20 hover:scale-[1.015] hover:-translate-y-0.5 active:scale-[0.99] touch-blue'
+                    : 'border-white/8 bg-gradient-to-br from-slate-800/30 to-slate-900/30 hover:border-white/18 hover:bg-white/4 hover:shadow-md hover:-translate-y-px'}`}
+              >
+                {row.highlight && (
+                  <div className="pointer-events-none absolute -top-6 -right-6 w-28 h-28 bg-blue-500/20 rounded-full blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                )}
+                <div className="relative grid grid-cols-2 md:grid-cols-4 gap-x-4 items-center px-5 py-4">
+                  {/* Service */}
+                  <div className="flex items-center gap-3">
+                    {row.highlight && (
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300 shrink-0">
+                        <Sparkles className="h-4 w-4 text-white" />
+                      </div>
+                    )}
+                    <div>
+                      <span className={`font-bold text-sm ${row.highlight ? 'text-blue-300 group-hover:text-cyan-300 transition-colors duration-300' : 'text-white/80'}`}>
+                        {row.name}
+                      </span>
+                      {row.highlight && (
+                        <span className="ml-2 rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-300">
+                          Best value
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {/* Cost */}
+                  <div className="text-center">
+                    <span className="text-xs text-white/35 md:hidden">Cost: </span>
+                    <span className={`font-bold text-sm ${row.highlight ? 'text-cyan-300' : 'text-white/65'}`}>{row.cost}</span>
+                  </div>
+                  {/* Time */}
+                  <div className="text-center">
+                    <span className="text-xs text-white/35 md:hidden">Time: </span>
+                    <span className="text-sm text-white/50">{row.time}</span>
+                  </div>
+                  {/* Personal */}
+                  <div className="text-center">
+                    {row.personal
+                      ? <span className="inline-flex items-center gap-1 text-emerald-400 text-xs font-semibold"><CheckCircle className="h-3.5 w-3.5" />Verified person</span>
+                      : <span className="text-white/25 text-xs">No</span>}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
           <p className="mt-3 text-center text-xs text-white/25">BootHop prices are negotiated between sender and traveller. Savings of 40–70% vs traditional couriers are typical on UK→Nigeria routes.</p>
         </div>
