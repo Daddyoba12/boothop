@@ -148,24 +148,26 @@ export default function AboutPage() {
             <div className="space-y-3">
               <p className="mb-5 text-sm font-medium text-white/40">What people send with BootHop</p>
               {[
-                { icon: <Package className="h-4 w-4" />, title: 'Personal effects & gifts', desc: 'Clothes, shoes, homemade food, family gifts — things that matter.' },
-                { icon: <CheckCircle className="h-4 w-4" />, title: 'Documents & letters', desc: 'Passports, certificates, legal papers — delivered securely by hand.' },
-                { icon: <Globe className="h-4 w-4" />, title: 'Small parcels', desc: 'Anything hand-luggage sized that fits within airline weight limits.' },
-                { icon: <Shield className="h-4 w-4" />, title: 'Not accepted', desc: 'No cash, no prohibited items, no anything that wouldn\'t clear customs.', muted: true },
+                { icon: <Package className="h-5 w-5" />, title: 'Personal effects & gifts', desc: 'Clothes, shoes, homemade food, family gifts — things that matter.' },
+                { icon: <CheckCircle className="h-5 w-5" />, title: 'Documents & letters', desc: 'Passports, certificates, legal papers — delivered securely by hand.' },
+                { icon: <Globe className="h-5 w-5" />, title: 'Small parcels', desc: 'Anything hand-luggage sized that fits within airline weight limits.' },
+                { icon: <Shield className="h-5 w-5" />, title: 'Not accepted', desc: 'No cash, no prohibited items, no anything that wouldn\'t clear customs.', muted: true },
               ].map((item, i) => (
-                <div key={item.title} className={`reveal d${i+1} group flex items-start gap-4 rounded-2xl border p-4 transition-all duration-300 cursor-pointer
+                <div key={item.title} className={`reveal d${i+1} group flex items-start gap-5 p-5 rounded-2xl border transition-all duration-300 cursor-pointer
                   ${item.muted
-                    ? 'border-white/5 bg-white/2 hover:border-red-500/20 hover:bg-white/3'
-                    : 'border-white/8 bg-white/3 hover:border-blue-500/40 hover:bg-white/5 hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5 active:scale-[0.98] touch-blue'
+                    ? 'border-white/5 bg-gradient-to-br from-slate-800/20 to-slate-900/20 hover:border-red-500/20'
+                    : 'border-slate-700/50 bg-gradient-to-br from-slate-800/30 to-slate-900/30 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-500/15 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 touch-blue'
                   }`}>
-                  <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110
-                    ${item.muted ? 'bg-red-500/10 text-red-400/60' : 'bg-blue-500/15 text-blue-400'}`}>
+                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl shadow-lg transition-transform duration-300 group-hover:scale-110
+                    ${item.muted
+                      ? 'bg-red-500/10 text-red-400/60'
+                      : 'bg-gradient-to-br from-blue-500 to-cyan-400 text-white shadow-blue-500/40'}`}>
                     {item.icon}
                   </div>
-                  <div>
-                    <p className={`text-sm font-semibold transition-colors duration-300
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-bold transition-colors duration-300
                       ${item.muted ? 'text-white/30' : 'text-white group-hover:text-cyan-400'}`}>{item.title}</p>
-                    <p className={`text-xs mt-0.5 ${item.muted ? 'text-white/20' : 'text-white/45'}`}>{item.desc}</p>
+                    <p className={`text-xs mt-1 leading-relaxed ${item.muted ? 'text-white/20' : 'text-slate-400'}`}>{item.desc}</p>
                   </div>
                 </div>
               ))}
