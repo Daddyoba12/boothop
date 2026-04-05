@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getSessionCookieName, signAppSession } from '@/lib/auth/session';
@@ -52,17 +51,6 @@ export async function POST(request: Request) {
       .update({ used: true, used_at: new Date().toISOString() })
       .eq('id', record.id);
 
-    const cookieStore = await cookies();
-    const token = signAppSession({ email, verified: true });
-
-    cookieStore.set(getSessionCookieName(), token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
-    });
-
     // Save journey draft if the user came from the register form with trip details
     let hasDraft = false;
     if (record.journey_payload) {
@@ -73,16 +61,16 @@ export async function POST(request: Request) {
         const priceNum = parseFloat(String(p.price || '0').replace(/[^0-9.]/g, '')) || null;
         await supabase.from('journey_drafts').insert({
           email,
-          user_id:     userId,
-          type:        p.mode || 'send',
-          from_city:   p.from || '',
-          to_city:     p.to  || '',
-          travel_date: p.date || null,
-          weight:      p.weight || null,
-          price:       priceNum,
+          user_id:       userId,
+          type:          p.mode || 'send',
+          from_city:     p.from || '',
+          to_city:       p.to  || '',
+          travel_date:   p.date || null,
+          weight:        p.weight || null,
+          price:         priceNum,
           interested_in: p.interestedIn || null,
-          status:      'draft',
-          expires_at:  new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          status:        'draft',
+          expires_at:    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         });
         hasDraft = true;
       } catch (draftErr) {
@@ -90,10 +78,10 @@ export async function POST(request: Request) {
       }
     }
 
-    // Decide where to send the user after login:
-    // - Has a draft from this login flow → dashboard (will auto-show draft tab)
+    // Decide redirect:
+    // - Has a draft → dashboard (auto-shows draft tab)
     // - Has existing trips → dashboard
-    // - Brand new user with no trips → intent page to create their first journey
+    // - Brand new user with no trips → intent page
     let redirectTo = '/dashboard';
     if (!hasDraft) {
       const { count: tripCount } = await supabase
@@ -101,18 +89,28 @@ export async function POST(request: Request) {
         .select('id', { count: 'exact', head: true })
         .eq('email', email)
         .limit(1);
-      if ((tripCount ?? 0) === 0) {
-        redirectTo = '/intent';
-      }
+      if ((tripCount ?? 0) === 0) redirectTo = '/intent';
     }
 
-    return NextResponse.json({
+    // ─── Set session cookie on the response (NOT via cookies() which is
+    //     read-only in Route Handlers and silently drops the write) ────────
+    const token = signAppSession({ email, verified: true });
+    const response = NextResponse.json({
       ok: true,
       email,
       hasDraft,
       journeyPayload: record.journey_payload,
       redirectTo,
     });
+    response.cookies.set(getSessionCookieName(), token, {
+      httpOnly: true,
+      secure:   process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path:     '/',
+      maxAge:   60 * 60 * 24 * 7, // 7 days
+    });
+    return response;
+
   } catch (error) {
     console.error('verify-code error', error);
     return NextResponse.json(

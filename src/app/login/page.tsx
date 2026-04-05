@@ -3,23 +3,35 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { ArrowRight, Shield, Clock, CheckCircle, Mail, RefreshCw } from 'lucide-react';
+import {
+  ArrowRight, Shield, Clock, CheckCircle, Mail,
+  RefreshCw, Package, Plane, PlusCircle, AlertCircle, MapPin,
+} from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
 
 const bgImages = ['/images/D_login1.jpg', '/images/D_login2.jpg'];
 
-export default function LoginPage() {
-  const router = useRouter();
+type Trip = {
+  id: string;
+  type: string;
+  from_city: string;
+  to_city: string;
+  travel_date: string | null;
+  status: string;
+  weight: string | null;
+};
 
-  const [email, setEmail]             = useState('');
-  const [code, setCode]               = useState('');
-  const [step, setStep]               = useState<'email' | 'code'>('email');
-  const [loading, setLoading]         = useState(false);
-  const [error, setError]             = useState<string | null>(null);
+export default function LoginPage() {
+  const [email, setEmail]           = useState('');
+  const [code, setCode]             = useState('');
+  // step: 'email' → 'verify' (shows listings + code input) → done
+  const [step, setStep]             = useState<'email' | 'verify'>('email');
+  const [trips, setTrips]           = useState<Trip[]>([]);
+  const [loading, setLoading]       = useState(false);
+  const [error, setError]           = useState<string | null>(null);
   const [resendTimer, setResendTimer] = useState(0);
-  const [bgIdx, setBgIdx]             = useState(0);
-  const codeRef                       = useRef<HTMLInputElement>(null);
+  const [bgIdx, setBgIdx]           = useState(0);
+  const codeRef                     = useRef<HTMLInputElement>(null);
 
   // Rotate background images
   useEffect(() => {
@@ -36,28 +48,46 @@ export default function LoginPage() {
 
   // Focus code input when step changes
   useEffect(() => {
-    if (step === 'code') codeRef.current?.focus();
+    if (step === 'verify') setTimeout(() => codeRef.current?.focus(), 300);
   }, [step]);
 
+  // ── 1. Send OTP + fetch listings in parallel ──────────────────────────
   const sendCode = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!email) { setError('Please enter your email address.'); return; }
     setLoading(true);
     setError(null);
 
-    const res = await fetch('/api/auth/request-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-    const data = await res.json();
+    const [codeRes, tripsRes] = await Promise.all([
+      fetch('/api/auth/request-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      }),
+      fetch('/api/auth/user-trips', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      }),
+    ]);
+
+    const codeData = await codeRes.json();
+    const tripsData = tripsRes.ok ? await tripsRes.json() : { trips: [] };
+
     setLoading(false);
 
-    if (!res.ok) { setError(data.error || 'Unable to send code.'); return; }
-    setStep('code');
+    if (!codeRes.ok) {
+      setError(codeData.error || 'Unable to send code.');
+      return;
+    }
+
+    setTrips(tripsData.trips || []);
+    setStep('verify');
     setResendTimer(60);
   };
 
+  // ── 2. Verify OTP — use window.location for hard redirect so
+  //       the new session cookie is picked up immediately ──────────────────
   const verifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = code.trim().toUpperCase();
@@ -73,13 +103,26 @@ export default function LoginPage() {
     const data = await res.json();
     setLoading(false);
 
-    if (!res.ok) { setError(data.error || 'Invalid or expired code. Please try again.'); return; }
-    router.push(data.redirectTo || '/intent');
+    if (!res.ok) {
+      setError(data.error || 'Invalid or expired code. Please try again.');
+      return;
+    }
+
+    // Hard navigate so the browser picks up the new session cookie
+    window.location.href = data.redirectTo || '/intent';
+  };
+
+  const resetToEmail = () => {
+    setStep('email');
+    setCode('');
+    setError(null);
+    setTrips([]);
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* ── Left panel: hero ── */}
+
+      {/* ── Left panel: rotating hero images ── */}
       <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 overflow-hidden">
         {bgImages.map((src, i) => (
           <div
@@ -93,9 +136,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-blue-950/70 to-slate-900/60" />
 
         <div className="relative z-10">
-          <Link href="/">
-            <BootHopLogo iconClass="text-white" textClass="text-white" />
-          </Link>
+          <Link href="/"><BootHopLogo iconClass="text-white" textClass="text-white" /></Link>
         </div>
 
         <div className="relative z-10">
@@ -109,26 +150,29 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ── Right panel: form ── */}
+      {/* ── Right panel ── */}
       <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 bg-white">
+
         {/* Mobile logo */}
         <div className="lg:hidden mb-8">
-          <Link href="/">
-            <BootHopLogo iconClass="text-slate-800" textClass="text-slate-900" />
-          </Link>
+          <Link href="/"><BootHopLogo iconClass="text-slate-800" textClass="text-slate-900" /></Link>
         </div>
 
         <div className="w-full max-w-sm">
-          {step === 'email' ? (
+
+          {/* ════════════════════════════════
+              STEP 1 — Email entry
+          ════════════════════════════════ */}
+          {step === 'email' && (
             <>
               <div className="mb-8">
                 <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome to BootHop</h1>
-                <p className="text-slate-500">Enter your email — we&apos;ll send a one-time code. No password needed.</p>
+                <p className="text-slate-500 text-sm">Enter your email — we&apos;ll show your listings and send a one-time code.</p>
               </div>
 
               {error && (
-                <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
-                  {error}
+                <div className="mb-4 flex items-start gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />{error}
                 </div>
               )}
 
@@ -145,6 +189,7 @@ export default function LoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
+                      autoFocus
                       placeholder="you@example.com"
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm"
                     />
@@ -156,41 +201,109 @@ export default function LoginPage() {
                   disabled={loading}
                   className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-60 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-sm hover:shadow-md"
                 >
-                  {loading ? 'Sending code…' : 'Send one-time code'}
+                  {loading ? 'Checking…' : 'Continue'}
                   {!loading && <ArrowRight className="h-4 w-4" />}
                 </button>
               </form>
 
-              <p className="text-center text-sm text-slate-500 mt-8">
-                New here? Just enter your email — we&apos;ll create your account automatically.
+              <p className="text-center text-sm text-slate-500 mt-6">
+                New here?{' '}
+                <Link href="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+                  Create a journey →
+                </Link>
               </p>
             </>
-          ) : (
+          )}
+
+          {/* ════════════════════════════════
+              STEP 2 — Listings + code entry
+          ════════════════════════════════ */}
+          {step === 'verify' && (
             <>
-              <div className="mb-8">
-                <button
-                  onClick={() => { setStep('email'); setCode(''); setError(null); }}
-                  className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 mb-4"
-                >
-                  ← Change email
-                </button>
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">Check your inbox</h1>
-                <p className="text-slate-500">
-                  We sent a 5-character code to <span className="font-medium text-slate-700">{email}</span>
+              <button
+                onClick={resetToEmail}
+                className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 mb-6"
+              >
+                ← Change email
+              </button>
+
+              {/* ── Listings section ── */}
+              {trips.length > 0 ? (
+                <div className="mb-6">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">
+                    Your listings ({trips.length})
+                  </p>
+                  <div className="space-y-2">
+                    {trips.map((t) => (
+                      <div
+                        key={t.id}
+                        className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3"
+                      >
+                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+                          t.type === 'travel' || t.type === 'booter'
+                            ? 'bg-blue-100 text-blue-600'
+                            : 'bg-emerald-100 text-emerald-600'
+                        }`}>
+                          {t.type === 'travel' || t.type === 'booter'
+                            ? <Plane className="h-4 w-4" />
+                            : <Package className="h-4 w-4" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-slate-800 truncate">
+                            {t.from_city} → {t.to_city}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {t.travel_date
+                              ? new Date(t.travel_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                              : 'Date TBC'}
+                            {t.weight ? ` · ${t.weight}` : ''}
+                            {' · '}
+                            <span className={`font-medium ${
+                              t.status === 'active' ? 'text-green-600' :
+                              t.status === 'matched' ? 'text-blue-600' :
+                              t.status === 'completed' ? 'text-slate-500' :
+                              'text-amber-600'
+                            }`}>{t.status}</span>
+                          </p>
+                        </div>
+                        <MapPin className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-6 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4">
+                  <p className="text-sm font-semibold text-slate-700 mb-1">No listings found</p>
+                  <p className="text-xs text-slate-500 mb-3">
+                    There are no journeys or delivery requests associated with{' '}
+                    <span className="font-medium text-slate-700">{email}</span>.
+                  </p>
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 transition"
+                  >
+                    <PlusCircle className="h-3.5 w-3.5" /> Create a journey
+                  </Link>
+                </div>
+              )}
+
+              {/* ── Code entry ── */}
+              <div className="mb-1">
+                <h2 className="text-xl font-bold text-slate-900 mb-1">Enter your code</h2>
+                <p className="text-sm text-slate-500">
+                  We sent a 5-character code to{' '}
+                  <span className="font-medium text-slate-700">{email}</span>
                 </p>
               </div>
 
               {error && (
-                <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
-                  {error}
+                <div className="my-3 flex items-start gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />{error}
                 </div>
               )}
 
-              <form onSubmit={verifyCode} className="space-y-6">
+              <form onSubmit={verifyCode} className="space-y-4 mt-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-3">
-                    Verification code
-                  </label>
                   <input
                     ref={codeRef}
                     type="text"
@@ -198,9 +311,9 @@ export default function LoginPage() {
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     maxLength={5}
                     placeholder="4827A"
-                    className="w-full h-16 text-center text-2xl font-bold tracking-[0.35em] uppercase rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition placeholder-slate-300"
+                    className="w-full h-14 text-center text-2xl font-bold tracking-[0.35em] uppercase rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition placeholder-slate-300"
                   />
-                  <p className="text-xs text-slate-400 mt-2 text-center">4 digits + 1 letter, e.g. 4827A</p>
+                  <p className="text-xs text-slate-400 mt-1.5 text-center">4 digits + 1 letter · e.g. 4827A</p>
                 </div>
 
                 <button
@@ -213,7 +326,7 @@ export default function LoginPage() {
                 </button>
               </form>
 
-              <div className="mt-6 text-center">
+              <div className="mt-5 text-center">
                 {resendTimer > 0 ? (
                   <p className="text-sm text-slate-400 flex items-center justify-center gap-1.5">
                     <Clock className="h-3.5 w-3.5" /> Resend in {resendTimer}s
