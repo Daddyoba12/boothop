@@ -152,13 +152,19 @@ export default function AboutPage() {
                 { icon: <CheckCircle className="h-4 w-4" />, title: 'Documents & letters', desc: 'Passports, certificates, legal papers — delivered securely by hand.' },
                 { icon: <Globe className="h-4 w-4" />, title: 'Small parcels', desc: 'Anything hand-luggage sized that fits within airline weight limits.' },
                 { icon: <Shield className="h-4 w-4" />, title: 'Not accepted', desc: 'No cash, no prohibited items, no anything that wouldn\'t clear customs.', muted: true },
-              ].map((item) => (
-                <div key={item.title} className={`flex items-start gap-4 rounded-2xl border p-4 ${item.muted ? 'border-white/5 bg-white/2' : 'border-white/8 bg-white/3 hover:border-white/15 hover:bg-white/5'} transition-all duration-200`}>
-                  <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${item.muted ? 'bg-red-500/10 text-red-400/60' : 'bg-blue-500/15 text-blue-400'}`}>
+              ].map((item, i) => (
+                <div key={item.title} className={`reveal d${i+1} group flex items-start gap-4 rounded-2xl border p-4 transition-all duration-300 cursor-pointer
+                  ${item.muted
+                    ? 'border-white/5 bg-white/2 hover:border-red-500/20 hover:bg-white/3'
+                    : 'border-white/8 bg-white/3 hover:border-blue-500/40 hover:bg-white/5 hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5 active:scale-[0.98] touch-blue'
+                  }`}>
+                  <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110
+                    ${item.muted ? 'bg-red-500/10 text-red-400/60' : 'bg-blue-500/15 text-blue-400'}`}>
                     {item.icon}
                   </div>
                   <div>
-                    <p className={`text-sm font-semibold ${item.muted ? 'text-white/30' : 'text-white'}`}>{item.title}</p>
+                    <p className={`text-sm font-semibold transition-colors duration-300
+                      ${item.muted ? 'text-white/30' : 'text-white group-hover:text-cyan-400'}`}>{item.title}</p>
                     <p className={`text-xs mt-0.5 ${item.muted ? 'text-white/20' : 'text-white/45'}`}>{item.desc}</p>
                   </div>
                 </div>
