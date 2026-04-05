@@ -107,9 +107,9 @@ export default function PrivacyPage() {
         </div>
 
         <Section id="who-we-are" title="Who We Are" icon={Shield}>
-          <P>BootHop Ltd ("BootHop", "we", "us") is a company registered in the United Kingdom. We operate the peer-to-peer delivery platform available at boothop.co.uk and its associated applications.</P>
+          <P>BootHop Ltd ("BootHop", "we", "us") is a company registered in the United Kingdom. We operate the peer-to-peer delivery platform available at boothop.com and its associated applications.</P>
           <P>BootHop acts as the data controller for the personal information you provide when using our platform.</P>
-          <P>If you have questions about how we handle your data, please contact us at <a href="mailto:privacy@boothop.co.uk" className="text-cyan-400 hover:text-cyan-300 underline transition-colors">privacy@boothop.co.uk</a>.</P>
+          <P>If you have questions about how we handle your data, please contact us at <a href="mailto:privacy@boothop.com" className="text-cyan-400 hover:text-cyan-300 underline transition-colors">privacy@boothop.com</a>.</P>
         </Section>
 
         <Section id="data-we-collect" title="Data We Collect" icon={Database}>
@@ -192,7 +192,7 @@ export default function PrivacyPage() {
             'Right to object: object to processing based on legitimate interests',
             'Right to withdraw consent: for any processing based on your consent',
           ]} />
-          <P>To exercise any of these rights, email <a href="mailto:privacy@boothop.co.uk" className="text-cyan-400 hover:text-cyan-300 underline transition-colors">privacy@boothop.co.uk</a>. We will respond within 30 days. You also have the right to lodge a complaint with the UK Information Commissioner's Office (ICO) at ico.org.uk.</P>
+          <P>To exercise any of these rights, email <a href="mailto:privacy@boothop.com" className="text-cyan-400 hover:text-cyan-300 underline transition-colors">privacy@boothop.com</a>. We will respond within 30 days. You also have the right to lodge a complaint with the UK Information Commissioner's Office (ICO) at ico.org.uk.</P>
         </Section>
 
         <Section id="cookies" title="Cookies" icon={Eye}>
@@ -222,7 +222,7 @@ export default function PrivacyPage() {
           <P>For all privacy-related enquiries, please contact:</P>
           <div className="rounded-xl border border-white/8 bg-white/3 p-5 space-y-1">
             <p className="font-semibold text-white">BootHop Ltd — Data Protection</p>
-            <p>Email: <a href="mailto:privacy@boothop.co.uk" className="text-cyan-400 hover:text-cyan-300 underline transition-colors">privacy@boothop.co.uk</a></p>
+            <p>Email: <a href="mailto:privacy@boothop.com" className="text-cyan-400 hover:text-cyan-300 underline transition-colors">privacy@boothop.com</a></p>
             <p>Registered in England and Wales</p>
           </div>
           <P>We aim to respond to all privacy enquiries within 30 days. For urgent data protection concerns, mark your email with "URGENT – Data Protection".</P>

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-const APP_URL = 'https://boothop.co.uk';
+const APP_URL = 'https://boothop.com';
 
 // ─── Replace G-XXXXXXXXXX with your real GA4 Measurement ID ───────────────
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX';
@@ -99,7 +99,7 @@ const jsonLd = {
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'customer support',
-        email: 'support@boothop.co.uk',
+        email: 'support@boothop.com',
         availableLanguage: 'English',
       },
     },

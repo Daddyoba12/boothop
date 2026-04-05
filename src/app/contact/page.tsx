@@ -113,8 +113,8 @@ export default function ContactPage() {
             </div>
             <p className="relative text-sm text-slate-400 leading-relaxed">
               Reach us directly at{' '}
-              <a href="mailto:support@boothop.co.uk" className="text-cyan-400 font-medium hover:underline">
-                support@boothop.co.uk
+              <a href="mailto:support@boothop.com" className="text-cyan-400 font-medium hover:underline">
+                support@boothop.com
               </a>
             </p>
           </div>
@@ -199,7 +199,7 @@ export default function ContactPage() {
               {status === 'error' && (
                 <div className="flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
                   <AlertCircle className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-red-300">Something went wrong. Please email us directly at support@boothop.co.uk</p>
+                  <p className="text-sm text-red-300">Something went wrong. Please email us directly at support@boothop.com</p>
                 </div>
               )}
 

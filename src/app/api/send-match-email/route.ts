@@ -3,7 +3,7 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM   = 'BootHop <noreply@boothop.co.uk>';
+const FROM   = 'BootHop <noreply@boothop.com>';
 
 async function createActionToken(
   supabase: ReturnType<typeof createSupabaseAdminClient>,

@@ -141,7 +141,7 @@ export default function CookiePolicyPage() {
           <ul className="space-y-3 pl-2">
             {[
               'Browser settings: Most browsers allow you to block or delete cookies. See your browser\'s help documentation for instructions.',
-              'Opt-out of analytics: You can opt out of anonymous analytics tracking by contacting us at privacy@boothop.co.uk.',
+              'Opt-out of analytics: You can opt out of anonymous analytics tracking by contacting us at privacy@boothop.com.',
               'Essential cookies cannot be disabled without breaking core platform functionality such as login and payment.',
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-2.5">
@@ -162,7 +162,7 @@ export default function CookiePolicyPage() {
           <p>If you have any questions about our use of cookies, please contact us at:</p>
           <div className="rounded-xl border border-white/8 bg-white/3 p-5 space-y-1">
             <p className="font-semibold text-white">BootHop Ltd — Privacy &amp; Cookies</p>
-            <p>Email: <a href="mailto:privacy@boothop.co.uk" className="text-cyan-400 hover:text-cyan-300 underline transition-colors">privacy@boothop.co.uk</a></p>
+            <p>Email: <a href="mailto:privacy@boothop.com" className="text-cyan-400 hover:text-cyan-300 underline transition-colors">privacy@boothop.com</a></p>
             <p>Registered in England and Wales</p>
           </div>
         </Section>

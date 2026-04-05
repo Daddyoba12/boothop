@@ -3,7 +3,7 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM   = 'BootHop <noreply@boothop.co.uk>';
+const FROM   = 'BootHop <noreply@boothop.com>';
 
 // Vercel Cron: runs every 6 hours (see vercel.json)
 // Guards against replay: only runs if invoked with the correct CRON_SECRET header
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
 
   try {
     const supabase = createSupabaseAdminClient();
-    const appUrl   = process.env.NEXT_PUBLIC_APP_URL || 'https://boothop.co.uk';
+    const appUrl   = process.env.NEXT_PUBLIC_APP_URL || 'https://boothop.com';
 
     // Find accepted matches where contact is unlocked but delivery is NOT yet complete
     const { data: matches } = await supabase

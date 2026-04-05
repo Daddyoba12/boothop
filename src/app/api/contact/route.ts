@@ -12,8 +12,8 @@ export async function POST(request: Request) {
     }
 
     await resend.emails.send({
-      from: 'BootHop Support <noreply@boothop.co.uk>',
-      to: ['support@boothop.co.uk'],
+      from: 'BootHop Support <noreply@boothop.com>',
+      to: ['support@boothop.com'],
       replyTo: email,
       subject: `[Contact Form] ${topic} — from ${name}`,
       text: `New contact form submission\n\nName: ${name}\nEmail: ${email}\nTopic: ${topic}\n\nMessage:\n${message}`,

@@ -3,7 +3,7 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM   = 'BootHop <noreply@boothop.co.uk>';
+const FROM   = 'BootHop <noreply@boothop.com>';
 
 async function createActionToken(
   supabase: ReturnType<typeof createSupabaseAdminClient>,
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   try {
     const { matchId } = await request.json();
     const supabase = createSupabaseAdminClient();
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://boothop.co.uk';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://boothop.com';
 
     const { data: match } = await supabase
       .from('matches')
@@ -128,7 +128,7 @@ export async function POST(request: Request) {
             </div>
 
             <div style="background:#0f172a;border-top:1px solid #1e293b;padding:20px 40px;text-align:center;">
-              <p style="color:#334155;font-size:12px;margin:0;">© BootHop · <a href="${appUrl}" style="color:#38bdf8;text-decoration:none;">boothop.co.uk</a></p>
+              <p style="color:#334155;font-size:12px;margin:0;">© BootHop · <a href="${appUrl}" style="color:#38bdf8;text-decoration:none;">boothop.com</a></p>
             </div>
           </div>
         `,
