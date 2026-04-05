@@ -171,9 +171,21 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 8px 32px rgba(0,0,0,0.25);
   }
+
+  /* background-attachment:fixed is broken on iOS standalone PWA —
+     the background image disappears entirely. Force scroll mode. */
+  * { background-attachment: scroll !important; }
+
+  /* Reveal elements: show faster in PWA since everything is in-viewport */
+  .reveal, .reveal-left, .reveal-scale {
+    animation-delay: 0.1s !important;
+  }
 }
 
 @media (hover: none) {
+
+  /* background-attachment:fixed causes images to vanish on mobile/PWA */
+  * { background-attachment: scroll !important; }
 
   /* Make trip action buttons always visible on touch devices */
   [class*="group-hover:opacity-100"] { opacity: 1 !important; }

@@ -33,12 +33,13 @@ export function useScrollReveal() {
 
         elements.forEach((el) => observer.observe(el));
 
-        // Safety net: any element still not visible after 800ms gets forced visible.
-        // Catches PWA cases where IntersectionObserver fires but callback is delayed.
+        // Safety net: any element still not visible after 300ms gets forced visible.
+        // Catches PWA cases where IntersectionObserver fires but callback is delayed,
+        // and prevents images inside reveal containers from staying hidden too long.
         const fallback = setTimeout(() => {
           document.querySelectorAll<HTMLElement>('.reveal:not(.visible), .reveal-left:not(.visible), .reveal-scale:not(.visible)')
             .forEach((el) => el.classList.add('visible'));
-        }, 800);
+        }, 300);
 
         (window as any).__scrollRevealCleanup = () => {
           observer.disconnect();
