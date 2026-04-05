@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Package, Shield, ArrowRight, CheckCircle, Users, Globe } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 const VIDEOS = [
   '/videos/Aboutus_train.mp4',
@@ -14,6 +15,7 @@ const VIDEOS = [
 const SLIDES = ['/images/Customs1.jpg', '/images/Handover.jpg', '/images/GoingonHolsz.jpg'];
 
 export default function AboutPage() {
+  useScrollReveal();
   const [leftIdx, setLeftIdx]   = useState(0);
   const [rightIdx, setRightIdx] = useState(2);
   const [slideIdx, setSlideIdx] = useState(0);
@@ -178,12 +180,12 @@ export default function AboutPage() {
               { icon: <Users className="h-6 w-6" />, title: 'Community first', body: 'People helping people on journeys they\'re already making. No strangers — verified identities, real connections.' },
               { icon: <Shield className="h-6 w-6" />, title: 'Safety & escrow', body: 'Funds are held securely until the recipient confirms delivery. No money changes hands until the job is done.' },
               { icon: <Globe className="h-6 w-6" />, title: 'Efficient & affordable', body: 'Use the space that already exists on existing journeys. Better for your wallet, better for the environment.' },
-            ].map((item) => (
-              <div key={item.title} className="rounded-3xl border border-white/8 bg-white/3 p-7 transition-all duration-300 hover:border-blue-500/20 hover:bg-white/5 hover:-translate-y-1">
-                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-400">
+            ].map((item, i) => (
+              <div key={item.title} className={`reveal d${i+1} group rounded-3xl border border-white/8 bg-white/3 p-7 transition-all duration-300 hover:border-blue-500/20 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10 active:scale-[0.98] cursor-pointer touch-blue`}>
+                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-400 group-hover:scale-110 transition-transform duration-300">
                   {item.icon}
                 </div>
-                <h3 className="mb-3 text-base font-semibold text-white">{item.title}</h3>
+                <h3 className="mb-3 text-base font-semibold text-white group-hover:text-cyan-400 transition-colors duration-300">{item.title}</h3>
                 <p className="text-sm leading-relaxed text-white/50">{item.body}</p>
               </div>
             ))}

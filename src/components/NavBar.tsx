@@ -8,10 +8,10 @@ import BootHopLogo from './BootHopLogo';
 
 const links = [
   { href: '/how-it-works',    label: 'How It Works' },
+  { href: '/journeys',        label: 'Live Journeys' },
   { href: '/pricing',         label: 'Pricing' },
   { href: '/about',           label: 'About' },
   { href: '/trust-safety',    label: 'Trust & Safety' },
-  { href: '/#testimonials',   label: 'Testimonials' },
 ];
 
 export default function NavBar() {

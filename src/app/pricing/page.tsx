@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Check, CheckCircle, Shield, Package, DollarSign, Sparkles, ArrowRight, Lock, Zap, ChevronDown } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 const faqData = [
   { q: 'When do I pay?', a: 'Hoopers pay when they accept a Booter\'s offer. Booters receive payment after both parties confirm the delivery is complete.' },
@@ -16,6 +17,7 @@ const faqData = [
 ];
 
 export default function PricingPage() {
+  useScrollReveal();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
@@ -97,7 +99,7 @@ export default function PricingPage() {
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
 
           {/* Hooper Card */}
-          <div className="group relative overflow-hidden rounded-3xl border border-blue-500/25 bg-gradient-to-br from-blue-600/15 to-slate-900/40 backdrop-blur-sm p-10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20 hover:border-blue-400/40 transition-all duration-500 cursor-default active:scale-[0.98]">
+          <div className="reveal d1 group relative overflow-hidden rounded-3xl border border-blue-500/25 bg-gradient-to-br from-blue-600/15 to-slate-900/40 backdrop-blur-sm p-10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20 hover:border-blue-400/40 transition-all duration-500 cursor-pointer active:scale-[0.98] touch-blue">
             <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-500/15 rounded-full blur-3xl group-hover:opacity-80 transition-opacity" />
             <div className="relative">
               <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
@@ -144,7 +146,7 @@ export default function PricingPage() {
           </div>
 
           {/* Booter Card */}
-          <div className="group relative overflow-hidden rounded-3xl border border-emerald-500/25 bg-gradient-to-br from-emerald-600/15 to-slate-900/40 backdrop-blur-sm p-10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-emerald-500/20 hover:border-emerald-400/40 transition-all duration-500 cursor-default active:scale-[0.98]">
+          <div className="reveal d2 group relative overflow-hidden rounded-3xl border border-emerald-500/25 bg-gradient-to-br from-emerald-600/15 to-slate-900/40 backdrop-blur-sm p-10 hover:scale-[1.02] hover:shadow-2xl hover:shadow-emerald-500/20 hover:border-emerald-400/40 transition-all duration-500 cursor-pointer active:scale-[0.98] touch-emerald">
             <div className="absolute -top-12 -right-12 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl group-hover:opacity-80 transition-opacity" />
             <div className="relative">
               <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/50 group-hover:scale-110 transition-transform duration-300">

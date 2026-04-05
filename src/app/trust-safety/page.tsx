@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 const pipeline = [
   { label: 'CREATED',      desc: 'Trip or delivery posted',               color: 'from-slate-500 to-slate-400' },
@@ -87,6 +88,7 @@ const prohibited = [
 ];
 
 export default function TrustSafetyPage() {
+  useScrollReveal();
   const [scrollY, setScrollY] = useState(0);
   useEffect(() => {
     const h = () => setScrollY(window.scrollY);
@@ -151,7 +153,7 @@ export default function TrustSafetyPage() {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {pipeline.map((step, i) => (
-              <div key={step.label} className="group relative rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-5 text-center hover:scale-[1.06] active:scale-[0.97] transition-all duration-300 hover:shadow-2xl cursor-pointer overflow-hidden">
+              <div key={step.label} className={`reveal d${Math.min(i+1,5)} group relative rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-5 text-center hover:scale-[1.06] active:scale-[0.97] transition-all duration-300 hover:shadow-2xl cursor-pointer overflow-hidden touch-violet`}>
                 {/* Colour glow on hover */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${step.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-2xl`} />
                 {/* Top edge light bar */}
@@ -182,8 +184,8 @@ export default function TrustSafetyPage() {
             Four layers of protection
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
-            {pillars.map(({ icon: Icon, title, gradient, glow, hover, points }) => (
-              <div key={title} className={`group relative overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-8 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl ${hover} cursor-pointer`}>
+            {pillars.map(({ icon: Icon, title, gradient, glow, hover, points }, i) => (
+              <div key={title} className={`reveal d${i+1} group relative overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-8 transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] hover:shadow-2xl ${hover} cursor-pointer touch-violet`}>
                 <div className={`absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-10 rounded-full blur-2xl transition-opacity duration-500`} />
                 <div className="relative">
                   <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} mb-5 shadow-lg ${glow} group-hover:scale-110 transition-transform duration-300`}>
