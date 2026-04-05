@@ -5,6 +5,7 @@ import { Package, Plane, Shield, CreditCard, MessageCircle, UserCheck, Clock, Al
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import FaqAccordion from './FaqAccordion';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 const faqs = [
   {
@@ -151,7 +152,32 @@ const borderMap: Record<string, string> = {
   amber:  'hover:border-amber-500/50 hover:shadow-amber-500/20',
 };
 
+const touchMap: Record<string, string> = {
+  blue:   'touch-blue',
+  emerald:'touch-emerald',
+  violet: 'touch-violet',
+  red:    'touch-red',
+  amber:  'touch-amber',
+};
+
+const hoverTitleMap: Record<string, string> = {
+  blue:   'group-hover:text-cyan-400',
+  emerald:'group-hover:text-emerald-400',
+  violet: 'group-hover:text-violet-400',
+  red:    'group-hover:text-red-400',
+  amber:  'group-hover:text-amber-400',
+};
+
+const glowColorMap: Record<string, string> = {
+  blue:   'bg-blue-500/20',
+  emerald:'bg-emerald-500/20',
+  violet: 'bg-violet-500/20',
+  red:    'bg-red-500/20',
+  amber:  'bg-amber-500/20',
+};
+
 export default function HelpPageClient() {
+  useScrollReveal();
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden">
       <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
@@ -200,17 +226,18 @@ export default function HelpPageClient() {
       </div>
 
       <main className="relative z-10 max-w-3xl mx-auto px-6 pb-24">
-        {faqs.map((section) => {
+        {faqs.map((section, idx) => {
           const Icon = section.icon;
           return (
-            <div key={section.category} className="mb-10">
+            <div key={section.category} className={`reveal d${Math.min(idx + 1, 5)} mb-10 group`}>
               <div className="flex items-center gap-3 mb-5">
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${glowMap[section.color]} flex items-center justify-center shadow-lg`}>
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${glowMap[section.color]} flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110`}>
                   <Icon className="h-5 w-5 text-white" />
                 </div>
-                <h2 className="text-lg font-black text-white">{section.category}</h2>
+                <h2 className={`text-lg font-black text-white transition-colors duration-300 ${hoverTitleMap[section.color]}`}>{section.category}</h2>
               </div>
-              <div className={`rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm px-6 transition-all duration-500 hover:border-slate-600/70 hover:shadow-xl ${borderMap[section.color]}`}>
+              <div className={`relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm px-6 transition-all duration-300 hover:border-slate-600/70 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.99] cursor-pointer ${borderMap[section.color]} ${touchMap[section.color]}`}>
+                <div className={`pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 ${glowColorMap[section.color]} rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                 {section.items.map((item) => (
                   <FaqAccordion key={item.q} q={item.q} a={item.a} />
                 ))}

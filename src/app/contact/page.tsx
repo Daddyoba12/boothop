@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Mail, MessageCircle, Clock, CheckCircle, AlertCircle, ArrowRight, Sparkles, Shield } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 const topics = [
   'General enquiry',
@@ -17,6 +18,7 @@ const topics = [
 ];
 
 export default function ContactPage() {
+  useScrollReveal();
   const [form, setForm] = useState({ name: '', email: '', topic: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
@@ -103,13 +105,14 @@ export default function ContactPage() {
         {/* INFO SIDEBAR */}
         <div className="md:col-span-2 space-y-5">
 
-          <div className="group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:border-blue-500/50 hover:scale-105 transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/10">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="reveal d1 group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:border-blue-500/50 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/15 active:scale-[0.98] cursor-pointer touch-blue">
+            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-blue-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/50">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/50 transition-transform duration-300 group-hover:scale-110">
                 <Mail className="h-4 w-4 text-white" />
               </div>
-              <h3 className="font-bold text-white">Email Support</h3>
+              <h3 className="font-bold text-white group-hover:text-cyan-400 transition-colors duration-300">Email Support</h3>
             </div>
             <p className="relative text-sm text-slate-400 leading-relaxed">
               Reach us directly at{' '}
@@ -119,13 +122,14 @@ export default function ContactPage() {
             </p>
           </div>
 
-          <div className="group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:border-emerald-500/50 hover:scale-105 transition-all duration-500 hover:shadow-xl hover:shadow-emerald-500/10">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="reveal d2 group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:border-emerald-500/50 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/15 active:scale-[0.98] cursor-pointer touch-emerald">
+            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/50">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/50 transition-transform duration-300 group-hover:scale-110">
                 <Clock className="h-4 w-4 text-white" />
               </div>
-              <h3 className="font-bold text-white">Response Times</h3>
+              <h3 className="font-bold text-white group-hover:text-emerald-400 transition-colors duration-300">Response Times</h3>
             </div>
             <ul className="relative space-y-2 text-sm text-slate-400">
               <li className="flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />General queries: within 24 hrs</li>
@@ -134,14 +138,15 @@ export default function ContactPage() {
             </ul>
           </div>
 
-          <div className="group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:border-purple-500/50 hover:scale-105 transition-all duration-500 hover:shadow-xl hover:shadow-purple-500/10">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="reveal d3 group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:border-violet-500/50 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-violet-500/15 active:scale-[0.98] cursor-pointer touch-violet">
+            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-violet-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-400 flex items-center justify-center shadow-lg shadow-purple-500/50">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-400 flex items-center justify-center shadow-lg shadow-purple-500/50 transition-transform duration-300 group-hover:scale-110">
                   <Clock className="h-4 w-4 text-white" />
                 </div>
-                <h3 className="font-bold text-white">Support Hours</h3>
+                <h3 className="font-bold text-white group-hover:text-violet-400 transition-colors duration-300">Support Hours</h3>
               </div>
               <p className="text-sm text-slate-400">Monday – Friday: 9am – 6pm GMT</p>
               <p className="text-sm text-slate-400 mt-1">Weekend: Limited support</p>
@@ -149,12 +154,13 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="group relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-900/10 backdrop-blur-sm p-6 hover:scale-105 transition-all duration-500">
+          <div className="reveal d4 group relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-900/10 backdrop-blur-sm p-6 hover:border-amber-500/60 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/15 active:scale-[0.98] cursor-pointer touch-amber">
+            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-amber-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-400 flex items-center justify-center shadow-lg">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-400 flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110">
                 <Shield className="h-4 w-4 text-white" />
               </div>
-              <h3 className="font-bold text-white">Before you contact us</h3>
+              <h3 className="font-bold text-white group-hover:text-amber-400 transition-colors duration-300">Before you contact us</h3>
             </div>
             <p className="text-sm text-amber-200/80 leading-relaxed">
               Many questions are answered in our{' '}
