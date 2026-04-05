@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Check, CheckCircle, Shield, Package, DollarSign, Sparkles, ArrowRight, Lock, Zap, ChevronDown } from 'lucide-react';
+import { Check, CheckCircle, Shield, Package, DollarSign, Sparkles, ArrowRight, Lock, Zap, ChevronDown, X, Calendar, Tag } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
@@ -236,17 +236,18 @@ export default function PricingPage() {
       {/* TRUST LINK */}
       <section className="relative py-8 px-6">
         <div className="max-w-4xl mx-auto">
-          <Link href="/trust-safety" className="group flex items-center justify-between rounded-2xl border border-white/8 bg-white/3 px-6 py-5 transition-all duration-200 hover:border-white/20 hover:bg-white/5">
-            <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
+          <Link href="/trust-safety" className="reveal group relative overflow-hidden flex items-center justify-between rounded-2xl border border-amber-500/20 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm px-6 py-5 transition-all duration-300 hover:border-amber-500/40 hover:shadow-xl hover:shadow-amber-500/10 hover:scale-[1.015] active:scale-[0.98] touch-amber">
+            <div className="pointer-events-none absolute -top-6 -right-6 w-24 h-24 bg-amber-500/15 rounded-full blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative flex items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-yellow-400 text-white shadow-lg shadow-amber-500/40 group-hover:scale-110 transition-transform duration-300">
                 <Lock className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white">ID verified · Escrow payments · 8-stage pipeline</p>
+                <p className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors duration-300">ID verified · Escrow payments · 8-stage pipeline</p>
                 <p className="mt-0.5 text-xs text-white/40">See how every payment is protected →</p>
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 shrink-0 text-white/25 transition-transform group-hover:translate-x-1 group-hover:text-amber-400" />
+            <ArrowRight className="relative h-4 w-4 shrink-0 text-white/25 transition-transform group-hover:translate-x-1 group-hover:text-amber-400" />
           </Link>
         </div>
       </section>
@@ -262,17 +263,21 @@ export default function PricingPage() {
               </div>
               <h2 className="text-4xl font-black text-white mb-3">No Hidden Fees</h2>
               <p className="text-slate-400 text-lg mb-10 max-w-lg mx-auto">What you see is what you pay. No surprises, no additional charges.</p>
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-3 gap-5 mt-2">
                 {[
-                  { icon: '❌', title: 'No Listing Fees', desc: 'Post journeys or requests for free', touch: 'touch-blue', border: 'hover:border-blue-500/40 hover:shadow-blue-500/15' },
-                  { icon: '❌', title: 'No Monthly Fees', desc: 'Pay only when you transact', touch: 'touch-emerald', border: 'hover:border-emerald-500/40 hover:shadow-emerald-500/15' },
-                  { icon: '❌', title: 'No Cancellation Fees', desc: 'Cancel anytime before acceptance', touch: 'touch-violet', border: 'hover:border-violet-500/40 hover:shadow-violet-500/15' },
+                  { Icon: Tag,      title: 'No Listing Fees',      desc: 'Post journeys or requests for free',   grad: 'from-blue-500 to-cyan-400',    shadow: 'shadow-blue-500/50',   glow: 'bg-blue-500/15',   border: 'border-blue-500/25 hover:border-blue-400/40 hover:shadow-blue-500/20',   touch: 'touch-blue',   hoverTitle: 'group-hover:text-cyan-400' },
+                  { Icon: Calendar, title: 'No Monthly Fees',       desc: 'Pay only when you transact',           grad: 'from-emerald-500 to-teal-400', shadow: 'shadow-emerald-500/50', glow: 'bg-emerald-500/15', border: 'border-emerald-500/25 hover:border-emerald-400/40 hover:shadow-emerald-500/20', touch: 'touch-emerald', hoverTitle: 'group-hover:text-emerald-400' },
+                  { Icon: X,        title: 'No Cancellation Fees',  desc: 'Cancel anytime before acceptance',     grad: 'from-violet-500 to-purple-400', shadow: 'shadow-violet-500/50', glow: 'bg-violet-500/15',  border: 'border-violet-500/25 hover:border-violet-400/40 hover:shadow-violet-500/20',  touch: 'touch-violet', hoverTitle: 'group-hover:text-violet-400' },
                 ].map((item, i) => (
-                  <div key={item.title} className={`reveal d${i+1} group relative overflow-hidden bg-gradient-to-br from-slate-800/30 to-slate-900/30 rounded-2xl p-5 border border-white/8 ${item.border} hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 active:scale-[0.98] cursor-pointer ${item.touch}`}>
-                    <div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 w-16 h-16 bg-white/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="text-2xl mb-2 group-hover:scale-110 transition-transform duration-300 inline-block">{item.icon}</div>
-                    <p className="font-bold text-white mb-1 text-sm group-hover:text-cyan-400 transition-colors duration-300">{item.title}</p>
-                    <p className="text-xs text-slate-500">{item.desc}</p>
+                  <div key={item.title} className={`reveal d${i+1} group relative overflow-hidden rounded-3xl border ${item.border} bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-8 hover:scale-[1.03] hover:shadow-2xl transition-all duration-500 cursor-pointer active:scale-[0.98] ${item.touch}`}>
+                    <div className={`absolute -top-8 -right-8 w-32 h-32 ${item.glow} rounded-full blur-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+                    <div className="relative">
+                      <div className={`w-12 h-12 bg-gradient-to-br ${item.grad} rounded-2xl flex items-center justify-center mb-5 shadow-lg ${item.shadow} group-hover:scale-110 transition-transform duration-300`}>
+                        <item.Icon className="h-5 w-5 text-white" />
+                      </div>
+                      <p className={`font-black text-base text-white mb-1.5 transition-colors duration-300 ${item.hoverTitle}`}>{item.title}</p>
+                      <p className="text-sm text-slate-400 leading-relaxed">{item.desc}</p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -292,15 +297,22 @@ export default function PricingPage() {
             {faqData.map((item, i) => (
               <div
                 key={i}
-                className={`reveal d${Math.min(i + 1, 5)} overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer ${openFaq === i ? 'border-cyan-500/30 bg-cyan-500/5' : 'border-white/8 bg-white/3 hover:bg-white/5 hover:border-white/15 hover:-translate-y-0.5'}`}
+                className={`reveal d${Math.min(i + 1, 5)} group relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer active:scale-[0.99] touch-blue
+                  ${openFaq === i
+                    ? 'border-cyan-500/30 bg-gradient-to-br from-cyan-500/8 to-slate-900/40 shadow-xl shadow-cyan-500/10'
+                    : 'border-white/8 bg-gradient-to-br from-slate-800/30 to-slate-900/30 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-0.5'}`}
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
               >
-                <div className="flex items-center justify-between px-6 py-5">
-                  <h3 className={`font-bold text-sm md:text-base transition-colors duration-300 ${openFaq === i ? 'text-cyan-400' : 'text-white'}`}>{item.q}</h3>
-                  <ChevronDown className={`h-5 w-5 flex-shrink-0 ml-4 text-slate-500 transition-transform duration-300 ${openFaq === i ? 'rotate-180 text-cyan-400' : ''}`} />
+                <div className="pointer-events-none absolute -top-6 -right-6 w-20 h-20 bg-blue-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative flex items-center justify-between px-6 py-5">
+                  <h3 className={`font-bold text-sm md:text-base transition-colors duration-300 ${openFaq === i ? 'text-cyan-400' : 'text-white group-hover:text-cyan-400'}`}>{item.q}</h3>
+                  <div className={`flex h-7 w-7 shrink-0 ml-4 items-center justify-center rounded-xl transition-all duration-300 group-hover:scale-110
+                    ${openFaq === i ? 'bg-cyan-500/20 text-cyan-400' : 'bg-white/5 text-slate-500 group-hover:bg-blue-500/20 group-hover:text-blue-400'}`}>
+                    <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${openFaq === i ? 'rotate-180' : ''}`} />
+                  </div>
                 </div>
                 {openFaq === i && (
-                  <div className="px-6 pb-5">
+                  <div className="relative px-6 pb-5">
                     <p className="text-slate-400 text-sm leading-relaxed">{item.a}</p>
                   </div>
                 )}
