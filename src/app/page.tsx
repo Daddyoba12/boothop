@@ -539,13 +539,19 @@ function HomePageContent() {
       )}
 
       {/* ── STATS ── */}
-      <section className="border-y border-white/6 bg-white/3 py-10">
+      <section className="py-14 md:py-20">
         <div className="mx-auto max-w-5xl px-6 md:px-8">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4 md:gap-0 md:divide-x md:divide-white/8">
-            {stats.map((stat) => (
-              <div key={stat.label} className="px-6 text-center">
-                <div className="mb-1 text-3xl font-bold text-white md:text-4xl">{stat.value}</div>
-                <div className="text-sm text-white/45">{stat.label}</div>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {stats.map((stat, i) => (
+              <div key={stat.label} className={`reveal d${i+1} group relative overflow-hidden rounded-2xl border border-white/8 bg-white/3 p-6 text-center transition-all duration-300 hover:border-blue-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10 active:scale-[0.97] cursor-default touch-blue`}>
+                {/* glow blob */}
+                <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-blue-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative">
+                  <div className="mb-1 text-3xl font-black bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent md:text-4xl group-hover:from-cyan-300 group-hover:to-blue-400 transition-all duration-300">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs font-medium text-white/45 group-hover:text-white/70 transition-colors duration-300">{stat.label}</div>
+                </div>
               </div>
             ))}
           </div>
