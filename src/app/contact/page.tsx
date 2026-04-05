@@ -68,7 +68,7 @@ export default function ContactPage() {
           className="absolute inset-0"
           style={{
             backgroundImage: 'url(/images/betterPics.jpg)',
-            backgroundAttachment: 'fixed',
+            backgroundAttachment: 'scroll',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}

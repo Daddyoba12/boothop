@@ -141,7 +141,7 @@ export default function PricingPage() {
                 <span className="text-xs font-bold uppercase tracking-widest text-blue-400">For Hoopers · Senders</span>
               </div>
               <div className="flex items-end gap-2 mb-2">
-                <span className="text-7xl font-black bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">+3%</span>
+                <span className="text-5xl sm:text-7xl font-black bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">+3%</span>
               </div>
               <p className="text-slate-400 mb-8 text-sm">Service fee on top of the agreed price</p>
 
@@ -188,7 +188,7 @@ export default function PricingPage() {
                 <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">For Booters · Travellers</span>
               </div>
               <div className="flex items-end gap-2 mb-2">
-                <span className="text-7xl font-black bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">−5%</span>
+                <span className="text-5xl sm:text-7xl font-black bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">−5%</span>
               </div>
               <p className="text-slate-400 mb-8 text-sm">Deducted from the agreed price on payout</p>
 

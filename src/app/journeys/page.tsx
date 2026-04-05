@@ -162,11 +162,11 @@ export default function LiveJourneysPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden flex flex-col">
 
-      {/* AMBIENT BLOBS */}
-      <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
-        <div className="absolute top-0 -left-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'4s'}} />
-        <div className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'6s',animationDelay:'2s'}} />
-        <div className="absolute bottom-40 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s',animationDelay:'1s'}} />
+      {/* AMBIENT BLOBS — hidden on mobile to preserve performance */}
+      <div className="hidden sm:block fixed inset-0 opacity-20 pointer-events-none z-0">
+        <div className="absolute top-0 -left-4 w-72 h-72 md:w-96 md:h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'4s'}} />
+        <div className="absolute top-0 -right-4 w-72 h-72 md:w-96 md:h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'6s',animationDelay:'2s'}} />
+        <div className="hidden md:block absolute bottom-40 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s',animationDelay:'1s'}} />
       </div>
 
       <NavBar />
@@ -201,7 +201,7 @@ export default function LiveJourneysPage() {
           className="absolute inset-0"
           style={{
             backgroundImage: 'url(/images/GoingonHols1.jpg)',
-            backgroundAttachment: 'fixed',
+            backgroundAttachment: 'scroll',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
@@ -210,7 +210,7 @@ export default function LiveJourneysPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-blue-950/10 via-transparent to-slate-950/10" />
 
         <div className="relative z-10 pt-28 pb-16 px-6 w-full max-w-3xl mx-auto">
-          <h1 className="text-6xl md:text-8xl font-black mb-4 leading-tight drop-shadow-2xl">
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-black mb-4 leading-tight drop-shadow-2xl">
             Live{' '}
             <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
               Journeys
@@ -244,7 +244,7 @@ export default function LiveJourneysPage() {
       {/* FILTER STRIP — premium animated underline fields */}
       <div className="relative z-10 bg-slate-950/60 backdrop-blur-xl border-b border-white/6">
         <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex flex-wrap items-end gap-8 md:gap-12">
+          <div className="flex flex-wrap items-end gap-4 md:gap-10">
             <Field id="from" label="From">
               <input
                 type="text"

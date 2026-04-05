@@ -180,7 +180,7 @@ export default function HowItWorksPage() {
               <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-900/50 to-slate-950/30" />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 p-6 md:p-12 relative z-10">
+            <div className="grid md:grid-cols-2 gap-4 md:gap-8 p-6 md:p-12 relative z-10">
               <div className="flex flex-col justify-center">
                 <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-2 mb-6 w-fit">
                   <TrendingUp className="w-4 h-4 text-blue-400" />
@@ -206,7 +206,7 @@ export default function HowItWorksPage() {
                   <div className="text-slate-400 text-sm mb-2 flex items-center gap-2">
                     <Sparkles className="w-4 h-4" /> POTENTIAL EARNINGS
                   </div>
-                  <div className="text-5xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-4">£85–£320</div>
+                  <div className="text-3xl sm:text-5xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-4">£85–£320</div>
                   <p className="text-slate-400 text-sm">Per trip • Instant payout</p>
                   <div className="mt-6 pt-6 border-t border-slate-700/50 grid grid-cols-3 gap-4">
                     <div><div className="text-2xl font-bold text-white">10K+</div><div className="text-xs text-slate-400">Active Users</div></div>
