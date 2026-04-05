@@ -10,7 +10,18 @@ export async function POST(request: Request) {
   const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+  console.log('[create-checkout] env check:', {
+    hasStripe: !!STRIPE_SECRET_KEY,
+    hasSupabaseUrl: !!SUPABASE_URL,
+    hasServiceKey: !!SUPABASE_SERVICE_KEY,
+  });
+
   if (!STRIPE_SECRET_KEY || !SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+    console.error('[create-checkout] MISSING ENV VARS:', {
+      STRIPE_SECRET_KEY: STRIPE_SECRET_KEY ? 'SET' : 'MISSING',
+      NEXT_PUBLIC_SUPABASE_URL: SUPABASE_URL ? 'SET' : 'MISSING',
+      SUPABASE_SERVICE_ROLE_KEY: SUPABASE_SERVICE_KEY ? 'SET' : 'MISSING',
+    });
     return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
   }
 
