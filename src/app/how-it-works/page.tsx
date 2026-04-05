@@ -83,7 +83,9 @@ export default function HowItWorksPage() {
               <img
                 src="/images/Delivery.jpg"
                 alt="Delivery"
-                className="w-full h-full object-cover"
+                loading="eager"
+                fetchPriority="high"
+                className="w-full h-full object-cover object-[20%_center]"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-900/50 to-slate-950/30"></div>
             </div>
