@@ -38,7 +38,9 @@ export async function POST(request: Request) {
 
     const code = generateVerificationCode();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-    const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
+    // Always derive origin from the live request so the link works in production
+    // even if NEXT_PUBLIC_APP_URL is set to localhost in env vars.
+    const origin = new URL(request.url).origin;
     const verifyUrl = `${origin}/verify?email=${encodeURIComponent(email)}&code=${encodeURIComponent(code)}`;
 
     const { error: insertError } = await supabase.from('email_login_codes').insert({

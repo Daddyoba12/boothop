@@ -90,12 +90,28 @@ export async function POST(request: Request) {
       }
     }
 
+    // Decide where to send the user after login:
+    // - Has a draft from this login flow → dashboard (will auto-show draft tab)
+    // - Has existing trips → dashboard
+    // - Brand new user with no trips → intent page to create their first journey
+    let redirectTo = '/dashboard';
+    if (!hasDraft) {
+      const { count: tripCount } = await supabase
+        .from('trips')
+        .select('id', { count: 'exact', head: true })
+        .eq('email', email)
+        .limit(1);
+      if ((tripCount ?? 0) === 0) {
+        redirectTo = '/intent';
+      }
+    }
+
     return NextResponse.json({
       ok: true,
       email,
       hasDraft,
       journeyPayload: record.journey_payload,
-      redirectTo: '/dashboard',
+      redirectTo,
     });
   } catch (error) {
     console.error('verify-code error', error);
