@@ -60,8 +60,8 @@ export async function POST(request: Request) {
         const p = record.journey_payload as any;
         const priceNum = parseFloat(String(p.price || '0').replace(/[^0-9.]/g, '')) || null;
 
-        // Keep journey_drafts for match-engine reference
-        await supabase.from('journey_drafts').insert({
+        // Keep journey_drafts for match-engine reference (best-effort)
+        supabase.from('journey_drafts').insert({
           email,
           user_id:       userId,
           type:          p.mode || 'send',
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
           interested_in: p.interestedIn || null,
           status:        'draft',
           expires_at:    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        }).then(() => {}).catch(() => {}); // best-effort
+        }).then();
 
         // Publish the trip as a live listing so it appears on /journeys
         const { error: tripErr } = await supabase.from('trips').insert({
