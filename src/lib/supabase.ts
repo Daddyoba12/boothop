@@ -1,12 +1,18 @@
 import { createBrowserClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 
-// Client-side Supabase client (for use in components)
+// Singleton browser client — one instance per tab prevents the
+// "Multiple GoTrueClient instances" warning and avoids auth state conflicts
+let browserClient: ReturnType<typeof createBrowserClient> | null = null;
+
 export function createSupabaseClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  if (!browserClient) {
+    browserClient = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+  }
+  return browserClient;
 }
 
 // Server-side Supabase client (for API routes)

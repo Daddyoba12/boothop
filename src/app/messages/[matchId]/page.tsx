@@ -45,7 +45,7 @@ export default function ChatPage({ params }: { params: { matchId: string } }) {
           table: 'messages',
           filter: `match_id=eq.${params.matchId}`,
         },
-        (payload) => {
+        (_payload: any) => {
           fetchMessages();
         }
       )

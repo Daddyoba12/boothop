@@ -114,18 +114,18 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
       setVideoKycRecords(vkycData || []);
 
       // Calculate advanced stats
-      const verifiedCount = usersData?.filter(u => u.verified).length || 0;
-      const activeCount = matchesData?.filter(m => m.status === 'accepted' || m.status === 'in_transit').length || 0;
-      const completedCount = matchesData?.filter(m => m.status === 'completed').length || 0;
-      const escrowSum = escrowData?.reduce((sum, m) => sum + Number(m.agreed_price || 0), 0) || 0;
-      
-      const releasedData = matchesData?.filter(m => m.payment_status === 'released');
-      const releasedSum = releasedData?.reduce((sum, m) => sum + Number(m.agreed_price || 0), 0) || 0;
-      
+      const verifiedCount = usersData?.filter((u: any) => u.verified).length || 0;
+      const activeCount = matchesData?.filter((m: any) => m.status === 'accepted' || m.status === 'in_transit').length || 0;
+      const completedCount = matchesData?.filter((m: any) => m.status === 'completed').length || 0;
+      const escrowSum = escrowData?.reduce((sum: number, m: any) => sum + Number(m.agreed_price || 0), 0) || 0;
+
+      const releasedData = matchesData?.filter((m: any) => m.payment_status === 'released');
+      const releasedSum = releasedData?.reduce((sum: number, m: any) => sum + Number(m.agreed_price || 0), 0) || 0;
+
       // Calculate platform revenue (fees from completed matches)
       const revenue = matchesData
-        ?.filter(m => m.status === 'completed')
-        .reduce((sum, m) => {
+        ?.filter((m: any) => m.status === 'completed')
+        .reduce((sum: number, m: any) => {
           const hooperFee = Number(m.hooper_pays || 0) - Number(m.agreed_price || 0);
           const booterFee = Number(m.agreed_price || 0) - Number(m.booter_receives || 0);
           return sum + hooperFee + booterFee;

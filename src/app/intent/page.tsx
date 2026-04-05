@@ -15,7 +15,7 @@ export default function IntentPage() {
   const [hover, setHover]     = useState<'send' | 'travel' | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(({ data: { user } }: { data: { user: any } }) => {
       if (!user) { router.replace('/login'); return; }
       setEmail(user.email ?? '');
       setLoading(false);

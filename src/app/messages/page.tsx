@@ -68,7 +68,7 @@ export default function MessagesPage() {
 
       // For each match, get the last message and other user info
       const conversationsData = await Promise.all(
-        matches.map(async (match) => {
+        matches.map(async (match: any) => {
           const otherUserId = match.booter_id === user.id ? match.hooper_id : match.booter_id;
 
           // Get other user profile

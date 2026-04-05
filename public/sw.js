@@ -76,9 +76,10 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((res) => {
-        // Cache successful page responses so they work offline
+        // Clone BEFORE the body is consumed by the browser
         if (res.ok && res.status < 300) {
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, res.clone()));
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
         return res;
       })
