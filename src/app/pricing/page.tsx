@@ -56,7 +56,7 @@ export default function PricingPage() {
             <h2 className="text-2xl font-black text-white">How we compare — London to Lagos, 2kg</h2>
             <p className="mt-2 text-sm text-slate-400">Indicative prices. Courier rates vary by size, weight, and season.</p>
           </div>
-          <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/3">
+          <div className="reveal overflow-hidden rounded-3xl border border-white/10 bg-white/3">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/8 bg-white/5">
@@ -203,7 +203,7 @@ export default function PricingPage() {
             </div>
             <h2 className="text-4xl font-black text-white">At a glance</h2>
           </div>
-          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm">
+          <div className="reveal relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/10">
@@ -254,7 +254,7 @@ export default function PricingPage() {
       {/* NO HIDDEN FEES */}
       <section className="relative py-16 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-600/10 to-slate-900/40 backdrop-blur-sm p-12 text-center">
+          <div className="reveal relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-600/10 to-slate-900/40 backdrop-blur-sm p-12 text-center">
             <div className="absolute -top-10 -right-10 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
             <div className="relative">
               <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/50">
@@ -264,13 +264,14 @@ export default function PricingPage() {
               <p className="text-slate-400 text-lg mb-10 max-w-lg mx-auto">What you see is what you pay. No surprises, no additional charges.</p>
               <div className="grid md:grid-cols-3 gap-4">
                 {[
-                  { icon: '❌', title: 'No Listing Fees', desc: 'Post journeys or requests for free' },
-                  { icon: '❌', title: 'No Monthly Fees', desc: 'Pay only when you transact' },
-                  { icon: '❌', title: 'No Cancellation Fees', desc: 'Cancel anytime before acceptance' },
-                ].map((item) => (
-                  <div key={item.title} className="bg-white/5 rounded-2xl p-5 border border-white/8 hover:bg-white/8 hover:scale-105 transition-all duration-300 active:scale-[0.98]">
-                    <div className="text-2xl mb-2">{item.icon}</div>
-                    <p className="font-bold text-white mb-1 text-sm">{item.title}</p>
+                  { icon: '❌', title: 'No Listing Fees', desc: 'Post journeys or requests for free', touch: 'touch-blue', border: 'hover:border-blue-500/40 hover:shadow-blue-500/15' },
+                  { icon: '❌', title: 'No Monthly Fees', desc: 'Pay only when you transact', touch: 'touch-emerald', border: 'hover:border-emerald-500/40 hover:shadow-emerald-500/15' },
+                  { icon: '❌', title: 'No Cancellation Fees', desc: 'Cancel anytime before acceptance', touch: 'touch-violet', border: 'hover:border-violet-500/40 hover:shadow-violet-500/15' },
+                ].map((item, i) => (
+                  <div key={item.title} className={`reveal d${i+1} group relative overflow-hidden bg-gradient-to-br from-slate-800/30 to-slate-900/30 rounded-2xl p-5 border border-white/8 ${item.border} hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 active:scale-[0.98] cursor-pointer ${item.touch}`}>
+                    <div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 w-16 h-16 bg-white/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="text-2xl mb-2 group-hover:scale-110 transition-transform duration-300 inline-block">{item.icon}</div>
+                    <p className="font-bold text-white mb-1 text-sm group-hover:text-cyan-400 transition-colors duration-300">{item.title}</p>
                     <p className="text-xs text-slate-500">{item.desc}</p>
                   </div>
                 ))}
@@ -291,7 +292,7 @@ export default function PricingPage() {
             {faqData.map((item, i) => (
               <div
                 key={i}
-                className={`overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer ${openFaq === i ? 'border-cyan-500/30 bg-cyan-500/5' : 'border-white/8 bg-white/3 hover:bg-white/5 hover:border-white/15'}`}
+                className={`reveal d${Math.min(i + 1, 5)} overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer ${openFaq === i ? 'border-cyan-500/30 bg-cyan-500/5' : 'border-white/8 bg-white/3 hover:bg-white/5 hover:border-white/15 hover:-translate-y-0.5'}`}
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
               >
                 <div className="flex items-center justify-between px-6 py-5">
