@@ -5,7 +5,6 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function sendVerificationEmail(params: {
   to: string;
   code: string;
-  verifyUrl: string;
 }) {
   const from = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 

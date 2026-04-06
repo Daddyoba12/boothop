@@ -38,14 +38,9 @@ export async function POST(request: Request) {
 
     const code = generateVerificationCode();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-    // Always derive origin from the live request so the link works in production
-    // even if NEXT_PUBLIC_APP_URL is set to localhost in env vars.
-    const origin = new URL(request.url).origin;
-    const verifyUrl = `${origin}/verify?email=${encodeURIComponent(email)}&code=${encodeURIComponent(code)}`;
 
     const { error: insertError } = await supabase.from('email_login_codes').insert({
       email,
-      code,
       code_hash: hashCode(code),
       expires_at: expiresAt,
       used: false,
@@ -57,7 +52,7 @@ export async function POST(request: Request) {
 
     if (insertError) throw insertError;
 
-    await sendVerificationEmail({ to: email, code, verifyUrl });
+    await sendVerificationEmail({ to: email, code });
 
     return NextResponse.json({
       ok: true,
