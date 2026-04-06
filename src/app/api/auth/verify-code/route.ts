@@ -123,7 +123,7 @@ export async function POST(request: Request) {
         .eq('email', email)
         .limit(1);
 
-      if ((tripCount ?? 0) === 0) redirectTo = '/intent';
+      if ((tripCount ?? 0) === 0) redirectTo = '/journeys';
     }
 
     const token = signAppSession({ email, verified: true });

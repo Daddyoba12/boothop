@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     const supabase = createSupabaseAdminClient();
     const { data } = await supabase
       .from('trips')
-      .select('id, type, from_city, to_city, travel_date, status, weight')
+      .select('id, type, from_city, to_city, travel_date, weight')
       .eq('email', email)
       .order('created_at', { ascending: false })
       .limit(5);
