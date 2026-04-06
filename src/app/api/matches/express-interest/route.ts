@@ -28,9 +28,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Trip not found.' }, { status: 404 });
     }
 
-    // Prevent self-interest
+    // Prevent self-interest — you can't be both Booter and Hooper on the same trip
     if (trip.email && normalizeEmail(trip.email) === email) {
-      return NextResponse.json({ error: 'You cannot express interest in your own listing.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'You cannot be both a Booter and a Hooper on the same trip. This is your own listing.' },
+        { status: 400 },
+      );
     }
 
     const finalOfferedPrice = offeredPrice ?? trip.price ?? 0;
