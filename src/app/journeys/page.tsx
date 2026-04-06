@@ -471,12 +471,35 @@ export default function LiveJourneysPage() {
             {/* ── STEP: initial ── */}
             {step === 'initial' && (
               <>
-                <p className="text-slate-300 text-sm font-semibold text-center mb-1">Interested in this journey?</p>
-                <p className="text-slate-500 text-xs text-center mb-6">
-                  {selectedTrip.type === 'travel'
-                    ? 'This traveller has space for your package.'
-                    : 'This sender is looking for a traveller on this route.'}
-                </p>
+                {/* Context-aware header */}
+                {selectedTrip.type === 'travel' ? (
+                  <>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-8 h-8 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                        <Plane className="h-4 w-4 text-blue-400" />
+                      </div>
+                      <p className="text-white font-black text-base">Booter has space on this route</p>
+                    </div>
+                    <p className="text-slate-400 text-xs leading-relaxed mb-5">
+                      This <span className="text-blue-300 font-semibold">Booter (Traveller)</span> is already flying this route and has luggage space available.
+                      Request them to carry your package — they earn, you save on shipping.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                        <Package className="h-4 w-4 text-emerald-400" />
+                      </div>
+                      <p className="text-white font-black text-base">Hooper needs a carrier</p>
+                    </div>
+                    <p className="text-slate-400 text-xs leading-relaxed mb-5">
+                      This <span className="text-emerald-300 font-semibold">Hooper (Sender)</span> has a package ready to go on this route.
+                      If you&apos;re travelling this way, carry it and earn from your spare luggage space.
+                    </p>
+                  </>
+                )}
+
                 <div className="flex gap-3">
                   {selectedTrip.price ? (
                     <>
@@ -490,7 +513,8 @@ export default function LiveJourneysPage() {
                         onClick={() => { setInterestType('full_price'); setStep('enter-email'); }}
                         className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
                       >
-                        <CheckCircle className="h-4 w-4" /> Yes, I&apos;m interested
+                        <CheckCircle className="h-4 w-4" />
+                        {selectedTrip.type === 'travel' ? 'Request Carry' : 'I\'ll Carry This'}
                       </button>
                     </>
                   ) : (
@@ -498,7 +522,8 @@ export default function LiveJourneysPage() {
                       onClick={() => { setInterestType('full_price'); setStep('enter-email'); }}
                       className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] transition-all"
                     >
-                      <CheckCircle className="h-4 w-4" /> Yes, I&apos;m interested
+                      <CheckCircle className="h-4 w-4" />
+                      {selectedTrip.type === 'travel' ? 'Request Carry' : 'I\'ll Carry This'}
                     </button>
                   )}
                 </div>
