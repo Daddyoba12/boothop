@@ -6,6 +6,7 @@ import {
   Search, Plane, Calendar, Package, ArrowRight, X, Filter,
   Sparkles, CheckCircle, Tag, ChevronLeft, Mail, Shield,
 } from 'lucide-react';
+import RoleToggle from '@/components/RoleToggle';
 import { createSupabaseClient } from '@/lib/supabase';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
@@ -362,16 +363,7 @@ export default function LiveJourneysPage() {
                   </div>
                   <div className="flex items-center gap-4 flex-shrink-0 sm:ml-auto">
                     {trip.type && (
-                      <span className={`relative text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full overflow-hidden ${trip.type === 'travel' ? 'bg-blue-500/12 text-blue-400 border border-blue-500/20' : 'bg-emerald-500/12 text-emerald-400 border border-emerald-500/20'}`}>
-                        {/* Default label — hidden on group hover */}
-                        <span className="block group-hover:hidden">
-                          {trip.type === 'travel' ? 'Traveller' : 'Sender'}
-                        </span>
-                        {/* Hover label */}
-                        <span className="hidden group-hover:block">
-                          {trip.type === 'travel' ? 'Booter' : 'Hooper'}
-                        </span>
-                      </span>
+                      <RoleToggle role={trip.type === 'travel' ? 'travel' : 'sender'} />
                     )}
                     {trip.price ? (
                       <div className="text-right">

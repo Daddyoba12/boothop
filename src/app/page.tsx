@@ -12,6 +12,7 @@ import {
 import { createClient } from '@supabase/supabase-js';
 import BootHopLogo from '@/components/BootHopLogo';
 import Footer from '@/components/Footer';
+import RoleToggle from '@/components/RoleToggle';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 const supabase = createClient(
@@ -611,7 +612,7 @@ function HomePageContent() {
               <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-400">
                 <Package className="h-6 w-6" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold text-white">For Senders</h3>
+              <h3 className="mb-2 text-xl font-semibold text-white">For <RoleToggle role="sender" variant="text" /></h3>
               <p className="mb-6 text-sm text-white/50">Send items with verified travellers at a fraction of courier costs.</p>
               <ul className="mb-8 space-y-3">
                 {['Cheaper than excess baggage fees', 'Faster than traditional shipping', 'Matched with real, verified travellers', 'Funds held securely in escrow'].map((point) => (
@@ -631,7 +632,7 @@ function HomePageContent() {
               <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-400">
                 <Plane className="h-6 w-6" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold text-white">For Travellers</h3>
+              <h3 className="mb-2 text-xl font-semibold text-white">For <RoleToggle role="travel" variant="text" /></h3>
               <p className="mb-6 text-sm text-white/50">Earn from unused luggage space on trips you&apos;re already taking.</p>
               <ul className="mb-8 space-y-3">
                 {['Earn from unused luggage space', 'Choose what you carry', 'Turn trips into extra income', 'Full identity protection'].map((point) => (
@@ -745,7 +746,9 @@ function HomePageContent() {
                 <div className="mb-4 flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15"><Plane className="h-4 w-4 text-blue-400" /></div>
                   <div>
-                    <h3 className="text-sm font-semibold text-white">Booters — Travellers</h3>
+                    <h3 className="text-sm font-semibold text-white">
+                      <RoleToggle role="travel" invert variant="text" /> — <RoleToggle role="travel" variant="text" className="opacity-60" />
+                    </h3>
                     <p className="text-xs text-white/35">People with space to carry items</p>
                   </div>
                   <span className="ml-auto rounded-full border border-blue-400/15 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-300">{booterTrips.length} active</span>
@@ -782,7 +785,9 @@ function HomePageContent() {
                 <div className="mb-4 flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15"><Package className="h-4 w-4 text-emerald-400" /></div>
                   <div>
-                    <h3 className="text-sm font-semibold text-white">Hoopers — Senders</h3>
+                    <h3 className="text-sm font-semibold text-white">
+                      <RoleToggle role="sender" invert variant="text" /> — <RoleToggle role="sender" variant="text" className="opacity-60" />
+                    </h3>
                     <p className="text-xs text-white/35">People who need items delivered</p>
                   </div>
                   <span className="ml-auto rounded-full border border-emerald-400/15 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300">{hooperTrips.length} active</span>

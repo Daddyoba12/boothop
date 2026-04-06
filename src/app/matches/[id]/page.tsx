@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
-import { 
-  ArrowLeft, Check, X, MapPin, Calendar, DollarSign, 
+import {
+  ArrowLeft, Check, X, MapPin, Calendar, DollarSign,
   User, Shield, AlertCircle, Loader2, Package, Clock,
   MessageSquare, CheckCircle, Sparkles, Star, Award
 } from 'lucide-react';
+import RoleToggle from '@/components/RoleToggle';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -404,8 +405,8 @@ export default function MatchDetailsPage() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                    Sender
-                    <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full">Hooper</span>
+                    <RoleToggle role="sender" variant="text" className="text-2xl font-bold text-white" />
+                    <RoleToggle role="sender" className="!text-purple-300 !bg-purple-500/20 !border-purple-500/30 hover:!bg-purple-500/30 hover:!text-purple-200" />
                   </h3>
                   <p className="text-white/60">Needs delivery</p>
                 </div>
@@ -471,8 +472,8 @@ export default function MatchDetailsPage() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                    Traveler
-                    <span className="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full">Booter</span>
+                    <RoleToggle role="travel" variant="text" className="text-2xl font-bold text-white" />
+                    <RoleToggle role="travel" />
                   </h3>
                   <p className="text-white/60">Can carry package</p>
                 </div>
@@ -621,13 +622,13 @@ export default function MatchDetailsPage() {
                 <div className="grid md:grid-cols-2 gap-6">
                   {/* Sender contact */}
                   <div className="p-6 bg-white/5 rounded-2xl border border-white/10 space-y-3">
-                    <p className="text-purple-300 font-semibold text-sm uppercase tracking-wider">Sender (Hooper)</p>
+                    <p className="text-purple-300 font-semibold text-sm uppercase tracking-wider"><RoleToggle role="sender" variant="text" /></p>
                     <p className="text-white font-bold text-xl">{(match.sender_profile as any)?.full_name || 'Unknown'}</p>
                     <p className="text-slate-300 text-sm">{(match.sender_profile as any)?.email || '—'}</p>
                   </div>
                   {/* Traveler contact */}
                   <div className="p-6 bg-white/5 rounded-2xl border border-white/10 space-y-3">
-                    <p className="text-blue-300 font-semibold text-sm uppercase tracking-wider">Traveler (Booter)</p>
+                    <p className="text-blue-300 font-semibold text-sm uppercase tracking-wider"><RoleToggle role="travel" variant="text" /></p>
                     <p className="text-white font-bold text-xl">{(match.traveler_profile as any)?.full_name || 'Unknown'}</p>
                     <p className="text-slate-300 text-sm">{(match.traveler_profile as any)?.email || '—'}</p>
                   </div>
@@ -686,7 +687,7 @@ export default function MatchDetailsPage() {
                         <Clock className="h-10 w-10 text-yellow-400 animate-pulse" />
                       )}
                       <div>
-                        <div className="font-bold text-white text-xl mb-1">Traveler (Booter) Confirmation</div>
+                        <div className="font-bold text-white text-xl mb-1"><RoleToggle role="travel" variant="text" /> Confirmation</div>
                         <div className="text-white/70">
                           {booterConfirmed 
                             ? `✅ Confirmed at ${new Date(match.booter_confirmed_at!).toLocaleString('en-US', {
@@ -728,7 +729,7 @@ export default function MatchDetailsPage() {
                         <Clock className="h-10 w-10 text-yellow-400 animate-pulse" />
                       )}
                       <div>
-                        <div className="font-bold text-white text-xl mb-1">Sender (Hooper) Confirmation</div>
+                        <div className="font-bold text-white text-xl mb-1"><RoleToggle role="sender" variant="text" /> Confirmation</div>
                         <div className="text-white/70">
                           {hooperConfirmed 
                             ? `✅ Confirmed at ${new Date(match.hooper_confirmed_at!).toLocaleString('en-US', {
