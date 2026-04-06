@@ -48,7 +48,12 @@
       "Bash(grep -roh \"/images/[^\"\"''''\\\\`> \\)]*\" C:/Users/babso/desktop/boothop/src --include=\"*.tsx\" --include=\"*.ts\")",
       "Bash(grep -rn \"BootHopLogo\\\\|boothop.*logo\\\\|logo.*boothop\" C:Usersbabsodesktopboothopsrc --include=*.tsx --include=*.ts)",
       "Bash(mkdir -p docs)",
-      "Bash(mv public/engine.html docs/engine.html)"
+      "Bash(mv public/engine.html docs/engine.html)",
+      "Bash(git -C \"C:/Users/babso/desktop/boothop\" commit --allow-empty -m \"chore: force redeploy\")",
+      "Bash(git -C \"C:/Users/babso/desktop/boothop\" push origin main)",
+      "Bash(git:*)",
+      "Bash(find /c/Users/babso/desktop/boothop -type f -name *match*)",
+      "Bash(grep -n \"Traveller\\\\|Sender\\\\|Hooper\\\\|Booter\" C:Usersbabsodesktopboothopsrcappdashboardpage.tsx C:Usersbabsodesktopboothopsrcappmatches[id]page.tsx C:Usersbabsodesktopboothopsrcappbooter-dashboardpage.tsx C:Usersbabsodesktopboothopsrcapppage.tsx)"
     ]
   }
 }
