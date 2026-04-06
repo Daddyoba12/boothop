@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
-import { createSupabaseClient } from '@/lib/supabaseClient';
 
 function VerifyContent() {
   const router = useRouter();
@@ -31,39 +30,34 @@ function VerifyContent() {
       setError(null);
       setMessage('Verifying your email...');
 
-      const res = await fetch('/api/auth/verify-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code }),
-      });
-
-      const data = await res.json();
-      console.log('VERIFY RESPONSE:', data);
-
-      setLoading(false);
-
-      if (!res.ok) {
-        setError(data.error || 'Verification failed.');
-        setMessage(null);
-        return;
-      }
-
-      setMessage('Email verified! Redirecting...');
-
       try {
-        const supabase = createSupabaseClient();
+        const res = await fetch('/api/auth/verify-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, code }),
+        });
 
-        // small delay to allow cookie to be set
-        await new Promise((res) => setTimeout(res, 100));
+        const data = await res.json();
+        setLoading(false);
 
-        // trigger session read (safe no-op if not used)
-        await supabase.auth.getSession();
-      } catch (e) {
-        console.warn('Session sync warning (non-blocking):', e);
+        if (!res.ok) {
+          setError(data.error || 'Verification failed.');
+          setMessage(null);
+          return;
+        }
+
+        setMessage('Email verified! Redirecting...');
+
+        // 🔥 FIX: FULL PAGE RELOAD TO APPLY SESSION COOKIE
+        const target = data.redirectTo || '/dashboard';
+        if (typeof window !== 'undefined') {
+          window.location.href = target;
+        }
+
+      } catch (err) {
+        setLoading(false);
+        setError('Something went wrong. Please try again.');
       }
-
-      // 🔥 CRITICAL FIX — full reload so server reads cookie
-      window.location.href = data.redirectTo || '/dashboard';
     }
 
     if (email && code) {
@@ -73,38 +67,35 @@ function VerifyContent() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     setLoading(true);
     setError(null);
     setMessage(null);
 
-    const res = await fetch('/api/auth/verify-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, code: code.toUpperCase() }),
-    });
-
-    const data = await res.json();
-    console.log('VERIFY RESPONSE:', data);
-
-    setLoading(false);
-
-    if (!res.ok) {
-      setError(data.error || 'Verification failed.');
-      return;
-    }
-
     try {
-      const supabase = createSupabaseClient();
+      const res = await fetch('/api/auth/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code: code.toUpperCase() }),
+      });
 
-      await new Promise((res) => setTimeout(res, 100));
-      await supabase.auth.getSession();
-    } catch (e) {
-      console.warn('Session sync warning (non-blocking):', e);
+      const data = await res.json();
+      setLoading(false);
+
+      if (!res.ok) {
+        setError(data.error || 'Verification failed.');
+        return;
+      }
+
+      // 🔥 FIX: FULL PAGE RELOAD TO APPLY SESSION COOKIE
+      const target = data.redirectTo || '/dashboard';
+      if (typeof window !== 'undefined') {
+        window.location.href = target;
+      }
+
+    } catch (err) {
+      setLoading(false);
+      setError('Something went wrong. Please try again.');
     }
-
-    // 🔥 CRITICAL FIX — full reload
-    window.location.href = data.redirectTo || '/dashboard';
   }
 
   return (
@@ -177,7 +168,8 @@ function VerifyContent() {
             >
               {loading ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" /> Verifying...
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Verifying...
                 </>
               ) : (
                 'Confirm and continue'
