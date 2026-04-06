@@ -90,6 +90,7 @@ export default function LiveJourneysPage() {
   const [otpCode, setOtpCode]           = useState('');
   const [busy, setBusy]                 = useState(false);
   const [fieldError, setFieldError]     = useState('');
+  const [blockingError, setBlockingError] = useState('');
 
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
@@ -145,6 +146,7 @@ export default function LiveJourneysPage() {
     setOtpCode('');
     setBusy(false);
     setFieldError('');
+    setBlockingError('');
     // Pre-fill email if logged in
     fetch('/api/auth/me').then(r => r.json()).then(me => {
       if (me.authenticated && me.user?.email) setEmail(me.user.email);
@@ -200,7 +202,15 @@ export default function LiveJourneysPage() {
         }),
       });
       const interestJson = await interestRes.json();
-      if (!interestRes.ok) throw new Error(interestJson.error || 'Could not submit. Please try again.');
+      if (!interestRes.ok) {
+        const msg = interestJson.error || 'Could not submit. Please try again.';
+        // Show blocking popup for role-conflict errors
+        if (msg.toLowerCase().includes('same person') || msg.toLowerCase().includes('booter and a hooper')) {
+          setBlockingError(msg);
+          return;
+        }
+        throw new Error(msg);
+      }
 
       setStep('confirmed');
     } catch (e: any) { setFieldError(e.message); }
@@ -383,6 +393,30 @@ export default function LiveJourneysPage() {
       </div>
 
       <Footer />
+
+      {/* ── BLOCKING ERROR POPUP ── */}
+      {blockingError && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-3xl border border-red-500/30 bg-slate-900 shadow-2xl shadow-red-500/20 p-8 text-center animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-red-500/15 border border-red-500/30 rounded-2xl flex items-center justify-center mx-auto mb-5">
+              <X className="h-8 w-8 text-red-400" />
+            </div>
+            <h3 className="text-white font-black text-xl mb-3">Action Not Allowed</h3>
+            <p className="text-slate-300 text-sm leading-relaxed mb-2">
+              The <span className="text-red-400 font-semibold">Sender</span> and <span className="text-blue-400 font-semibold">Traveller</span> on a BootHop match cannot be the same person.
+            </p>
+            <p className="text-slate-500 text-xs leading-relaxed mb-7">
+              You are trying to respond to a listing using the same email address as the person who posted it. Each match requires two different people — a <strong className="text-emerald-400">Hooper</strong> (sender) and a <strong className="text-blue-400">Booter</strong> (traveller).
+            </p>
+            <button
+              onClick={() => { setBlockingError(''); closeModal(); }}
+              className="w-full rounded-xl bg-gradient-to-r from-red-600 to-rose-500 py-3.5 text-sm font-bold text-white hover:shadow-lg hover:shadow-red-500/30 transition-all"
+            >
+              Got it — close
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ══════════════════════════════════════════════════════
           INTEREST / OFFER MODAL
