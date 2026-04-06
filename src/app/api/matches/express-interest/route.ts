@@ -38,14 +38,22 @@ export async function POST(request: Request) {
 
     const finalOfferedPrice = offeredPrice ?? trip.price ?? 0;
 
+    // Assign trip ID to the correct side based on trip type
+    // If the listed trip is a 'travel' trip → it's the traveler's trip
+    // If the listed trip is a 'send' trip   → it's the sender's trip
+    const sender_trip_id   = trip.type === 'send'   ? tripId : null;
+    const traveler_trip_id = trip.type === 'travel' ? tripId : null;
+
     // Upsert interest record into matches table
     const { error: matchErr } = await supabase.from('matches').insert({
-      trip_id:        tripId,
-      sender_email:   trip.type === 'travel' ? email      : (trip.email ?? null),
-      traveler_email: trip.type === 'travel' ? (trip.email ?? null) : email,
-      offered_price:  finalOfferedPrice,
-      interest_type:  interestType,
-      status:         'pending',
+      trip_id:          tripId,
+      sender_trip_id,
+      traveler_trip_id,
+      sender_email:     trip.type === 'travel' ? email           : (trip.email ?? null),
+      traveler_email:   trip.type === 'travel' ? (trip.email ?? null) : email,
+      offered_price:    finalOfferedPrice,
+      interest_type:    interestType,
+      status:           'pending',
     });
 
     if (matchErr) {
