@@ -53,7 +53,8 @@
       "Bash(git -C \"C:/Users/babso/desktop/boothop\" push origin main)",
       "Bash(git:*)",
       "Bash(find /c/Users/babso/desktop/boothop -type f -name *match*)",
-      "Bash(grep -n \"Traveller\\\\|Sender\\\\|Hooper\\\\|Booter\" C:Usersbabsodesktopboothopsrcappdashboardpage.tsx C:Usersbabsodesktopboothopsrcappmatches[id]page.tsx C:Usersbabsodesktopboothopsrcappbooter-dashboardpage.tsx C:Usersbabsodesktopboothopsrcapppage.tsx)"
+      "Bash(grep -n \"Traveller\\\\|Sender\\\\|Hooper\\\\|Booter\" C:Usersbabsodesktopboothopsrcappdashboardpage.tsx C:Usersbabsodesktopboothopsrcappmatches[id]page.tsx C:Usersbabsodesktopboothopsrcappbooter-dashboardpage.tsx C:Usersbabsodesktopboothopsrcapppage.tsx)",
+      "Bash(npx vercel:*)"
     ]
   }
 }

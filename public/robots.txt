@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-# Block private/auth routes from indexing
+# Private/authenticated routes — do not index
 Disallow: /dashboard
 Disallow: /dashboard/
 Disallow: /admin
@@ -16,5 +16,10 @@ Disallow: /api/
 Disallow: /confirm
 Disallow: /verify
 Disallow: /intent
+Disallow: /booter-dashboard
+Disallow: /hooper-dashboard
+Disallow: /requests/create
+Disallow: /journeys/create
 
-Sitemap: https://boothop.co.uk/sitemap.xml
+# Sitemap
+Sitemap: https://www.boothop.com/sitemap.xml
