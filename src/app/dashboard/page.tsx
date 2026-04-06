@@ -37,14 +37,19 @@ export default function DashboardPage() {
 
   const loadDashboard = async () => {
     try {
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      
-      if (!currentUser) {
+      // Use our custom cookie session (not Supabase Auth)
+      const meRes = await fetch('/api/auth/me');
+      if (!meRes.ok) {
         router.push('/login');
         return;
       }
-
-      setUser(currentUser);
+      const me = await meRes.json();
+      if (!me.authenticated || !me.user?.email) {
+        router.push('/login');
+        return;
+      }
+      const userEmail = me.user.email;
+      setUser({ email: userEmail });
 
       // Load matches where user is either sender or traveler
       const { data: matchesData } = await supabase
@@ -54,16 +59,16 @@ export default function DashboardPage() {
           sender_trip:sender_trip_id(from_city, to_city, travel_date, price),
           traveler_trip:traveler_trip_id(from_city, to_city, travel_date, price)
         `)
-        .or(`sender_trip_id.user_id.eq.${currentUser.id},traveler_trip_id.user_id.eq.${currentUser.id}`)
+        .eq('email', userEmail)
         .order('created_at', { ascending: false });
 
       setMatches(matchesData || []);
 
-      // Load user's trips
+      // Load user's trips by email
       const { data: tripsData } = await supabase
         .from('trips')
         .select('*')
-        .eq('user_id', currentUser.id)
+        .eq('email', userEmail)
         .order('created_at', { ascending: false });
 
       setTrips(tripsData || []);
@@ -200,7 +205,7 @@ export default function DashboardPage() {
             </div>
             <button
               onClick={async () => {
-                await supabase.auth.signOut();
+                await fetch('/api/auth/logout', { method: 'POST' });
                 router.push('/');
               }}
               className="text-white/80 hover:text-white text-sm transition-colors"

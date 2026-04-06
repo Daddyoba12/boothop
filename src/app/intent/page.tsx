@@ -15,15 +15,15 @@ export default function IntentPage() {
   const [hover, setHover]     = useState<'send' | 'travel' | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }: { data: { user: any } }) => {
-      if (!user) { router.replace('/login'); return; }
-      setEmail(user.email ?? '');
+    fetch('/api/auth/me').then(r => r.json()).then(me => {
+      if (!me.authenticated || !me.user?.email) { router.replace('/login'); return; }
+      setEmail(me.user.email);
       setLoading(false);
     });
-  }, [router, supabase.auth]);
+  }, [router]);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/');
   };
 
