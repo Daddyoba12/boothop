@@ -1,19 +1,21 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
 
 function VerifyContent() {
-  const router = useRouter(); // kept (not removed to respect your structure)
+  const router = useRouter(); // kept (structure preserved)
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const hasRunRef = useRef(false); // 🔥 PATCH: prevent duplicate autoVerify
 
   useEffect(() => {
     const queryEmail = searchParams.get('email') || '';
@@ -25,15 +27,69 @@ function VerifyContent() {
   useEffect(() => {
     async function autoVerify() {
       if (!email || !code) return;
+      if (hasRunRef.current) return; // 🔥 PATCH
+
+      hasRunRef.current = true; // 🔥 PATCH
 
       setLoading(true);
       setError(null);
       setMessage('Verifying your email...');
 
+      try {
+        const res = await fetch('/api/auth/verify-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, code }),
+        });
+
+        const data = await res.json();
+        console.log('VERIFY RESPONSE:', data);
+
+        setLoading(false);
+
+        if (!res.ok) {
+          setError(data.error || 'Verification failed.');
+          setMessage(null);
+          hasRunRef.current = false; // 🔥 PATCH: allow retry
+          return;
+        }
+
+        setMessage('Email verified! Redirecting...');
+
+        // allow cookie to settle
+        await new Promise((r) => setTimeout(r, 100));
+
+        const target = data?.redirectTo || '/dashboard';
+
+        // 🔥 FULL reload (CRITICAL FIX)
+        if (typeof window !== 'undefined') {
+          window.location.href = target;
+        }
+
+      } catch (err) {
+        setLoading(false);
+        setError('Something went wrong. Please try again.');
+        hasRunRef.current = false; // 🔥 PATCH
+      }
+    }
+
+    if (email && code) {
+      void autoVerify();
+    }
+  }, [email, code, router]);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setLoading(true);
+    setError(null);
+    setMessage(null);
+
+    try {
       const res = await fetch('/api/auth/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code }),
+        body: JSON.stringify({ email, code: code.toUpperCase() }),
       });
 
       const data = await res.json();
@@ -43,52 +99,22 @@ function VerifyContent() {
 
       if (!res.ok) {
         setError(data.error || 'Verification failed.');
-        setMessage(null);
         return;
       }
 
-      setMessage('Email verified! Redirecting...');
+      await new Promise((r) => setTimeout(r, 100));
 
-      // allow cookie to settle (important)
-      await new Promise((res) => setTimeout(res, 100));
+      const target = data?.redirectTo || '/dashboard';
 
-      // 🔥 critical fix: full reload (server reads session cookie)
-      window.location.href = data?.redirectTo || '/register?resume=true';
+      // 🔥 FULL reload (CRITICAL FIX)
+      if (typeof window !== 'undefined') {
+        window.location.href = target;
+      }
+
+    } catch (err) {
+      setLoading(false);
+      setError('Something went wrong. Please try again.');
     }
-
-    if (email && code) {
-      void autoVerify();
-    }
-  }, [email, code]);
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    setLoading(true);
-    setError(null);
-    setMessage(null);
-
-    const res = await fetch('/api/auth/verify-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, code: code.toUpperCase() }),
-    });
-
-    const data = await res.json();
-    console.log('VERIFY RESPONSE:', data);
-
-    setLoading(false);
-
-    if (!res.ok) {
-      setError(data.error || 'Verification failed.');
-      return;
-    }
-
-    // allow cookie to settle
-    await new Promise((res) => setTimeout(res, 100));
-
-    // 🔥 critical fix: full reload
-    window.location.href = data.redirectTo || '/dashboard';
   }
 
   return (
@@ -157,7 +183,8 @@ function VerifyContent() {
             >
               {loading ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" /> Verifying...
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Verifying...
                 </>
               ) : (
                 'Confirm and continue'

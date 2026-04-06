@@ -1,198 +1,157 @@
-'use client';
+import { NextResponse } from 'next/server';
+import { createSupabaseAdminClient } from '@/lib/supabase/admin';
+import { getSessionCookieName, signAppSession } from '@/lib/auth/session';
+import { hashCode, normalizeEmail } from '@/lib/auth/code';
 
-import { useEffect, useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
-import BootHopLogo from '@/components/BootHopLogo';
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const email = normalizeEmail(body?.email || '');
+    const code = String(body?.code || '').trim().toUpperCase();
 
-function VerifyContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [email, setEmail] = useState('');
-  const [code, setCode] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+    if (!email || !code) {
+      return NextResponse.json({ error: 'Email and code are required.' }, { status: 400 });
+    }
 
-  useEffect(() => {
-    const queryEmail = searchParams.get('email') || '';
-    const queryCode = searchParams.get('code') || '';
-    if (queryEmail) setEmail(queryEmail);
-    if (queryCode) setCode(queryCode.toUpperCase());
-  }, [searchParams]);
+    const supabase = createSupabaseAdminClient();
+    const nowIso = new Date().toISOString();
 
-  useEffect(() => {
-    async function autoVerify() {
-      if (!email || !code) return;
+    const { data: record, error: selectError } = await supabase
+      .from('email_login_codes')
+      .select('*')
+      .eq('email', email)
+      .eq('used', false)
+      .gte('expires_at', nowIso)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-      setLoading(true);
-      setError(null);
-      setMessage('Verifying your email...');
+    if (selectError) throw selectError;
 
+    if (!record) {
+      return NextResponse.json({ error: 'Code is invalid or has expired.' }, { status: 400 });
+    }
+
+    if (record.attempts >= record.max_attempts) {
+      return NextResponse.json({ error: 'Too many incorrect attempts. Request a new code.' }, { status: 429 });
+    }
+
+    const incomingHash = hashCode(code);
+    if (incomingHash !== record.code_hash) {
+      await supabase
+        .from('email_login_codes')
+        .update({ attempts: record.attempts + 1 })
+        .eq('id', record.id);
+
+      return NextResponse.json({ error: 'Incorrect verification code.' }, { status: 400 });
+    }
+
+    await supabase
+      .from('email_login_codes')
+      .update({ used: true, used_at: new Date().toISOString() })
+      .eq('id', record.id);
+
+    // Save journey and publish as a live trip if the user came from the register form
+    let hasDraft = false;
+    if (record.journey_payload) {
       try {
-        const res = await fetch('/api/auth/verify-code', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, code }),
+        const { data: authUser } = await (supabase.auth.admin as any)
+          .getUserByEmail(email)
+          .catch(() => ({ data: null }));
+
+        const userId = authUser?.user?.id ?? null; // 🔥 PATCH (safe fallback)
+
+        const p = record.journey_payload as any;
+        const priceNum =
+          parseFloat(String(p.price || '0').replace(/[^0-9.]/g, '')) || null;
+
+        // Keep journey_drafts for match-engine reference (best-effort)
+        supabase.from('journey_drafts').insert({
+          email,
+          user_id:       userId,
+          type:          p.mode || 'send',
+          from_city:     p.from || '',
+          to_city:       p.to  || '',
+          travel_date:   p.date || null,
+          weight:        p.weight || null,
+          price:         priceNum,
+          interested_in: p.interestedIn || null,
+          status:        'draft',
+          expires_at:    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        }).then();
+
+        // Publish the trip as a live listing so it appears on /journeys
+        const { error: tripErr } = await supabase.from('trips').insert({
+          email,
+          user_id:      userId,
+          type:         p.mode || 'send',
+          from_city:    p.from || '',
+          to_city:      p.to  || '',
+          travel_date:  p.date || null,
+          weight:       p.weight || null,
+          price:        priceNum,
         });
 
-        const data = await res.json();
-        setLoading(false);
+        if (tripErr) {
+          console.error('❌ Trip insert error:', {
+            message: tripErr.message,
+            details: tripErr.details,
+            hint: tripErr.hint,
+          });
 
-        if (!res.ok) {
-          setError(data.error || 'Verification failed.');
-          setMessage(null);
-          return;
+          // 🔥 PATCH: stop silent failure
+          return NextResponse.json(
+            { error: 'Failed to create trip. Please try again.' },
+            { status: 500 }
+          );
         }
 
-        setMessage('Email verified! Redirecting...');
-
-        // 🔥 FIX: FULL PAGE RELOAD TO APPLY SESSION COOKIE
-        const target = data.redirectTo || '/dashboard';
-        if (typeof window !== 'undefined') {
-          window.location.href = target;
-        }
-
-      } catch (err) {
-        setLoading(false);
-        setError('Something went wrong. Please try again.');
+        hasDraft = true;
+      } catch (draftErr) {
+        console.error('Draft save failed (non-blocking):', draftErr);
       }
     }
 
-    if (email && code) {
-      void autoVerify();
+    // Decide redirect:
+    let redirectTo = '/dashboard';
+    if (hasDraft) {
+      redirectTo = '/journeys?listing=new';
+    } else {
+      const { count: tripCount } = await supabase
+        .from('trips')
+        .select('id', { count: 'exact', head: true })
+        .eq('email', email)
+        .limit(1);
+
+      if ((tripCount ?? 0) === 0) redirectTo = '/intent';
     }
-  }, [email, code]);
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setLoading(true);
-    setError(null);
-    setMessage(null);
+    const token = signAppSession({ email, verified: true });
 
-    try {
-      const res = await fetch('/api/auth/verify-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code: code.toUpperCase() }),
-      });
+    const response = NextResponse.json({
+      ok: true,
+      email,
+      hasDraft,
+      tripSaved: hasDraft,
+      journeyPayload: record.journey_payload,
+      redirectTo,
+    });
 
-      const data = await res.json();
-      setLoading(false);
+    response.cookies.set(getSessionCookieName(), token, {
+      httpOnly: true,
+      secure:   process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path:     '/',
+      maxAge:   60 * 60 * 24 * 7,
+    });
 
-      if (!res.ok) {
-        setError(data.error || 'Verification failed.');
-        return;
-      }
+    return response;
 
-      // 🔥 FIX: FULL PAGE RELOAD TO APPLY SESSION COOKIE
-      const target = data.redirectTo || '/dashboard';
-      if (typeof window !== 'undefined') {
-        window.location.href = target;
-      }
-
-    } catch (err) {
-      setLoading(false);
-      setError('Something went wrong. Please try again.');
-    }
+  } catch (error) {
+    console.error('verify-code error', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unable to verify code.' },
+      { status: 500 },
+    );
   }
-
-  return (
-    <main className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-6 py-20">
-      <div className="w-full max-w-md">
-        <div className="mb-8 flex justify-center">
-          <Link href="/">
-            <BootHopLogo iconClass="text-white" textClass="text-white" />
-          </Link>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-slate-900/80 p-8 shadow-2xl backdrop-blur">
-          <h1 className="text-2xl font-bold text-white mb-2">Verify your email</h1>
-          <p className="text-sm text-slate-400 mb-8">
-            Enter the 5-character code we sent to your email.
-          </p>
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-slate-800 px-4 py-3 text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-blue-500 transition"
-                placeholder="you@example.com"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                Verification code
-              </label>
-              <input
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value.toUpperCase())}
-                className="w-full rounded-xl border border-white/10 bg-slate-800 px-4 py-3 text-center text-2xl font-bold tracking-[0.35em] uppercase text-white placeholder-slate-600 outline-none focus:ring-2 focus:ring-blue-500 transition"
-                placeholder="4827A"
-                maxLength={5}
-                required
-              />
-            </div>
-
-            {message && (
-              <div className="flex items-center gap-2 rounded-xl bg-blue-500/10 border border-blue-500/20 px-4 py-3 text-sm text-blue-300">
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin shrink-0" />
-                ) : (
-                  <CheckCircle className="h-4 w-4 shrink-0" />
-                )}
-                {message}
-              </div>
-            )}
-
-            {error && (
-              <div className="flex items-center gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-300">
-                <AlertCircle className="h-4 w-4 shrink-0" />
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-semibold py-3 px-4 rounded-xl transition-all"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Verifying...
-                </>
-              ) : (
-                'Confirm and continue'
-              )}
-            </button>
-          </form>
-
-          <p className="text-center text-sm text-slate-500 mt-6">
-            Didn&apos;t get a code?{' '}
-            <Link href="/login" className="text-blue-400 hover:text-blue-300 font-medium">
-              Back to login
-            </Link>
-          </p>
-        </div>
-      </div>
-    </main>
-  );
-}
-
-export default function VerifyPage() {
-  return (
-    <Suspense>
-      <VerifyContent />
-    </Suspense>
-  );
 }
