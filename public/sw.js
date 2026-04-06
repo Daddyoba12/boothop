@@ -73,13 +73,17 @@ self.addEventListener('fetch', (event) => {
   }
 
   // HTML pages → network first, fall back to cache
+  // Next.js streaming/RSC responses can't be cloned — wrap in try-catch
   event.respondWith(
     fetch(event.request)
       .then((res) => {
-        // Clone BEFORE the body is consumed by the browser
         if (res.ok && res.status < 300) {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          try {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          } catch (_) {
+            // Streaming response — skip caching, still serve to browser
+          }
         }
         return res;
       })
