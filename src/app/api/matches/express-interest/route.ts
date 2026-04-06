@@ -38,6 +38,17 @@ export async function POST(request: Request) {
 
     const finalOfferedPrice = offeredPrice ?? trip.price ?? 0;
 
+    // Derive both sides and ensure they are different people
+    const senderEmail   = trip.type === 'travel' ? email           : (trip.email ?? null);
+    const travelerEmail = trip.type === 'travel' ? (trip.email ?? null) : email;
+
+    if (senderEmail && travelerEmail && normalizeEmail(senderEmail) === normalizeEmail(travelerEmail)) {
+      return NextResponse.json(
+        { error: 'The sender and traveller cannot be the same person.' },
+        { status: 400 },
+      );
+    }
+
     // Assign trip ID to the correct side based on trip type
     // If the listed trip is a 'travel' trip → it's the traveler's trip
     // If the listed trip is a 'send' trip   → it's the sender's trip
@@ -49,8 +60,8 @@ export async function POST(request: Request) {
       trip_id:          tripId,
       sender_trip_id,
       traveler_trip_id,
-      sender_email:     trip.type === 'travel' ? email           : (trip.email ?? null),
-      traveler_email:   trip.type === 'travel' ? (trip.email ?? null) : email,
+      sender_email:     senderEmail,
+      traveler_email:   travelerEmail,
       offered_price:    finalOfferedPrice,
       interest_type:    interestType,
       status:           'pending',
