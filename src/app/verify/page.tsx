@@ -36,6 +36,7 @@ function VerifyContent() {
       });
 
       const data = await res.json();
+      console.log('VERIFY RESPONSE:', data);
       setLoading(false);
 
       if (!res.ok) {
@@ -45,7 +46,14 @@ function VerifyContent() {
       }
 
       setMessage('Email verified! Redirecting...');
-      router.replace(data.redirectTo || '/dashboard');
+      // router.replace(data.redirectTo || '/dashboard');
+      if (data?.redirectTo) {
+  router.replace(data.redirectTo);
+} else {
+  // fallback logic
+  router.replace('/register?resume=true');
+}
+router.refresh();
     }
 
     if (email && code) {
@@ -66,6 +74,7 @@ function VerifyContent() {
     });
 
     const data = await res.json();
+    console.log('VERIFY RESPONSE:', data);
     setLoading(false);
 
     if (!res.ok) {
@@ -74,6 +83,7 @@ function VerifyContent() {
     }
 
     router.replace(data.redirectTo || '/dashboard');
+    router.refresh();
   }
 
   return (

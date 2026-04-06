@@ -44,7 +44,11 @@
       "Bash(npm install:*)",
       "Bash(ls:*)",
       "Bash(node:*)",
-      "Bash(wc -l /c/Users/babso/desktop/boothop/schema/*.sql)"
+      "Bash(wc -l /c/Users/babso/desktop/boothop/schema/*.sql)",
+      "Bash(grep -roh \"/images/[^\"\"''''\\\\`> \\)]*\" C:/Users/babso/desktop/boothop/src --include=\"*.tsx\" --include=\"*.ts\")",
+      "Bash(grep -rn \"BootHopLogo\\\\|boothop.*logo\\\\|logo.*boothop\" C:Usersbabsodesktopboothopsrc --include=*.tsx --include=*.ts)",
+      "Bash(mkdir -p docs)",
+      "Bash(mv public/engine.html docs/engine.html)"
     ]
   }
 }
