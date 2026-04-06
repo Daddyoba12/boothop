@@ -129,10 +129,10 @@ export default function LiveJourneysPage() {
   const hasFilters = !!(searchTerm || fromCity || toCity || dateFilter);
 
   /* ── Compute offered price from listing price ── */
-  function computePrice(trip: Trip): number {
+  function computePrice(trip: Trip): string {
     const base = Number(trip.price) || 0;
-    if (interestType === 'full_price') return base;
-    return Math.round(base * (1 - discountPct / 100));
+    if (interestType === 'full_price') return base.toFixed(2);
+    return (base * (1 - discountPct / 100)).toFixed(2);
   }
 
   /* ── Open modal: reset all state ── */
@@ -367,7 +367,7 @@ export default function LiveJourneysPage() {
                     )}
                     {trip.price ? (
                       <div className="text-right">
-                        <div className="font-black text-lg bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">£{Number(trip.price).toFixed(0)}</div>
+                        <div className="font-black text-lg bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">£{Number(trip.price).toFixed(2)}</div>
                         <div className="text-xs text-slate-600">budget</div>
                       </div>
                     ) : (
@@ -429,7 +429,7 @@ export default function LiveJourneysPage() {
               {selectedTrip.price && (
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-slate-400">Listed price</span>
-                  <span className="text-cyan-400 font-black text-lg">£{Number(selectedTrip.price).toFixed(0)}</span>
+                  <span className="text-cyan-400 font-black text-lg">£{Number(selectedTrip.price).toFixed(2)}</span>
                 </div>
               )}
             </div>
@@ -476,11 +476,11 @@ export default function LiveJourneysPage() {
               <>
                 <p className="text-slate-300 text-sm font-semibold mb-1">Select your offer</p>
                 <p className="text-slate-500 text-xs mb-5">
-                  Listed at <span className="text-white font-bold">£{Number(selectedTrip.price).toFixed(0)}</span> — choose a price below.
+                  Listed at <span className="text-white font-bold">£{Number(selectedTrip.price).toFixed(2)}</span> — choose a price below.
                 </p>
                 <div className="space-y-2 mb-5">
                   {TIERS.map(tier => {
-                    const price   = Math.round(Number(selectedTrip.price) * (1 - tier.pct / 100));
+                    const price   = (Number(selectedTrip.price) * (1 - tier.pct / 100)).toFixed(2);
                     const chosen  = discountPct === tier.pct;
                     return (
                       <button key={tier.pct} onClick={() => setDiscountPct(tier.pct)}
@@ -509,7 +509,7 @@ export default function LiveJourneysPage() {
                 </div>
                 <button onClick={() => setStep('enter-email')}
                   className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all">
-                  Continue with £{Math.round(Number(selectedTrip.price) * (1 - discountPct / 100))} →
+                  Continue with £{(Number(selectedTrip.price) * (1 - discountPct / 100)).toFixed(2)} →
                 </button>
               </>
             )}
@@ -526,7 +526,7 @@ export default function LiveJourneysPage() {
                     <p className="text-white font-black text-2xl">£{computePrice(selectedTrip)}</p>
                   </div>
                   {interestType === 'offer' && (
-                    <p className="text-slate-500 text-xs text-right line-through">£{Number(selectedTrip.price).toFixed(0)}</p>
+                    <p className="text-slate-500 text-xs text-right line-through">£{Number(selectedTrip.price).toFixed(2)}</p>
                   )}
                 </div>
 
