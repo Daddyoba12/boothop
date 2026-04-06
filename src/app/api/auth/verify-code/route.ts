@@ -88,7 +88,7 @@ export async function POST(request: Request) {
         });
 
         if (tripErr) {
-          console.error('Trip insert error:', tripErr);
+          console.error('Trip insert error:', tripErr.message, tripErr.details, tripErr.hint);
         }
 
         hasDraft = true;
@@ -120,6 +120,7 @@ export async function POST(request: Request) {
       ok: true,
       email,
       hasDraft,
+      tripSaved: hasDraft,
       journeyPayload: record.journey_payload,
       redirectTo,
     });

@@ -34,7 +34,8 @@ function RegisterForm() {
 
   const [mode, setMode]         = useState<'travel' | 'send'>(initialMode as 'travel' | 'send');
   const [form, setForm]         = useState({ from: prefillFrom, to: prefillTo, date: prefillDate, weight: '', price: '', email: '' });
-  const [step, setStep]         = useState<'trip' | 'email' | 'sent'>('trip');
+  const [step, setStep]         = useState<'trip' | 'email' | 'sent' | 'success'>('trip');
+  const [successData, setSuccessData] = useState<{ from: string; to: string; date: string; type: string; redirectTo: string } | null>(null);
   const [codeInput, setCodeInput] = useState('');
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState<string | null>(null);
@@ -182,7 +183,23 @@ function RegisterForm() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Verification failed');
-      window.location.href = data.redirectTo || '/intent';
+
+      if (data.hasDraft) {
+        setSuccessData({
+          from: form.from,
+          to: form.to,
+          date: form.date,
+          type: mode,
+          redirectTo: data.redirectTo || '/journeys?listing=new',
+        });
+        setStep('success');
+        // Auto-redirect after 3 seconds
+        setTimeout(() => {
+          window.location.href = data.redirectTo || '/journeys?listing=new';
+        }, 3000);
+      } else {
+        window.location.href = data.redirectTo || '/intent';
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Verification failed');
     } finally {
@@ -283,6 +300,45 @@ function RegisterForm() {
 
         <div className="relative z-10 flex-1 flex items-center justify-center px-6 py-12">
           <div className="w-full max-w-sm">
+
+            {/* ── SUCCESS STATE — trip registered ── */}
+            {step === 'success' && successData && (
+              <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 backdrop-blur-xl p-10 shadow-2xl text-center">
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
+                <div className="relative">
+                  <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-400 shadow-xl shadow-emerald-500/50">
+                    <CheckCircle className="h-8 w-8 text-white" />
+                  </div>
+                  <h2 className="text-2xl font-black text-white mb-2">Your trip is live!</h2>
+                  <p className="text-slate-400 text-sm mb-6">Your listing has been registered and is now live on BootHop Journeys.</p>
+
+                  {/* Trip summary */}
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm space-y-2 mb-6 text-left">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${successData.type === 'travel' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}`}>
+                      {successData.type === 'travel' ? <><Plane className="h-3 w-3" /> Travelling</> : <><Package className="h-3 w-3" /> Sending</>}
+                    </span>
+                    <p className="text-white font-bold text-base">{successData.from} → {successData.to}</p>
+                    <p className="text-slate-400">
+                      {new Date(successData.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-2 text-emerald-400 text-sm font-semibold mb-2">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                    Redirecting to Live Journeys…
+                  </div>
+                  <p className="text-slate-600 text-xs">You'll be taken there automatically in a moment.</p>
+
+                  <button
+                    onClick={() => { window.location.href = successData.redirectTo; }}
+                    className="mt-5 w-full bg-gradient-to-r from-emerald-600 to-cyan-500 py-3 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-emerald-500/50 transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    View my listing <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* ── SENT STATE — code input ── */}
             {step === 'sent' && (
