@@ -66,28 +66,21 @@ export async function POST(request: Request) {
           parseFloat(String(p.price || '0').replace(/[^0-9.]/g, '')) || null;
 
         // Keep journey_drafts for match-engine reference (best-effort)
+        // journey_drafts table uses a single payload jsonb column
         supabase.from('journey_drafts').insert({
           email,
-          user_id:       userId,
-          type:          p.mode || 'send',
-          from_city:     p.from || '',
-          to_city:       p.to  || '',
-          travel_date:   p.date || null,
-          weight:        p.weight || null,
-          price:         priceNum,
-          interested_in: p.interestedIn || null,
-          status:        'draft',
-          expires_at:    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          payload: { ...p, user_id: userId, priceNum },
         }).then();
 
         // Publish the trip as a live listing so it appears on /journeys
+        // trips table: user_id is nullable (custom OTP users may not be in auth.users)
         const { error: tripErr } = await supabase.from('trips').insert({
           email,
           user_id:      userId,
           type:         p.mode || 'send',
           from_city:    p.from || '',
           to_city:      p.to  || '',
-          travel_date:  p.date || null,
+          travel_date:  p.date,
           weight:       p.weight || null,
           price:        priceNum,
         });
