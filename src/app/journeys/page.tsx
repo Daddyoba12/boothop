@@ -23,17 +23,22 @@ function weightLabel(raw: string | null): string {
   return WEIGHT_LABELS[raw.toLowerCase()] ?? raw;
 }
 
-/* ── New listing banner ── */
-function ListingBanner() {
+/* ── New listing banner + auto-open handler ── */
+function ListingBanner({ onOpenTrip }: { onOpenTrip: (id: string) => void }) {
   const searchParams = useSearchParams();
   const [show, setShow] = useState(false);
+
   useEffect(() => {
     if (searchParams.get('listing') === 'new') {
       setShow(true);
       const t = setTimeout(() => setShow(false), 6000);
       return () => clearTimeout(t);
     }
-  }, [searchParams]);
+    // Auto-open modal for a specific trip (e.g. linked from home page)
+    const openId = searchParams.get('open');
+    if (openId) onOpenTrip(openId);
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!show) return null;
   return (
     <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
@@ -91,10 +96,19 @@ export default function LiveJourneysPage() {
   const [busy, setBusy]                 = useState(false);
   const [fieldError, setFieldError]     = useState('');
   const [blockingError, setBlockingError] = useState('');
+  const [pendingOpenId, setPendingOpenId] = useState<string | null>(null);
 
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
   useEffect(() => { fetchTrips(); }, []);
+
+  // Open modal once trips are loaded if a ?open=id param was passed
+  useEffect(() => {
+    if (pendingOpenId && trips.length > 0) {
+      const trip = trips.find(t => t.id === pendingOpenId);
+      if (trip) { openModal(trip); setPendingOpenId(null); }
+    }
+  }, [pendingOpenId, trips]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchTrips = async () => {
     setLoading(true); setError(null);
@@ -258,7 +272,7 @@ export default function LiveJourneysPage() {
       </div>
 
       <NavBar />
-      <Suspense><ListingBanner /></Suspense>
+      <Suspense><ListingBanner onOpenTrip={(id) => setPendingOpenId(id)} /></Suspense>
 
       {/* HERO */}
       <section className="relative min-h-[60vh] flex flex-col items-center justify-center text-center overflow-hidden">

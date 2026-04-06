@@ -767,7 +767,7 @@ function HomePageContent() {
                               <span className={`rounded-full border px-2.5 py-1 text-xs text-blue-300 ${item.weight ? 'bg-blue-500/12 border-blue-400/15' : 'invisible'}`}>
                                 {weightOptions.find(w => w.value === item.weight)?.label || item.weight || '—'}
                               </span>
-                              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="rounded-xl bg-blue-500 px-3.5 py-1.5 text-xs font-semibold text-white transition-all opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 hover:shadow-lg hover:shadow-blue-500/30">Request →</button>
+                              <button onClick={() => router.push(`/journeys?open=${item.id}`)} className="rounded-xl bg-blue-500 px-3.5 py-1.5 text-xs font-semibold text-white transition-all opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 hover:shadow-lg hover:shadow-blue-500/30">Request →</button>
                             </div>
                           </div>
                         </div>
@@ -806,7 +806,7 @@ function HomePageContent() {
                               <span className={`rounded-full border px-2.5 py-1 text-xs text-emerald-300 ${item.weight ? 'bg-emerald-500/12 border-emerald-400/15' : 'invisible'}`}>
                                 {weightOptions.find(w => w.value === item.weight)?.label || item.weight || '—'}
                               </span>
-                              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="rounded-xl bg-emerald-500 px-3.5 py-1.5 text-xs font-semibold text-white transition-all opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 hover:shadow-lg hover:shadow-emerald-500/30">Carry this →</button>
+                              <button onClick={() => router.push(`/journeys?open=${item.id}`)} className="rounded-xl bg-emerald-500 px-3.5 py-1.5 text-xs font-semibold text-white transition-all opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 hover:shadow-lg hover:shadow-emerald-500/30">Carry this →</button>
                             </div>
                           </div>
                         </div>
