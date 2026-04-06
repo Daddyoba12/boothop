@@ -1,6 +1,5 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const from   = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
 
@@ -19,6 +18,7 @@ export async function sendInterestEmail(params: {
   const isOffer    = params.interestType === 'offer';
   const priceLabel = isOffer ? `£${params.offeredPrice} (${discount}% off)` : `£${params.offeredPrice} (Full Price)`;
 
+  const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
     from,
     to: params.toEmail,
@@ -58,6 +58,7 @@ export async function sendMatchConfirmedEmail(params: {
   price:      number;
   matchId:    string;
 }) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
     from,
     to: params.toEmail,

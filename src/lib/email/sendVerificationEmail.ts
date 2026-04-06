@@ -1,11 +1,10 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function sendVerificationEmail(params: {
   to: string;
   code: string;
 }) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   const from = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
   const { error } = await resend.emails.send({
