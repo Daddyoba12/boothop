@@ -54,55 +54,42 @@ export async function POST(request: Request) {
     // Save journey and publish as a live trip if the user came from the register form
     let hasDraft = false;
     if (record.journey_payload) {
-      try {
-        const { data: authUser } = await (supabase.auth.admin as any)
-          .getUserByEmail(email)
-          .catch(() => ({ data: null }));
+      const p = record.journey_payload as any;
+      const priceNum = parseFloat(String(p.price || '0').replace(/[^0-9.]/g, '')) || null;
 
-        const userId = authUser?.user?.id ?? null; // 🔥 PATCH (safe fallback)
+      // Get Supabase Auth user id if they exist (nullable — custom OTP users may not)
+      const { data: authUser } = await (supabase.auth.admin as any)
+        .getUserByEmail(email)
+        .catch(() => ({ data: null }));
+      const userId = authUser?.user?.id ?? null;
 
-        const p = record.journey_payload as any;
-        const priceNum =
-          parseFloat(String(p.price || '0').replace(/[^0-9.]/g, '')) || null;
+      // journey_drafts — best-effort fire and forget
+      supabase.from('journey_drafts').insert({
+        email,
+        payload: { ...p, user_id: userId, priceNum },
+      }).then();
 
-        // Keep journey_drafts for match-engine reference (best-effort)
-        // journey_drafts table uses a single payload jsonb column
-        supabase.from('journey_drafts').insert({
-          email,
-          payload: { ...p, user_id: userId, priceNum },
-        }).then();
+      // Publish as a live trip
+      const { error: tripErr } = await supabase.from('trips').insert({
+        email,
+        user_id:     userId,
+        type:        p.mode || 'send',
+        from_city:   p.from || '',
+        to_city:     p.to  || '',
+        travel_date: p.date,
+        weight:      p.weight || null,
+        price:       priceNum,
+      });
 
-        // Publish the trip as a live listing so it appears on /journeys
-        // trips table: user_id is nullable (custom OTP users may not be in auth.users)
-        const { error: tripErr } = await supabase.from('trips').insert({
-          email,
-          user_id:      userId,
-          type:         p.mode || 'send',
-          from_city:    p.from || '',
-          to_city:      p.to  || '',
-          travel_date:  p.date,
-          weight:       p.weight || null,
-          price:        priceNum,
-        });
-
-        if (tripErr) {
-          console.error('❌ Trip insert error:', {
-            message: tripErr.message,
-            details: tripErr.details,
-            hint: tripErr.hint,
-          });
-
-          // 🔥 PATCH: stop silent failure
-          return NextResponse.json(
-            { error: 'Failed to create trip. Please try again.' },
-            { status: 500 }
-          );
-        }
-
-        hasDraft = true;
-      } catch (draftErr) {
-        console.error('Draft save failed (non-blocking):', draftErr);
+      if (tripErr) {
+        // Surface the real DB error so we can diagnose it
+        return NextResponse.json(
+          { error: `Trip save failed: ${tripErr.message}` },
+          { status: 500 },
+        );
       }
+
+      hasDraft = true;
     }
 
     // Decide redirect:
