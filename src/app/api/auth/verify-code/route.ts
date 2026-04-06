@@ -57,11 +57,8 @@ export async function POST(request: Request) {
       const p = record.journey_payload as any;
       const priceNum = parseFloat(String(p.price || '0').replace(/[^0-9.]/g, '')) || null;
 
-      // Get Supabase Auth user id if they exist (nullable — custom OTP users may not)
-      const { data: authUser } = await (supabase.auth.admin as any)
-        .getUserByEmail(email)
-        .catch(() => ({ data: null }));
-      const userId = authUser?.user?.id ?? null;
+      // Custom OTP users are not in Supabase Auth — user_id is nullable
+      const userId = null;
 
       // journey_drafts — best-effort fire and forget
       supabase.from('journey_drafts').insert({
