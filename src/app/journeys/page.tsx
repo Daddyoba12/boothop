@@ -1,37 +1,31 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, Plane, Calendar, Package, ArrowRight, X, Filter, Sparkles, CheckCircle, Tag, ChevronLeft } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import {
+  Search, Plane, Calendar, Package, ArrowRight, X, Filter,
+  Sparkles, CheckCircle, Tag, ChevronLeft, Mail, Shield,
+} from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 
 /* ── Weight label mapping ── */
 const WEIGHT_LABELS: Record<string, string> = {
-  letter:  'Letter  <1 kg',
-  small:   'Small parcel  <5 kg',
-  medium:  'Medium package  5–23 kg',
-  large:   'Large package  23–32 kg',
+  letter: 'Letter  <1 kg',
+  small:  'Small parcel  <5 kg',
+  medium: 'Medium package  5–23 kg',
+  large:  'Large package  23–32 kg',
 };
 function weightLabel(raw: string | null): string {
   if (!raw) return '';
   return WEIGHT_LABELS[raw.toLowerCase()] ?? raw;
 }
 
-/* ── Offer discount tiers ── */
-const DISCOUNT_TIERS = [
-  { pct: 5,  label: '5% off',  desc: 'Slight discount' },
-  { pct: 10, label: '10% off', desc: 'Popular choice', recommended: true },
-  { pct: 15, label: '15% off', desc: 'Good deal' },
-  { pct: 20, label: '20% off', desc: 'Best offer' },
-];
-
-/* ── useSearchParams must live in a Suspense child ── */
+/* ── New listing banner ── */
 function ListingBanner() {
   const searchParams = useSearchParams();
   const [show, setShow] = useState(false);
-
   useEffect(() => {
     if (searchParams.get('listing') === 'new') {
       setShow(true);
@@ -39,13 +33,11 @@ function ListingBanner() {
       return () => clearTimeout(t);
     }
   }, [searchParams]);
-
   if (!show) return null;
-
   return (
     <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
       <div className="relative flex items-center gap-4 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-teal-900/95 border border-emerald-500/40 rounded-2xl px-5 py-4 shadow-2xl shadow-emerald-500/20 backdrop-blur-xl">
-        <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/40">
+        <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-xl flex items-center justify-center flex-shrink-0">
           <CheckCircle className="h-5 w-5 text-white" />
         </div>
         <div className="flex-1 min-w-0">
@@ -73,11 +65,11 @@ type Trip = {
   created_at?: string;
 };
 
-type OfferStep = 'initial' | 'choose-discount' | 'enter-email';
+/* ── Modal step machine ── */
+type ModalStep = 'initial' | 'choose-price' | 'enter-email' | 'enter-otp' | 'confirmed';
 
 export default function LiveJourneysPage() {
   const supabase = createSupabaseClient();
-  const router   = useRouter();
 
   const [trips, setTrips]               = useState<Trip[]>([]);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
@@ -89,70 +81,45 @@ export default function LiveJourneysPage() {
   const [dateFilter, setDateFilter] = useState('');
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
-  /* ── Offer / interest modal state ── */
-  const [offerStep, setOfferStep]         = useState<OfferStep>('initial');
-  const [interestType, setInterestType]   = useState<'full_price' | 'offer'>('full_price');
-  const [discountPct, setDiscountPct]     = useState<number>(10);
-  const [offerEmail, setOfferEmail]       = useState('');
-  const [submitting, setSubmitting]       = useState(false);
-  const [submitError, setSubmitError]     = useState('');
-  const [submitted, setSubmitted]         = useState(false);
+  /* ── Modal state ── */
+  const [step, setStep]                 = useState<ModalStep>('initial');
+  const [interestType, setInterestType] = useState<'full_price' | 'offer'>('full_price');
+  const [discountPct, setDiscountPct]   = useState<5 | 10 | 15 | 20>(10);
+  const [email, setEmail]               = useState('');
+  const [otpCode, setOtpCode]           = useState('');
+  const [busy, setBusy]                 = useState(false);
+  const [fieldError, setFieldError]     = useState('');
 
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
   useEffect(() => { fetchTrips(); }, []);
 
-  /* Pre-fill email from session */
-  useEffect(() => {
-    if (selectedTrip) {
-      fetch('/api/auth/me').then(r => r.json()).then(me => {
-        if (me.authenticated && me.user?.email) setOfferEmail(me.user.email);
-      });
-    }
-  }, [selectedTrip]);
-
   const fetchTrips = async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try {
-      const { data: d1, error: e1 } = await supabase
-        .from('trips')
-        .select('*')
-        .gte('travel_date', tomorrow)
-        .order('travel_date', { ascending: true });
+      const { data, error: e } = await supabase
+        .from('trips').select('*').gte('travel_date', tomorrow).order('travel_date', { ascending: true });
+      if (!e && data) { setTrips(data as Trip[]); return; }
 
-      if (!e1 && d1 !== null) { setTrips(d1 as Trip[]); return; }
-
-      const { data: d2, error: e2 } = await supabase
-        .from('trips')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (!e2 && d2 !== null) {
-        const fut = d2.filter((t: any) => {
-          const dateVal = t.travel_date || t.date || t.departure_date || '';
-          return !dateVal || dateVal >= tomorrow;
-        });
-        setTrips(fut as Trip[]);
+      // fallback: client-side date filter
+      const { data: all } = await supabase.from('trips').select('*').order('created_at', { ascending: false });
+      if (all) {
+        setTrips((all as Trip[]).filter(t => !t.travel_date || t.travel_date >= tomorrow));
         return;
       }
-
-      setError('No trips found. Check back soon — journeys are added daily.');
-    } catch {
-      setError('Unable to load journeys right now. Please try again shortly.');
-    } finally {
-      setLoading(false);
-    }
+      setError('No journeys found. Check back soon.');
+    } catch { setError('Unable to load journeys. Please try again shortly.'); }
+    finally { setLoading(false); }
   };
 
-  const filtered = trips.filter((t) => {
-    const fromVal = (t.from_city ?? '').toLowerCase();
-    const toVal   = (t.to_city   ?? '').toLowerCase();
-    const q = searchTerm.toLowerCase();
+  const filtered = trips.filter(t => {
+    const from = (t.from_city ?? '').toLowerCase();
+    const to   = (t.to_city   ?? '').toLowerCase();
+    const q    = searchTerm.toLowerCase();
     return (
-      (!q       || fromVal.includes(q) || toVal.includes(q)) &&
-      (!fromCity || fromVal.includes(fromCity.toLowerCase())) &&
-      (!toCity   || toVal.includes(toCity.toLowerCase())) &&
+      (!q         || from.includes(q) || to.includes(q)) &&
+      (!fromCity  || from.includes(fromCity.toLowerCase())) &&
+      (!toCity    || to.includes(toCity.toLowerCase())) &&
       (!dateFilter || (t.travel_date ?? '') >= dateFilter)
     );
   });
@@ -160,72 +127,114 @@ export default function LiveJourneysPage() {
   const clearFilters = () => { setSearchTerm(''); setFromCity(''); setToCity(''); setDateFilter(''); };
   const hasFilters = !!(searchTerm || fromCity || toCity || dateFilter);
 
-  /* ── Open modal & reset state ── */
+  /* ── Compute offered price from listing price ── */
+  function computePrice(trip: Trip): number {
+    const base = Number(trip.price) || 0;
+    if (interestType === 'full_price') return base;
+    return Math.round(base * (1 - discountPct / 100));
+  }
+
+  /* ── Open modal: reset all state ── */
   const openModal = (trip: Trip) => {
     setSelectedTrip(trip);
-    setOfferStep('initial');
+    setStep('initial');
     setInterestType('full_price');
     setDiscountPct(10);
-    setSubmitError('');
-    setSubmitted(false);
+    setEmail('');
+    setOtpCode('');
+    setBusy(false);
+    setFieldError('');
+    // Pre-fill email if logged in
+    fetch('/api/auth/me').then(r => r.json()).then(me => {
+      if (me.authenticated && me.user?.email) setEmail(me.user.email);
+    }).catch(() => {});
   };
 
-  const closeModal = () => {
-    setSelectedTrip(null);
-    setSubmitted(false);
-  };
+  const closeModal = () => setSelectedTrip(null);
 
-  /* ── Compute offered price ── */
-  const offeredPrice = (trip: Trip) => {
-    if (!trip.price) return null;
-    if (interestType === 'full_price') return trip.price;
-    return Math.round(trip.price * (1 - discountPct / 100));
-  };
-
-  /* ── Submit express interest ── */
-  const submitInterest = async () => {
-    if (!selectedTrip) return;
-    if (!offerEmail.trim().includes('@')) { setSubmitError('Please enter a valid email address.'); return; }
-    setSubmitting(true);
-    setSubmitError('');
+  /* ── Step: send OTP ── */
+  const sendOtp = async () => {
+    if (!email.trim().includes('@')) { setFieldError('Enter a valid email address.'); return; }
+    setBusy(true); setFieldError('');
     try {
-      const res = await fetch('/api/matches/express-interest', {
+      const res  = await fetch('/api/auth/request-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // no journeyPayload — this is interest only, not a new listing
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Failed to send code.');
+      setStep('enter-otp');
+    } catch (e: any) { setFieldError(e.message); }
+    finally { setBusy(false); }
+  };
+
+  /* ── Step: verify OTP then submit interest ── */
+  const verifyAndSubmit = async () => {
+    if (!selectedTrip) return;
+    const code = otpCode.trim().toUpperCase();
+    if (code.length < 4) { setFieldError('Enter the full verification code.'); return; }
+    setBusy(true); setFieldError('');
+    try {
+      // 1. Verify OTP — sets session cookie but creates no trip (no journeyPayload)
+      const verifyRes  = await fetch('/api/auth/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), code }),
+      });
+      const verifyJson = await verifyRes.json();
+      if (!verifyRes.ok) throw new Error(verifyJson.error || 'Incorrect code. Please try again.');
+
+      // 2. Record interest / offer
+      const interestRes  = await fetch('/api/matches/express-interest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tripId:       selectedTrip.id,
           interestType,
           discountPct:  interestType === 'offer' ? discountPct : 0,
-          offeredPrice: offeredPrice(selectedTrip),
-          email:        offerEmail.trim().toLowerCase(),
+          offeredPrice: computePrice(selectedTrip),
+          email:        email.trim().toLowerCase(),
         }),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Something went wrong.');
-      setSubmitted(true);
-    } catch (e: any) {
-      setSubmitError(e.message);
-    } finally {
-      setSubmitting(false);
-    }
+      const interestJson = await interestRes.json();
+      if (!interestRes.ok) throw new Error(interestJson.error || 'Could not submit. Please try again.');
+
+      setStep('confirmed');
+    } catch (e: any) { setFieldError(e.message); }
+    finally { setBusy(false); }
   };
 
-  /* ── Field wrapper ── */
+  /* ── Field wrapper with animated underline ── */
   const Field = ({ id, label, children }: { id: string; label: string; children: React.ReactNode }) => (
-    <div className="flex-1 min-w-[120px] relative group">
+    <div className="flex-1 min-w-[120px] relative">
       <label className={`block text-[10px] font-bold uppercase tracking-widest mb-2 transition-colors duration-300 ${focusedField === id ? 'text-cyan-400' : 'text-slate-500'}`}>
         {label}
       </label>
       {children}
       <div className="absolute bottom-0 left-0 h-px w-full bg-white/10" />
-      <div
-        className="absolute bottom-0 left-0 h-px bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500"
-        style={{ width: focusedField === id ? '100%' : '0%', boxShadow: focusedField === id ? '0 0 8px rgba(34,211,238,0.6)' : 'none' }}
-      />
+      <div className="absolute bottom-0 left-0 h-px bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500"
+        style={{ width: focusedField === id ? '100%' : '0%' }} />
     </div>
   );
-
   const inputCls = 'w-full bg-transparent pb-3 pt-1 text-sm text-white placeholder:text-slate-600 focus:outline-none';
+
+  /* ── Discount tiers ── */
+  const TIERS: Array<{ pct: 5 | 10 | 15 | 20; label: string; recommended?: true }> = [
+    { pct: 5,  label: 'Save 5%' },
+    { pct: 10, label: 'Save 10%', recommended: true },
+    { pct: 15, label: 'Save 15%' },
+    { pct: 20, label: 'Save 20%' },
+  ];
+
+  /* ── Back logic ── */
+  const goBack = () => {
+    setFieldError('');
+    if (step === 'choose-price')  { setStep('initial'); return; }
+    if (step === 'enter-email')   { setStep(interestType === 'offer' ? 'choose-price' : 'initial'); return; }
+    if (step === 'enter-otp')     { setStep('enter-email'); return; }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden flex flex-col">
@@ -238,47 +247,23 @@ export default function LiveJourneysPage() {
       </div>
 
       <NavBar />
-
-      <Suspense>
-        <ListingBanner />
-      </Suspense>
+      <Suspense><ListingBanner /></Suspense>
 
       {/* HERO */}
       <section className="relative min-h-[60vh] flex flex-col items-center justify-center text-center overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: 'url(/images/GoingonHols1.jpg)',
-            backgroundAttachment: 'scroll',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
+        <div className="absolute inset-0" style={{ backgroundImage:'url(/images/GoingonHols1.jpg)', backgroundSize:'cover', backgroundPosition:'center' }} />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-900/15 to-slate-950/65" />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-950/10 via-transparent to-slate-950/10" />
-
         <div className="relative z-10 pt-28 pb-16 px-6 w-full max-w-3xl mx-auto">
           <h1 className="text-4xl sm:text-6xl md:text-8xl font-black mb-4 leading-tight drop-shadow-2xl">
-            Live{' '}
-            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
-              Journeys
-            </span>
+            Live <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">Journeys</span>
           </h1>
-          <p className="text-white/80 text-lg font-medium drop-shadow-lg">
-            Real trips from verified BootHop travellers
-          </p>
-
+          <p className="text-white/80 text-lg font-medium drop-shadow-lg">Real trips from verified BootHop travellers</p>
           <div className="mt-10 max-w-xl mx-auto relative">
             <Search className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
-            <input
-              type="text"
-              placeholder="Search any city..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onFocus={() => setFocusedField('search')}
-              onBlur={() => setFocusedField(null)}
-              className="w-full bg-transparent border-b border-white/20 py-3 pl-8 pr-8 text-white text-lg placeholder:text-white/35 focus:outline-none focus:border-cyan-400/70 transition-colors duration-300"
-            />
+            <input type="text" placeholder="Search any city..." value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              onFocus={() => setFocusedField('search')} onBlur={() => setFocusedField(null)}
+              className="w-full bg-transparent border-b border-white/20 py-3 pl-8 pr-8 text-white text-lg placeholder:text-white/35 focus:outline-none focus:border-cyan-400/70 transition-colors duration-300" />
             {searchTerm && (
               <button onClick={() => setSearchTerm('')} className="absolute right-0 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors">
                 <X className="h-4 w-4" />
@@ -294,24 +279,19 @@ export default function LiveJourneysPage() {
           <div className="flex flex-wrap items-end gap-4 md:gap-10">
             <Field id="from" label="From">
               <input type="text" placeholder="Any city" value={fromCity}
-                onChange={(e) => setFromCity(e.target.value)}
-                onFocus={() => setFocusedField('from')} onBlur={() => setFocusedField(null)}
-                className={inputCls} />
+                onChange={e => setFromCity(e.target.value)} onFocus={() => setFocusedField('from')} onBlur={() => setFocusedField(null)} className={inputCls} />
             </Field>
             <Field id="to" label="To">
               <input type="text" placeholder="Any city" value={toCity}
-                onChange={(e) => setToCity(e.target.value)}
-                onFocus={() => setFocusedField('to')} onBlur={() => setFocusedField(null)}
-                className={inputCls} />
+                onChange={e => setToCity(e.target.value)} onFocus={() => setFocusedField('to')} onBlur={() => setFocusedField(null)} className={inputCls} />
             </Field>
             <Field id="date" label="Date from">
-              <input type="date" value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-                onFocus={() => setFocusedField('date')} onBlur={() => setFocusedField(null)}
-                min={tomorrow} className={`${inputCls} [color-scheme:dark]`} />
+              <input type="date" value={dateFilter} min={tomorrow}
+                onChange={e => setDateFilter(e.target.value)} onFocus={() => setFocusedField('date')} onBlur={() => setFocusedField(null)}
+                className={`${inputCls} [color-scheme:dark]`} />
             </Field>
             {hasFilters && (
-              <button onClick={clearFilters} className="flex items-center gap-2 text-xs text-slate-500 hover:text-cyan-400 transition-colors duration-200 pb-3">
+              <button onClick={clearFilters} className="flex items-center gap-2 text-xs text-slate-500 hover:text-cyan-400 transition-colors pb-3">
                 <Filter className="h-3.5 w-3.5" /> Clear filters
               </button>
             )}
@@ -330,71 +310,56 @@ export default function LiveJourneysPage() {
           </div>
         ) : error ? (
           <div className="text-center py-24">
-            <div className="w-14 h-14 bg-gradient-to-br from-slate-700 to-slate-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Plane className="h-7 w-7 text-slate-400" />
-            </div>
+            <Plane className="h-10 w-10 text-slate-600 mx-auto mb-4" />
             <p className="text-white font-bold text-lg mb-2">{error}</p>
             <button onClick={fetchTrips} className="mt-4 text-sm text-cyan-400 hover:text-cyan-300 transition-colors">Try again</button>
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-24">
-            <div className="w-14 h-14 bg-gradient-to-br from-slate-700 to-slate-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Plane className="h-7 w-7 text-slate-400" />
-            </div>
+            <Plane className="h-10 w-10 text-slate-600 mx-auto mb-4" />
             <p className="text-white font-bold text-lg mb-1">No journeys match your filters</p>
-            <p className="text-slate-500 text-sm">Try adjusting or clearing filters</p>
-            {hasFilters && (
-              <button onClick={clearFilters} className="mt-4 text-sm text-cyan-400 hover:text-cyan-300 transition-colors">Clear all filters</button>
-            )}
+            {hasFilters && <button onClick={clearFilters} className="mt-4 text-sm text-cyan-400">Clear all filters</button>}
           </div>
         ) : (
           <>
-            <div className="mb-6 flex items-center gap-3">
+            <div className="mb-6">
               <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5">
                 <div className="h-2 w-2 rounded-full bg-blue-400 animate-pulse" />
-                <span className="text-sm text-blue-400 font-semibold">
-                  {filtered.length} {filtered.length === 1 ? 'journey' : 'journeys'} live
-                </span>
+                <span className="text-sm text-blue-400 font-semibold">{filtered.length} {filtered.length === 1 ? 'journey' : 'journeys'} live</span>
               </div>
             </div>
 
             <div className="space-y-px">
               {filtered.map((trip, i) => (
-                <div
-                  key={trip.id}
-                  onClick={() => openModal(trip)}
+                <div key={trip.id} onClick={() => openModal(trip)}
                   className="group relative flex flex-col sm:flex-row sm:items-center gap-4 px-6 py-5 border-b border-white/6 hover:bg-white/4 hover:border-white/10 transition-all duration-300 cursor-pointer first:rounded-t-2xl last:rounded-b-2xl last:border-b-0"
-                  style={{ animationDelay: `${i * 40}ms` }}
-                >
+                  style={{ animationDelay:`${i*40}ms` }}>
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-cyan-400 rounded-l-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/40 flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                       <Plane className="h-5 w-5 text-white" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-black text-white text-base group-hover:text-cyan-400 transition-colors duration-300">{trip.from_city}</span>
+                        <span className="font-black text-white text-base group-hover:text-cyan-400 transition-colors">{trip.from_city}</span>
                         <ArrowRight className="h-4 w-4 text-slate-600 flex-shrink-0" />
-                        <span className="font-black text-white text-base group-hover:text-cyan-400 transition-colors duration-300">{trip.to_city}</span>
+                        <span className="font-black text-white text-base group-hover:text-cyan-400 transition-colors">{trip.to_city}</span>
                       </div>
                       <div className="flex items-center gap-3 mt-0.5 flex-wrap">
                         {trip.travel_date && (
                           <span className="flex items-center gap-1 text-xs text-slate-500">
                             <Calendar className="h-3 w-3" />
-                            {new Date(trip.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            {new Date(trip.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}
                           </span>
                         )}
                         {trip.weight && (
                           <span className="flex items-center gap-1 text-xs text-slate-500">
-                            <Package className="h-3 w-3" />
-                            {weightLabel(trip.weight)}
+                            <Package className="h-3 w-3" /> {weightLabel(trip.weight)}
                           </span>
                         )}
                       </div>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-4 flex-shrink-0 sm:ml-auto">
                     {trip.type && (
                       <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${trip.type === 'travel' ? 'bg-blue-500/12 text-blue-400 border border-blue-500/20' : 'bg-emerald-500/12 text-emerald-400 border border-emerald-500/20'}`}>
@@ -407,9 +372,9 @@ export default function LiveJourneysPage() {
                         <div className="text-xs text-slate-600">budget</div>
                       </div>
                     ) : (
-                      <span className="text-xs text-slate-600 font-medium">Negotiable</span>
+                      <span className="text-xs text-slate-600">Negotiable</span>
                     )}
-                    <ArrowRight className="h-4 w-4 text-slate-700 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all duration-300 hidden sm:block" />
+                    <ArrowRight className="h-4 w-4 text-slate-700 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all hidden sm:block" />
                   </div>
                 </div>
               ))}
@@ -420,19 +385,18 @@ export default function LiveJourneysPage() {
 
       <Footer />
 
-      {/* ── INTEREST / OFFER MODAL ── */}
+      {/* ══════════════════════════════════════════════════════
+          INTEREST / OFFER MODAL
+      ══════════════════════════════════════════════════════ */}
       {selectedTrip && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 shadow-2xl p-7 animate-in slide-in-from-bottom-4 duration-300">
+          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 shadow-2xl p-7 animate-in slide-in-from-bottom-4 duration-300 max-h-[90vh] overflow-y-auto">
 
-            {/* Header */}
+            {/* Modal header */}
             <div className="flex items-start justify-between mb-5">
               <div>
-                {offerStep !== 'initial' && !submitted && (
-                  <button
-                    onClick={() => setOfferStep(offerStep === 'enter-email' && interestType === 'offer' ? 'choose-discount' : 'initial')}
-                    className="flex items-center gap-1 text-xs text-slate-500 hover:text-white transition-colors mb-2"
-                  >
+                {step !== 'initial' && step !== 'confirmed' && (
+                  <button onClick={goBack} className="flex items-center gap-1 text-xs text-slate-500 hover:text-white transition-colors mb-2">
                     <ChevronLeft className="h-3.5 w-3.5" /> Back
                   </button>
                 )}
@@ -440,22 +404,20 @@ export default function LiveJourneysPage() {
                   <Sparkles className="h-4 w-4 text-cyan-400" />
                   <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">Live Journey</span>
                 </div>
-                <h2 className="text-xl font-black text-white">
-                  {selectedTrip.from_city} → {selectedTrip.to_city}
-                </h2>
+                <h2 className="text-xl font-black text-white">{selectedTrip.from_city} → {selectedTrip.to_city}</h2>
               </div>
-              <button onClick={closeModal} className="p-2 text-slate-500 hover:text-white transition-colors">
+              <button onClick={closeModal} className="p-2 text-slate-500 hover:text-white transition-colors flex-shrink-0">
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            {/* Journey details card */}
+            {/* Journey summary card — always visible */}
             <div className="rounded-2xl border border-white/8 bg-white/4 p-4 mb-6 space-y-3">
               {selectedTrip.travel_date && (
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-slate-400 flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> Date</span>
                   <span className="text-white font-semibold">
-                    {new Date(selectedTrip.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    {new Date(selectedTrip.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' })}
                   </span>
                 </div>
               )}
@@ -465,12 +427,6 @@ export default function LiveJourneysPage() {
                   <span className="text-white font-semibold">{weightLabel(selectedTrip.weight)}</span>
                 </div>
               )}
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400 flex items-center gap-1.5"><Plane className="h-3.5 w-3.5" /> Type</span>
-                <span className={`font-bold uppercase text-xs px-2.5 py-1 rounded-full ${selectedTrip.type === 'travel' ? 'bg-blue-500/15 text-blue-400' : 'bg-emerald-500/15 text-emerald-400'}`}>
-                  {selectedTrip.type === 'travel' ? 'Traveller' : 'Sender'}
-                </span>
-              </div>
               {selectedTrip.price && (
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-slate-400">Listed price</span>
@@ -479,150 +435,186 @@ export default function LiveJourneysPage() {
               )}
             </div>
 
-            {/* ── STEP: submitted ── */}
-            {submitted ? (
-              <div className="text-center py-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/40">
-                  <CheckCircle className="h-7 w-7 text-white" />
-                </div>
-                <p className="text-white font-black text-lg mb-2">
-                  {interestType === 'full_price' ? 'Interest registered!' : 'Offer submitted!'}
-                </p>
-                <p className="text-slate-400 text-sm mb-6">
-                  {interestType === 'full_price'
-                    ? 'The listing owner will be notified. We\'ll email you when matched.'
-                    : `Your offer of £${offeredPrice(selectedTrip)} has been sent. We'll email you when they respond.`}
-                </p>
-                <button onClick={closeModal} className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-3.5 text-sm font-bold text-white">
-                  Done
-                </button>
-              </div>
-            ) : offerStep === 'initial' ? (
-              /* ── STEP: choose action ── */
+            {/* ── STEP: initial ── */}
+            {step === 'initial' && (
               <>
-                <p className="text-slate-300 text-sm mb-1 font-semibold text-center">Interested in this journey?</p>
+                <p className="text-slate-300 text-sm font-semibold text-center mb-1">Interested in this journey?</p>
                 <p className="text-slate-500 text-xs text-center mb-6">
                   {selectedTrip.type === 'travel'
-                    ? 'This traveller can carry your package.'
-                    : 'This sender needs a traveller like you.'}
+                    ? 'This traveller has space for your package.'
+                    : 'This sender is looking for a traveller on this route.'}
                 </p>
                 <div className="flex gap-3">
-                  <button
-                    onClick={() => setSelectedTrip(null)}
-                    className="flex-1 rounded-xl border border-white/10 py-3.5 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all"
-                  >
-                    Maybe later
-                  </button>
                   {selectedTrip.price ? (
                     <>
                       <button
-                        onClick={() => { setInterestType('offer'); setOfferStep('choose-discount'); }}
-                        className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-blue-500/40 bg-blue-500/10 py-3.5 text-sm font-bold text-blue-300 hover:bg-blue-500/20 transition-all"
+                        onClick={() => { setInterestType('offer'); setStep('choose-price'); }}
+                        className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-blue-500/40 bg-blue-500/10 py-4 text-sm font-bold text-blue-300 hover:bg-blue-500/20 transition-all"
                       >
                         <Tag className="h-4 w-4" /> Make Offer
                       </button>
                       <button
-                        onClick={() => { setInterestType('full_price'); setOfferStep('enter-email'); }}
-                        className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-3.5 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                        onClick={() => { setInterestType('full_price'); setStep('enter-email'); }}
+                        className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
                       >
-                        <CheckCircle className="h-4 w-4" /> Full Price
+                        <CheckCircle className="h-4 w-4" /> Yes, I&apos;m interested
                       </button>
                     </>
                   ) : (
                     <button
-                      onClick={() => { setInterestType('full_price'); setOfferStep('enter-email'); }}
-                      className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-3.5 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                      onClick={() => { setInterestType('full_price'); setStep('enter-email'); }}
+                      className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] transition-all"
                     >
-                      <CheckCircle className="h-4 w-4" /> Yes, I&apos;m interested!
+                      <CheckCircle className="h-4 w-4" /> Yes, I&apos;m interested
                     </button>
                   )}
                 </div>
               </>
-            ) : offerStep === 'choose-discount' ? (
-              /* ── STEP: pick discount tier ── */
+            )}
+
+            {/* ── STEP: choose-price ── */}
+            {step === 'choose-price' && (
               <>
-                <p className="text-slate-300 text-sm font-semibold mb-1">Choose your offer</p>
+                <p className="text-slate-300 text-sm font-semibold mb-1">Select your offer</p>
                 <p className="text-slate-500 text-xs mb-5">
-                  Listed at <span className="text-white font-bold">£{Number(selectedTrip.price).toFixed(0)}</span> — select a discount below.
+                  Listed at <span className="text-white font-bold">£{Number(selectedTrip.price).toFixed(0)}</span> — choose a price below.
                 </p>
-                <div className="grid grid-cols-2 gap-3 mb-5">
-                  {DISCOUNT_TIERS.map((tier) => {
-                    const price = Math.round(Number(selectedTrip.price) * (1 - tier.pct / 100));
-                    const selected = discountPct === tier.pct;
+                <div className="space-y-2 mb-5">
+                  {TIERS.map(tier => {
+                    const price   = Math.round(Number(selectedTrip.price) * (1 - tier.pct / 100));
+                    const chosen  = discountPct === tier.pct;
                     return (
-                      <button
-                        key={tier.pct}
-                        onClick={() => setDiscountPct(tier.pct)}
-                        className={`relative rounded-2xl border p-4 text-left transition-all duration-200 ${
-                          selected
+                      <button key={tier.pct} onClick={() => setDiscountPct(tier.pct)}
+                        className={`relative w-full flex items-center justify-between rounded-2xl border px-5 py-4 transition-all duration-200 ${
+                          chosen
                             ? 'border-blue-400 bg-blue-500/20 shadow-lg shadow-blue-500/20'
                             : 'border-white/10 bg-white/4 hover:border-white/20'
-                        }`}
-                      >
+                        }`}>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${chosen ? 'border-blue-400 bg-blue-400' : 'border-slate-600'}`}>
+                            {chosen && <div className="w-2 h-2 rounded-full bg-white" />}
+                          </div>
+                          <div className="text-left">
+                            <p className="text-white font-black text-lg leading-none">£{price}</p>
+                            <p className={`text-xs mt-0.5 ${chosen ? 'text-blue-300' : 'text-slate-500'}`}>{tier.label}</p>
+                          </div>
+                        </div>
                         {tier.recommended && (
-                          <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full whitespace-nowrap">
-                            Popular
+                          <span className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+                            ⭐ Recommended
                           </span>
                         )}
-                        <p className="text-white font-black text-lg">£{price}</p>
-                        <p className={`text-xs font-bold mt-0.5 ${selected ? 'text-blue-300' : 'text-slate-400'}`}>{tier.label}</p>
-                        <p className="text-xs text-slate-600 mt-0.5">{tier.desc}</p>
                       </button>
                     );
                   })}
                 </div>
-                <button
-                  onClick={() => setOfferStep('enter-email')}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-3.5 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
-                >
-                  Continue with £{Math.round(Number(selectedTrip.price) * (1 - discountPct / 100))} offer →
+                <button onClick={() => setStep('enter-email')}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                  Continue with £{Math.round(Number(selectedTrip.price) * (1 - discountPct / 100))} →
                 </button>
               </>
-            ) : (
-              /* ── STEP: enter email ── */
+            )}
+
+            {/* ── STEP: enter-email ── */}
+            {step === 'enter-email' && (
               <>
-                <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4 mb-5 flex items-center justify-between">
+                {/* Selected price summary */}
+                <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4 mb-6 flex items-center justify-between">
                   <div>
                     <p className="text-xs text-blue-300 font-semibold uppercase tracking-wider mb-1">
                       {interestType === 'full_price' ? 'Full price' : `${discountPct}% discount`}
                     </p>
-                    <p className="text-white font-black text-2xl">
-                      £{offeredPrice(selectedTrip) ?? '—'}
-                    </p>
+                    <p className="text-white font-black text-2xl">£{computePrice(selectedTrip)}</p>
                   </div>
-                  {interestType === 'offer' && selectedTrip.price && (
-                    <p className="text-slate-500 text-xs text-right">
-                      Listed<br />
-                      <span className="line-through">£{Number(selectedTrip.price).toFixed(0)}</span>
-                    </p>
+                  {interestType === 'offer' && (
+                    <p className="text-slate-500 text-xs text-right line-through">£{Number(selectedTrip.price).toFixed(0)}</p>
                   )}
                 </div>
 
-                <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Your email</label>
-                <input
-                  type="email"
-                  placeholder="you@example.com"
-                  value={offerEmail}
-                  onChange={(e) => { setOfferEmail(e.target.value); setSubmitError(''); }}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/60 transition-colors mb-2"
-                />
-                {submitError && <p className="text-red-400 text-xs mb-3">{submitError}</p>}
-                <p className="text-slate-600 text-xs mb-5">We&apos;ll notify you by email when the listing owner responds.</p>
-
-                <button
-                  onClick={submitInterest}
-                  disabled={submitting}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-3.5 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
-                >
-                  {submitting
+                <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Your email address</label>
+                <input type="email" placeholder="you@example.com" value={email}
+                  onChange={e => { setEmail(e.target.value); setFieldError(''); }}
+                  onKeyDown={e => e.key === 'Enter' && sendOtp()}
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/60 transition-colors mb-1" />
+                {fieldError && <p className="text-red-400 text-xs mb-3">{fieldError}</p>}
+                <p className="text-slate-600 text-xs mb-5 flex items-center gap-1.5">
+                  <Shield className="h-3.5 w-3.5" /> We&apos;ll send a one-time code to verify your email.
+                </p>
+                <button onClick={sendOtp} disabled={busy}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100">
+                  {busy
                     ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Sending...</>
-                    : interestType === 'full_price'
-                      ? <><CheckCircle className="h-4 w-4" /> Confirm interest</>
-                      : <><Tag className="h-4 w-4" /> Submit offer</>
-                  }
+                    : <><Mail className="h-4 w-4" /> Send verification code</>}
                 </button>
               </>
             )}
+
+            {/* ── STEP: enter-otp ── */}
+            {step === 'enter-otp' && (
+              <>
+                <div className="text-center mb-6">
+                  <div className="w-12 h-12 bg-blue-500/20 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                    <Mail className="h-6 w-6 text-blue-400" />
+                  </div>
+                  <p className="text-white font-semibold text-sm mb-1">Check your inbox</p>
+                  <p className="text-slate-500 text-xs">
+                    We sent a code to <span className="text-white font-medium">{email}</span>
+                  </p>
+                </div>
+
+                {/* Offer summary */}
+                <div className="rounded-xl border border-blue-500/20 bg-blue-500/8 px-4 py-3 mb-5 flex items-center justify-between">
+                  <span className="text-slate-400 text-xs">
+                    {interestType === 'full_price' ? 'Full price offer' : `${discountPct}% discount offer`}
+                  </span>
+                  <span className="text-white font-black">£{computePrice(selectedTrip)}</span>
+                </div>
+
+                <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Verification code</label>
+                <input type="text" placeholder="Enter code" value={otpCode} maxLength={8}
+                  onChange={e => { setOtpCode(e.target.value.toUpperCase()); setFieldError(''); }}
+                  onKeyDown={e => e.key === 'Enter' && verifyAndSubmit()}
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white text-center tracking-widest placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/60 transition-colors mb-1" />
+                {fieldError && <p className="text-red-400 text-xs mb-3 text-center">{fieldError}</p>}
+                <p className="text-slate-600 text-xs text-center mb-5">
+                  Didn&apos;t receive it?{' '}
+                  <button onClick={() => { setOtpCode(''); setFieldError(''); setStep('enter-email'); }} className="text-cyan-500 hover:text-cyan-400 transition-colors">
+                    Resend code
+                  </button>
+                </p>
+
+                <button onClick={verifyAndSubmit} disabled={busy}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100">
+                  {busy
+                    ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Verifying...</>
+                    : interestType === 'full_price'
+                      ? <><CheckCircle className="h-4 w-4" /> Confirm interest</>
+                      : <><Tag className="h-4 w-4" /> Submit offer</>}
+                </button>
+              </>
+            )}
+
+            {/* ── STEP: confirmed ── */}
+            {step === 'confirmed' && (
+              <div className="text-center py-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-emerald-500/40">
+                  <CheckCircle className="h-8 w-8 text-white" />
+                </div>
+                <p className="text-white font-black text-xl mb-2">
+                  {interestType === 'full_price' ? 'Interest confirmed!' : 'Offer submitted!'}
+                </p>
+                <p className="text-slate-400 text-sm mb-2">
+                  {interestType === 'full_price'
+                    ? 'The listing owner has been notified and can now accept or decline.'
+                    : `Your offer of £${computePrice(selectedTrip)} has been sent to the listing owner.`}
+                </p>
+                <p className="text-slate-500 text-xs mb-8">We&apos;ll email you at <span className="text-white">{email}</span> when they respond.</p>
+                <button onClick={closeModal} className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg transition-all">
+                  Done
+                </button>
+              </div>
+            )}
+
           </div>
         </div>
       )}
