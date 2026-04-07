@@ -276,7 +276,7 @@ export default function LiveJourneysPage() {
 
       {/* HERO */}
       <section className="relative min-h-[60vh] flex flex-col items-center justify-center text-center overflow-hidden">
-        <div className="absolute inset-0" style={{ backgroundImage:'url(/images/drealboothop.jpg)', backgroundSize:'cover', backgroundPosition:'center top' }} />
+        <div className="absolute inset-0" style={{ backgroundImage:'url(/images/GoingonHols1.jpg)', backgroundSize:'cover', backgroundPosition:'center top' }} />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-900/15 to-slate-950/65" />
         <div className="relative z-10 pt-28 pb-16 px-6 w-full max-w-3xl mx-auto">
           <h1 className="text-4xl sm:text-6xl md:text-8xl font-black mb-4 leading-tight drop-shadow-2xl">
