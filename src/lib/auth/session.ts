@@ -31,3 +31,15 @@ export function verifyAppSession(token: string): AppSessionPayload {
     audience: 'boothop-users',
   }) as AppSessionPayload;
 }
+
+export function getAppSession(
+  cookieStore: { get: (name: string) => { value: string } | undefined }
+): AppSessionPayload | null {
+  try {
+    const cookie = cookieStore.get(COOKIE_NAME);
+    if (!cookie?.value) return null;
+    return verifyAppSession(cookie.value);
+  } catch {
+    return null;
+  }
+}
