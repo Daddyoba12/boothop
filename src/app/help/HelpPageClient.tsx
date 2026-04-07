@@ -189,7 +189,7 @@ export default function HelpPageClient() {
       <NavBar />
 
       <section className="relative min-h-[65vh] flex items-center justify-center text-center overflow-hidden">
-        <div className="absolute inset-0" style={{backgroundImage: 'url(/images/GoingonHolsz.jpg)', backgroundAttachment: 'scroll', backgroundSize: 'cover', backgroundPosition: 'center'}} />
+        <div className="absolute inset-0" style={{backgroundImage: 'url(/images/GoingonHolsz.jpg)', backgroundAttachment: 'scroll', backgroundSize: 'cover', backgroundPosition: 'center top'}} />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-900/55 to-slate-950/95" />
         <div className="absolute inset-0 opacity-50 pointer-events-none">
           <div className="absolute top-24 left-1/4 w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
