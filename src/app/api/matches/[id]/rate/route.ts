@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const cookieStore = await cookies();
@@ -15,7 +15,7 @@ export async function POST(
     }
 
     const { rating, comment } = await request.json();
-    const matchId = params.id;
+    const { id: matchId } = await params;
 
     if (!rating || rating < 1 || rating > 5) {
       return NextResponse.json({ error: 'Rating must be between 1 and 5.' }, { status: 400 });
