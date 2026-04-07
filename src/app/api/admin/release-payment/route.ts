@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       .eq('id', matchId);
 
     const tripRaw   = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
-    const trip      = tripRaw as { from_city: string; to_city: string } | null | undefined;
+    const trip      = tripRaw as unknown as { from_city: string; to_city: string } | null | undefined;
     const fromCity  = trip?.from_city ?? '';
     const toCity    = trip?.to_city ?? '';
 
@@ -81,7 +81,8 @@ export async function POST(request: NextRequest) {
       .eq('id', matchId);
 
     if (match) {
-      const trip     = match.sender_trip as { from_city: string; to_city: string } | null;
+      const tripRaw  = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
+      const trip     = tripRaw as unknown as { from_city: string; to_city: string } | null | undefined;
       const fromCity = trip?.from_city ?? '';
       const toCity   = trip?.to_city ?? '';
       await Promise.allSettled([
