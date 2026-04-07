@@ -60,10 +60,6 @@ function AdminHubContent() {
   const [noteVal,       setNoteVal]       = useState('');
   const [feedback,      setFeedback]      = useState<string | null>(null);
 
-  if (!adminKey || adminKey !== process.env.NEXT_PUBLIC_ADMIN_KEY) {
-    // Client-side key check is for UX only — real auth is on the API
-  }
-
   const load = async () => {
     setLoading(true);
     try {

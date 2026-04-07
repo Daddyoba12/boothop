@@ -59,7 +59,7 @@ export default function DashboardPage() {
           sender_trip:sender_trip_id(from_city, to_city, travel_date, price),
           traveler_trip:traveler_trip_id(from_city, to_city, travel_date, price)
         `)
-        .eq('email', userEmail)
+        .or(`sender_email.eq.${userEmail},traveler_email.eq.${userEmail}`)
         .order('created_at', { ascending: false });
 
       setMatches(matchesData || []);
@@ -74,14 +74,15 @@ export default function DashboardPage() {
       setTrips(tripsData || []);
 
       // Calculate stats
-      const active = matchesData?.filter(m => m.status === 'pending' || m.status === 'accepted').length || 0;
+      const ACTIVE_STATUSES = ['matched', 'agreed', 'committed', 'kyc_pending', 'kyc_complete', 'payment_processing', 'active'];
+      const active    = matchesData?.filter(m => ACTIVE_STATUSES.includes(m.status)).length || 0;
       const completed = matchesData?.filter(m => m.status === 'completed').length || 0;
-      const earnings = matchesData
-        ?.filter(m => m.status === 'completed' && m.booter_receives)
-        .reduce((sum, m) => sum + Number(m.booter_receives), 0) || 0;
-      const pending = matchesData
-        ?.filter(m => m.payment_status === 'escrowed')
-        .reduce((sum, m) => sum + Number(m.booter_receives || 0), 0) || 0;
+      const earnings  = matchesData
+        ?.filter(m => m.status === 'completed')
+        .reduce((sum, m) => sum + Number(m.agreed_price || 0), 0) || 0;
+      const pending   = matchesData
+        ?.filter(m => m.status === 'payment_processing')
+        .reduce((sum, m) => sum + Number(m.agreed_price || 0), 0) || 0;
 
       setStats({
         activeMatches: active,
@@ -129,19 +130,20 @@ export default function DashboardPage() {
 
   const getMatchStatus = (match: any) => {
     switch (match.status) {
-      case 'matched':         return { label: 'Matched',       color: 'blue',   icon: Clock };
-      case 'pending':         return { label: 'Pending',       color: 'yellow', icon: Clock };
-      case 'accepted':        return { label: 'Accepted',      color: 'blue',   icon: Clock };
-      case 'kyc_pending':     return { label: 'ID Check',      color: 'violet', icon: Shield };
-      case 'kyc_complete':    return { label: 'ID Verified',   color: 'green',  icon: CheckCircle };
-      case 'payment_pending': return { label: 'Awaiting Pay',  color: 'amber',  icon: Clock };
-      case 'payment_held':    return { label: 'Escrow Held',   color: 'amber',  icon: Shield };
-      case 'active':          return { label: 'Active',        color: 'blue',   icon: CheckCircle };
-      case 'completed':       return { label: 'Completed',     color: 'green',  icon: CheckCircle };
-      case 'released':        return { label: 'Paid Out',      color: 'green',  icon: CheckCircle };
-      case 'declined':        return { label: 'Declined',      color: 'red',    icon: XCircle };
-      case 'cancelled':       return { label: 'Cancelled',     color: 'red',    icon: XCircle };
-      default:                return { label: match.status ?? 'Unknown', color: 'gray', icon: AlertCircle };
+      case 'matched':                return { label: 'Matched',            color: 'blue',   icon: Clock };
+      case 'agreed':                 return { label: 'Price agreed',       color: 'blue',   icon: Clock };
+      case 'committed':              return { label: 'Terms signed',       color: 'blue',   icon: Clock };
+      case 'kyc_pending':            return { label: 'ID Check',           color: 'violet', icon: Shield };
+      case 'kyc_complete':           return { label: 'ID Verified',        color: 'green',  icon: CheckCircle };
+      case 'payment_processing':     return { label: 'Payment processing', color: 'yellow', icon: Clock };
+      case 'active':                 return { label: 'Active',             color: 'blue',   icon: CheckCircle };
+      case 'delivery_confirmed':     return { label: 'Delivery confirmed', color: 'green',  icon: CheckCircle };
+      case 'completed':              return { label: 'Completed',          color: 'green',  icon: CheckCircle };
+      case 'disputed':               return { label: 'Disputed',           color: 'red',    icon: AlertCircle };
+      case 'cancellation_requested': return { label: 'Cancellation req.',  color: 'yellow', icon: AlertCircle };
+      case 'declined':               return { label: 'Declined',           color: 'red',    icon: XCircle };
+      case 'cancelled':              return { label: 'Cancelled',          color: 'red',    icon: XCircle };
+      default:                       return { label: match.status ?? 'Unknown', color: 'gray', icon: AlertCircle };
     }
   };
 
@@ -344,19 +346,22 @@ export default function DashboardPage() {
                   >
                     <div className="flex items-center justify-between mb-4">
                       <div className={`px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 ${
-                        status.color === 'green' ? 'bg-green-500/20 text-green-300 border border-green-400/30' :
-                        status.color === 'blue' ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30' :
+                        status.color === 'green'  ? 'bg-green-500/20 text-green-300 border border-green-400/30' :
+                        status.color === 'blue'   ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30' :
                         status.color === 'yellow' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-400/30' :
-                        'bg-red-500/20 text-red-300 border border-red-400/30'
+                        status.color === 'amber'  ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' :
+                        status.color === 'violet' ? 'bg-violet-500/20 text-violet-300 border border-violet-400/30' :
+                        status.color === 'red'    ? 'bg-red-500/20 text-red-300 border border-red-400/30' :
+                        'bg-white/10 text-white/50 border border-white/10'
                       }`}>
                         <StatusIcon className="w-4 h-4" />
                         {status.label}
                       </div>
 
-                      {match.payment_status === 'escrowed' && (
-                        <div className="flex items-center gap-2 text-green-400 text-sm">
+                      {match.status === 'payment_processing' && (
+                        <div className="flex items-center gap-2 text-amber-400 text-sm">
                           <Shield className="w-4 h-4" />
-                          <span>Payment Secured</span>
+                          <span>Payment processing</span>
                         </div>
                       )}
                     </div>
@@ -367,7 +372,9 @@ export default function DashboardPage() {
                         <div>
                           <p className="text-white/60 text-sm">Route</p>
                           <p className="text-white font-semibold">
-                            {match.sender_trip.from_city} → {match.sender_trip.to_city}
+                            {match.sender_trip
+                              ? `${match.sender_trip.from_city} → ${match.sender_trip.to_city}`
+                              : '—'}
                           </p>
                         </div>
                       </div>
@@ -377,7 +384,9 @@ export default function DashboardPage() {
                         <div>
                           <p className="text-white/60 text-sm">Date</p>
                           <p className="text-white font-semibold">
-                            {new Date(match.sender_trip.travel_date).toLocaleDateString()}
+                            {match.sender_trip?.travel_date
+                              ? new Date(match.sender_trip.travel_date).toLocaleDateString()
+                              : '—'}
                           </p>
                         </div>
                       </div>
@@ -387,7 +396,7 @@ export default function DashboardPage() {
                         <div>
                           <p className="text-white/60 text-sm">Amount</p>
                           <p className="text-white font-semibold">
-                            £{Number(match.agreed_price || match.sender_trip.price).toFixed(2)}
+                            £{Number(match.agreed_price || match.sender_trip?.price || 0).toFixed(2)}
                           </p>
                         </div>
                       </div>

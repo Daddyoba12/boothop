@@ -70,6 +70,7 @@ export async function GET(
     return NextResponse.json({
       match,
       userRole: match.sender_email === email ? 'sender' : 'traveler',
+      userEmail: email,
       alreadyAccepted: !!acceptance,
     });
 

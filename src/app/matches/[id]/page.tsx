@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowLeft, CheckCircle, Clock, AlertCircle, Loader2,
-  Package, Plane, Shield, Lock, Phone, Mail,
-  XCircle, RefreshCw, Truck,
+  Package, Plane, Shield, Lock, Mail,
+  XCircle, RefreshCw, Truck, MessageSquare, Send,
+  Star, AlertTriangle, Scale,
 } from 'lucide-react';
 
 type KycStatus = 'none' | 'pending' | 'verified' | 'failed';
@@ -31,7 +32,15 @@ type Match = {
 type PageData = {
   match: Match;
   userRole: 'sender' | 'traveler';
+  userEmail: string;
   alreadyAccepted: boolean;
+};
+
+type Message = {
+  id: string;
+  sender_email: string;
+  content: string;
+  created_at: string;
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -47,30 +56,104 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   completed:            { label: 'Completed',           color: 'text-green-400' },
   cancelled:            { label: 'Cancelled',           color: 'text-red-400' },
   declined:             { label: 'Declined',            color: 'text-red-400' },
+  disputed:             { label: 'Disputed',            color: 'text-red-400' },
+  cancellation_requested: { label: 'Cancellation requested', color: 'text-orange-400' },
 };
 
 const CANCELLABLE = ['matched', 'agreed', 'committed', 'kyc_pending', 'kyc_complete'];
+const MESSAGING_STATUSES = ['active', 'delivery_confirmed', 'disputed'];
+const DISPUTE_STATUSES = ['active', 'delivery_confirmed'];
+
+const DISPUTE_REASONS = [
+  'Item not delivered',
+  'Item damaged in transit',
+  'Wrong item delivered',
+  'Carrier did not show up',
+  'Sender provided wrong details',
+  'Other',
+];
+
+function StarRating({ value, onChange }: { value: number; onChange: (n: number) => void }) {
+  const [hovered, setHovered] = useState(0);
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map(n => (
+        <button
+          key={n}
+          type="button"
+          onMouseEnter={() => setHovered(n)}
+          onMouseLeave={() => setHovered(0)}
+          onClick={() => onChange(n)}
+          className="transition-colors"
+        >
+          <Star
+            className={`h-8 w-8 ${(hovered || value) >= n ? 'text-amber-400 fill-amber-400' : 'text-white/20'}`}
+          />
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function MatchPage() {
   const params  = useParams();
   const router  = useRouter();
   const matchId = params.id as string;
 
-  const [data,           setData]           = useState<PageData | null>(null);
-  const [loading,        setLoading]        = useState(true);
-  const [cancelling,     setCancelling]     = useState(false);
-  const [cancelConfirm,  setCancelConfirm]  = useState(false);
-  const [error,          setError]          = useState<string | null>(null);
+  const [data,          setData]          = useState<PageData | null>(null);
+  const [loading,       setLoading]       = useState(true);
+  const [cancelling,    setCancelling]    = useState(false);
+  const [cancelConfirm, setCancelConfirm] = useState(false);
+  const [error,         setError]         = useState<string | null>(null);
+
+  // Messages
+  const [messages,     setMessages]     = useState<Message[]>([]);
+  const [msgContent,   setMsgContent]   = useState('');
+  const [sendingMsg,   setSendingMsg]   = useState(false);
+  const [msgError,     setMsgError]     = useState<string | null>(null);
+  const msgEndRef = useRef<HTMLDivElement>(null);
+
+  // Dispute
+  const [disputeReason,  setDisputeReason]  = useState(DISPUTE_REASONS[0]);
+  const [disputeDesc,    setDisputeDesc]    = useState('');
+  const [disputeLoading, setDisputeLoading] = useState(false);
+  const [disputeError,   setDisputeError]   = useState<string | null>(null);
+  const [disputeSent,    setDisputeSent]    = useState(false);
+  const [showDispute,    setShowDispute]    = useState(false);
+
+  // Rating
+  const [ratingValue,   setRatingValue]   = useState(0);
+  const [ratingComment, setRatingComment] = useState('');
+  const [ratingLoading, setRatingLoading] = useState(false);
+  const [ratingError,   setRatingError]   = useState<string | null>(null);
+  const [ratingSent,    setRatingSent]    = useState(false);
 
   const load = async () => {
     setLoading(true);
     try {
-      const res  = await fetch(`/api/matches/${matchId}/details`);
+      const res = await fetch(`/api/matches/${matchId}/details`);
       if (res.status === 401) { router.replace('/login'); return; }
       if (!res.ok) { const j = await res.json(); setError(j.error || 'Failed to load match.'); setLoading(false); return; }
-      setData(await res.json());
+      const d = await res.json();
+      setData(d);
+
+      // Load messages if in messaging-eligible status
+      if (MESSAGING_STATUSES.includes(d.match.status)) {
+        loadMessages();
+      }
     } catch { setError('Could not load match.'); }
     finally { setLoading(false); }
+  };
+
+  const loadMessages = async () => {
+    try {
+      const res = await fetch(`/api/messages/list?matchId=${matchId}`);
+      if (res.ok) {
+        const j = await res.json();
+        setMessages(j.messages ?? []);
+        setTimeout(() => msgEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+      }
+    } catch {}
   };
 
   useEffect(() => { load(); }, [matchId]);
@@ -88,6 +171,57 @@ export default function MatchPage() {
       else { await load(); setCancelConfirm(false); }
     } catch { setError('Could not cancel match.'); }
     finally { setCancelling(false); }
+  };
+
+  const sendMessage = async () => {
+    if (!msgContent.trim()) return;
+    setSendingMsg(true);
+    setMsgError(null);
+    try {
+      const res = await fetch('/api/messages/send', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ matchId, content: msgContent.trim() }),
+      });
+      const j = await res.json();
+      if (!res.ok) { setMsgError(j.error || 'Failed to send.'); }
+      else { setMsgContent(''); await loadMessages(); }
+    } catch { setMsgError('Could not send message.'); }
+    finally { setSendingMsg(false); }
+  };
+
+  const submitDispute = async () => {
+    if (!disputeDesc.trim()) { setDisputeError('Please describe the issue.'); return; }
+    setDisputeLoading(true);
+    setDisputeError(null);
+    try {
+      const res = await fetch('/api/disputes/create', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ matchId, reason: disputeReason, description: disputeDesc.trim() }),
+      });
+      const j = await res.json();
+      if (!res.ok) { setDisputeError(j.error || 'Failed to raise dispute.'); }
+      else { setDisputeSent(true); setShowDispute(false); await load(); }
+    } catch { setDisputeError('Could not raise dispute.'); }
+    finally { setDisputeLoading(false); }
+  };
+
+  const submitRating = async () => {
+    if (!ratingValue) { setRatingError('Please select a star rating.'); return; }
+    setRatingLoading(true);
+    setRatingError(null);
+    try {
+      const res = await fetch(`/api/matches/${matchId}/rate`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ rating: ratingValue, comment: ratingComment.trim() || undefined }),
+      });
+      const j = await res.json();
+      if (!res.ok) { setRatingError(j.error || 'Failed to submit rating.'); }
+      else { setRatingSent(true); }
+    } catch { setRatingError('Could not submit rating.'); }
+    finally { setRatingLoading(false); }
   };
 
   if (loading) {
@@ -113,20 +247,21 @@ export default function MatchPage() {
 
   if (!data) return null;
 
-  const { match, userRole } = data;
+  const { match, userRole, userEmail } = data;
   const trip        = match.sender_trip;
   const route       = trip ? `${trip.from_city} → ${trip.to_city}` : 'your delivery';
   const isActive    = match.status === 'active';
   const isComplete  = ['delivery_confirmed', 'completed'].includes(match.status);
   const isCancelled = ['cancelled', 'declined'].includes(match.status);
   const canCancel   = CANCELLABLE.includes(match.status);
+  const canMessage  = MESSAGING_STATUSES.includes(match.status);
+  const canDispute  = DISPUTE_STATUSES.includes(match.status) && match.status !== 'disputed';
+  const canRate     = ['completed', 'delivery_confirmed'].includes(match.status);
   const statusInfo  = STATUS_LABELS[match.status] ?? { label: match.status, color: 'text-white/50' };
 
-  const otherEmail     = userRole === 'sender' ? match.traveler_email : match.sender_email;
-  const myKyc          = userRole === 'sender' ? match.sender_kyc_status    : match.traveler_kyc_status;
-  const theirKyc       = userRole === 'sender' ? match.traveler_kyc_status  : match.sender_kyc_status;
-  const iConfirmed     = userRole === 'sender' ? match.hooper_confirmed_receipt   : match.booter_confirmed_delivery;
-  const theyConfirmed  = userRole === 'sender' ? match.booter_confirmed_delivery  : match.hooper_confirmed_receipt;
+  const otherEmail    = userRole === 'sender' ? match.traveler_email : match.sender_email;
+  const myKyc         = userRole === 'sender' ? match.sender_kyc_status   : match.traveler_kyc_status;
+  const theirKyc      = userRole === 'sender' ? match.traveler_kyc_status : match.sender_kyc_status;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
@@ -203,12 +338,12 @@ export default function MatchPage() {
             </p>
             <div className="space-y-3">
               {[
-                { done: true,                                           label: 'Match found' },
-                { done: match.sender_kyc_status !== 'none',            label: 'Identity verification started' },
-                { done: myKyc === 'verified',                          label: 'Your identity verified' },
-                { done: theirKyc === 'verified',                       label: "Other party's identity verified" },
+                { done: true,                                                                                   label: 'Match found' },
+                { done: match.sender_kyc_status !== 'none',                                                    label: 'Identity verification started' },
+                { done: myKyc === 'verified',                                                                  label: 'Your identity verified' },
+                { done: theirKyc === 'verified',                                                               label: "Other party's identity verified" },
                 { done: ['payment_processing', 'active', 'delivery_confirmed', 'completed'].includes(match.status), label: 'Payment received' },
-                { done: isActive || isComplete,                        label: 'Contact details released' },
+                { done: isActive || isComplete,                                                                label: 'Contact details released' },
               ].map(({ done, label }) => (
                 <div key={label} className="flex items-center gap-3 text-sm">
                   {done
@@ -219,7 +354,6 @@ export default function MatchPage() {
               ))}
             </div>
 
-            {/* Steer them to the right next step */}
             {['committed', 'kyc_pending', 'kyc_complete'].includes(match.status) && (
               <Link
                 href={`/kyc?matchId=${matchId}`}
@@ -256,8 +390,132 @@ export default function MatchPage() {
               </div>
             </div>
             <p className="text-xs text-white/30 mt-3">
-              You will receive a confirmation email with a one-click link when it's time to confirm your side.
+              You will receive a confirmation email with a one-click link when it is time to confirm your side.
             </p>
+          </div>
+        )}
+
+        {/* ── MESSAGING ── */}
+        {canMessage && (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-4 flex items-center gap-2">
+              <MessageSquare className="h-3.5 w-3.5" /> Messages
+            </p>
+
+            {/* Message list */}
+            <div className="space-y-3 max-h-72 overflow-y-auto mb-4 pr-1">
+              {messages.length === 0 && (
+                <p className="text-white/30 text-xs text-center py-6">No messages yet. Say hello!</p>
+              )}
+              {messages.map(msg => {
+                const isMe = msg.sender_email === userEmail;
+                return (
+                  <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'bg-blue-600 text-white' : 'bg-white/10 text-white/80'}`}>
+                      <p>{msg.content}</p>
+                      <p className={`text-xs mt-1 ${isMe ? 'text-blue-200' : 'text-white/30'}`}>
+                        {new Date(msg.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+              <div ref={msgEndRef} />
+            </div>
+
+            {msgError && (
+              <p className="text-red-400 text-xs mb-2">{msgError}</p>
+            )}
+
+            {/* Compose */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={msgContent}
+                onChange={e => setMsgContent(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                maxLength={1000}
+                placeholder="Type a message..."
+                className="flex-1 bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                onClick={sendMessage}
+                disabled={sendingMsg || !msgContent.trim()}
+                className="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white rounded-xl px-4 py-2.5 transition-all"
+              >
+                {sendingMsg ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              </button>
+            </div>
+            <p className="text-xs text-white/20 mt-2">Do not share phone numbers or contact details outside BootHop.</p>
+          </div>
+        )}
+
+        {/* ── DISPUTE ── */}
+        {canDispute && (
+          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+            {!showDispute ? (
+              <button
+                onClick={() => setShowDispute(true)}
+                className="text-orange-400 hover:text-orange-300 text-sm font-semibold transition-colors flex items-center gap-2"
+              >
+                <AlertTriangle className="h-4 w-4" /> Raise a dispute →
+              </button>
+            ) : (
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-orange-400 mb-4 flex items-center gap-2">
+                  <Scale className="h-3.5 w-3.5" /> Raise a dispute
+                </p>
+
+                {disputeError && <p className="text-red-400 text-xs mb-3">{disputeError}</p>}
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-xs text-white/50 font-semibold uppercase tracking-wider block mb-1.5">Reason</label>
+                    <select
+                      value={disputeReason}
+                      onChange={e => setDisputeReason(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {DISPUTE_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs text-white/50 font-semibold uppercase tracking-wider block mb-1.5">Description</label>
+                    <textarea
+                      value={disputeDesc}
+                      onChange={e => setDisputeDesc(e.target.value)}
+                      rows={3}
+                      placeholder="Explain what happened..."
+                      className="w-full bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 mt-4">
+                  <button
+                    onClick={submitDispute}
+                    disabled={disputeLoading}
+                    className="flex-1 flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-500 disabled:opacity-60 text-white font-bold py-3 rounded-xl text-sm transition-all"
+                  >
+                    {disputeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Scale className="h-4 w-4" />}
+                    Submit dispute
+                  </button>
+                  <button
+                    onClick={() => { setShowDispute(false); setDisputeError(null); }}
+                    className="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl text-sm transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {disputeSent && (
+          <div className="flex items-center gap-3 rounded-xl bg-orange-500/20 border border-orange-500/30 px-5 py-4">
+            <Scale className="h-5 w-5 text-orange-400 shrink-0" />
+            <p className="text-orange-200 text-sm">Your dispute has been raised. Our team will review it and contact both parties within 48 hours.</p>
           </div>
         )}
 
@@ -271,6 +529,52 @@ export default function MatchPage() {
                 ? 'Your goods have been delivered. Thank you for using BootHop.'
                 : 'Payment is being processed to your account. Thank you!'}
             </p>
+          </div>
+        )}
+
+        {/* ── RATING ── */}
+        {canRate && (
+          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-amber-400 mb-4 flex items-center gap-2">
+              <Star className="h-3.5 w-3.5" /> Rate your experience
+            </p>
+
+            {ratingSent ? (
+              <div className="text-center py-4">
+                <CheckCircle className="h-8 w-8 text-green-400 mx-auto mb-2" />
+                <p className="text-white font-semibold">Rating submitted. Thank you!</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {ratingError && <p className="text-red-400 text-xs">{ratingError}</p>}
+
+                <div>
+                  <p className="text-white/50 text-xs mb-2">How was your experience?</p>
+                  <StarRating value={ratingValue} onChange={setRatingValue} />
+                </div>
+
+                <div>
+                  <label className="text-xs text-white/50 font-semibold uppercase tracking-wider block mb-1.5">Comment (optional)</label>
+                  <textarea
+                    value={ratingComment}
+                    onChange={e => setRatingComment(e.target.value)}
+                    rows={2}
+                    maxLength={500}
+                    placeholder="Share your experience..."
+                    className="w-full bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <button
+                  onClick={submitRating}
+                  disabled={ratingLoading || !ratingValue}
+                  className="w-full flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-40 text-white font-bold py-3 rounded-xl text-sm transition-all"
+                >
+                  {ratingLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className="h-4 w-4" />}
+                  Submit rating
+                </button>
+              </div>
+            )}
           </div>
         )}
 
