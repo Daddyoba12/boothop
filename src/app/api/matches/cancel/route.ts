@@ -2,9 +2,14 @@ import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getAppSession } from '@/lib/auth/session';
 import { cookies } from 'next/headers';
+import { Resend } from 'resend';
 
-// Statuses where cancellation with no penalty is allowed
-const CANCELLABLE_STATUSES = ['matched', 'agreed', 'committed', 'kyc_pending', 'kyc_complete'];
+// Free cancel — no payment made yet
+const FREE_CANCEL   = ['matched', 'agreed', 'committed', 'kyc_pending', 'kyc_complete'];
+// Payment pending/processing — refund request (90% rule)
+const REFUND_CANCEL = ['payment_processing'];
+// Post-contact-release — no cancel, must dispute
+const NO_CANCEL     = ['active', 'delivery_confirmed', 'disputed', 'completed'];
 
 export async function POST(request: Request) {
   try {
@@ -24,7 +29,7 @@ export async function POST(request: Request) {
 
     const { data: match, error: matchErr } = await supabase
       .from('matches')
-      .select('id, status, sender_email, traveler_email')
+      .select('id, status, sender_email, traveler_email, agreed_price, sender_trip:sender_trip_id(from_city, to_city)')
       .eq('id', matchId)
       .maybeSingle();
 
@@ -37,23 +42,81 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Access denied.' }, { status: 403 });
     }
 
-    if (!CANCELLABLE_STATUSES.includes(match.status)) {
+    if (NO_CANCEL.includes(match.status)) {
       return NextResponse.json({
-        error: 'This match cannot be cancelled at this stage. If payment has been made, please contact support.',
+        error: 'This match cannot be cancelled after contact details have been released. Please raise a dispute if there is an issue.',
+        canDispute: true,
       }, { status: 400 });
     }
 
-    await supabase
-      .from('matches')
-      .update({
-        status:           'cancelled',
-        cancelled_by:     email,
-        cancelled_at:     new Date().toISOString(),
-        cancellation_reason: reason ?? null,
-      })
-      .eq('id', matchId);
+    if (FREE_CANCEL.includes(match.status)) {
+      await supabase
+        .from('matches')
+        .update({ status: 'cancelled', cancelled_by: email, cancelled_at: new Date().toISOString(), cancellation_reason: reason ?? null })
+        .eq('id', matchId);
 
-    return NextResponse.json({ ok: true });
+      return NextResponse.json({ ok: true, type: 'free_cancel' });
+    }
+
+    if (REFUND_CANCEL.includes(match.status)) {
+      // Payment was submitted — flag for admin to process refund (90%)
+      await supabase
+        .from('matches')
+        .update({ status: 'cancellation_requested', cancelled_by: email, cancelled_at: new Date().toISOString(), cancellation_reason: reason ?? null })
+        .eq('id', matchId);
+
+      const trip         = (match as any).sender_trip;
+      const fromCity     = trip?.from_city ?? '';
+      const toCity       = trip?.to_city   ?? '';
+      const agreedPrice  = match.agreed_price ?? 0;
+      const refundAmount = (agreedPrice * 0.90).toFixed(2);
+      const adminEmail   = process.env.ADMIN_EMAIL   || 'admin@boothop.com';
+      const from         = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
+      const appUrl       = process.env.NEXT_PUBLIC_APP_URL || '';
+      const resend       = new Resend(process.env.RESEND_API_KEY);
+
+      await Promise.allSettled([
+        // Alert admin
+        resend.emails.send({
+          from,
+          to: adminEmail,
+          subject: `[REFUND REQUEST] ${fromCity} → ${toCity} — £${refundAmount}`,
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px 24px;">
+              <h2>Cancellation + refund request</h2>
+              <p><strong>Route:</strong> ${fromCity} → ${toCity}</p>
+              <p><strong>Requested by:</strong> ${email}</p>
+              <p><strong>Original amount:</strong> £${agreedPrice.toFixed(2)}</p>
+              <p><strong>Refund due (90%):</strong> £${refundAmount}</p>
+              <p><strong>Reason:</strong> ${reason ?? 'Not provided'}</p>
+              <p>Match ID: ${matchId}</p>
+              <p>Please process the refund and update the match status in the admin hub: <a href="${appUrl}/admin/hub?adminKey=${process.env.ADMIN_SECRET}">${appUrl}/admin/hub</a></p>
+            </div>
+          `,
+          text: `Refund request: ${fromCity} → ${toCity}\nBy: ${email}\nAmount: £${refundAmount}\nReason: ${reason}`,
+        }),
+        // Confirm to user
+        resend.emails.send({
+          from,
+          to: email,
+          subject: `Cancellation request received — ${fromCity} → ${toCity}`,
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;">
+              <span style="font-size:22px;font-weight:900;color:#1e3a8a;">Boot</span><span style="font-size:22px;font-weight:900;color:#2563eb;">Hop</span>
+              <h2 style="margin:24px 0 8px;">Cancellation request received</h2>
+              <p style="color:#475569;">Your cancellation request for <strong>${fromCity} → ${toCity}</strong> has been received.</p>
+              <p style="color:#475569;">As payment was already being processed, a refund of <strong>£${refundAmount}</strong> (90% of £${agreedPrice.toFixed(2)}) will be issued within 3–5 business days.</p>
+              <p style="font-size:12px;color:#94a3b8;margin-top:24px;">Reply to this email if you need help.</p>
+            </div>
+          `,
+          text: `Cancellation received. Refund of £${refundAmount} will be processed within 3-5 business days.`,
+        }),
+      ]);
+
+      return NextResponse.json({ ok: true, type: 'refund_requested', refundAmount: parseFloat(refundAmount) });
+    }
+
+    return NextResponse.json({ error: 'This match cannot be cancelled.' }, { status: 400 });
 
   } catch (error) {
     console.error('matches/cancel error:', error);
