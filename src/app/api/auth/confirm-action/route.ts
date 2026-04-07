@@ -2,6 +2,8 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { signAppSession, getSessionCookieName } from '@/lib/auth/session';
+import { sendTermsAcceptanceEmail } from '@/lib/email/sendTermsEmail';
+import { sendAdminDeliveryConfirmedEmail, sendDeliveryCompleteEmail } from '@/lib/email/sendDeliveryEmail';
 
 export async function POST(request: Request) {
   try {
@@ -69,13 +71,39 @@ export async function POST(request: Request) {
           .single();
 
         if (match?.sender_accepted && match?.traveler_accepted) {
+          // Both accepted price — move to 'agreed', now require Terms acceptance
           await supabase
             .from('matches')
-            .update({ status: 'accepted' })
+            .update({ status: 'agreed' })
             .eq('id', matchId);
-        }
 
-        message = 'Match confirmed! You can now proceed to payment.';
+          // Fetch full match to send terms emails
+          const { data: fullMatch } = await supabase
+            .from('matches')
+            .select('sender_email, traveler_email, agreed_price, sender_trip:sender_trip_id(from_city, to_city, travel_date)')
+            .eq('id', matchId)
+            .single();
+
+          const trip = (fullMatch as any)?.sender_trip;
+          if (trip) {
+            const emailBase = {
+              fromCity:    trip.from_city,
+              toCity:      trip.to_city,
+              travelDate:  trip.travel_date,
+              agreedPrice: fullMatch?.agreed_price ?? 0,
+              matchId,
+            };
+            await Promise.allSettled([
+              fullMatch?.sender_email   && sendTermsAcceptanceEmail({ toEmail: fullMatch.sender_email,   role: 'sender',   ...emailBase }),
+              fullMatch?.traveler_email && sendTermsAcceptanceEmail({ toEmail: fullMatch.traveler_email, role: 'traveler', ...emailBase }),
+            ]);
+          }
+
+          redirectTo = `/commit?matchId=${matchId}`;
+          message    = 'Price confirmed! Please read and accept our Terms & Conditions to continue.';
+        } else {
+          message = 'Confirmed! Waiting for the other party to accept.';
+        }
       }
 
       if (action_type === 'decline_match') {
@@ -146,29 +174,42 @@ export async function POST(request: Request) {
       await supabase
         .from('matches')
         .update({
-          hooper_confirmed_receipt: true,
-          hooper_confirmed_condition: true,
-          hooper_confirmed_at: nowIso,
+          hooper_confirmed_receipt:    true,
+          hooper_confirmed_condition:  true,
+          hooper_confirmed_at:         nowIso,
         })
         .eq('id', matchId);
 
-      // Check if collection was also confirmed → trigger escrow release
-      const { data: match } = await supabase
+      // Check if carrier also confirmed → both done, notify admin to release payment
+      const { data: updatedMatch } = await supabase
         .from('matches')
-        .select('booter_confirmed_delivery, stripe_payment_intent_id')
+        .select('booter_confirmed_delivery, sender_email, traveler_email, agreed_price, sender_trip:sender_trip_id(from_city, to_city)')
         .eq('id', matchId)
         .single();
 
-      if (match?.booter_confirmed_delivery && match?.stripe_payment_intent_id) {
-        const origin = process.env.NEXT_PUBLIC_APP_URL || '';
-        fetch(`${origin}/api/release-payment`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ matchId }),
-        }).catch(console.error);
+      if (updatedMatch?.booter_confirmed_delivery) {
+        // Mark as delivery_confirmed
+        await supabase
+          .from('matches')
+          .update({ status: 'delivery_confirmed' })
+          .eq('id', matchId);
+
+        const trip = (updatedMatch as any).sender_trip;
+        await Promise.allSettled([
+          sendAdminDeliveryConfirmedEmail({
+            matchId,
+            fromCity:      trip?.from_city    ?? '',
+            toCity:        trip?.to_city      ?? '',
+            senderEmail:   updatedMatch.sender_email,
+            travelerEmail: updatedMatch.traveler_email,
+            agreedPrice:   updatedMatch.agreed_price ?? 0,
+          }),
+          sendDeliveryCompleteEmail({ toEmail: updatedMatch.sender_email,   fromCity: trip?.from_city ?? '', toCity: trip?.to_city ?? '', matchId, role: 'sender' }),
+          sendDeliveryCompleteEmail({ toEmail: updatedMatch.traveler_email, fromCity: trip?.from_city ?? '', toCity: trip?.to_city ?? '', matchId, role: 'traveler' }),
+        ]);
       }
 
-      message = 'Delivery confirmed! Escrow will be released shortly.';
+      message = 'Delivery confirmed! Your transaction is being finalised.';
     }
 
     return NextResponse.json({ ok: true, email, action_type, redirectTo, message });
