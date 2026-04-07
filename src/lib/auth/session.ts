@@ -43,3 +43,52 @@ export function getAppSession(
     return null;
   }
 }
+
+// ── Business portal session ───────────────────────────────────────────────────
+const BIZ_COOKIE   = 'boothop_biz_session';
+const BIZ_OTP_COOKIE = 'boothop_biz_otp';
+
+export type BizSessionPayload = { email: string; business: true };
+
+export function getBizCookieName()    { return BIZ_COOKIE; }
+export function getBizOtpCookieName() { return BIZ_OTP_COOKIE; }
+
+export function signBizSession(email: string) {
+  const secret = process.env.APP_SESSION_SECRET;
+  if (!secret) throw new Error('APP_SESSION_SECRET is missing');
+  return jwt.sign({ email, business: true } as BizSessionPayload, secret, {
+    expiresIn: '7d', issuer: 'boothop', audience: 'boothop-business',
+  });
+}
+
+export function signBizOtp(email: string, code: string) {
+  const secret = process.env.APP_SESSION_SECRET;
+  if (!secret) throw new Error('APP_SESSION_SECRET is missing');
+  return jwt.sign({ email, code, type: 'biz_otp' }, secret, {
+    expiresIn: '10m', issuer: 'boothop', audience: 'boothop-business',
+  });
+}
+
+export function getBizSession(
+  cookieStore: { get: (name: string) => { value: string } | undefined }
+): BizSessionPayload | null {
+  try {
+    const cookie = cookieStore.get(BIZ_COOKIE);
+    if (!cookie?.value) return null;
+    return jwt.verify(cookie.value, process.env.APP_SESSION_SECRET!, {
+      issuer: 'boothop', audience: 'boothop-business',
+    }) as BizSessionPayload;
+  } catch { return null; }
+}
+
+export function getBizOtp(
+  cookieStore: { get: (name: string) => { value: string } | undefined }
+): { email: string; code: string } | null {
+  try {
+    const cookie = cookieStore.get(BIZ_OTP_COOKIE);
+    if (!cookie?.value) return null;
+    return jwt.verify(cookie.value, process.env.APP_SESSION_SECRET!, {
+      issuer: 'boothop', audience: 'boothop-business',
+    }) as { email: string; code: string };
+  } catch { return null; }
+}
