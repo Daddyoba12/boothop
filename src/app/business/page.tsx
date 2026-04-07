@@ -2,81 +2,143 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Mail, ShieldCheck, CheckCircle, ArrowRight } from 'lucide-react';
+import {
+  Loader2, Mail, ShieldCheck, CheckCircle, ArrowRight,
+  Zap, Lock, Clock, MapPin, Package, Star, Building2,
+} from 'lucide-react';
 
-// ─────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────
-type Stage = 'loading' | 'email' | 'otp' | 'form' | 'success';
-
-type JobForm = {
-  pickup: string;
-  dropoff: string;
-  description: string;
-  weight: string;
-  value: string;
-  category: string;
-  urgency: 'same_day' | 'next_day';
-  insurance: boolean;
+// ─────────────────────────────────────────────────────────────────────────────
+// Pricing engine — no external API needed
+// ─────────────────────────────────────────────────────────────────────────────
+const UK_CITIES: Record<string, [number, number]> = {
+  london:       [51.5074, -0.1278],
+  'central london': [51.5074, -0.1278],
+  birmingham:   [52.4862, -1.8904],
+  manchester:   [53.4808, -2.2426],
+  leeds:        [53.8008, -1.5491],
+  sheffield:    [53.3811, -1.4701],
+  liverpool:    [53.4084, -2.9916],
+  bristol:      [51.4545, -2.5879],
+  nottingham:   [52.9548, -1.1581],
+  leicester:    [52.6369, -1.1398],
+  derby:        [52.9225, -1.4746],
+  coventry:     [52.4068, -1.5197],
+  edinburgh:    [55.9533, -3.1883],
+  glasgow:      [55.8642, -4.2518],
+  cardiff:      [51.4816, -3.1791],
+  cambridge:    [52.2053,  0.1218],
+  oxford:       [51.7520, -1.2577],
+  norwich:      [52.6309,  1.2974],
+  southampton:  [50.9097, -1.4044],
+  portsmouth:   [50.8198, -1.0880],
+  reading:      [51.4543, -0.9781],
+  newcastle:    [54.9783, -1.6178],
+  sunderland:   [54.9069, -1.3838],
+  middlesbrough:[54.5743, -1.2350],
+  hull:         [53.7457, -0.3367],
+  york:         [53.9600, -1.0873],
+  bradford:     [53.7960, -1.7594],
+  stoke:        [53.0027, -2.1794],
+  exeter:       [50.7184, -3.5339],
+  brighton:     [50.8229, -0.1363],
+  ipswich:      [52.0567,  1.1482],
+  peterborough: [52.5695, -0.2405],
+  northampton:  [52.2405, -0.9027],
 };
 
-// ─────────────────────────────────────────────
-// Main Page
-// ─────────────────────────────────────────────
+function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 3958.8;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function detectCity(text: string): [number, number] | null {
+  const lower = text.toLowerCase();
+  // Try longest match first so "central london" beats "london"
+  const sorted = Object.keys(UK_CITIES).sort((a, b) => b.length - a.length);
+  for (const city of sorted) {
+    if (lower.includes(city)) return UK_CITIES[city];
+  }
+  return null;
+}
+
+// Nottingham→Leicester ≈ 27 miles = £250 base unit
+// London from Notts ≈ 125 miles → £500
+// Every additional 35 miles beyond 130 = +£250
+function priceFromMiles(miles: number): number {
+  if (miles <= 35)  return 250;
+  if (miles <= 130) return 500;
+  const extra = Math.ceil((miles - 130) / 35);
+  return 500 + extra * 250;
+}
+
+function calculatePrice(pickup: string, dropoff: string): { price: number; miles: number } | null {
+  const from = detectCity(pickup);
+  const to   = detectCity(dropoff);
+  if (!from || !to) return null;
+  const miles = Math.round(haversine(from[0], from[1], to[0], to[1]));
+  return { price: priceFromMiles(miles), miles };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────────────────────────────────────
+type Stage = 'loading' | 'landing' | 'email' | 'otp' | 'form' | 'success';
+
+type JobForm = {
+  pickup: string; dropoff: string; description: string;
+  weight: string; value: string; category: string;
+  urgency: 'same_day' | 'next_day'; insurance: boolean;
+};
+
+const FADE = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -16 } };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────────────────────────────────────
 export default function BoothopBusiness() {
-  const [stage,      setStage]      = useState<Stage>('loading');
-  const [bizEmail,   setBizEmail]   = useState('');
-  const [emailInput, setEmailInput] = useState('');
-  const [otpInput,   setOtpInput]   = useState('');
-  const [authError,  setAuthError]  = useState<string | null>(null);
-  const [authLoading,setAuthLoading]= useState(false);
-  const [jobRef,     setJobRef]     = useState('');
+  const [stage,       setStage]       = useState<Stage>('loading');
+  const [bizEmail,    setBizEmail]    = useState('');
+  const [emailInput,  setEmailInput]  = useState('');
+  const [otpInput,    setOtpInput]    = useState('');
+  const [authError,   setAuthError]   = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [jobRef,      setJobRef]      = useState('');
 
   const [form, setForm] = useState<JobForm>({
     pickup: '', dropoff: '', description: '',
     weight: '', value: '', category: '',
     urgency: 'same_day', insurance: true,
   });
-  const [price,       setPrice]       = useState<number | null>(null);
+  const [estimate,    setEstimate]    = useState<{ price: number; miles: number } | null>(null);
   const [formLoading, setFormLoading] = useState(false);
   const [formError,   setFormError]   = useState<string | null>(null);
 
-  // ── Check existing business session on load ──
+  // Check existing session
   useEffect(() => {
     fetch('/api/business/auth/me')
       .then(r => r.json())
-      .then(d => {
-        if (d.authenticated) {
-          setBizEmail(d.email);
-          setStage('form');
-        } else {
-          setStage('email');
-        }
-      })
-      .catch(() => setStage('email'));
+      .then(d => { if (d.authenticated) { setBizEmail(d.email); setStage('form'); } else { setStage('landing'); } })
+      .catch(() => setStage('landing'));
   }, []);
 
-  // ── Live price estimate ──
+  // Live price estimate
   useEffect(() => {
-    if (!form.pickup || !form.dropoff) { setPrice(null); return; }
-    const from = form.pickup.toLowerCase();
-    const to   = form.dropoff.toLowerCase();
-    if (from.includes('nottingham') && to.includes('leicester')) setPrice(250);
-    else if (to.includes('london')  || from.includes('london'))  setPrice(500);
-    else setPrice(300);
+    if (form.pickup && form.dropoff) setEstimate(calculatePrice(form.pickup, form.dropoff));
+    else setEstimate(null);
   }, [form.pickup, form.dropoff]);
 
-  // ─────────────────────────────────────────────
-  // Auth handlers
-  // ─────────────────────────────────────────────
+  // ── Auth ──────────────────────────────────────────────────────────────────
   const sendOtp = async () => {
-    setAuthError(null);
-    setAuthLoading(true);
+    setAuthError(null); setAuthLoading(true);
     try {
       const res = await fetch('/api/business/auth/send-otp', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email: emailInput.trim() }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailInput.trim() }),
       });
       const j = await res.json();
       if (!res.ok) { setAuthError(j.error); return; }
@@ -86,360 +148,456 @@ export default function BoothopBusiness() {
   };
 
   const verifyOtp = async () => {
-    setAuthError(null);
-    setAuthLoading(true);
+    setAuthError(null); setAuthLoading(true);
     try {
       const res = await fetch('/api/business/auth/verify-otp', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ code: otpInput.trim() }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: otpInput.trim() }),
       });
       const j = await res.json();
       if (!res.ok) { setAuthError(j.error); return; }
-      setBizEmail(j.email);
-      setStage('form');
+      setBizEmail(j.email); setStage('form');
     } catch { setAuthError('Verification failed. Please try again.'); }
     finally { setAuthLoading(false); }
   };
 
-  // ─────────────────────────────────────────────
-  // Job submission
-  // ─────────────────────────────────────────────
+  // ── Submit job ────────────────────────────────────────────────────────────
   const submitJob = async () => {
     if (!form.insurance) { setFormError('Insurance is compulsory.'); return; }
     if (!form.pickup || !form.dropoff) { setFormError('Pickup and drop-off are required.'); return; }
-    setFormError(null);
-    setFormLoading(true);
+    setFormError(null); setFormLoading(true);
     try {
       const res = await fetch('/api/business/create-job', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ ...form, price }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, price: estimate?.price ?? 250, miles: estimate?.miles ?? 0 }),
       });
       const j = await res.json();
       if (!res.ok) { setFormError(j.error || 'Something went wrong.'); return; }
-      setJobRef(j.jobRef);
-      setStage('success');
-    } catch { setFormError('Something went wrong. Please try again.'); }
+      setJobRef(j.jobRef); setStage('success');
+    } catch { setFormError('Something went wrong.'); }
     finally { setFormLoading(false); }
   };
 
-  // ─────────────────────────────────────────────
-  // Loading
-  // ─────────────────────────────────────────────
+  // ── Loading ───────────────────────────────────────────────────────────────
   if (stage === 'loading') {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-[#050a05] flex items-center justify-center">
         <Loader2 className="h-8 w-8 text-emerald-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 py-10">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-[#050a05] text-white">
+      <AnimatePresence mode="wait">
 
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-          <h1 className="text-4xl font-bold">
-            BootHop <span className="text-emerald-400">Business</span>
-          </h1>
-          <p className="text-gray-400 mt-2">Premium logistics for time-sensitive business deliveries</p>
-        </motion.div>
+        {/* ══════════════════════════════════════════
+            LANDING PAGE
+        ══════════════════════════════════════════ */}
+        {stage === 'landing' && (
+          <motion.div key="landing" {...FADE} transition={{ duration: 0.4 }}>
 
-        <AnimatePresence mode="wait">
+            {/* Nav */}
+            <nav className="px-8 py-5 flex items-center justify-between border-b border-white/5">
+              <div className="text-xl font-black tracking-tight">
+                Boot<span className="text-emerald-400">Hop</span>
+                <span className="ml-2 text-xs font-semibold bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full uppercase tracking-widest">Business</span>
+              </div>
+              <button
+                onClick={() => setStage('email')}
+                className="text-sm font-semibold text-white/60 hover:text-white transition-colors"
+              >
+                Sign in →
+              </button>
+            </nav>
 
-          {/* ── STAGE: EMAIL ── */}
-          {stage === 'email' && (
-            <motion.div
-              key="email"
-              initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
-              className="bg-white/5 backdrop-blur-xl p-8 rounded-2xl border border-white/10 shadow-xl max-w-md mx-auto"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center">
-                  <ShieldCheck className="h-6 w-6 text-emerald-400" />
-                </div>
-                <div>
-                  <h2 className="text-white font-bold text-lg">Business access only</h2>
-                  <p className="text-white/40 text-sm">Enter your company email to continue</p>
-                </div>
+            {/* Hero */}
+            <div className="max-w-5xl mx-auto px-8 pt-24 pb-16 text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold px-4 py-2 rounded-full mb-8 uppercase tracking-widest"
+              >
+                <Zap className="h-3.5 w-3.5" /> Premium business logistics
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-6"
+              >
+                Same-day delivery<br />
+                <span className="text-emerald-400">across the UK.</span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                className="text-white/50 text-xl max-w-2xl mx-auto mb-12 leading-relaxed"
+              >
+                BootHop Business connects your company to a network of verified carriers.
+                Fast, insured, and built for time-critical deliveries.
+              </motion.p>
+
+              <motion.button
+                initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.25 }}
+                onClick={() => setStage('email')}
+                className="inline-flex items-center gap-3 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-lg px-10 py-4 rounded-2xl hover:scale-105 transition-all shadow-2xl shadow-emerald-500/30"
+              >
+                Request a delivery <ArrowRight className="h-5 w-5" />
+              </motion.button>
+              <p className="text-white/20 text-sm mt-4">Business email required · No personal accounts accepted</p>
+            </div>
+
+            {/* Stats */}
+            <div className="max-w-5xl mx-auto px-8 pb-16">
+              <div className="grid grid-cols-3 gap-4">
+                {[
+                  { value: '£250', label: 'Starting from', sub: 'Nottingham ↔ Leicester range' },
+                  { value: '100%', label: 'Insured', sub: 'Every single delivery' },
+                  { value: 'Same day', label: 'Delivery', sub: 'For urgent business needs' },
+                ].map(s => (
+                  <div key={s.label} className="bg-white/3 border border-white/8 rounded-2xl p-6 text-center">
+                    <p className="text-3xl font-black text-emerald-400 mb-1">{s.value}</p>
+                    <p className="text-white font-semibold text-sm">{s.label}</p>
+                    <p className="text-white/30 text-xs mt-0.5">{s.sub}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* How it works */}
+            <div className="max-w-5xl mx-auto px-8 pb-20">
+              <h2 className="text-2xl font-black text-center mb-10">How it works</h2>
+              <div className="grid md:grid-cols-3 gap-6">
+                {[
+                  { icon: Building2, step: '01', title: 'Verify your business', body: 'Sign in with your company email. No Gmail or personal accounts — business only.' },
+                  { icon: MapPin,    step: '02', title: 'Submit your request', body: 'Tell us the route, what needs delivering, and when. Get an instant price estimate.' },
+                  { icon: Zap,       step: '03', title: 'We handle the rest', body: 'We match a verified carrier to your job and keep you updated every step of the way.' },
+                ].map(({ icon: Icon, step, title, body }) => (
+                  <div key={step} className="bg-white/3 border border-white/8 rounded-2xl p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                        <Icon className="h-5 w-5 text-emerald-400" />
+                      </div>
+                      <span className="text-white/20 font-black text-2xl">{step}</span>
+                    </div>
+                    <h3 className="text-white font-bold mb-2">{title}</h3>
+                    <p className="text-white/40 text-sm leading-relaxed">{body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Pricing */}
+            <div className="max-w-5xl mx-auto px-8 pb-20">
+              <h2 className="text-2xl font-black text-center mb-4">Transparent pricing</h2>
+              <p className="text-white/40 text-center text-sm mb-10">Fixed rates based on distance. No hidden fees.</p>
+              <div className="grid md:grid-cols-4 gap-4">
+                {[
+                  { range: 'Up to 35 miles',    price: '£250', example: 'Nottingham ↔ Leicester' },
+                  { range: '36 – 130 miles',    price: '£500', example: 'Nottingham ↔ London' },
+                  { range: '131 – 165 miles',   price: '£750', example: 'London ↔ Manchester' },
+                  { range: '165+ miles',        price: '£1,000+', example: 'Cross-country routes' },
+                ].map(p => (
+                  <div key={p.range} className="bg-white/3 border border-white/8 rounded-2xl p-5">
+                    <p className="text-2xl font-black text-emerald-400 mb-1">{p.price}</p>
+                    <p className="text-white/60 text-xs font-semibold mb-2">{p.range}</p>
+                    <p className="text-white/25 text-xs">{p.example}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-white/20 text-xs text-center mt-4">All prices include insurance. +£250 per additional 35-mile band beyond 165 miles.</p>
+            </div>
+
+            {/* Features */}
+            <div className="max-w-5xl mx-auto px-8 pb-20">
+              <div className="grid md:grid-cols-2 gap-4">
+                {[
+                  { icon: ShieldCheck, title: 'Fully insured',       body: 'Every delivery is insured to the declared value of goods.' },
+                  { icon: Clock,       title: 'Same-day available',   body: 'Submit before midday for same-day delivery on most routes.' },
+                  { icon: Lock,        title: 'Business-only access', body: 'Verified business accounts only. No personal users on the platform.' },
+                  { icon: Star,        title: 'Rated carriers',       body: 'All our carriers are verified, rated, and background-checked.' },
+                ].map(({ icon: Icon, title, body }) => (
+                  <div key={title} className="flex items-start gap-4 bg-white/3 border border-white/8 rounded-2xl p-5">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0">
+                      <Icon className="h-5 w-5 text-emerald-400" />
+                    </div>
+                    <div>
+                      <p className="text-white font-bold mb-1">{title}</p>
+                      <p className="text-white/40 text-sm leading-relaxed">{body}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom CTA */}
+            <div className="max-w-2xl mx-auto px-8 pb-24 text-center">
+              <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border border-emerald-500/20 rounded-3xl p-10">
+                <h2 className="text-3xl font-black mb-3">Ready to get started?</h2>
+                <p className="text-white/40 mb-8">Enter your business email to access the portal.</p>
+                <button
+                  onClick={() => setStage('email')}
+                  className="inline-flex items-center gap-3 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black px-8 py-4 rounded-2xl hover:scale-105 transition-all"
+                >
+                  Get access <ArrowRight className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+          </motion.div>
+        )}
+
+        {/* ══════════════════════════════════════════
+            EMAIL INPUT
+        ══════════════════════════════════════════ */}
+        {stage === 'email' && (
+          <motion.div key="email" {...FADE} className="min-h-screen flex flex-col items-center justify-center px-6">
+            <div className="w-full max-w-md">
+              <div className="text-center mb-8">
+                <p className="text-xl font-black mb-1">Boot<span className="text-emerald-400">Hop</span> <span className="text-white/40 font-normal">Business</span></p>
+                <h2 className="text-3xl font-black mt-4 mb-2">Enter your business email</h2>
+                <p className="text-white/40 text-sm">Personal email addresses are not accepted</p>
               </div>
 
-              {authError && (
-                <div className="mb-4 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">
-                  {authError}
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 space-y-4">
+                {authError && (
+                  <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">{authError}</div>
+                )}
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+                  <input
+                    type="email"
+                    value={emailInput}
+                    onChange={e => setEmailInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && sendOtp()}
+                    placeholder="you@yourcompany.com"
+                    autoFocus
+                    className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+                  />
                 </div>
-              )}
-
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs text-white/40 font-semibold uppercase tracking-wider block mb-1.5">
-                    Business email address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
-                    <input
-                      type="email"
-                      value={emailInput}
-                      onChange={e => setEmailInput(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && sendOtp()}
-                      placeholder="you@yourcompany.com"
-                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-                    />
-                  </div>
-                  <p className="text-xs text-white/25 mt-1.5">Gmail and personal email addresses are not accepted</p>
-                </div>
-
                 <button
                   onClick={sendOtp}
                   disabled={authLoading || !emailInput.trim()}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold text-sm disabled:opacity-40 hover:scale-[1.02] transition-all"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black disabled:opacity-40 hover:scale-[1.02] transition-all"
                 >
                   {authLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
                   {authLoading ? 'Sending code…' : 'Send verification code'}
                 </button>
+                <button onClick={() => setStage('landing')} className="w-full text-center text-white/25 hover:text-white/50 text-sm transition-colors pt-1">
+                  ← Back
+                </button>
               </div>
-            </motion.div>
-          )}
+            </div>
+          </motion.div>
+        )}
 
-          {/* ── STAGE: OTP ── */}
-          {stage === 'otp' && (
-            <motion.div
-              key="otp"
-              initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
-              className="bg-white/5 backdrop-blur-xl p-8 rounded-2xl border border-white/10 shadow-xl max-w-md mx-auto"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center">
-                  <Mail className="h-6 w-6 text-emerald-400" />
+        {/* ══════════════════════════════════════════
+            OTP
+        ══════════════════════════════════════════ */}
+        {stage === 'otp' && (
+          <motion.div key="otp" {...FADE} className="min-h-screen flex flex-col items-center justify-center px-6">
+            <div className="w-full max-w-md">
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+                  <Mail className="h-8 w-8 text-emerald-400" />
                 </div>
-                <div>
-                  <h2 className="text-white font-bold text-lg">Check your email</h2>
-                  <p className="text-white/40 text-sm">We sent a 6-digit code to <span className="text-emerald-400">{emailInput}</span></p>
-                </div>
+                <h2 className="text-3xl font-black mb-2">Check your inbox</h2>
+                <p className="text-white/40 text-sm">We sent a 6-digit code to</p>
+                <p className="text-emerald-400 font-semibold text-sm mt-0.5">{emailInput}</p>
               </div>
 
-              {authError && (
-                <div className="mb-4 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">
-                  {authError}
-                </div>
-              )}
-
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs text-white/40 font-semibold uppercase tracking-wider block mb-1.5">
-                    Verification code
-                  </label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={otpInput}
-                    onChange={e => setOtpInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    onKeyDown={e => e.key === 'Enter' && verifyOtp()}
-                    placeholder="000000"
-                    className="w-full text-center text-3xl font-mono tracking-[0.5em] py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  />
-                </div>
-
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 space-y-4">
+                {authError && (
+                  <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">{authError}</div>
+                )}
+                <input
+                  type="text" inputMode="numeric"
+                  value={otpInput}
+                  onChange={e => setOtpInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onKeyDown={e => e.key === 'Enter' && verifyOtp()}
+                  placeholder="000000"
+                  autoFocus
+                  className="w-full text-center text-4xl font-mono tracking-[0.6em] py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
                 <button
                   onClick={verifyOtp}
                   disabled={authLoading || otpInput.length < 6}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold text-sm disabled:opacity-40 hover:scale-[1.02] transition-all"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black disabled:opacity-40 hover:scale-[1.02] transition-all"
                 >
                   {authLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
                   {authLoading ? 'Verifying…' : 'Verify & continue'}
                 </button>
-
-                <button
-                  onClick={() => { setStage('email'); setOtpInput(''); setAuthError(null); }}
-                  className="w-full text-center text-white/30 hover:text-white/60 text-sm transition-colors"
-                >
+                <button onClick={() => { setStage('email'); setOtpInput(''); setAuthError(null); }}
+                  className="w-full text-center text-white/25 hover:text-white/50 text-sm transition-colors">
                   Use a different email
                 </button>
               </div>
-            </motion.div>
-          )}
+            </div>
+          </motion.div>
+        )}
 
-          {/* ── STAGE: FORM ── */}
-          {stage === 'form' && (
-            <motion.div
-              key="form"
-              initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
-            >
-              {/* Logged in bar */}
-              <div className="flex items-center gap-2 mb-6 text-sm text-white/40">
-                <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                Logged in as <span className="text-emerald-400 font-semibold">{bizEmail}</span>
+        {/* ══════════════════════════════════════════
+            DELIVERY FORM
+        ══════════════════════════════════════════ */}
+        {stage === 'form' && (
+          <motion.div key="form" {...FADE} className="px-6 py-10">
+            <div className="max-w-3xl mx-auto">
+
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h1 className="text-3xl font-black">Boot<span className="text-emerald-400">Hop</span> Business</h1>
+                  <p className="text-white/30 text-sm mt-0.5">Premium logistics portal</p>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-white/30 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                  <span className="text-emerald-400 font-semibold">{bizEmail}</span>
+                </div>
               </div>
 
-              <div className="bg-white/5 backdrop-blur-xl p-6 rounded-2xl border border-white/10 shadow-xl space-y-6">
+              <div className="bg-white/3 border border-white/8 rounded-3xl p-8 space-y-6">
 
                 {/* Route */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs text-white/40 font-semibold uppercase tracking-wider block mb-1.5">Pickup location</label>
-                    <input
-                      value={form.pickup}
-                      onChange={e => setForm({ ...form, pickup: e.target.value })}
-                      placeholder="e.g. Nottingham city centre"
-                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-white/40 font-semibold uppercase tracking-wider block mb-1.5">Drop-off location</label>
-                    <input
-                      value={form.dropoff}
-                      onChange={e => setForm({ ...form, dropoff: e.target.value })}
-                      placeholder="e.g. London EC2A"
-                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-                    />
-                  </div>
-                </div>
-
-                {/* Description */}
                 <div>
-                  <label className="text-xs text-white/40 font-semibold uppercase tracking-wider block mb-1.5">Describe the goods</label>
-                  <textarea
-                    value={form.description}
-                    onChange={e => setForm({ ...form, description: e.target.value })}
-                    placeholder="What needs to be delivered?"
-                    rows={3}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm resize-none"
-                  />
+                  <p className="text-xs font-bold uppercase tracking-widest text-white/30 mb-3 flex items-center gap-2">
+                    <MapPin className="h-3.5 w-3.5" /> Route
+                  </p>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs text-white/40 block mb-1.5">Pickup location</label>
+                      <input value={form.pickup} onChange={e => setForm({ ...form, pickup: e.target.value })}
+                        placeholder="e.g. Nottingham city centre"
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-white/40 block mb-1.5">Drop-off location</label>
+                      <input value={form.dropoff} onChange={e => setForm({ ...form, dropoff: e.target.value })}
+                        placeholder="e.g. London EC2A"
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
+                    </div>
+                  </div>
+                  {form.pickup && form.dropoff && !estimate && (
+                    <p className="text-amber-400/60 text-xs mt-2">Enter recognised city names for an instant quote (e.g. "Nottingham", "London")</p>
+                  )}
                 </div>
 
-                {/* Details */}
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="text-xs text-white/40 font-semibold uppercase tracking-wider block mb-1.5">Weight (kg)</label>
-                    <input
-                      value={form.weight}
-                      onChange={e => setForm({ ...form, weight: e.target.value })}
-                      placeholder="e.g. 5"
-                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-white/40 font-semibold uppercase tracking-wider block mb-1.5">Declared value (£)</label>
-                    <input
-                      value={form.value}
-                      onChange={e => setForm({ ...form, value: e.target.value })}
-                      placeholder="e.g. 500"
-                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-white/40 font-semibold uppercase tracking-wider block mb-1.5">Category</label>
-                    <select
-                      value={form.category}
-                      onChange={e => setForm({ ...form, category: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-                    >
-                      <option value="">Select category</option>
-                      <option>Documents</option>
-                      <option>Medical</option>
-                      <option>Parts</option>
-                      <option>Other</option>
-                    </select>
+                {/* Goods */}
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-white/30 mb-3 flex items-center gap-2">
+                    <Package className="h-3.5 w-3.5" /> Goods
+                  </p>
+                  <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
+                    placeholder="Describe what needs to be delivered"
+                    rows={2}
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm resize-none mb-4" />
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-xs text-white/40 block mb-1.5">Weight (kg)</label>
+                      <input value={form.weight} onChange={e => setForm({ ...form, weight: e.target.value })}
+                        placeholder="e.g. 5"
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-white/40 block mb-1.5">Declared value (£)</label>
+                      <input value={form.value} onChange={e => setForm({ ...form, value: e.target.value })}
+                        placeholder="e.g. 500"
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-white/40 block mb-1.5">Category</label>
+                      <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                        <option value="">Select category</option>
+                        <option>Documents</option>
+                        <option>Medical</option>
+                        <option>Parts / Components</option>
+                        <option>Electronics</option>
+                        <option>Other</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
 
                 {/* Urgency */}
                 <div>
-                  <label className="text-xs text-white/40 font-semibold uppercase tracking-wider block mb-2">Urgency</label>
-                  <div className="flex gap-3">
+                  <p className="text-xs font-bold uppercase tracking-widest text-white/30 mb-3 flex items-center gap-2">
+                    <Clock className="h-3.5 w-3.5" /> Urgency
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
                     {(['same_day', 'next_day'] as const).map(u => (
-                      <button
-                        key={u}
-                        onClick={() => setForm({ ...form, urgency: u })}
-                        className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all ${
-                          form.urgency === u
-                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-black'
-                            : 'bg-white/5 border border-white/10 text-white/60 hover:text-white'
-                        }`}
-                      >
-                        {u === 'same_day' ? 'Same Day' : 'Next Morning'}
+                      <button key={u} onClick={() => setForm({ ...form, urgency: u })}
+                        className={`py-3.5 rounded-xl text-sm font-bold transition-all ${form.urgency === u ? 'bg-gradient-to-r from-emerald-400 to-teal-400 text-black' : 'bg-white/5 border border-white/10 text-white/60 hover:text-white'}`}>
+                        {u === 'same_day' ? '⚡ Same Day' : '🌅 Next Morning'}
                       </button>
                     ))}
                   </div>
                 </div>
 
                 {/* Insurance */}
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${form.insurance ? 'bg-emerald-500 border-emerald-500' : 'border-white/20'}`}>
+                <label className="flex items-center gap-3 cursor-pointer bg-white/3 border border-white/8 rounded-xl px-5 py-4">
+                  <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${form.insurance ? 'bg-emerald-500 border-emerald-500' : 'border-white/20'}`}>
                     {form.insurance && <CheckCircle className="h-3.5 w-3.5 text-black" />}
                   </div>
-                  <input
-                    type="checkbox"
-                    className="sr-only"
-                    checked={form.insurance}
-                    onChange={() => setForm({ ...form, insurance: !form.insurance })}
-                  />
-                  <span className="text-sm text-white/70">
-                    Insurance <span className="text-white/30 text-xs">(compulsory for all business deliveries)</span>
-                  </span>
+                  <input type="checkbox" className="sr-only" checked={form.insurance} onChange={() => setForm({ ...form, insurance: !form.insurance })} />
+                  <div>
+                    <p className="text-white font-semibold text-sm">Insurance included</p>
+                    <p className="text-white/30 text-xs">Compulsory for all business deliveries · Covers declared goods value</p>
+                  </div>
                 </label>
 
-                {/* Price */}
-                {price && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.97 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl flex items-center justify-between"
-                  >
-                    <span className="text-white/50 text-sm">Estimated price</span>
-                    <span className="text-emerald-400 font-bold text-2xl">£{price}</span>
+                {/* Price estimate */}
+                {estimate && (
+                  <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
+                    className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-6 py-5 flex items-center justify-between">
+                    <div>
+                      <p className="text-white/50 text-xs font-semibold uppercase tracking-wider mb-0.5">Estimated price</p>
+                      <p className="text-white/30 text-xs">{estimate.miles} miles · fixed rate</p>
+                    </div>
+                    <p className="text-emerald-400 font-black text-3xl">£{estimate.price}</p>
                   </motion.div>
                 )}
 
                 {formError && (
-                  <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">
-                    {formError}
-                  </div>
+                  <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">{formError}</div>
                 )}
 
-                {/* Submit */}
-                <button
-                  onClick={submitJob}
-                  disabled={formLoading}
-                  className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-500 text-black font-bold text-base hover:scale-[1.02] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
-                >
+                <button onClick={submitJob} disabled={formLoading}
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-base hover:scale-[1.02] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
                   {formLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
                   {formLoading ? 'Submitting…' : 'Submit delivery request'}
                 </button>
               </div>
-            </motion.div>
-          )}
+            </div>
+          </motion.div>
+        )}
 
-          {/* ── STAGE: SUCCESS ── */}
-          {stage === 'success' && (
-            <motion.div
-              key="success"
-              initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
-              className="text-center py-20 max-w-md mx-auto"
-            >
+        {/* ══════════════════════════════════════════
+            SUCCESS
+        ══════════════════════════════════════════ */}
+        {stage === 'success' && (
+          <motion.div key="success" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
+            className="min-h-screen flex items-center justify-center px-6">
+            <div className="text-center max-w-md">
               <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="h-10 w-10 text-emerald-400" />
               </div>
-              <h2 className="text-3xl font-bold text-white mb-3">Request submitted</h2>
-              <p className="text-white/40 mb-6">Your delivery request has been received. We will match a carrier and be in touch shortly.</p>
-              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-6 py-4 inline-block">
-                <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">Your job reference</p>
-                <p className="text-emerald-400 font-mono font-bold text-2xl tracking-widest">{jobRef}</p>
+              <h2 className="text-4xl font-black mb-3">Request submitted</h2>
+              <p className="text-white/40 mb-8 leading-relaxed">
+                Your delivery request has been received. Our team will match a carrier and be in touch shortly with confirmation and payment details.
+              </p>
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-8 py-5 inline-block mb-6">
+                <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-1">Job reference</p>
+                <p className="text-emerald-400 font-mono font-black text-2xl tracking-widest">{jobRef}</p>
               </div>
-              <p className="text-white/30 text-sm mt-6">A confirmation has been sent to <span className="text-white/50">{bizEmail}</span></p>
+              <p className="text-white/25 text-sm mb-8">Confirmation sent to <span className="text-white/40">{bizEmail}</span></p>
               <button
-                onClick={() => { setStage('form'); setFormError(null); setForm({ pickup:'', dropoff:'', description:'', weight:'', value:'', category:'', urgency:'same_day', insurance:true }); }}
-                className="mt-8 text-emerald-400 hover:text-emerald-300 text-sm font-semibold transition-colors"
-              >
+                onClick={() => { setStage('form'); setFormError(null); setForm({ pickup:'', dropoff:'', description:'', weight:'', value:'', category:'', urgency:'same_day', insurance:true }); setEstimate(null); }}
+                className="text-emerald-400 hover:text-emerald-300 text-sm font-bold transition-colors">
                 Submit another request →
               </button>
-            </motion.div>
-          )}
+            </div>
+          </motion.div>
+        )}
 
-        </AnimatePresence>
-      </div>
+      </AnimatePresence>
     </div>
   );
 }
