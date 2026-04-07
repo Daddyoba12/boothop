@@ -55,6 +55,18 @@ export async function POST(request: Request) {
     const sender_trip_id   = trip.type === 'send'   ? tripId : null;
     const traveler_trip_id = trip.type === 'travel' ? tripId : null;
 
+    // Block duplicate interest from the same email on the same trip
+    const { data: existing } = await supabase
+      .from('matches')
+      .select('id')
+      .eq('trip_id', tripId)
+      .or(`sender_email.eq.${email},traveler_email.eq.${email}`)
+      .maybeSingle();
+
+    if (existing) {
+      return NextResponse.json({ error: 'You have already expressed interest in this trip.' }, { status: 409 });
+    }
+
     // Upsert interest record into matches table
     const { error: matchErr } = await supabase.from('matches').insert({
       trip_id:          tripId,

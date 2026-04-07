@@ -2,6 +2,23 @@ import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { sendMatchConfirmedEmail } from '@/lib/email/sendMatchEmail';
 
+async function createActionToken(
+  supabase: ReturnType<typeof createSupabaseAdminClient>,
+  email: string,
+  action_type: string,
+  entity_id: string,
+  payload: object,
+  hoursValid = 72,
+) {
+  const expires_at = new Date(Date.now() + hoursValid * 3_600_000).toISOString();
+  const { data } = await supabase
+    .from('action_tokens')
+    .insert({ email, action_type, entity_id, payload, expires_at })
+    .select('token')
+    .single();
+  return data?.token as string | undefined;
+}
+
 /* ── Haversine distance in miles ── */
 function haversineMiles(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 3958.8;
@@ -60,10 +77,10 @@ export async function GET(request: Request) {
   const supabase = createSupabaseAdminClient();
   const today    = new Date().toISOString().split('T')[0];
 
-  /* Fetch all future unmatched trips */
+  /* Fetch all future active trips only */
   const [{ data: senders }, { data: travellers }] = await Promise.all([
-    supabase.from('trips').select('*').eq('type', 'send').gte('travel_date', today),
-    supabase.from('trips').select('*').eq('type', 'travel').gte('travel_date', today),
+    supabase.from('trips').select('*').eq('type', 'send').eq('status', 'active').gte('travel_date', today),
+    supabase.from('trips').select('*').eq('type', 'travel').eq('status', 'active').gte('travel_date', today),
   ]);
 
   if (!senders?.length || !travellers?.length) {
@@ -120,18 +137,28 @@ export async function GET(request: Request) {
       created.push(matchRecord.id);
       alreadyMatched.add(pairKey); // prevent double-matching in same run
 
-      /* Notify both parties */
-      const emailPayload = {
-        fromCity:   send.from_city,
-        toCity:     send.to_city,
-        travelDate: send.travel_date,
-        price:      agreedPrice ?? 0,
-        matchId:    matchRecord.id,
-      };
-
+      /* Create one-click accept/decline tokens for each party */
       const emailPromises = [];
-      if (send.email)    emailPromises.push(sendMatchConfirmedEmail({ toEmail: send.email,    ...emailPayload }));
-      if (travel.email)  emailPromises.push(sendMatchConfirmedEmail({ toEmail: travel.email,  ...emailPayload }));
+
+      for (const [email, role] of [[send.email, 'sender'], [travel.email, 'traveler']] as [string, string][]) {
+        if (!email) continue;
+        const [acceptToken, declineToken] = await Promise.all([
+          createActionToken(supabase, email, 'accept_match', matchRecord.id, { role }),
+          createActionToken(supabase, email, 'decline_match', matchRecord.id, { role }),
+        ]);
+        emailPromises.push(
+          sendMatchConfirmedEmail({
+            toEmail:     email,
+            fromCity:    send.from_city,
+            toCity:      send.to_city,
+            travelDate:  send.travel_date,
+            price:       agreedPrice ?? 0,
+            matchId:     matchRecord.id,
+            acceptToken,
+            declineToken,
+          }),
+        );
+      }
       await Promise.allSettled(emailPromises);
     }
   }

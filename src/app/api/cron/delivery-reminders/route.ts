@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM   = 'BootHop <noreply@boothop.com>';
+const FROM = 'BootHop <noreply@boothop.com>';
 
 // Vercel Cron: runs every 6 hours (see vercel.json)
 // Guards against replay: only runs if invoked with the correct CRON_SECRET header
@@ -49,6 +48,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ sent: 0 });
     }
 
+    const resend = new Resend(process.env.RESEND_API_KEY);
     let sent = 0;
 
     for (const match of matches) {
