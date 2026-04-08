@@ -140,6 +140,7 @@ function HomePageContent() {
   const [mapsReady, setMapsReady] = useState(false);
 
   const [trip, setTrip] = useState<TripForm>({ from: '', to: '', date: '', price: '', email: '', weight: '' });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [contactForm,    setContactForm]    = useState({ name: '', email: '', message: '' });
   const [contactLoading, setContactLoading] = useState(false);
   const [contactStatus,  setContactStatus]  = useState<'idle' | 'ok' | 'err'>('idle');
@@ -233,14 +234,20 @@ function HomePageContent() {
   const hooperTrips = filteredTrips.filter(t => t.type === 'send');
 
   const handleSubmit = () => {
-    if (!trip.from || !trip.to || !trip.date || !trip.weight) { alert('Please fill in all required fields.'); return; }
-    if (!fromSelected) { alert('Please select a valid "From" city from the dropdown.'); return; }
-    if (!toSelected) { alert('Please select a valid "To" city from the dropdown.'); return; }
+    const errors: Record<string, string> = {};
+    if (!trip.from)        errors.from   = 'Please enter a departure city';
+    else if (!fromSelected) errors.from  = 'Select a city from the dropdown';
+    if (!trip.to)          errors.to     = 'Please enter a destination city';
+    else if (!toSelected)   errors.to    = 'Select a city from the dropdown';
+    if (!trip.date)        errors.date   = 'Please choose a date';
+    if (!trip.weight)      errors.weight = 'Please select a weight';
+    if (Object.keys(errors).length > 0) { setFormErrors(errors); return; }
+    setFormErrors({});
     setShowEmail(true);
   };
 
   const sendMagicLink = async () => {
-    if (!trip.email) { alert('Please enter your email.'); return; }
+    if (!trip.email) { setFormErrors({ email: 'Please enter your email address' }); return; }
     setSubmitting(true);
     const journeyPayload = { from: trip.from, to: trip.to, date: trip.date, price: trip.price, weight: trip.weight, mode };
     const res = await fetch('/api/auth/request-code', {
@@ -249,7 +256,7 @@ function HomePageContent() {
       body: JSON.stringify({ email: trip.email, journeyPayload }),
     });
     setSubmitting(false);
-    if (!res.ok) { const d = await res.json(); alert(d.error || 'Unable to send code.'); return; }
+    if (!res.ok) { const d = await res.json(); setFormErrors({ email: d.error || 'Unable to send code. Please try again.' }); return; }
     setEmailSent(true);
   };
 
@@ -415,42 +422,52 @@ function HomePageContent() {
             {/* Form */}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.3)]">
               <div className="grid gap-2.5 sm:grid-cols-2">
-                <div className="relative">
+                <div className="relative pb-4">
                   <input placeholder="From (City)" value={queryFrom}
-                    onChange={(e) => { setQueryFrom(e.target.value); setTrip({ ...trip, from: e.target.value }); setFromSelected(false); }}
-                    className={inputClass} />
+                    onChange={(e) => { setQueryFrom(e.target.value); setTrip({ ...trip, from: e.target.value }); setFromSelected(false); setFormErrors(p => ({ ...p, from: '' })); }}
+                    className={`${inputClass} ${formErrors.from ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
                   {fromSuggestions.length > 0 && (
                     <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl">
                       {fromSuggestions.map((s, i) => (
-                        <div key={i} onClick={() => { setTrip({ ...trip, from: s }); setQueryFrom(s); setFromSuggestions([]); setFromSelected(true); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
+                        <div key={i} onClick={() => { setTrip({ ...trip, from: s }); setQueryFrom(s); setFromSuggestions([]); setFromSelected(true); setFormErrors(p => ({ ...p, from: '' })); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
                           className="cursor-pointer px-4 py-3 text-sm text-white/85 hover:bg-white/8 hover:text-white transition-colors">{s}</div>
                       ))}
                     </div>
                   )}
-                  {queryFrom && !fromSelected && <p className="absolute -bottom-4 left-0 text-xs text-amber-400">Select from list</p>}
+                  {formErrors.from
+                    ? <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.from}</p>
+                    : queryFrom && !fromSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-400">Select from list</p>}
                 </div>
-                <div className="relative">
+                <div className="relative pb-4">
                   <input placeholder="To (City)" value={queryTo}
-                    onChange={(e) => { setQueryTo(e.target.value); setTrip({ ...trip, to: e.target.value }); setToSelected(false); }}
-                    className={inputClass} />
+                    onChange={(e) => { setQueryTo(e.target.value); setTrip({ ...trip, to: e.target.value }); setToSelected(false); setFormErrors(p => ({ ...p, to: '' })); }}
+                    className={`${inputClass} ${formErrors.to ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
                   {toSuggestions.length > 0 && (
                     <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl">
                       {toSuggestions.map((s, i) => (
-                        <div key={i} onClick={() => { setTrip({ ...trip, to: s }); setQueryTo(s); setToSuggestions([]); setToSelected(true); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
+                        <div key={i} onClick={() => { setTrip({ ...trip, to: s }); setQueryTo(s); setToSuggestions([]); setToSelected(true); setFormErrors(p => ({ ...p, to: '' })); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
                           className="cursor-pointer px-4 py-3 text-sm text-white/85 hover:bg-white/8 hover:text-white transition-colors">{s}</div>
                       ))}
                     </div>
                   )}
-                  {queryTo && !toSelected && <p className="absolute -bottom-4 left-0 text-xs text-amber-400">Select from list</p>}
+                  {formErrors.to
+                    ? <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.to}</p>
+                    : queryTo && !toSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-400">Select from list</p>}
                 </div>
-                <input type="date" value={trip.date} min={new Date().toISOString().split('T')[0]}
-                  onChange={(e) => setTrip({ ...trip, date: e.target.value })}
-                  className={`${inputClass} [color-scheme:dark]`} />
-                <select value={trip.weight} onChange={(e) => setTrip({ ...trip, weight: e.target.value })}
-                  className={`${inputClass} cursor-pointer`}>
-                  <option value="" disabled className="bg-slate-900 text-white/50">Weight</option>
-                  {weightOptions.map((o) => <option key={o.value} value={o.value} className="bg-slate-900 text-white">{o.label}</option>)}
-                </select>
+                <div className="relative pb-4">
+                  <input type="date" value={trip.date} min={new Date().toISOString().split('T')[0]}
+                    onChange={(e) => { setTrip({ ...trip, date: e.target.value }); setFormErrors(p => ({ ...p, date: '' })); }}
+                    className={`${inputClass} [color-scheme:dark] ${formErrors.date ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
+                  {formErrors.date && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.date}</p>}
+                </div>
+                <div className="relative pb-4">
+                  <select value={trip.weight} onChange={(e) => { setTrip({ ...trip, weight: e.target.value }); setFormErrors(p => ({ ...p, weight: '' })); }}
+                    className={`${inputClass} cursor-pointer ${formErrors.weight ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`}>
+                    <option value="" disabled className="bg-slate-900 text-white/50">Weight</option>
+                    {weightOptions.map((o) => <option key={o.value} value={o.value} className="bg-slate-900 text-white">{o.label}</option>)}
+                  </select>
+                  {formErrors.weight && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.weight}</p>}
+                </div>
                 <input type="number" placeholder={mode === 'travel' ? 'Price (£)' : 'Budget (£)'}
                   value={trip.price} onChange={(e) => setTrip({ ...trip, price: e.target.value })}
                   className={inputClass} />
@@ -519,8 +536,9 @@ function HomePageContent() {
                 <h2 className="mb-2 text-xl font-semibold text-white md:text-2xl">Verify Your Email</h2>
                 <p className="mb-6 text-sm text-white/50">We&apos;ll send you a secure magic link to continue.</p>
                 <input type="email" placeholder="Enter your email" value={trip.email}
-                  onChange={(e) => setTrip({ ...trip, email: e.target.value })}
-                  className="mb-4 w-full rounded-xl border border-white/12 bg-white/5 p-3.5 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all" />
+                  onChange={(e) => { setTrip({ ...trip, email: e.target.value }); setFormErrors(p => ({ ...p, email: '' })); }}
+                  className={`mb-1 w-full rounded-xl border bg-white/5 p-3.5 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all ${formErrors.email ? 'border-red-500/60 ring-1 ring-red-500/40' : 'border-white/12'}`} />
+                {formErrors.email && <p className="mb-3 text-xs text-red-400">{formErrors.email}</p>}
                 <div className="flex gap-3">
                   <button onClick={() => setShowEmail(false)}
                     className="flex-1 rounded-xl border border-white/12 py-3 text-sm text-white/65 transition-all hover:bg-white/5 hover:text-white">
