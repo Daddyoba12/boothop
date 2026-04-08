@@ -234,6 +234,15 @@ export default function BoothopBusiness() {
   const [hooperLoading,  setHooperLoading]  = useState(false);
   const [hooperStatus,   setHooperStatus]   = useState<'idle' | 'ok' | 'err'>('idle');
 
+  // Priority Partner
+  const [companyName,     setCompanyName]     = useState('');
+  const [partnerTier,     setPartnerTier]     = useState<string | null>(null);
+  const [partnerStatus,   setPartnerStatus]   = useState<string | null>(null);
+  const [partnerDiscount, setPartnerDiscount] = useState<number | null>(null);
+  const [priorityForm,    setPriorityForm]    = useState({ email: '', company_name: '', phone: '', delivery_volume: '', notes: '' });
+  const [priorityLoading, setPriorityLoading] = useState(false);
+  const [priorityStatus,  setPriorityStatus]  = useState<'idle' | 'ok' | 'err'>('idle');
+
   // Google Places coords for accurate pricing
   const [pickupCoords,  setPickupCoords]  = useState<[number, number] | null>(null);
   const [dropoffCoords, setDropoffCoords] = useState<[number, number] | null>(null);
@@ -245,7 +254,19 @@ export default function BoothopBusiness() {
   useEffect(() => {
     fetch('/api/business/auth/me')
       .then(r => r.json())
-      .then(d => { if (d.authenticated) { setBizEmail(d.email); setStage('portal'); } else { setStage('landing'); } })
+      .then(d => {
+        if (d.authenticated) {
+          setBizEmail(d.email);
+          if (d.company_name)           setCompanyName(d.company_name);
+          if (d.partner_tier)           setPartnerTier(d.partner_tier);
+          if (d.partner_status)         setPartnerStatus(d.partner_status);
+          if (d.partner_discount)       setPartnerDiscount(d.partner_discount);
+          setPriorityForm(p => ({ ...p, email: d.email }));
+          setStage('portal');
+        } else {
+          setStage('landing');
+        }
+      })
       .catch(() => setStage('landing'));
   }, []);
 
@@ -455,6 +476,20 @@ export default function BoothopBusiness() {
     finally { setHooperLoading(false); }
   };
 
+  // ── Priority Partner apply ────────────────────────────────────────────────
+  const submitPriorityApply = async () => {
+    if (!priorityForm.email || !priorityForm.company_name || !priorityForm.phone) return;
+    setPriorityLoading(true);
+    try {
+      const res = await fetch('/api/business/priority-apply', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(priorityForm),
+      });
+      setPriorityStatus(res.ok ? 'ok' : 'err');
+    } catch { setPriorityStatus('err'); }
+    finally { setPriorityLoading(false); }
+  };
+
   // ── Loading ────────────────────────────────────────────────────────────────
   if (stage === 'loading') {
     return (
@@ -557,6 +592,10 @@ export default function BoothopBusiness() {
                   className="text-sm font-semibold text-white/40 hover:text-white transition-colors hidden sm:block">
                   How It Works
                 </button>
+                <button onClick={() => document.getElementById('biz-priority')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="text-sm font-semibold text-amber-400/60 hover:text-amber-400 transition-colors hidden sm:block">
+                  Priority Partner
+                </button>
                 <button onClick={() => document.getElementById('biz-contact')?.scrollIntoView({ behavior: 'smooth' })}
                   className="text-sm font-semibold text-white/40 hover:text-white transition-colors hidden sm:block">
                   Contact
@@ -602,6 +641,10 @@ export default function BoothopBusiness() {
                   className="inline-flex items-center gap-2.5 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-sm px-7 py-3.5 rounded-2xl hover:scale-105 transition-all shadow-2xl shadow-emerald-500/30">
                   Request a delivery <ArrowRight className="h-4 w-4" />
                 </button>
+                <a href="/business/priority-partner"
+                  className="inline-flex items-center gap-2.5 bg-gradient-to-r from-amber-500/20 to-orange-500/10 border border-amber-500/30 text-amber-400 font-black text-sm px-7 py-3.5 rounded-2xl hover:bg-amber-500/25 hover:border-amber-500/50 transition-all">
+                  <Star className="h-4 w-4" /> Priority Partner
+                </a>
               </motion.div>
 
               {/* Dropdown registration panels */}
@@ -792,6 +835,91 @@ export default function BoothopBusiness() {
               </div>
             </div>
 
+            {/* ── Priority Partner Programme ── */}
+            <div id="biz-priority" className="max-w-5xl mx-auto px-8 pb-20">
+              <div className="group relative overflow-hidden bg-gradient-to-br from-amber-500/5 to-orange-500/5 border border-amber-500/20 rounded-3xl p-10 transition-all duration-300 hover:border-amber-500/35 hover:shadow-2xl hover:shadow-amber-500/10">
+                <div className="pointer-events-none absolute -top-10 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl" />
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                    <Star className="h-6 w-6 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-2xl font-black">Priority Partner</h2>
+                      <span className="text-xs font-bold bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-full uppercase tracking-widest">Exclusive</span>
+                    </div>
+                    <p className="text-white/40 text-sm mt-0.5">For businesses that ship regularly — unlock premium perks</p>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-2 gap-8 mb-10">
+                  <div>
+                    <p className="text-white/50 text-sm leading-relaxed mb-6">
+                      Join our Priority Partner programme and experience a higher tier of service. Your requests go to the front of the queue, you get a dedicated account manager, and you earn volume discounts automatically — no negotiation needed.
+                    </p>
+                    <div className="space-y-3">
+                      {[
+                        { icon: Clock,       label: '2-hour guaranteed response', sub: 'Every request answered within 2 hours' },
+                        { icon: User,        label: 'Dedicated account team',     sub: 'Your own named contact at BootHop' },
+                        { icon: Zap,         label: 'Priority carrier matching',  sub: 'Your jobs are first in line' },
+                        { icon: ShieldCheck, label: 'Volume discounts',           sub: '5% on 2–5 deliveries · 10% on 6+ per year' },
+                      ].map(({ icon: Icon, label, sub }) => (
+                        <div key={label} className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center shrink-0 mt-0.5">
+                            <Icon className="h-4 w-4 text-amber-400" />
+                          </div>
+                          <div>
+                            <p className="text-white font-bold text-sm">{label}</p>
+                            <p className="text-white/35 text-xs mt-0.5">{sub}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    {priorityStatus === 'ok' ? (
+                      <div className="rounded-2xl bg-amber-500/10 border border-amber-500/20 px-6 py-8 text-center h-full flex flex-col items-center justify-center">
+                        <CheckCircle className="h-10 w-10 text-amber-400 mx-auto mb-3" />
+                        <p className="text-white font-bold text-lg">Application received!</p>
+                        <p className="text-white/40 text-sm mt-2 leading-relaxed">Our team will review your application and be in touch within 24 hours.</p>
+                      </div>
+                    ) : (
+                      <div className="bg-white/3 border border-white/8 rounded-2xl p-6 space-y-3">
+                        <p className="text-white font-bold text-sm mb-4">Apply now — it takes 60 seconds</p>
+                        {priorityStatus === 'err' && <p className="text-red-400 text-xs">Something went wrong — please try again.</p>}
+                        <input value={priorityForm.email} onChange={e => setPriorityForm(p => ({ ...p, email: e.target.value }))}
+                          type="email" placeholder="Business email *"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm" />
+                        <input value={priorityForm.company_name} onChange={e => setPriorityForm(p => ({ ...p, company_name: e.target.value }))}
+                          placeholder="Company name *"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm" />
+                        <input value={priorityForm.phone} onChange={e => setPriorityForm(p => ({ ...p, phone: e.target.value }))}
+                          type="tel" placeholder="Phone number *"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm" />
+                        <select value={priorityForm.delivery_volume} onChange={e => setPriorityForm(p => ({ ...p, delivery_volume: e.target.value }))}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm">
+                          <option value="" className="bg-[#0a1628]">Expected deliveries per year</option>
+                          <option value="2-5" className="bg-[#0a1628]">2–5 deliveries/year (5% discount)</option>
+                          <option value="6-10" className="bg-[#0a1628]">6–10 deliveries/year (10% discount)</option>
+                          <option value="10+" className="bg-[#0a1628]">10+ deliveries/year (10% discount)</option>
+                        </select>
+                        <button onClick={submitPriorityApply}
+                          disabled={priorityLoading || !priorityForm.email || !priorityForm.company_name || !priorityForm.phone}
+                          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 text-black font-black disabled:opacity-40 hover:scale-[1.02] transition-all text-sm">
+                          {priorityLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className="h-4 w-4" />}
+                          {priorityLoading ? 'Submitting…' : 'Apply for Priority Partner'}
+                        </button>
+                        <p className="text-white/20 text-xs text-center">No payment taken now · Our team contacts you within 24h</p>
+                        <a href="/business/priority-partner"
+                          className="block text-center text-amber-400/50 hover:text-amber-400 text-xs transition-colors mt-1">
+                          View full programme details →
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* ── Contact Us ── */}
             <div id="biz-contact" className="max-w-3xl mx-auto px-8 pb-20">
               <div className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-3xl p-10 transition-all duration-300 hover:border-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/8 touch-emerald">
@@ -960,17 +1088,107 @@ export default function BoothopBusiness() {
 
             <div className="max-w-5xl mx-auto px-8 py-16">
               {/* Welcome */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-16">
-                <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold px-4 py-2 rounded-full mb-6 uppercase tracking-widest">
-                  <CheckCircle className="h-3.5 w-3.5" /> Verified business account
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-12">
+                <div className="flex flex-wrap items-center gap-2 mb-6">
+                  <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold px-4 py-2 rounded-full uppercase tracking-widest">
+                    <CheckCircle className="h-3.5 w-3.5" /> Verified business account
+                  </div>
+                  {partnerStatus === 'active' && (
+                    <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-black px-4 py-2 rounded-full uppercase tracking-widest">
+                      <Star className="h-3.5 w-3.5" /> Priority Partner {partnerTier === 'elite' ? '— Elite' : ''}
+                    </div>
+                  )}
+                  {partnerStatus === 'pending' && (
+                    <div className="inline-flex items-center gap-2 bg-white/5 border border-white/15 text-white/40 text-xs font-semibold px-4 py-2 rounded-full uppercase tracking-widest">
+                      <Clock className="h-3.5 w-3.5" /> Partner application pending
+                    </div>
+                  )}
                 </div>
                 <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-4">
-                  Welcome back,<br /><span className="text-emerald-400">let's move something.</span>
+                  Welcome back{companyName ? ',' : ','}<br />
+                  <span className="text-emerald-400">{companyName || 'let\'s move something.'}</span>
                 </h1>
                 <p className="text-white/40 text-lg max-w-2xl">
-                  Signed in as <span className="text-white/70 font-semibold">{bizEmail}</span>. Review the information below before placing your first job.
+                  Signed in as <span className="text-white/70 font-semibold">{bizEmail}</span>.
+                  {partnerStatus === 'active'
+                    ? <span className="text-amber-400/70 ml-1">You have {partnerDiscount}% volume discount and {partnerStatus === 'active' ? '2-hour' : ''} priority response.</span>
+                    : ' Review the information below before placing your first job.'}
                 </p>
               </motion.div>
+
+              {/* Priority Partner upsell / status (post-login) */}
+              {(!partnerStatus || partnerStatus === 'rejected') && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
+                  className="group relative overflow-hidden mb-12 bg-gradient-to-br from-amber-500/5 to-orange-500/5 border border-amber-500/20 rounded-2xl p-8 transition-all duration-300 hover:border-amber-500/35 hover:shadow-lg hover:shadow-amber-500/8 touch-emerald">
+                  <div className="pointer-events-none absolute -top-8 right-0 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl" />
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                      <Star className="h-5 w-5 text-amber-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-black">Become a Priority Partner</h2>
+                      <p className="text-white/40 text-xs mt-0.5">For businesses that ship regularly — unlock exclusive perks</p>
+                    </div>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-3 mb-6">
+                    {[
+                      { icon: Clock,       label: '2-hour response',        sub: 'Guaranteed reply within 2 hours, every time' },
+                      { icon: Star,        label: 'Dedicated account team', sub: 'Your own point of contact at BootHop' },
+                      { icon: Zap,         label: 'Priority carrier match', sub: 'Your jobs jump the queue on our network' },
+                      { icon: ShieldCheck, label: 'Volume discount',        sub: '5% on 2–5 jobs/year · 10% on 6+ jobs/year' },
+                    ].map(({ icon: Icon, label, sub }) => (
+                      <div key={label} className="flex items-start gap-3 bg-white/3 rounded-xl p-4">
+                        <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center shrink-0 mt-0.5">
+                          <Icon className="h-4 w-4 text-amber-400" />
+                        </div>
+                        <div>
+                          <p className="text-white font-bold text-sm">{label}</p>
+                          <p className="text-white/35 text-xs mt-0.5">{sub}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {priorityStatus === 'ok' ? (
+                    <div className="rounded-2xl bg-amber-500/10 border border-amber-500/20 px-6 py-5 text-center">
+                      <CheckCircle className="h-7 w-7 text-amber-400 mx-auto mb-2" />
+                      <p className="text-white font-bold">Application submitted!</p>
+                      <p className="text-white/40 text-sm mt-1">Our team will review and be in touch within 24h.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {priorityStatus === 'err' && <p className="text-red-400 text-xs">Something went wrong — try again.</p>}
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <input value={priorityForm.email} onChange={e => setPriorityForm(p => ({ ...p, email: e.target.value }))}
+                          type="email" placeholder="Business email *"
+                          className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm" />
+                        <input value={priorityForm.company_name} onChange={e => setPriorityForm(p => ({ ...p, company_name: e.target.value }))}
+                          placeholder="Company name *"
+                          className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm" />
+                        <input value={priorityForm.phone} onChange={e => setPriorityForm(p => ({ ...p, phone: e.target.value }))}
+                          type="tel" placeholder="Phone number *"
+                          className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm" />
+                        <select value={priorityForm.delivery_volume} onChange={e => setPriorityForm(p => ({ ...p, delivery_volume: e.target.value }))}
+                          className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm">
+                          <option value="" className="bg-[#0a1628]">Deliveries per year</option>
+                          <option value="2-5" className="bg-[#0a1628]">2–5 deliveries (5% discount)</option>
+                          <option value="6-10" className="bg-[#0a1628]">6–10 deliveries (10% discount)</option>
+                          <option value="10+" className="bg-[#0a1628]">10+ deliveries (10% discount)</option>
+                        </select>
+                      </div>
+                      <textarea value={priorityForm.notes} onChange={e => setPriorityForm(p => ({ ...p, notes: e.target.value }))}
+                        rows={2} placeholder="Anything else we should know about your delivery needs?"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm resize-none" />
+                      <button onClick={submitPriorityApply}
+                        disabled={priorityLoading || !priorityForm.email || !priorityForm.company_name || !priorityForm.phone}
+                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 text-black font-black disabled:opacity-40 hover:scale-[1.02] transition-all text-sm">
+                        {priorityLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className="h-4 w-4" />}
+                        {priorityLoading ? 'Submitting…' : 'Apply for Priority Partner status'}
+                      </button>
+                      <p className="text-white/20 text-xs text-center">No payment taken now — our team will contact you to finalise your account</p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
 
               {/* Retainer Programme */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
