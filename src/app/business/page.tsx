@@ -247,8 +247,11 @@ export default function BoothopBusiness() {
   const [pickupCoords,  setPickupCoords]  = useState<[number, number] | null>(null);
   const [dropoffCoords, setDropoffCoords] = useState<[number, number] | null>(null);
 
-  const pickupRef  = useRef<HTMLInputElement>(null);
-  const dropoffRef = useRef<HTMLInputElement>(null);
+  const [mapsReady,    setMapsReady]    = useState(false);
+  const [queryPickup,  setQueryPickup]  = useState('');
+  const [pickupSugs,   setPickupSugs]   = useState<string[]>([]);
+  const [queryDropoff, setQueryDropoff] = useState('');
+  const [dropoffSugs,  setDropoffSugs]  = useState<string[]>([]);
 
   // ── Session check ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -287,49 +290,36 @@ export default function BoothopBusiness() {
     }
   }, [form.pickup, form.dropoff, form.delivery_type, pickupCoords, dropoffCoords]);
 
-  // ── Google Places autocomplete ─────────────────────────────────────────────
-  const initPlaces = useCallback(() => {
-    const g = (window as any).google;
-    if (!g?.maps?.places) return;
-
-    const setup = (ref: React.RefObject<HTMLInputElement | null>, field: 'pickup' | 'dropoff') => {
-      if (!ref.current) return;
-      const ac = new g.maps.places.Autocomplete(ref.current, {
-        fields: ['name', 'geometry', 'address_components', 'types'],
-      });
-      ac.addListener('place_changed', () => {
-        const place = ac.getPlace();
-        if (!place) return;
-        const name = place.name || ref.current?.value || '';
-        setForm(prev => ({ ...prev, [field]: name }));
-        const lat = place.geometry?.location?.lat();
-        const lng = place.geometry?.location?.lng();
-        if (lat && lng) {
-          if (field === 'pickup')  setPickupCoords([lat, lng]);
-          else                     setDropoffCoords([lat, lng]);
-        }
-        // Auto-detect international if country ≠ GB
-        const country = place.address_components?.find((c: any) => c.types.includes('country'));
-        if (country && country.short_name !== 'GB') {
-          setForm(prev => ({ ...prev, delivery_type: 'international' }));
-        }
-      });
-    };
-
-    setup(pickupRef, 'pickup');
-    setup(dropoffRef, 'dropoff');
+  // ── Google Places ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if ((window as any).google?.maps?.places) { setMapsReady(true); return; }
+    const t = setInterval(() => {
+      if ((window as any).google?.maps?.places) { setMapsReady(true); clearInterval(t); }
+    }, 300);
+    return () => clearInterval(t);
   }, []);
 
   useEffect(() => {
-    if (stage !== 'form') return;
-    let tries = 0;
-    const poll = setInterval(() => {
-      tries++;
-      if ((window as any).google?.maps?.places) { clearInterval(poll); initPlaces(); }
-      else if (tries > 30) clearInterval(poll);
-    }, 200);
-    return () => clearInterval(poll);
-  }, [stage, initPlaces]);
+    if (!mapsReady || queryPickup.length < 3) { setPickupSugs([]); return; }
+    const t = setTimeout(() => {
+      new (window as any).google.maps.places.AutocompleteService().getPlacePredictions(
+        { input: queryPickup },
+        (p: any[] | null) => setPickupSugs(p ? p.map((x: any) => x.description) : [])
+      );
+    }, 300);
+    return () => clearTimeout(t);
+  }, [queryPickup, mapsReady]);
+
+  useEffect(() => {
+    if (!mapsReady || queryDropoff.length < 3) { setDropoffSugs([]); return; }
+    const t = setTimeout(() => {
+      new (window as any).google.maps.places.AutocompleteService().getPlacePredictions(
+        { input: queryDropoff },
+        (p: any[] | null) => setDropoffSugs(p ? p.map((x: any) => x.description) : [])
+      );
+    }, 300);
+    return () => clearTimeout(t);
+  }, [queryDropoff, mapsReady]);
 
   // ── Auth ───────────────────────────────────────────────────────────────────
   const sendOtp = async () => {
@@ -393,7 +383,8 @@ export default function BoothopBusiness() {
   // ── Submit ─────────────────────────────────────────────────────────────────
   const goodsValue       = parseFloat(form.value) || 0;
   const insuranceFee     = goodsValue > 1000 ? Math.round(goodsValue * 0.08) : 0;
-  const totalPrice       = (estimate?.price ?? 0) + insuranceFee;
+  const sameDaySurcharge = form.urgency === 'same_day' ? Math.round((estimate?.price ?? 0) * 0.2) : 0;
+  const totalPrice       = (estimate?.price ?? 0) + insuranceFee + sameDaySurcharge;
 
   const submitJob = async () => {
     if (!form.phone.trim())               { setFormError('Phone number is required.'); return; }
@@ -421,7 +412,7 @@ export default function BoothopBusiness() {
       });
       const j = await res.json();
       if (!res.ok) { setFormError(j.error || 'Something went wrong.'); return; }
-      setJobRef(j.jobRef); setStage('success');
+      setJobRef(j.jobRef); setStage('success'); setQueryPickup(''); setQueryDropoff('');
     } catch { setFormError('Something went wrong.'); }
     finally { setFormLoading(false); }
   };
@@ -752,24 +743,6 @@ export default function BoothopBusiness() {
               <p className="text-white/20 text-xs mt-5">Business email required for delivery requests · Personal accounts not accepted</p>
             </div>
 
-            {/* Stats */}
-            <div className="max-w-5xl mx-auto px-8 pb-16">
-              <div className="grid grid-cols-3 gap-4">
-                {[
-                  { value: '£200+',    label: 'Local from',  sub: 'UK-to-UK distance pricing' },
-                  { value: '100%',     label: 'Insured',     sub: 'Every single delivery' },
-                  { value: 'Same day', label: 'Delivery',    sub: 'For urgent business needs' },
-                ].map(s => (
-                  <div key={s.label} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 text-center transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.97] touch-emerald">
-                    <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <p className="text-3xl font-black text-emerald-400 mb-1">{s.value}</p>
-                    <p className="text-white font-semibold text-sm">{s.label}</p>
-                    <p className="text-white/30 text-xs mt-0.5">{s.sub}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* How it works */}
             <div id="biz-how-it-works" className="max-w-5xl mx-auto px-8 pb-20">
               <h2 className="text-2xl font-black text-center mb-10">How it works</h2>
@@ -779,16 +752,34 @@ export default function BoothopBusiness() {
                   { icon: MapPin,    step: '02', title: 'Submit your request',   body: 'Tell us the route, what needs delivering, and when. Get an instant price estimate.' },
                   { icon: Zap,       step: '03', title: 'We handle the rest',    body: 'We match a verified carrier to your job and keep you updated every step of the way.' },
                 ].map(({ icon: Icon, step, title, body }) => (
-                  <div key={step} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.97] touch-emerald">
+                  <div key={step} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98] touch-emerald">
                     <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <Icon className="h-5 w-5 text-emerald-400" />
                       </div>
                       <span className="text-white/20 font-black text-2xl">{step}</span>
                     </div>
-                    <h3 className="text-white font-bold mb-2">{title}</h3>
+                    <h3 className="text-white font-bold mb-2 group-hover:text-emerald-300 transition-colors duration-300">{title}</h3>
                     <p className="text-white/40 text-sm leading-relaxed">{body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="max-w-5xl mx-auto px-8 pb-16">
+              <div className="grid grid-cols-3 gap-4">
+                {[
+                  { value: '£200+',    label: 'Local from',  sub: 'UK-to-UK distance pricing' },
+                  { value: '100%',     label: 'Insured',     sub: 'Every single delivery' },
+                  { value: 'Same day', label: 'Delivery',    sub: 'For urgent business needs' },
+                ].map(s => (
+                  <div key={s.label} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 text-center transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98] touch-emerald">
+                    <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <p className="text-3xl font-black text-emerald-400 mb-1">{s.value}</p>
+                    <p className="text-white font-semibold text-sm group-hover:text-emerald-300 transition-colors duration-300">{s.label}</p>
+                    <p className="text-white/30 text-xs mt-0.5">{s.sub}</p>
                   </div>
                 ))}
               </div>
@@ -796,12 +787,12 @@ export default function BoothopBusiness() {
 
             {/* Pricing — sign in required */}
             <div className="max-w-3xl mx-auto px-8 pb-20">
-              <div className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-10 text-center transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.97] touch-emerald">
+              <div className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-10 text-center transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98] touch-emerald">
                 <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 bg-emerald-500/15 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-5">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform duration-300">
                   <Lock className="h-6 w-6 text-emerald-400" />
                 </div>
-                <h2 className="text-2xl font-black mb-3">Pricing available on sign-in</h2>
+                <h2 className="text-2xl font-black mb-3 group-hover:text-emerald-300 transition-colors duration-300">Pricing available on sign-in</h2>
                 <p className="text-white/40 text-sm leading-relaxed max-w-md mx-auto mb-6">
                   Our pricing is tailored to route, distance, and delivery type. Sign in with your business email to view full pricing details, retainer requirements, and insurance terms.
                 </p>
@@ -821,13 +812,13 @@ export default function BoothopBusiness() {
                   { icon: Lock,        title: 'Business-only access', body: 'Verified business accounts only. No personal users on the platform.' },
                   { icon: Star,        title: 'Rated carriers',       body: 'All our carriers are verified, rated, and background-checked.' },
                 ].map(({ icon: Icon, title, body }) => (
-                  <div key={title} className="group relative overflow-hidden flex items-start gap-4 bg-white/3 border border-white/8 rounded-2xl p-5 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.97] touch-emerald">
+                  <div key={title} className="group relative overflow-hidden flex items-start gap-4 bg-white/3 border border-white/8 rounded-2xl p-5 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98] touch-emerald">
                     <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
                       <Icon className="h-5 w-5 text-emerald-400" />
                     </div>
                     <div>
-                      <p className="text-white font-bold mb-1">{title}</p>
+                      <p className="text-white font-bold mb-1 group-hover:text-emerald-300 transition-colors duration-300">{title}</p>
                       <p className="text-white/40 text-sm leading-relaxed">{body}</p>
                     </div>
                   </div>
@@ -1171,7 +1162,10 @@ export default function BoothopBusiness() {
                     <Star className="h-5 w-5 text-emerald-400" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black">Retainer Programme</h2>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h2 className="text-xl font-black">Retainer Programme</h2>
+                      <span className="text-xs font-black bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 px-2.5 py-1 rounded-full uppercase tracking-widest">Founding Rate</span>
+                    </div>
                     <p className="text-white/40 text-xs mt-0.5">Recommended for businesses that deliver frequently</p>
                   </div>
                 </div>
@@ -1183,16 +1177,24 @@ export default function BoothopBusiness() {
                     <p className="text-emerald-400 font-black text-3xl mb-1">£10,000</p>
                     <p className="text-white font-bold text-sm mb-1">Local UK retainer</p>
                     <p className="text-white/40 text-xs">Ideal for frequent UK-to-UK delivery accounts</p>
+                    <p className="text-white/30 text-xs mt-2">First 30 accounts only — rate doubles for new clients after 9 months</p>
                   </div>
                   <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-5">
                     <p className="text-emerald-400 font-black text-3xl mb-1">£15,000</p>
                     <p className="text-white font-bold text-sm mb-1">International retainer</p>
                     <p className="text-white/40 text-xs">For accounts shipping internationally on a regular basis</p>
+                    <p className="text-white/30 text-xs mt-2">First 30 accounts only — rate doubles for new clients after 9 months</p>
                   </div>
                 </div>
                 <p className="text-white/25 text-xs leading-relaxed">
                   One-off jobs are also welcome — no retainer needed for occasional use. To open a retainer account, contact <span className="text-white/40">business@boothop.com</span>.
                 </p>
+                <div className="mt-5 bg-amber-500/8 border border-amber-500/20 rounded-xl px-4 py-3 flex items-start gap-3">
+                  <Star className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                  <p className="text-white/50 text-xs leading-relaxed">
+                    <span className="text-amber-400 font-bold">Founding member rates:</span> The first 30 accounts lock in these retainer rates permanently. After 9 months, rates double for all new clients. Your rate is fixed from the day you open your account.
+                  </p>
+                </div>
               </motion.div>
 
               {/* Pricing */}
@@ -1259,15 +1261,15 @@ export default function BoothopBusiness() {
                     { icon: Truck,       step: '03', title: 'Collection & delivery',   body: 'Carrier collects from your pickup address and delivers directly.' },
                     { icon: CheckCircle, step: '04', title: 'Confirmed & invoiced',    body: 'Delivery confirmed by both parties. Invoice issued on net terms.' },
                   ].map(({ icon: Icon, step, title, body }) => (
-                    <div key={step} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-5 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.97] touch-emerald">
+                    <div key={step} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-5 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98] touch-emerald">
                       <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                        <div className="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                           <Icon className="h-4 w-4 text-emerald-400" />
                         </div>
                         <span className="text-emerald-400/60 text-xs font-black tracking-widest">{step}</span>
                       </div>
-                      <p className="text-white font-bold text-sm mb-2">{title}</p>
+                      <p className="text-white font-bold text-sm mb-2 group-hover:text-emerald-300 transition-colors duration-300">{title}</p>
                       <p className="text-white/40 text-xs leading-relaxed">{body}</p>
                     </div>
                   ))}
@@ -1366,27 +1368,61 @@ export default function BoothopBusiness() {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label className="text-xs text-white/40 block mb-1.5">Pickup location <span className="text-red-400">*</span></label>
-                      {/* Uncontrolled — Google Places manages value natively; refs clear on reset */}
-                      <input
-                        ref={pickupRef}
-                        autoComplete="off"
-                        onChange={e => { setForm(prev => ({ ...prev, pickup: e.target.value })); setPickupCoords(null); }}
-                        placeholder={form.delivery_type === 'international' ? 'e.g. Heathrow Airport (LHR)' : 'e.g. Nottingham city centre'}
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-                      />
+                      <div className="relative">
+                        <input
+                          value={queryPickup}
+                          onChange={e => { setQueryPickup(e.target.value); setForm(prev => ({ ...prev, pickup: e.target.value })); setPickupCoords(null); }}
+                          onBlur={() => setPickupSugs([])}
+                          autoComplete="off"
+                          placeholder={form.delivery_type === 'international' ? 'e.g. Heathrow Airport (LHR)' : 'e.g. Nottingham city centre'}
+                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+                        />
+                        {pickupSugs.length > 0 && (
+                          <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-[#0a1628] border border-white/15 rounded-xl overflow-hidden shadow-2xl">
+                            {pickupSugs.slice(0, 6).map((s, i) => (
+                              <button key={i} type="button"
+                                onMouseDown={e => {
+                                  e.preventDefault();
+                                  setQueryPickup(s); setForm(prev => ({ ...prev, pickup: s })); setPickupSugs([]);
+                                  const coords = detectCity(s); if (coords) setPickupCoords(coords);
+                                }}
+                                className="w-full text-left px-4 py-2.5 text-sm text-white/70 hover:bg-white/8 hover:text-white transition-colors border-b border-white/5 last:border-0 flex items-center gap-2">
+                                <MapPin className="h-3.5 w-3.5 text-emerald-400/50 shrink-0" />{s}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <label className="text-xs text-white/40 block mb-1.5">Drop-off location <span className="text-red-400">*</span></label>
-                      <input
-                        ref={dropoffRef}
-                        autoComplete="off"
-                        onChange={e => { setForm(prev => ({ ...prev, dropoff: e.target.value })); setDropoffCoords(null); }}
-                        placeholder={form.delivery_type === 'international' ? 'e.g. Murtala Muhammed Airport (LOS)' : 'e.g. London EC2A'}
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-                      />
+                      <div className="relative">
+                        <input
+                          value={queryDropoff}
+                          onChange={e => { setQueryDropoff(e.target.value); setForm(prev => ({ ...prev, dropoff: e.target.value })); setDropoffCoords(null); }}
+                          onBlur={() => setDropoffSugs([])}
+                          autoComplete="off"
+                          placeholder={form.delivery_type === 'international' ? 'e.g. Murtala Muhammed Airport (LOS)' : 'e.g. London EC2A'}
+                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+                        />
+                        {dropoffSugs.length > 0 && (
+                          <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-[#0a1628] border border-white/15 rounded-xl overflow-hidden shadow-2xl">
+                            {dropoffSugs.slice(0, 6).map((s, i) => (
+                              <button key={i} type="button"
+                                onMouseDown={e => {
+                                  e.preventDefault();
+                                  setQueryDropoff(s); setForm(prev => ({ ...prev, dropoff: s })); setDropoffSugs([]);
+                                  const coords = detectCity(s); if (coords) setDropoffCoords(coords);
+                                }}
+                                className="w-full text-left px-4 py-2.5 text-sm text-white/70 hover:bg-white/8 hover:text-white transition-colors border-b border-white/5 last:border-0 flex items-center gap-2">
+                                <MapPin className="h-3.5 w-3.5 text-emerald-400/50 shrink-0" />{s}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <p className="text-white/20 text-xs mt-2">Start typing — city names and airports are both supported</p>
                 </div>
 
                 {/* Dates */}
@@ -1484,8 +1520,11 @@ export default function BoothopBusiness() {
                   <div className="grid grid-cols-2 gap-3">
                     {(['same_day', 'next_day'] as const).map(u => (
                       <button key={u} onClick={() => setForm(prev => ({ ...prev, urgency: u }))}
-                        className={`py-3.5 rounded-xl text-sm font-bold transition-all ${form.urgency === u ? 'bg-gradient-to-r from-emerald-400 to-teal-400 text-black' : 'bg-white/5 border border-white/10 text-white/60 hover:text-white'}`}>
-                        {u === 'same_day' ? '⚡ Same Day' : '🌅 Next Morning'}
+                        className={`py-3.5 px-4 rounded-xl text-sm font-bold transition-all text-left ${form.urgency === u ? 'bg-gradient-to-r from-emerald-400 to-teal-400 text-black' : 'bg-white/5 border border-white/10 text-white/60 hover:text-white'}`}>
+                        <span className="block">{u === 'same_day' ? '⚡ Same Day' : '🌅 Next Morning'}</span>
+                        <span className={`block text-xs font-semibold mt-0.5 ${form.urgency === u ? 'text-black/60' : 'text-white/30'}`}>
+                          {u === 'same_day' ? '+20% surcharge applies' : 'Standard rate'}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -1506,14 +1545,20 @@ export default function BoothopBusiness() {
                       </div>
                       <p className="text-emerald-400 font-black text-3xl">£{estimate.price.toLocaleString()}</p>
                     </div>
-                    {insuranceFee > 0 && (
+                    {sameDaySurcharge > 0 && (
                       <div className="flex items-center justify-between pt-3 border-t border-white/10">
+                        <p className="text-emerald-400/80 text-xs font-semibold">⚡ Same-day surcharge (20%)</p>
+                        <p className="text-emerald-400 font-bold text-sm">+£{sameDaySurcharge.toLocaleString()}</p>
+                      </div>
+                    )}
+                    {insuranceFee > 0 && (
+                      <div className={`flex items-center justify-between pt-3 ${sameDaySurcharge === 0 ? 'border-t border-white/10' : ''}`}>
                         <p className="text-orange-400/80 text-xs font-semibold">+ Mandatory insurance (8% of £{goodsValue.toLocaleString()})</p>
                         <p className="text-orange-400 font-bold text-sm">+£{insuranceFee.toLocaleString()}</p>
                       </div>
                     )}
-                    {insuranceFee > 0 && (
-                      <div className="flex items-center justify-between pt-2">
+                    {(insuranceFee > 0 || sameDaySurcharge > 0) && (
+                      <div className="flex items-center justify-between pt-2 border-t border-white/10">
                         <p className="text-white/50 text-xs font-bold uppercase tracking-wider">Total estimate</p>
                         <p className="text-white font-black text-xl">£{totalPrice.toLocaleString()}</p>
                       </div>
@@ -1708,7 +1753,7 @@ export default function BoothopBusiness() {
               <p className="text-white/25 text-sm mb-8">Confirmation sent to <span className="text-white/40">{bizEmail}</span></p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
-                  onClick={() => { setStage('form'); setFormError(null); setForm(EMPTY_FORM); setEstimate(null); setPickupCoords(null); setDropoffCoords(null); setTermsAccepted(false); setTermsScrolled(false); if (pickupRef.current) pickupRef.current.value = ''; if (dropoffRef.current) dropoffRef.current.value = ''; }}
+                  onClick={() => { setStage('form'); setFormError(null); setForm(EMPTY_FORM); setEstimate(null); setPickupCoords(null); setDropoffCoords(null); setQueryPickup(''); setQueryDropoff(''); setTermsAccepted(false); setTermsScrolled(false); }}
                   className="text-emerald-400 hover:text-emerald-300 text-sm font-bold transition-colors">
                   Submit another request →
                 </button>
