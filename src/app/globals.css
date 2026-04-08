@@ -192,6 +192,21 @@ body {
   .reveal, .reveal-left, .reveal-scale {
     animation-delay: 0.1s !important;
   }
+
+  /* Glow blobs always visible in standalone PWA */
+  [class*="group-hover:opacity-100"] { opacity: 1 !important; }
+
+  /* All hover-triggered glow shadows always on in PWA */
+  .touch-emerald {
+    border-color: rgba(16, 185, 129, 0.30) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 4px 28px rgba(16, 185, 129, 0.14), inset 0 0 0 1px rgba(16,185,129,0.08) !important;
+  }
+  .touch-blue {
+    border-color: rgba(59, 130, 246, 0.30) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 4px 28px rgba(59, 130, 246, 0.14), inset 0 0 0 1px rgba(59,130,246,0.08) !important;
+  }
 }
 
 @media (hover: none) {

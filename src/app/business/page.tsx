@@ -515,7 +515,7 @@ export default function BoothopBusiness() {
                   { value: '100%',     label: 'Insured',     sub: 'Every single delivery' },
                   { value: 'Same day', label: 'Delivery',    sub: 'For urgent business needs' },
                 ].map(s => (
-                  <div key={s.label} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 text-center transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10">
+                  <div key={s.label} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 text-center transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.97] touch-emerald">
                     <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <p className="text-3xl font-black text-emerald-400 mb-1">{s.value}</p>
                     <p className="text-white font-semibold text-sm">{s.label}</p>
@@ -534,7 +534,7 @@ export default function BoothopBusiness() {
                   { icon: MapPin,    step: '02', title: 'Submit your request',   body: 'Tell us the route, what needs delivering, and when. Get an instant price estimate.' },
                   { icon: Zap,       step: '03', title: 'We handle the rest',    body: 'We match a verified carrier to your job and keep you updated every step of the way.' },
                 ].map(({ icon: Icon, step, title, body }) => (
-                  <div key={step} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10">
+                  <div key={step} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.97] touch-emerald">
                     <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
@@ -575,7 +575,7 @@ export default function BoothopBusiness() {
                   { icon: Lock,        title: 'Business-only access', body: 'Verified business accounts only. No personal users on the platform.' },
                   { icon: Star,        title: 'Rated carriers',       body: 'All our carriers are verified, rated, and background-checked.' },
                 ].map(({ icon: Icon, title, body }) => (
-                  <div key={title} className="group relative overflow-hidden flex items-start gap-4 bg-white/3 border border-white/8 rounded-2xl p-5 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10">
+                  <div key={title} className="group relative overflow-hidden flex items-start gap-4 bg-white/3 border border-white/8 rounded-2xl p-5 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.97] touch-emerald">
                     <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0">
                       <Icon className="h-5 w-5 text-emerald-400" />
@@ -712,32 +712,35 @@ export default function BoothopBusiness() {
                 </p>
               </motion.div>
 
-              {/* Retainer Requirements */}
+              {/* Retainer Programme */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-                className="mb-12 bg-amber-500/5 border border-amber-500/20 rounded-2xl p-8">
+                className="mb-12 bg-white/3 border border-white/8 rounded-2xl p-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
-                    <AlertTriangle className="h-5 w-5 text-amber-400" />
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                    <Star className="h-5 w-5 text-emerald-400" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black">Retainer Requirements</h2>
-                    <p className="text-white/40 text-xs mt-0.5">Required before your first delivery can be processed</p>
+                    <h2 className="text-xl font-black">Retainer Programme</h2>
+                    <p className="text-white/40 text-xs mt-0.5">Recommended for businesses that deliver frequently</p>
                   </div>
                 </div>
+                <p className="text-white/50 text-sm leading-relaxed mb-6">
+                  If you plan to use BootHop Business on a regular basis, opening a retainer account gives you <span className="text-white/70 font-semibold">priority carrier matching</span>, <span className="text-white/70 font-semibold">faster turnaround</span>, and <span className="text-white/70 font-semibold">consolidated monthly invoicing</span> instead of paying per job. The retainer sits on account and is drawn down against delivery fees — it is never charged as a deposit.
+                </p>
                 <div className="grid md:grid-cols-2 gap-4 mb-5">
-                  <div className="bg-amber-500/8 border border-amber-500/20 rounded-xl p-5">
-                    <p className="text-amber-400 font-black text-3xl mb-1">£10,000</p>
+                  <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-5">
+                    <p className="text-emerald-400 font-black text-3xl mb-1">£10,000</p>
                     <p className="text-white font-bold text-sm mb-1">Local UK retainer</p>
-                    <p className="text-white/40 text-xs">For all UK-to-UK business accounts</p>
+                    <p className="text-white/40 text-xs">Ideal for frequent UK-to-UK delivery accounts</p>
                   </div>
-                  <div className="bg-amber-500/8 border border-amber-500/20 rounded-xl p-5">
-                    <p className="text-amber-400 font-black text-3xl mb-1">£15,000</p>
+                  <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-5">
+                    <p className="text-emerald-400 font-black text-3xl mb-1">£15,000</p>
                     <p className="text-white font-bold text-sm mb-1">International retainer</p>
-                    <p className="text-white/40 text-xs">For accounts requiring international delivery</p>
+                    <p className="text-white/40 text-xs">For accounts shipping internationally on a regular basis</p>
                   </div>
                 </div>
-                <p className="text-white/30 text-xs leading-relaxed">
-                  Retainers are held on account and drawn down against delivery fees — they are not a deposit. Contact our team at <span className="text-white/50">business@boothop.com</span> to arrange your retainer before submitting your first job.
+                <p className="text-white/25 text-xs leading-relaxed">
+                  One-off jobs are also welcome — no retainer needed for occasional use. To open a retainer account, contact <span className="text-white/40">business@boothop.com</span>.
                 </p>
               </motion.div>
 
