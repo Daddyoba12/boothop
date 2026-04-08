@@ -11,8 +11,8 @@ import {
 
 // Annual membership fee — update here to change pricing
 const FEES: Record<'uk' | 'international', number> = {
-  uk:            500,
-  international: 1000,
+  uk:            10000,
+  international: 15000,
 };
 
 const PERKS = [

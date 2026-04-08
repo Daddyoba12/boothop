@@ -10,8 +10,8 @@ import {
 import { useState } from 'react';
 
 const FEES: Record<string, number> = {
-  uk:            500,
-  international: 1000,
+  uk:            10000,
+  international: 15000,
 };
 
 function PaymentContent() {
@@ -19,7 +19,7 @@ function PaymentContent() {
   const type        = params.get('type') || 'uk';
   const email       = params.get('email') || '';
   const company     = params.get('company') || '';
-  const fee         = FEES[type] ?? 500;
+  const fee         = FEES[type] ?? 15000;
   const ref         = `PP-${company.replace(/[^A-Z0-9]/gi, '').toUpperCase().slice(0, 6) || 'BHOOD'}-${new Date().getFullYear()}`;
 
   const [copied, setCopied] = useState<string | null>(null);

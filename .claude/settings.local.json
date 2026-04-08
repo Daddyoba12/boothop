@@ -60,7 +60,8 @@
       "Bash(python make_boothop_promo.py)",
       "Bash(python make_boothop_promo_v3.py)",
       "Bash(python:*)",
-      "Bash(SCRIPTS=\"C:/Users/babso/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0/LocalCache/local-packages/Python313/Scripts\" \"$SCRIPTS/yt-dlp.exe\" -x --audio-format mp3 --audio-quality 0 -o \"C:/Users/babso/desktop/boothop/promo/redemption.%\\(ext\\)s\" \"https://www.youtube.com/watch?v=MYHrk_6qky8\")"
+      "Bash(SCRIPTS=\"C:/Users/babso/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0/LocalCache/local-packages/Python313/Scripts\" \"$SCRIPTS/yt-dlp.exe\" -x --audio-format mp3 --audio-quality 0 -o \"C:/Users/babso/desktop/boothop/promo/redemption.%\\(ext\\)s\" \"https://www.youtube.com/watch?v=MYHrk_6qky8\")",
+      "Bash(vercel:*)"
     ]
   }
 }
