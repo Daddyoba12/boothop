@@ -379,6 +379,7 @@ export default function BoothopBusiness() {
     if (!form.pickup || !form.dropoff)    { setFormError('Pickup and drop-off locations are required.'); return; }
     if (!form.delivery_date)              { setFormError('Collection date is required.'); return; }
     if (!form.expected_delivery_date)     { setFormError('Expected delivery date is required.'); return; }
+    if (form.expected_delivery_date < form.delivery_date) { setFormError('Expected delivery date cannot be before the collection date.'); return; }
     if (!termsAccepted)                   { setFormError('You must read and accept the Terms & Conditions.'); setShowTerms(true); return; }
 
     setFormError(null); setFormLoading(true);
@@ -551,13 +552,18 @@ export default function BoothopBusiness() {
                   <span className="ml-2 text-xs font-semibold bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full uppercase tracking-widest">Business</span>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <button onClick={() => document.getElementById('biz-how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="text-sm font-semibold text-white/40 hover:text-white transition-colors hidden sm:block">
+                  How It Works
+                </button>
                 <button onClick={() => document.getElementById('biz-contact')?.scrollIntoView({ behavior: 'smooth' })}
                   className="text-sm font-semibold text-white/40 hover:text-white transition-colors hidden sm:block">
-                  Contact Us
+                  Contact
                 </button>
-                <button onClick={() => setStage('email')} className="text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
-                  Sign in →
+                <button onClick={() => setStage('email')}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-sm px-5 py-2.5 rounded-xl hover:scale-105 transition-all">
+                  Book a Delivery
                 </button>
               </div>
             </nav>
@@ -720,7 +726,7 @@ export default function BoothopBusiness() {
             </div>
 
             {/* How it works */}
-            <div className="max-w-5xl mx-auto px-8 pb-20">
+            <div id="biz-how-it-works" className="max-w-5xl mx-auto px-8 pb-20">
               <h2 className="text-2xl font-black text-center mb-10">How it works</h2>
               <div className="grid md:grid-cols-3 gap-6">
                 {[
@@ -1161,9 +1167,10 @@ export default function BoothopBusiness() {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label className="text-xs text-white/40 block mb-1.5">Pickup location <span className="text-red-400">*</span></label>
+                      {/* Uncontrolled — Google Places manages value natively; refs clear on reset */}
                       <input
                         ref={pickupRef}
-                        value={form.pickup}
+                        autoComplete="off"
                         onChange={e => { setForm(prev => ({ ...prev, pickup: e.target.value })); setPickupCoords(null); }}
                         placeholder={form.delivery_type === 'international' ? 'e.g. Heathrow Airport (LHR)' : 'e.g. Nottingham city centre'}
                         className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
@@ -1173,7 +1180,7 @@ export default function BoothopBusiness() {
                       <label className="text-xs text-white/40 block mb-1.5">Drop-off location <span className="text-red-400">*</span></label>
                       <input
                         ref={dropoffRef}
-                        value={form.dropoff}
+                        autoComplete="off"
                         onChange={e => { setForm(prev => ({ ...prev, dropoff: e.target.value })); setDropoffCoords(null); }}
                         placeholder={form.delivery_type === 'international' ? 'e.g. Murtala Muhammed Airport (LOS)' : 'e.g. London EC2A'}
                         className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
@@ -1200,7 +1207,7 @@ export default function BoothopBusiness() {
                     </p>
                     <input type="date" value={form.expected_delivery_date}
                       min={form.delivery_date || new Date().toISOString().split('T')[0]}
-                      onChange={e => setForm(prev => ({ ...prev, expected_delivery_date: e.target.value }))}
+                      onChange={e => { const v = e.target.value; if (form.delivery_date && v < form.delivery_date) return; setForm(prev => ({ ...prev, expected_delivery_date: v })); }}
                       className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm [color-scheme:dark]" />
                   </div>
                 </div>
@@ -1501,7 +1508,7 @@ export default function BoothopBusiness() {
               <p className="text-white/25 text-sm mb-8">Confirmation sent to <span className="text-white/40">{bizEmail}</span></p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
-                  onClick={() => { setStage('form'); setFormError(null); setForm(EMPTY_FORM); setEstimate(null); setPickupCoords(null); setDropoffCoords(null); setTermsAccepted(false); setTermsScrolled(false); }}
+                  onClick={() => { setStage('form'); setFormError(null); setForm(EMPTY_FORM); setEstimate(null); setPickupCoords(null); setDropoffCoords(null); setTermsAccepted(false); setTermsScrolled(false); if (pickupRef.current) pickupRef.current.value = ''; if (dropoffRef.current) dropoffRef.current.value = ''; }}
                   className="text-emerald-400 hover:text-emerald-300 text-sm font-bold transition-colors">
                   Submit another request →
                 </button>
