@@ -8,6 +8,7 @@ import { useSearchParams } from 'next/navigation';
 import {
   ArrowRight, CheckCircle, MapPin, Menu, Package,
   Plane, Search, Star, X, Shield, Zap, Users,
+  MessageCircle, Send, Mail,
 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import BootHopLogo from '@/components/BootHopLogo';
@@ -139,6 +140,9 @@ function HomePageContent() {
   const [mapsReady, setMapsReady] = useState(false);
 
   const [trip, setTrip] = useState<TripForm>({ from: '', to: '', date: '', price: '', email: '', weight: '' });
+  const [contactForm,    setContactForm]    = useState({ name: '', email: '', message: '' });
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactStatus,  setContactStatus]  = useState<'idle' | 'ok' | 'err'>('idle');
 
   const [scrollY, setScrollY] = useState(0);
   useEffect(() => {
@@ -245,6 +249,20 @@ function HomePageContent() {
     setSubmitting(false);
     if (!res.ok) { const d = await res.json(); alert(d.error || 'Unable to send code.'); return; }
     setEmailSent(true);
+  };
+
+  const submitContact = async () => {
+    if (!contactForm.name || !contactForm.email || !contactForm.message) return;
+    setContactLoading(true);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: contactForm.name, email: contactForm.email, topic: 'General Enquiry', message: contactForm.message }),
+      });
+      setContactStatus(res.ok ? 'ok' : 'err');
+      if (res.ok) setContactForm({ name: '', email: '', message: '' });
+    } catch { setContactStatus('err'); }
+    finally { setContactLoading(false); }
   };
 
   const verifyModalCode = async () => {
@@ -837,6 +855,73 @@ function HomePageContent() {
           </div>
         </div>
       </section>
+
+      {/* ── Contact Us ─────────────────────────────────────────────────────── */}
+      <section className="py-24 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-10 reveal">
+            <h2 className="text-3xl font-black mb-3">Get in touch</h2>
+            <p className="text-white/40 text-sm">Questions, partnerships or just saying hello — we&apos;re here.</p>
+          </div>
+
+          <div className="bg-white/3 border border-white/8 rounded-3xl p-8 reveal">
+            {/* WhatsApp CTA */}
+            <a href="https://wa.me/4479506553755" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-3 bg-[#25D366]/10 border border-[#25D366]/25 text-[#25D366] rounded-2xl px-5 py-3.5 mb-6 hover:bg-[#25D366]/15 transition-all font-semibold text-sm">
+              <MessageCircle className="h-5 w-5 flex-shrink-0" />
+              <div>
+                <p className="font-bold">WhatsApp us</p>
+                <p className="text-[#25D366]/60 text-xs font-normal">Quickest way to reach us</p>
+              </div>
+              <ArrowRight className="h-4 w-4 ml-auto flex-shrink-0" />
+            </a>
+
+            {contactStatus === 'ok' ? (
+              <div className="rounded-2xl bg-blue-500/10 border border-blue-500/20 px-6 py-8 text-center">
+                <CheckCircle className="h-8 w-8 text-blue-400 mx-auto mb-3" />
+                <p className="text-white font-bold">Message sent!</p>
+                <p className="text-white/40 text-sm mt-1">We&apos;ll be in touch shortly.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {contactStatus === 'err' && (
+                  <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">
+                    Could not send message. Please try WhatsApp instead.
+                  </div>
+                )}
+                <div className="flex items-center gap-3 mb-1">
+                  <Mail className="h-4 w-4 text-white/30" />
+                  <p className="text-white/50 text-sm font-semibold">Or send us a message</p>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <input value={contactForm.name} onChange={e => setContactForm(p => ({ ...p, name: e.target.value }))}
+                    placeholder="Your name"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                  <input value={contactForm.email} onChange={e => setContactForm(p => ({ ...p, email: e.target.value }))}
+                    type="email" placeholder="Email address"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                </div>
+                <textarea value={contactForm.message} onChange={e => setContactForm(p => ({ ...p, message: e.target.value }))}
+                  rows={4} placeholder="How can we help?"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none" />
+                <button onClick={submitContact}
+                  disabled={contactLoading || !contactForm.name || !contactForm.email || !contactForm.message}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-blue-500 text-white font-black disabled:opacity-40 hover:scale-[1.02] transition-all text-sm">
+                  {contactLoading ? <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Send className="h-4 w-4" />}
+                  {contactLoading ? 'Sending…' : 'Send message'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Floating WhatsApp button */}
+      <a href="https://wa.me/4479506553755" target="_blank" rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-[#25D366] text-white font-bold text-sm px-5 py-3 rounded-full shadow-2xl shadow-[#25D366]/40 hover:scale-105 active:scale-95 transition-all">
+        <MessageCircle className="h-5 w-5" />
+        WhatsApp us
+      </a>
 
       <Footer />
     </div>

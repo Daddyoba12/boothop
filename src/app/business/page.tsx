@@ -7,6 +7,7 @@ import {
   Zap, Lock, Clock, MapPin, Package, Star, Building2, Truck,
   LogOut, List, XCircle, AlertCircle, User, ChevronLeft,
   Phone, Plane, Globe, FileText, AlertTriangle,
+  MessageCircle, Send, Car,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -215,6 +216,16 @@ export default function BoothopBusiness() {
   const [termsScrolled,setTermsScrolled]= useState(false);
   const [termsAccepted,setTermsAccepted]= useState(false);
 
+  // Contact form (landing)
+  const [contactForm,    setContactForm]    = useState({ name: '', email: '', message: '' });
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactStatus,  setContactStatus]  = useState<'idle' | 'ok' | 'err'>('idle');
+
+  // Carrier (Booter) application form
+  const [carrierForm,    setCarrierForm]    = useState({ name: '', email: '', phone: '', city: '', vehicle: '', about: '' });
+  const [carrierLoading, setCarrierLoading] = useState(false);
+  const [carrierStatus,  setCarrierStatus]  = useState<'idle' | 'ok' | 'err'>('idle');
+
   // Google Places coords for accurate pricing
   const [pickupCoords,  setPickupCoords]  = useState<[number, number] | null>(null);
   const [dropoffCoords, setDropoffCoords] = useState<[number, number] | null>(null);
@@ -383,6 +394,36 @@ export default function BoothopBusiness() {
       setJobRef(j.jobRef); setStage('success');
     } catch { setFormError('Something went wrong.'); }
     finally { setFormLoading(false); }
+  };
+
+  // ── Contact submit ────────────────────────────────────────────────────────
+  const submitContact = async () => {
+    if (!contactForm.name || !contactForm.email || !contactForm.message) return;
+    setContactLoading(true);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: contactForm.name, email: contactForm.email, topic: 'Business Enquiry', message: contactForm.message }),
+      });
+      setContactStatus(res.ok ? 'ok' : 'err');
+      if (res.ok) setContactForm({ name: '', email: '', message: '' });
+    } catch { setContactStatus('err'); }
+    finally { setContactLoading(false); }
+  };
+
+  // ── Carrier application submit ────────────────────────────────────────────
+  const submitCarrier = async () => {
+    if (!carrierForm.name || !carrierForm.email || !carrierForm.phone) return;
+    setCarrierLoading(true);
+    try {
+      const res = await fetch('/api/booter-apply', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(carrierForm),
+      });
+      setCarrierStatus(res.ok ? 'ok' : 'err');
+      if (res.ok) setCarrierForm({ name: '', email: '', phone: '', city: '', vehicle: '', about: '' });
+    } catch { setCarrierStatus('err'); }
+    finally { setCarrierLoading(false); }
   };
 
   // ── Loading ────────────────────────────────────────────────────────────────
@@ -589,6 +630,124 @@ export default function BoothopBusiness() {
               </div>
             </div>
 
+            {/* ── Become a Carrier ── */}
+            <div className="max-w-3xl mx-auto px-8 pb-20">
+              <div className="bg-white/3 border border-white/8 rounded-3xl p-10">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                    <Car className="h-5 w-5 text-blue-400" />
+                  </div>
+                  <span className="text-xs font-semibold uppercase tracking-widest text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full">For Drivers</span>
+                </div>
+                <h2 className="text-2xl font-black mb-2 mt-4">Become a BootHop Carrier</h2>
+                <p className="text-white/40 text-sm mb-8 leading-relaxed">
+                  We&apos;re building a network of verified drivers and travellers to power our business deliveries.
+                  Register your interest — we&apos;ll review your application and get back to you.
+                </p>
+
+                {carrierStatus === 'ok' ? (
+                  <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 px-6 py-8 text-center">
+                    <CheckCircle className="h-8 w-8 text-emerald-400 mx-auto mb-3" />
+                    <p className="text-white font-bold">Application received!</p>
+                    <p className="text-white/40 text-sm mt-1">We&apos;ll be in touch soon.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {carrierStatus === 'err' && (
+                      <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">
+                        Something went wrong. Please try again.
+                      </div>
+                    )}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <input value={carrierForm.name} onChange={e => setCarrierForm(p => ({ ...p, name: e.target.value }))}
+                        placeholder="Full name *" className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                      <input value={carrierForm.email} onChange={e => setCarrierForm(p => ({ ...p, email: e.target.value }))}
+                        type="email" placeholder="Email address *" className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                      <input value={carrierForm.phone} onChange={e => setCarrierForm(p => ({ ...p, phone: e.target.value }))}
+                        type="tel" placeholder="Phone number *" className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                      <input value={carrierForm.city} onChange={e => setCarrierForm(p => ({ ...p, city: e.target.value }))}
+                        placeholder="Your city / base location" className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                    </div>
+                    <select value={carrierForm.vehicle} onChange={e => setCarrierForm(p => ({ ...p, vehicle: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                      <option value="" className="bg-[#0a1628]">Vehicle / travel type</option>
+                      <option value="car" className="bg-[#0a1628]">Car</option>
+                      <option value="van" className="bg-[#0a1628]">Van</option>
+                      <option value="motorbike" className="bg-[#0a1628]">Motorbike / scooter</option>
+                      <option value="international" className="bg-[#0a1628]">Frequent international traveller</option>
+                      <option value="other" className="bg-[#0a1628]">Other</option>
+                    </select>
+                    <textarea value={carrierForm.about} onChange={e => setCarrierForm(p => ({ ...p, about: e.target.value }))}
+                      rows={3} placeholder="Tell us a bit about yourself and the routes you can cover…"
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none" />
+                    <button onClick={submitCarrier}
+                      disabled={carrierLoading || !carrierForm.name || !carrierForm.email || !carrierForm.phone}
+                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-black disabled:opacity-40 hover:scale-[1.02] transition-all text-sm">
+                      {carrierLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                      {carrierLoading ? 'Submitting…' : 'Apply to become a carrier'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ── Contact Us ── */}
+            <div className="max-w-3xl mx-auto px-8 pb-20">
+              <div className="bg-white/3 border border-white/8 rounded-3xl p-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                    <Mail className="h-5 w-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black">Get in touch</h2>
+                    <p className="text-white/40 text-sm">Questions about business deliveries? We reply within 24h.</p>
+                  </div>
+                </div>
+
+                {/* WhatsApp CTA */}
+                <a href="https://wa.me/4479506553755" target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-3 bg-[#25D366]/10 border border-[#25D366]/25 text-[#25D366] rounded-2xl px-5 py-3.5 mb-6 hover:bg-[#25D366]/15 transition-all font-semibold text-sm">
+                  <MessageCircle className="h-5 w-5 flex-shrink-0" />
+                  <div>
+                    <p className="font-bold">WhatsApp us directly</p>
+                    <p className="text-[#25D366]/60 text-xs font-normal">Fastest way to reach us</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 ml-auto flex-shrink-0" />
+                </a>
+
+                {contactStatus === 'ok' ? (
+                  <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 px-6 py-8 text-center">
+                    <CheckCircle className="h-8 w-8 text-emerald-400 mx-auto mb-3" />
+                    <p className="text-white font-bold">Message sent!</p>
+                    <p className="text-white/40 text-sm mt-1">We&apos;ll be in touch shortly.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {contactStatus === 'err' && (
+                      <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">
+                        Could not send message. Please try WhatsApp instead.
+                      </div>
+                    )}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <input value={contactForm.name} onChange={e => setContactForm(p => ({ ...p, name: e.target.value }))}
+                        placeholder="Your name" className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
+                      <input value={contactForm.email} onChange={e => setContactForm(p => ({ ...p, email: e.target.value }))}
+                        type="email" placeholder="Email address" className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
+                    </div>
+                    <textarea value={contactForm.message} onChange={e => setContactForm(p => ({ ...p, message: e.target.value }))}
+                      rows={4} placeholder="How can we help?"
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm resize-none" />
+                    <button onClick={submitContact}
+                      disabled={contactLoading || !contactForm.name || !contactForm.email || !contactForm.message}
+                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black disabled:opacity-40 hover:scale-[1.02] transition-all text-sm">
+                      {contactLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                      {contactLoading ? 'Sending…' : 'Send message'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Bottom CTA */}
             <div className="max-w-2xl mx-auto px-8 pb-24 text-center">
               <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border border-emerald-500/20 rounded-3xl p-10">
@@ -600,6 +759,13 @@ export default function BoothopBusiness() {
                 </button>
               </div>
             </div>
+
+            {/* Floating WhatsApp button */}
+            <a href="https://wa.me/4479506553755" target="_blank" rel="noopener noreferrer"
+              className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-[#25D366] text-white font-bold text-sm px-5 py-3 rounded-full shadow-2xl shadow-[#25D366]/40 hover:scale-105 active:scale-95 transition-all">
+              <MessageCircle className="h-5 w-5" />
+              WhatsApp us
+            </a>
           </motion.div>
         )}
 
