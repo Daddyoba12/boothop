@@ -103,6 +103,7 @@ A separate sub-application under `src/app/business/` and `src/app/api/business/`
 | `STRIPE_IDENTITY_WEBHOOK_SECRET` | Stripe webhook verification |
 | `NEXT_PUBLIC_APP_URL` | Base URL used in email links |
 | `ADMIN_EMAIL` / `SUPPORT_EMAIL` | Admin and support inboxes |
+| `WHATSAPP_NUMBER` | WhatsApp contact number in international format (e.g. `447506553755`). Used by `/api/whatsapp` redirect — never exposed to the browser. Add to Vercel env vars to change the number without touching code. |
 
 ## Reference Docs
 
