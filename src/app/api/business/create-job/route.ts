@@ -25,51 +25,57 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const {
-      company_name, pickup, dropoff, description, weight,
-      value, category, urgency, insurance, price,
+      company_name, phone, pickup, dropoff, description, weight,
+      value, category, urgency, price, miles,
+      insurance_fee, delivery_type, delivery_date, expected_delivery_date,
     } = body;
 
     if (!pickup || !dropoff) {
       return NextResponse.json({ error: 'Pickup and drop-off are required.' }, { status: 400 });
     }
-
-    if (!insurance) {
-      return NextResponse.json({ error: 'Insurance is compulsory.' }, { status: 400 });
+    if (!phone) {
+      return NextResponse.json({ error: 'Phone number is required.' }, { status: 400 });
     }
 
-    const jobRef  = generateRef();
+    const jobRef   = generateRef();
     const supabase = createSupabaseAdminClient();
 
     await supabase.from('business_jobs').insert({
-      job_ref:         jobRef,
-      email:           session.email,
-      company_name:    company_name || null,
+      job_ref:                jobRef,
+      email:                  session.email,
+      company_name:           company_name           || null,
+      phone:                  phone                  || null,
       pickup,
       dropoff,
-      description:     description || null,
-      weight:          weight      || null,
-      declared_value:  value       || null,
-      category:        category    || null,
-      urgency:         urgency     || 'same_day',
-      insurance:       !!insurance,
-      estimated_price: price       || null,
-      status:          'pending',
+      description:            description            || null,
+      weight:                 weight                 || null,
+      declared_value:         value                  || null,
+      category:               category               || null,
+      urgency:                urgency                || 'same_day',
+      insurance:              true,
+      estimated_price:        price                  || null,
+      distance_miles:         miles                  || null,
+      insurance_fee:          insurance_fee          || null,
+      delivery_type:          delivery_type          || 'local_uk',
+      delivery_date:          delivery_date          || null,
+      expected_delivery_date: expected_delivery_date || null,
+      status:                 'pending',
     });
 
     await Promise.allSettled([
       sendBusinessJobAdminAlertEmail({
         jobRef,
         email:         session.email,
-        companyName:   company_name || '',
+        companyName:   company_name  || '',
         pickup,
         dropoff,
-        description:   description || '',
-        weight:        weight      || '',
-        declaredValue: value       || '',
-        category:      category    || '',
-        urgency:       urgency     || 'same_day',
-        insurance:     !!insurance,
-        price:         price       || 0,
+        description:   description  || '',
+        weight:        weight        || '',
+        declaredValue: value         || '',
+        category:      category      || '',
+        urgency:       urgency       || 'same_day',
+        insurance:     true,
+        price:         price         || 0,
       }),
       sendBusinessJobConfirmationEmail({
         to:      session.email,
