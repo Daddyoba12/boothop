@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const WA_NUMBER = process.env.WHATSAPP_NUMBER ?? '447506553755';
+const WA_NUMBER = process.env.WHATSAPP_NUMBER ?? '447940405362';
 const WA_TEXT   = 'Hi BootHop, I found you via your website and would like to get in touch.';
 
 export async function GET() {
