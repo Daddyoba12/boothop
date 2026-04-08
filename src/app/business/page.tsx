@@ -239,7 +239,7 @@ export default function BoothopBusiness() {
   const [partnerTier,     setPartnerTier]     = useState<string | null>(null);
   const [partnerStatus,   setPartnerStatus]   = useState<string | null>(null);
   const [partnerDiscount, setPartnerDiscount] = useState<number | null>(null);
-  const [priorityForm,    setPriorityForm]    = useState({ email: '', company_name: '', phone: '', delivery_volume: '', notes: '' });
+  const [priorityForm,    setPriorityForm]    = useState({ email: '', company_name: '', phone: '', delivery_type: '', notes: '' });
   const [priorityLoading, setPriorityLoading] = useState(false);
   const [priorityStatus,  setPriorityStatus]  = useState<'idle' | 'ok' | 'err'>('idle');
 
@@ -886,33 +886,11 @@ export default function BoothopBusiness() {
                       <div className="bg-white/3 border border-white/8 rounded-2xl p-6 space-y-3">
                         <p className="text-white font-bold text-sm mb-4">Apply now — it takes 60 seconds</p>
                         {priorityStatus === 'err' && <p className="text-red-400 text-xs">Something went wrong — please try again.</p>}
-                        <input value={priorityForm.email} onChange={e => setPriorityForm(p => ({ ...p, email: e.target.value }))}
-                          type="email" placeholder="Business email *"
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm" />
-                        <input value={priorityForm.company_name} onChange={e => setPriorityForm(p => ({ ...p, company_name: e.target.value }))}
-                          placeholder="Company name *"
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm" />
-                        <input value={priorityForm.phone} onChange={e => setPriorityForm(p => ({ ...p, phone: e.target.value }))}
-                          type="tel" placeholder="Phone number *"
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm" />
-                        <select value={priorityForm.delivery_volume} onChange={e => setPriorityForm(p => ({ ...p, delivery_volume: e.target.value }))}
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm">
-                          <option value="" className="bg-[#0a1628]">Expected deliveries per year</option>
-                          <option value="2-5" className="bg-[#0a1628]">2–5 deliveries/year (5% discount)</option>
-                          <option value="6-10" className="bg-[#0a1628]">6–10 deliveries/year (10% discount)</option>
-                          <option value="10+" className="bg-[#0a1628]">10+ deliveries/year (10% discount)</option>
-                        </select>
-                        <button onClick={submitPriorityApply}
-                          disabled={priorityLoading || !priorityForm.email || !priorityForm.company_name || !priorityForm.phone}
-                          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 text-black font-black disabled:opacity-40 hover:scale-[1.02] transition-all text-sm">
-                          {priorityLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className="h-4 w-4" />}
-                          {priorityLoading ? 'Submitting…' : 'Apply for Priority Partner'}
-                        </button>
-                        <p className="text-white/20 text-xs text-center">No payment taken now · Our team contacts you within 24h</p>
                         <a href="/business/priority-partner"
-                          className="block text-center text-amber-400/50 hover:text-amber-400 text-xs transition-colors mt-1">
-                          View full programme details →
+                          className="flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 text-black font-black text-sm hover:scale-[1.02] active:scale-[0.98] transition-all">
+                          <Star className="h-4 w-4" /> Apply &amp; Pay — full details →
                         </a>
+                        <p className="text-white/20 text-xs text-center">UK £500/yr · International £1,000/yr · One-off annual fee</p>
                       </div>
                     )}
                   </div>
@@ -1167,24 +1145,18 @@ export default function BoothopBusiness() {
                         <input value={priorityForm.phone} onChange={e => setPriorityForm(p => ({ ...p, phone: e.target.value }))}
                           type="tel" placeholder="Phone number *"
                           className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm" />
-                        <select value={priorityForm.delivery_volume} onChange={e => setPriorityForm(p => ({ ...p, delivery_volume: e.target.value }))}
+                        <select value={priorityForm.delivery_type} onChange={e => setPriorityForm(p => ({ ...p, delivery_type: e.target.value }))}
                           className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm">
-                          <option value="" className="bg-[#0a1628]">Deliveries per year</option>
-                          <option value="2-5" className="bg-[#0a1628]">2–5 deliveries (5% discount)</option>
-                          <option value="6-10" className="bg-[#0a1628]">6–10 deliveries (10% discount)</option>
-                          <option value="10+" className="bg-[#0a1628]">10+ deliveries (10% discount)</option>
+                          <option value="" className="bg-[#0a1628]">Account type</option>
+                          <option value="uk" className="bg-[#0a1628]">UK deliveries — £500/year</option>
+                          <option value="international" className="bg-[#0a1628]">International deliveries — £1,000/year</option>
                         </select>
                       </div>
-                      <textarea value={priorityForm.notes} onChange={e => setPriorityForm(p => ({ ...p, notes: e.target.value }))}
-                        rows={2} placeholder="Anything else we should know about your delivery needs?"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm resize-none" />
-                      <button onClick={submitPriorityApply}
-                        disabled={priorityLoading || !priorityForm.email || !priorityForm.company_name || !priorityForm.phone}
-                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 text-black font-black disabled:opacity-40 hover:scale-[1.02] transition-all text-sm">
-                        {priorityLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className="h-4 w-4" />}
-                        {priorityLoading ? 'Submitting…' : 'Apply for Priority Partner status'}
-                      </button>
-                      <p className="text-white/20 text-xs text-center">No payment taken now — our team will contact you to finalise your account</p>
+                      <a href="/business/priority-partner"
+                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 text-black font-black hover:scale-[1.02] active:scale-[0.98] transition-all text-sm">
+                        <Star className="h-4 w-4" /> Apply &amp; pay — full details
+                      </a>
+                      <p className="text-white/20 text-xs text-center">UK £500/yr · International £1,000/yr · Annual membership</p>
                     </div>
                   )}
                 </motion.div>
