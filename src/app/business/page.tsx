@@ -705,7 +705,7 @@ export default function BoothopBusiness() {
                 </div>
 
                 {/* WhatsApp CTA */}
-                <a href="https://wa.me/4479506553755" target="_blank" rel="noopener noreferrer"
+                <a href="https://wa.me/447506553755" target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-3 bg-[#25D366]/10 border border-[#25D366]/25 text-[#25D366] rounded-2xl px-5 py-3.5 mb-6 hover:bg-[#25D366]/15 transition-all font-semibold text-sm">
                   <MessageCircle className="h-5 w-5 flex-shrink-0" />
                   <div>
@@ -761,7 +761,7 @@ export default function BoothopBusiness() {
             </div>
 
             {/* Floating WhatsApp button */}
-            <a href="https://wa.me/4479506553755" target="_blank" rel="noopener noreferrer"
+            <a href="https://wa.me/447506553755" target="_blank" rel="noopener noreferrer"
               className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-[#25D366] text-white font-bold text-sm px-5 py-3 rounded-full shadow-2xl shadow-[#25D366]/40 hover:scale-105 active:scale-95 transition-all">
               <MessageCircle className="h-5 w-5" />
               WhatsApp us
