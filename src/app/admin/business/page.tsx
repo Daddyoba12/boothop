@@ -38,6 +38,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any; n
   in_transit: { label: 'In Transit', color: 'text-purple-400 bg-purple-500/10 border-purple-500/20', icon: Truck,       next: 'delivered'  },
   delivered:  { label: 'Delivered',  color: 'text-green-400 bg-green-500/10 border-green-500/20',    icon: CheckCircle, next: null         },
   cancelled:  { label: 'Cancelled',  color: 'text-red-400 bg-red-500/10 border-red-500/20',          icon: XCircle,     next: null         },
+  failed:     { label: 'Failed',     color: 'text-orange-400 bg-orange-500/10 border-orange-500/20', icon: AlertCircle, next: null         },
 };
 
 const PIPELINE = ['pending', 'assigned', 'in_transit', 'delivered'];
@@ -389,10 +390,16 @@ function AdminBusinessContent() {
                             <User className="h-4 w-4" /> Reassign driver
                           </button>
                         )}
-                        {!['cancelled', 'delivered'].includes(job.status) && (
+                        {!['cancelled', 'delivered', 'failed'].includes(job.status) && (
                           <button onClick={() => advanceStatus(job, 'cancelled')} disabled={updating === job.id}
                             className="flex items-center gap-2 bg-white/5 border border-white/10 hover:bg-red-500/20 hover:border-red-500/30 text-white/40 hover:text-red-300 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all">
                             <XCircle className="h-4 w-4" /> Cancel job
+                          </button>
+                        )}
+                        {['in_transit'].includes(job.status) && (
+                          <button onClick={() => advanceStatus(job, 'failed')} disabled={updating === job.id}
+                            className="flex items-center gap-2 bg-white/5 border border-white/10 hover:bg-orange-500/20 hover:border-orange-500/30 text-white/40 hover:text-orange-300 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all">
+                            <AlertCircle className="h-4 w-4" /> Mark failed
                           </button>
                         )}
                       </div>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
-const VALID_STATUSES = ['pending', 'assigned', 'in_transit', 'delivered', 'cancelled'];
+const VALID_STATUSES = ['pending', 'assigned', 'in_transit', 'delivered', 'cancelled', 'failed'];
 
 export async function POST(request: NextRequest) {
   const adminKey = request.headers.get('x-admin-key');

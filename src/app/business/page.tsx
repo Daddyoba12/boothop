@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Loader2, Mail, ShieldCheck, CheckCircle, ArrowRight,
-  Zap, Lock, Clock, MapPin, Package, Star, Building2,
+  Zap, Lock, Clock, MapPin, Package, Star, Building2, Truck,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -87,7 +87,7 @@ function calculatePrice(pickup: string, dropoff: string): { price: number; miles
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
-type Stage = 'loading' | 'landing' | 'email' | 'otp' | 'form' | 'success';
+type Stage = 'loading' | 'landing' | 'email' | 'otp' | 'portal' | 'form' | 'success';
 
 type JobForm = {
   pickup: string; dropoff: string; description: string;
@@ -122,7 +122,7 @@ export default function BoothopBusiness() {
   useEffect(() => {
     fetch('/api/business/auth/me')
       .then(r => r.json())
-      .then(d => { if (d.authenticated) { setBizEmail(d.email); setStage('form'); } else { setStage('landing'); } })
+      .then(d => { if (d.authenticated) { setBizEmail(d.email); setStage('portal'); } else { setStage('landing'); } })
       .catch(() => setStage('landing'));
   }, []);
 
@@ -156,7 +156,7 @@ export default function BoothopBusiness() {
       });
       const j = await res.json();
       if (!res.ok) { setAuthError(j.error); return; }
-      setBizEmail(j.email); setStage('form');
+      setBizEmail(j.email); setStage('portal');
     } catch { setAuthError('Verification failed. Please try again.'); }
     finally { setAuthLoading(false); }
   };
@@ -431,6 +431,142 @@ export default function BoothopBusiness() {
                   Use a different email
                 </button>
               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ══════════════════════════════════════════
+            POST-LOGIN PORTAL / ABOUT PAGE
+        ══════════════════════════════════════════ */}
+        {stage === 'portal' && (
+          <motion.div key="portal" {...FADE} transition={{ duration: 0.4 }}>
+            {/* Nav */}
+            <nav className="px-8 py-5 flex items-center justify-between border-b border-white/5">
+              <div className="text-xl font-black tracking-tight">
+                Boot<span className="text-emerald-400">Hop</span>
+                <span className="ml-2 text-xs font-semibold bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full uppercase tracking-widest">Business</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="text-white/40 text-sm hidden md:block">{bizEmail}</span>
+                <button
+                  onClick={() => setStage('form')}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-sm px-5 py-2.5 rounded-xl hover:scale-105 transition-all"
+                >
+                  Book a delivery <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </nav>
+
+            <div className="max-w-5xl mx-auto px-8 py-16">
+              {/* Welcome */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                className="mb-16">
+                <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold px-4 py-2 rounded-full mb-6 uppercase tracking-widest">
+                  <CheckCircle className="h-3.5 w-3.5" /> Verified business account
+                </div>
+                <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-4">
+                  Welcome back,<br /><span className="text-emerald-400">let's move something.</span>
+                </h1>
+                <p className="text-white/40 text-lg max-w-2xl">
+                  You're signed in as <span className="text-white/70 font-semibold">{bizEmail}</span>. Everything below tells you exactly how BootHop works before you place your first job.
+                </p>
+              </motion.div>
+
+              {/* About BootHop */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                className="mb-12 bg-white/3 border border-white/8 rounded-2xl p-8">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                    <Building2 className="h-5 w-5 text-emerald-400" />
+                  </div>
+                  <h2 className="text-xl font-black">About BootHop</h2>
+                </div>
+                <p className="text-white/60 leading-relaxed mb-4">
+                  BootHop was founded in Nottingham with a simple idea: people already travelling between cities shouldn't be empty-handed while businesses and individuals struggle to move parcels quickly and affordably.
+                </p>
+                <p className="text-white/60 leading-relaxed mb-4">
+                  We built a peer-to-peer platform that connects everyday travellers — people driving, taking the train, or flying — with those who need packages moved urgently. Every carrier on our platform is verified, every delivery is insured, and every route is tracked end-to-end.
+                </p>
+                <p className="text-white/60 leading-relaxed">
+                  BootHop Business brings this model to companies. Whether you need samples delivered same-day between Nottingham and Leicester, documents couriered to London, or goods moved anywhere across the UK, we handle the logistics so you can focus on your business.
+                </p>
+              </motion.div>
+
+              {/* How it works */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+                className="mb-12">
+                <h2 className="text-2xl font-black mb-8">How it works</h2>
+                <div className="grid md:grid-cols-4 gap-4">
+                  {[
+                    { icon: Mail,        step: '01', title: 'You submit a job',       body: 'Tell us what needs moving, from where, to where, and when. Our system calculates a price instantly based on distance.' },
+                    { icon: ShieldCheck, step: '02', title: 'We verify & assign',     body: 'Our team reviews your job and assigns a vetted carrier. You receive an email confirmation with their details.' },
+                    { icon: Truck,       step: '03', title: 'Collection & delivery',  body: 'The carrier collects from your pickup address and delivers directly. You can track status in real time.' },
+                    { icon: CheckCircle, step: '04', title: 'Confirmed & invoiced',   body: 'Once delivered, you receive a delivery confirmation. An invoice is issued and payment is collected on net terms.' },
+                  ].map(({ icon: Icon, step, title, body }) => (
+                    <div key={step} className="bg-white/3 border border-white/8 rounded-2xl p-5">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                          <Icon className="h-4 w-4 text-emerald-400" />
+                        </div>
+                        <span className="text-emerald-400/60 text-xs font-black tracking-widest">{step}</span>
+                      </div>
+                      <p className="text-white font-bold text-sm mb-2">{title}</p>
+                      <p className="text-white/40 text-xs leading-relaxed">{body}</p>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Pricing */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                className="mb-12 bg-white/3 border border-white/8 rounded-2xl p-8">
+                <h2 className="text-xl font-black mb-2">Transparent pricing</h2>
+                <p className="text-white/40 text-sm mb-6">All prices include insurance. No hidden fees.</p>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {[
+                    { route: 'Short haul',  distance: 'Up to 35 miles',       price: '£250', example: 'e.g. Nottingham → Leicester' },
+                    { route: 'Mid haul',    distance: '36 – 130 miles',        price: '£500', example: 'e.g. Nottingham → London'    },
+                    { route: 'Long haul',   distance: '+35 miles per band',    price: '+£250', example: 'Beyond 130 miles'          },
+                  ].map(r => (
+                    <div key={r.route} className="bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-5">
+                      <p className="text-3xl font-black text-emerald-400 mb-1">{r.price}</p>
+                      <p className="text-white font-bold text-sm">{r.route}</p>
+                      <p className="text-white/40 text-xs mt-1">{r.distance}</p>
+                      <p className="text-white/25 text-xs mt-2 italic">{r.example}</p>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Commitments */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+                className="mb-16 grid md:grid-cols-3 gap-4">
+                {[
+                  { icon: Lock,   title: 'Fully insured',      body: 'Every single delivery is covered. Declare your item value and we handle the rest.' },
+                  { icon: Clock,  title: 'Same-day available', body: 'Need it there today? Mark your job as same-day and we\'ll prioritise matching a carrier.' },
+                  { icon: Star,   title: 'Rated carriers',     body: 'All carriers are rated by senders after every delivery. Only top-rated carriers stay on the platform.' },
+                ].map(({ icon: Icon, title, body }) => (
+                  <div key={title} className="bg-white/3 border border-white/8 rounded-2xl p-6">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4">
+                      <Icon className="h-5 w-5 text-emerald-400" />
+                    </div>
+                    <p className="text-white font-bold text-sm mb-2">{title}</p>
+                    <p className="text-white/40 text-xs leading-relaxed">{body}</p>
+                  </div>
+                ))}
+              </motion.div>
+
+              {/* CTA */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+                className="text-center">
+                <button
+                  onClick={() => setStage('form')}
+                  className="inline-flex items-center gap-3 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-xl px-12 py-5 rounded-2xl hover:scale-105 transition-all shadow-2xl shadow-emerald-500/30"
+                >
+                  Book a delivery <ArrowRight className="h-6 w-6" />
+                </button>
+                <p className="text-white/20 text-sm mt-4">Insured · Same-day available · UK-wide coverage</p>
+              </motion.div>
             </div>
           </motion.div>
         )}
