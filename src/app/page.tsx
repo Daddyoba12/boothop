@@ -241,6 +241,7 @@ function HomePageContent() {
     else if (!toSelected)   errors.to    = 'Select a city from the dropdown';
     if (!trip.date)        errors.date   = 'Please choose a date';
     if (!trip.weight)      errors.weight = 'Please select a weight';
+    if (!trip.price || Number(trip.price) <= 0) errors.price = mode === 'travel' ? 'Please enter your price (£)' : 'Please enter your budget (£)';
     if (Object.keys(errors).length > 0) { setFormErrors(errors); return; }
     setFormErrors({});
     setShowEmail(true);
@@ -468,9 +469,12 @@ function HomePageContent() {
                   </select>
                   {formErrors.weight && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.weight}</p>}
                 </div>
-                <input type="number" placeholder={mode === 'travel' ? 'Price (£)' : 'Budget (£)'}
-                  value={trip.price} onChange={(e) => setTrip({ ...trip, price: e.target.value })}
-                  className={inputClass} />
+                <div className="relative pb-4">
+                  <input type="number" placeholder={mode === 'travel' ? 'Price (£) *' : 'Budget (£) *'}
+                    value={trip.price} onChange={(e) => { setTrip({ ...trip, price: e.target.value }); setFormErrors(p => ({ ...p, price: '' })); }}
+                    className={`${inputClass} ${formErrors.price ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
+                  {formErrors.price && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.price}</p>}
+                </div>
                 <button onClick={handleSubmit}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-3 font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)] active:translate-y-0">
                   Register <ArrowRight className="h-4 w-4" />
