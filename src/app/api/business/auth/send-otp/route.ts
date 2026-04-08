@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { signBizOtp, getBizOtpCookieName } from '@/lib/auth/session';
+import { signBizOtp, getBizOtp, getBizOtpCookieName } from '@/lib/auth/session';
 import { sendBusinessOtpEmail } from '@/lib/email/sendBusinessEmail';
 
 const PERSONAL_DOMAINS = new Set([
@@ -41,12 +41,24 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const code    = generateOtp();
-    const token   = signBizOtp(email.toLowerCase(), code);
+    const cookieStore = await cookies();
+
+    // Rate limit: prevent resending within 60 seconds
+    const existing = getBizOtp(cookieStore);
+    if (existing?.iat) {
+      const secondsSinceIssued = Math.floor(Date.now() / 1000) - existing.iat;
+      if (secondsSinceIssued < 60) {
+        return NextResponse.json({
+          error: `Please wait ${60 - secondsSinceIssued} seconds before requesting a new code.`,
+        }, { status: 429 });
+      }
+    }
+
+    const code  = generateOtp();
+    const token = signBizOtp(email.toLowerCase(), code);
 
     await sendBusinessOtpEmail({ to: email, code });
 
-    const cookieStore = await cookies();
     cookieStore.set(getBizOtpCookieName(), token, {
       httpOnly: true,
       secure:   process.env.NODE_ENV === 'production',

@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const {
-      pickup, dropoff, description, weight,
+      company_name, pickup, dropoff, description, weight,
       value, category, urgency, insurance, price,
     } = body;
 
@@ -41,24 +41,26 @@ export async function POST(request: NextRequest) {
     const supabase = createSupabaseAdminClient();
 
     await supabase.from('business_jobs').insert({
-      job_ref:        jobRef,
-      email:          session.email,
+      job_ref:         jobRef,
+      email:           session.email,
+      company_name:    company_name || null,
       pickup,
       dropoff,
-      description:    description || null,
-      weight:         weight     || null,
-      declared_value: value      || null,
-      category:       category   || null,
-      urgency:        urgency    || 'same_day',
-      insurance:      !!insurance,
-      estimated_price: price     || null,
-      status:         'pending',
+      description:     description || null,
+      weight:          weight      || null,
+      declared_value:  value       || null,
+      category:        category    || null,
+      urgency:         urgency     || 'same_day',
+      insurance:       !!insurance,
+      estimated_price: price       || null,
+      status:          'pending',
     });
 
     await Promise.allSettled([
       sendBusinessJobAdminAlertEmail({
         jobRef,
         email:         session.email,
+        companyName:   company_name || '',
         pickup,
         dropoff,
         description:   description || '',

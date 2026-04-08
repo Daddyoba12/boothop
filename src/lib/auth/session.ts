@@ -61,10 +61,10 @@ export function signBizSession(email: string) {
   });
 }
 
-export function signBizOtp(email: string, code: string) {
+export function signBizOtp(email: string, code: string, attempts = 0) {
   const secret = process.env.APP_SESSION_SECRET;
   if (!secret) throw new Error('APP_SESSION_SECRET is missing');
-  return jwt.sign({ email, code, type: 'biz_otp' }, secret, {
+  return jwt.sign({ email, code, attempts, type: 'biz_otp' }, secret, {
     expiresIn: '10m', issuer: 'boothop', audience: 'boothop-business',
   });
 }
@@ -83,12 +83,12 @@ export function getBizSession(
 
 export function getBizOtp(
   cookieStore: { get: (name: string) => { value: string } | undefined }
-): { email: string; code: string } | null {
+): { email: string; code: string; attempts: number; iat?: number } | null {
   try {
     const cookie = cookieStore.get(BIZ_OTP_COOKIE);
     if (!cookie?.value) return null;
     return jwt.verify(cookie.value, process.env.APP_SESSION_SECRET!, {
       issuer: 'boothop', audience: 'boothop-business',
-    }) as { email: string; code: string };
+    }) as { email: string; code: string; attempts: number; iat?: number };
   } catch { return null; }
 }

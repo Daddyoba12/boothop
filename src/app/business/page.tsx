@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Loader2, Mail, ShieldCheck, CheckCircle, ArrowRight,
   Zap, Lock, Clock, MapPin, Package, Star, Building2, Truck,
+  LogOut, List, XCircle, AlertCircle, User, ChevronLeft,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -87,9 +88,19 @@ function calculatePrice(pickup: string, dropoff: string): { price: number; miles
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
-type Stage = 'loading' | 'landing' | 'email' | 'otp' | 'portal' | 'form' | 'success';
+type Stage = 'loading' | 'landing' | 'email' | 'otp' | 'portal' | 'form' | 'jobs' | 'success';
+
+type MyJob = {
+  id: string; job_ref: string; company_name: string | null;
+  pickup: string; dropoff: string; status: string;
+  urgency: string; estimated_price: number | null;
+  driver_name: string | null; driver_phone: string | null;
+  assigned_at: string | null; picked_up_at: string | null; delivered_at: string | null;
+  created_at: string;
+};
 
 type JobForm = {
+  company_name: string;
   pickup: string; dropoff: string; description: string;
   weight: string; value: string; category: string;
   urgency: 'same_day' | 'next_day'; insurance: boolean;
@@ -110,6 +121,7 @@ export default function BoothopBusiness() {
   const [jobRef,      setJobRef]      = useState('');
 
   const [form, setForm] = useState<JobForm>({
+    company_name: '',
     pickup: '', dropoff: '', description: '',
     weight: '', value: '', category: '',
     urgency: 'same_day', insurance: true,
@@ -117,6 +129,9 @@ export default function BoothopBusiness() {
   const [estimate,    setEstimate]    = useState<{ price: number; miles: number } | null>(null);
   const [formLoading, setFormLoading] = useState(false);
   const [formError,   setFormError]   = useState<string | null>(null);
+  const [myJobs,      setMyJobs]      = useState<MyJob[]>([]);
+  const [jobsLoading, setJobsLoading] = useState(false);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
 
   // Check existing session
   useEffect(() => {
@@ -161,6 +176,41 @@ export default function BoothopBusiness() {
     finally { setAuthLoading(false); }
   };
 
+  // ── Logout ────────────────────────────────────────────────────────────────
+  const logout = async () => {
+    await fetch('/api/business/auth/logout', { method: 'POST' });
+    setBizEmail('');
+    setStage('landing');
+  };
+
+  // ── Load my jobs ─────────────────────────────────────────────────────────
+  const loadMyJobs = async () => {
+    setJobsLoading(true);
+    try {
+      const res = await fetch('/api/business/my-jobs');
+      const j   = await res.json();
+      setMyJobs(j.jobs ?? []);
+    } catch { /* silent */ }
+    finally { setJobsLoading(false); }
+  };
+
+  const cancelJob = async (id: string) => {
+    setCancellingId(id);
+    try {
+      const res = await fetch('/api/business/cancel-job', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      const j = await res.json();
+      if (res.ok) {
+        setMyJobs(prev => prev.map(job => job.id === id ? { ...job, status: 'cancelled' } : job));
+      } else {
+        alert(j.error || 'Could not cancel job.');
+      }
+    } catch { alert('Something went wrong.'); }
+    finally { setCancellingId(null); }
+  };
+
   // ── Submit job ────────────────────────────────────────────────────────────
   const submitJob = async () => {
     if (!form.insurance) { setFormError('Insurance is compulsory.'); return; }
@@ -169,7 +219,7 @@ export default function BoothopBusiness() {
     try {
       const res = await fetch('/api/business/create-job', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, price: estimate?.price ?? 250, miles: estimate?.miles ?? 0 }),
+        body: JSON.stringify({ ...form, company_name: form.company_name || null, price: estimate?.price ?? 250, miles: estimate?.miles ?? 0 }),
       });
       const j = await res.json();
       if (!res.ok) { setFormError(j.error || 'Something went wrong.'); return; }
@@ -446,13 +496,19 @@ export default function BoothopBusiness() {
                 Boot<span className="text-emerald-400">Hop</span>
                 <span className="ml-2 text-xs font-semibold bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full uppercase tracking-widest">Business</span>
               </div>
-              <div className="flex items-center gap-4">
-                <span className="text-white/40 text-sm hidden md:block">{bizEmail}</span>
-                <button
-                  onClick={() => setStage('form')}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-sm px-5 py-2.5 rounded-xl hover:scale-105 transition-all"
-                >
+              <div className="flex items-center gap-3">
+                <span className="text-white/30 text-xs hidden md:block">{bizEmail}</span>
+                <button onClick={() => { setStage('jobs'); loadMyJobs(); }}
+                  className="inline-flex items-center gap-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white/70 font-semibold text-sm px-4 py-2.5 rounded-xl transition-all">
+                  <List className="h-4 w-4" /> My Jobs
+                </button>
+                <button onClick={() => setStage('form')}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-sm px-5 py-2.5 rounded-xl hover:scale-105 transition-all">
                   Book a delivery <ArrowRight className="h-4 w-4" />
+                </button>
+                <button onClick={logout} title="Sign out"
+                  className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-400 text-white/30 transition-all">
+                  <LogOut className="h-4 w-4" />
                 </button>
               </div>
             </nav>
@@ -579,17 +635,39 @@ export default function BoothopBusiness() {
             <div className="max-w-3xl mx-auto">
 
               <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h1 className="text-3xl font-black">Boot<span className="text-emerald-400">Hop</span> Business</h1>
-                  <p className="text-white/30 text-sm mt-0.5">Premium logistics portal</p>
+                <div className="flex items-center gap-4">
+                  <button onClick={() => setStage('portal')}
+                    className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-semibold transition-colors">
+                    <ChevronLeft className="h-4 w-4" /> Back
+                  </button>
+                  <div>
+                    <h1 className="text-3xl font-black">Boot<span className="text-emerald-400">Hop</span> Business</h1>
+                    <p className="text-white/30 text-sm mt-0.5">New delivery request</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-white/30 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
-                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-                  <span className="text-emerald-400 font-semibold">{bizEmail}</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-xs text-white/30 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                    <span className="text-emerald-400 font-semibold">{bizEmail}</span>
+                  </div>
+                  <button onClick={logout} title="Sign out"
+                    className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-400 text-white/30 transition-all">
+                    <LogOut className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
 
               <div className="bg-white/3 border border-white/8 rounded-3xl p-8 space-y-6">
+
+                {/* Company */}
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-white/30 mb-3 flex items-center gap-2">
+                    <Building2 className="h-3.5 w-3.5" /> Company
+                  </p>
+                  <input value={form.company_name} onChange={e => setForm({ ...form, company_name: e.target.value })}
+                    placeholder="Your company name (optional)"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
+                </div>
 
                 {/* Route */}
                 <div>
@@ -706,6 +784,129 @@ export default function BoothopBusiness() {
         )}
 
         {/* ══════════════════════════════════════════
+            MY JOBS
+        ══════════════════════════════════════════ */}
+        {stage === 'jobs' && (
+          <motion.div key="jobs" {...FADE} transition={{ duration: 0.3 }}>
+            <nav className="px-8 py-5 flex items-center justify-between border-b border-white/5">
+              <div className="flex items-center gap-4">
+                <button onClick={() => setStage('portal')}
+                  className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-semibold transition-colors">
+                  <ChevronLeft className="h-4 w-4" /> Back
+                </button>
+                <div className="text-xl font-black tracking-tight">
+                  Boot<span className="text-emerald-400">Hop</span>
+                  <span className="ml-2 text-xs font-semibold bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full uppercase tracking-widest">My Jobs</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button onClick={loadMyJobs} disabled={jobsLoading}
+                  className="inline-flex items-center gap-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white/50 text-sm px-4 py-2.5 rounded-xl transition-all">
+                  {jobsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />} Refresh
+                </button>
+                <button onClick={() => setStage('form')}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-sm px-5 py-2.5 rounded-xl hover:scale-105 transition-all">
+                  + New job
+                </button>
+                <button onClick={logout} title="Sign out"
+                  className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-400 text-white/30 transition-all">
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
+            </nav>
+
+            <div className="max-w-4xl mx-auto px-8 py-10">
+              {jobsLoading ? (
+                <div className="flex justify-center py-20">
+                  <Loader2 className="h-8 w-8 text-emerald-400 animate-spin" />
+                </div>
+              ) : myJobs.length === 0 ? (
+                <div className="text-center py-20">
+                  <Package className="h-12 w-12 text-white/10 mx-auto mb-4" />
+                  <p className="text-white/30 font-semibold">No jobs yet</p>
+                  <button onClick={() => setStage('form')}
+                    className="mt-6 inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 text-sm font-bold transition-colors">
+                    Book your first delivery <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {myJobs.map(job => {
+                    const statusColors: Record<string, string> = {
+                      pending:    'text-amber-400 bg-amber-500/10 border-amber-500/20',
+                      assigned:   'text-blue-400 bg-blue-500/10 border-blue-500/20',
+                      in_transit: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+                      delivered:  'text-green-400 bg-green-500/10 border-green-500/20',
+                      cancelled:  'text-red-400 bg-red-500/10 border-red-500/20',
+                      failed:     'text-orange-400 bg-orange-500/10 border-orange-500/20',
+                    };
+                    const statusLabels: Record<string, string> = {
+                      pending: 'Pending', assigned: 'Driver assigned', in_transit: 'In transit',
+                      delivered: 'Delivered', cancelled: 'Cancelled', failed: 'Failed',
+                    };
+                    const canCancel = ['pending', 'assigned'].includes(job.status);
+                    const fmt = (ts: string | null) => ts
+                      ? new Date(ts).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+                      : null;
+
+                    return (
+                      <div key={job.id} className="bg-white/3 border border-white/8 rounded-2xl p-6">
+                        <div className="flex items-start justify-between gap-4 flex-wrap">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 flex-wrap mb-2">
+                              <span className="font-mono font-black text-emerald-400 text-sm">{job.job_ref}</span>
+                              <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border ${statusColors[job.status] ?? 'text-white/40 bg-white/5 border-white/10'}`}>
+                                {statusLabels[job.status] ?? job.status}
+                              </span>
+                              {job.urgency === 'same_day' && (
+                                <span className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full font-semibold">⚡ Same day</span>
+                              )}
+                            </div>
+                            <p className="text-white font-semibold text-sm mb-1">{job.pickup} → {job.dropoff}</p>
+                            <p className="text-white/30 text-xs">{new Date(job.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+
+                            {/* Driver info if assigned */}
+                            {job.driver_name && (
+                              <div className="mt-3 flex items-center gap-2 text-xs text-blue-300">
+                                <User className="h-3.5 w-3.5" />
+                                <span>{job.driver_name}</span>
+                                {job.driver_phone && <span>· {job.driver_phone}</span>}
+                              </div>
+                            )}
+
+                            {/* Timeline */}
+                            {(job.assigned_at || job.picked_up_at || job.delivered_at) && (
+                              <div className="mt-3 space-y-1">
+                                {job.assigned_at  && <p className="text-xs text-white/30">Assigned: {fmt(job.assigned_at)}</p>}
+                                {job.picked_up_at && <p className="text-xs text-white/30">Collected: {fmt(job.picked_up_at)}</p>}
+                                {job.delivered_at && <p className="text-xs text-green-400/60">Delivered: {fmt(job.delivered_at)}</p>}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-3 flex-shrink-0">
+                            {job.estimated_price && (
+                              <span className="text-emerald-400 font-black text-lg">£{job.estimated_price}</span>
+                            )}
+                            {canCancel && (
+                              <button onClick={() => cancelJob(job.id)} disabled={cancellingId === job.id}
+                                className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/30 hover:text-red-400 bg-white/5 border border-white/10 hover:border-red-500/20 hover:bg-red-500/10 px-3 py-2 rounded-xl transition-all disabled:opacity-50">
+                                {cancellingId === job.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XCircle className="h-3.5 w-3.5" />}
+                                Cancel
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ══════════════════════════════════════════
             SUCCESS
         ══════════════════════════════════════════ */}
         {stage === 'success' && (
@@ -724,11 +925,18 @@ export default function BoothopBusiness() {
                 <p className="text-emerald-400 font-mono font-black text-2xl tracking-widest">{jobRef}</p>
               </div>
               <p className="text-white/25 text-sm mb-8">Confirmation sent to <span className="text-white/40">{bizEmail}</span></p>
-              <button
-                onClick={() => { setStage('form'); setFormError(null); setForm({ pickup:'', dropoff:'', description:'', weight:'', value:'', category:'', urgency:'same_day', insurance:true }); setEstimate(null); }}
-                className="text-emerald-400 hover:text-emerald-300 text-sm font-bold transition-colors">
-                Submit another request →
-              </button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => { setStage('form'); setFormError(null); setForm({ company_name:'', pickup:'', dropoff:'', description:'', weight:'', value:'', category:'', urgency:'same_day', insurance:true }); setEstimate(null); }}
+                  className="text-emerald-400 hover:text-emerald-300 text-sm font-bold transition-colors">
+                  Submit another request →
+                </button>
+                <button
+                  onClick={() => { setStage('jobs'); loadMyJobs(); }}
+                  className="text-white/40 hover:text-white text-sm font-semibold transition-colors">
+                  View all my jobs →
+                </button>
+              </div>
             </div>
           </motion.div>
         )}

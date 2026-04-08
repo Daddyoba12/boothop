@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import {
-  getBizOtp, signBizSession,
+  getBizOtp, signBizOtp, signBizSession,
   getBizCookieName, getBizOtpCookieName,
 } from '@/lib/auth/session';
+
+const MAX_ATTEMPTS = 5;
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,11 +24,31 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    if (pending.code !== code.trim()) {
-      return NextResponse.json({ error: 'Incorrect code. Please try again.' }, { status: 400 });
+    // Rate limit: max 5 attempts per OTP
+    if (pending.attempts >= MAX_ATTEMPTS) {
+      cookieStore.delete(getBizOtpCookieName());
+      return NextResponse.json({
+        error: 'Too many incorrect attempts. Please request a new code.',
+      }, { status: 429 });
     }
 
-    // Issue business session
+    if (pending.code !== code.trim()) {
+      // Increment attempts and re-issue the OTP cookie with same code
+      const newToken = signBizOtp(pending.email, pending.code, pending.attempts + 1);
+      const remaining = MAX_ATTEMPTS - (pending.attempts + 1);
+      cookieStore.set(getBizOtpCookieName(), newToken, {
+        httpOnly: true,
+        secure:   process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge:   600,
+        path:     '/',
+      });
+      return NextResponse.json({
+        error: `Incorrect code. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.`,
+      }, { status: 400 });
+    }
+
+    // Code correct — issue business session
     const sessionToken = signBizSession(pending.email);
 
     cookieStore.set(getBizCookieName(), sessionToken, {
@@ -37,7 +59,6 @@ export async function POST(request: NextRequest) {
       path:     '/',
     });
 
-    // Clear OTP cookie
     cookieStore.delete(getBizOtpCookieName());
 
     return NextResponse.json({ ok: true, email: pending.email });
