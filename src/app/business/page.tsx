@@ -429,14 +429,14 @@ export default function BoothopBusiness() {
   // ── Loading ────────────────────────────────────────────────────────────────
   if (stage === 'loading') {
     return (
-      <div className="min-h-screen bg-[#050a05] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)' }}>
         <Loader2 className="h-8 w-8 text-emerald-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#050a05] text-white">
+    <div className="min-h-screen text-white" style={{ background: 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)', backgroundAttachment: 'fixed' }}>
 
       {/* ── T&C MODAL ──────────────────────────────────────────────────────── */}
       <AnimatePresence>
@@ -515,14 +515,23 @@ export default function BoothopBusiness() {
           <motion.div key="landing" {...FADE} transition={{ duration: 0.4 }}>
 
             {/* Nav */}
-            <nav className="px-8 py-5 flex items-center justify-between border-b border-white/5">
-              <div className="text-xl font-black tracking-tight">
-                Boot<span className="text-emerald-400">Hop</span>
-                <span className="ml-2 text-xs font-semibold bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full uppercase tracking-widest">Business</span>
+            <nav className="px-6 py-5 flex items-center justify-between border-b border-white/5">
+              <div className="flex items-center gap-4">
+                <a href="/" className="text-white/30 hover:text-white/70 text-xs font-semibold transition-colors hidden sm:block">← BootHop</a>
+                <div className="text-xl font-black tracking-tight">
+                  Boot<span className="text-emerald-400">Hop</span>
+                  <span className="ml-2 text-xs font-semibold bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full uppercase tracking-widest">Business</span>
+                </div>
               </div>
-              <button onClick={() => setStage('email')} className="text-sm font-semibold text-white/60 hover:text-white transition-colors">
-                Sign in →
-              </button>
+              <div className="flex items-center gap-4">
+                <button onClick={() => document.getElementById('biz-contact')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="text-sm font-semibold text-white/40 hover:text-white transition-colors hidden sm:block">
+                  Contact Us
+                </button>
+                <button onClick={() => setStage('email')} className="text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
+                  Sign in →
+                </button>
+              </div>
             </nav>
 
             {/* Hero */}
@@ -692,7 +701,7 @@ export default function BoothopBusiness() {
             </div>
 
             {/* ── Contact Us ── */}
-            <div className="max-w-3xl mx-auto px-8 pb-20">
+            <div id="biz-contact" className="max-w-3xl mx-auto px-8 pb-20">
               <div className="bg-white/3 border border-white/8 rounded-3xl p-10">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
@@ -760,12 +769,6 @@ export default function BoothopBusiness() {
               </div>
             </div>
 
-            {/* Floating WhatsApp button */}
-            <a href="https://wa.me/447506553755" target="_blank" rel="noopener noreferrer"
-              className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-[#25D366] text-white font-bold text-sm px-5 py-3 rounded-full shadow-2xl shadow-[#25D366]/40 hover:scale-105 active:scale-95 transition-all">
-              <MessageCircle className="h-5 w-5" />
-              WhatsApp us
-            </a>
           </motion.div>
         )}
 
@@ -1433,6 +1436,13 @@ export default function BoothopBusiness() {
         )}
 
       </AnimatePresence>
+
+      {/* Floating WhatsApp — always visible on every stage */}
+      <a href="https://wa.me/447506553755" target="_blank" rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-[#25D366] text-white font-bold text-sm px-5 py-3 rounded-full shadow-2xl shadow-[#25D366]/40 hover:scale-105 active:scale-95 transition-all">
+        <MessageCircle className="h-5 w-5" />
+        WhatsApp us
+      </a>
     </div>
   );
 }
