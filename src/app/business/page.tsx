@@ -132,6 +132,7 @@ export default function BoothopBusiness() {
   const [myJobs,      setMyJobs]      = useState<MyJob[]>([]);
   const [jobsLoading, setJobsLoading] = useState(false);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [showPricing,  setShowPricing]  = useState(false);
 
   // Check existing session
   useEffect(() => {
@@ -304,7 +305,8 @@ export default function BoothopBusiness() {
                   { value: '100%', label: 'Insured', sub: 'Every single delivery' },
                   { value: 'Same day', label: 'Delivery', sub: 'For urgent business needs' },
                 ].map(s => (
-                  <div key={s.label} className="bg-white/3 border border-white/8 rounded-2xl p-6 text-center">
+                  <div key={s.label} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 text-center transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10">
+                    <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <p className="text-3xl font-black text-emerald-400 mb-1">{s.value}</p>
                     <p className="text-white font-semibold text-sm">{s.label}</p>
                     <p className="text-white/30 text-xs mt-0.5">{s.sub}</p>
@@ -322,7 +324,8 @@ export default function BoothopBusiness() {
                   { icon: MapPin,    step: '02', title: 'Submit your request', body: 'Tell us the route, what needs delivering, and when. Get an instant price estimate.' },
                   { icon: Zap,       step: '03', title: 'We handle the rest', body: 'We match a verified carrier to your job and keep you updated every step of the way.' },
                 ].map(({ icon: Icon, step, title, body }) => (
-                  <div key={step} className="bg-white/3 border border-white/8 rounded-2xl p-6">
+                  <div key={step} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10">
+                    <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
                         <Icon className="h-5 w-5 text-emerald-400" />
@@ -337,24 +340,51 @@ export default function BoothopBusiness() {
             </div>
 
             {/* Pricing */}
-            <div className="max-w-5xl mx-auto px-8 pb-20">
-              <h2 className="text-2xl font-black text-center mb-4">Transparent pricing</h2>
-              <p className="text-white/40 text-center text-sm mb-10">Fixed rates based on distance. No hidden fees.</p>
-              <div className="grid md:grid-cols-4 gap-4">
-                {[
-                  { range: 'Up to 35 miles',    price: '£250', example: 'Nottingham ↔ Leicester' },
-                  { range: '36 – 130 miles',    price: '£500', example: 'Nottingham ↔ London' },
-                  { range: '131 – 165 miles',   price: '£750', example: 'London ↔ Manchester' },
-                  { range: '165+ miles',        price: '£1,000+', example: 'Cross-country routes' },
-                ].map(p => (
-                  <div key={p.range} className="bg-white/3 border border-white/8 rounded-2xl p-5">
-                    <p className="text-2xl font-black text-emerald-400 mb-1">{p.price}</p>
-                    <p className="text-white/60 text-xs font-semibold mb-2">{p.range}</p>
-                    <p className="text-white/25 text-xs">{p.example}</p>
-                  </div>
-                ))}
+            <div className="max-w-3xl mx-auto px-8 pb-20">
+              <div className="bg-white/3 border border-white/8 rounded-2xl p-8 text-center">
+                <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400 mb-3">Pricing</p>
+                <h2 className="text-2xl font-black mb-3">Competitive, distance-based rates</h2>
+                <p className="text-white/40 text-sm leading-relaxed mb-6 max-w-lg mx-auto">
+                  Our pricing is calculated on the route distance and urgency of your delivery.
+                  All quotes include insurance — no hidden fees, ever.
+                </p>
+                <button
+                  onClick={() => setShowPricing(v => !v)}
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-400 border border-emerald-500/30 px-5 py-2.5 rounded-xl hover:bg-emerald-500/10 transition-all duration-200"
+                >
+                  {showPricing ? 'Hide pricing' : 'See pricing guide'} <ArrowRight className={`h-4 w-4 transition-transform duration-300 ${showPricing ? 'rotate-90' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {showPricing && (
+                    <motion.div
+                      key="pricing-grid"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.35 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="grid md:grid-cols-4 gap-4 mt-8">
+                        {[
+                          { range: 'Up to 35 miles',  price: '£250',    example: 'e.g. Nottingham ↔ Leicester' },
+                          { range: '36 – 130 miles',  price: '£500',    example: 'e.g. Nottingham ↔ London' },
+                          { range: '131 – 165 miles', price: '£750',    example: 'e.g. London ↔ Manchester' },
+                          { range: '165+ miles',      price: '£1,000+', example: 'Cross-country routes' },
+                        ].map(p => (
+                          <div key={p.range} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-5 text-left transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10">
+                            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            <p className="text-2xl font-black text-emerald-400 mb-1">{p.price}</p>
+                            <p className="text-white/60 text-xs font-semibold mb-2">{p.range}</p>
+                            <p className="text-white/25 text-xs">{p.example}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-white/20 text-xs text-center mt-4">All prices include insurance. +£250 per additional 35-mile band beyond 165 miles.</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              <p className="text-white/20 text-xs text-center mt-4">All prices include insurance. +£250 per additional 35-mile band beyond 165 miles.</p>
             </div>
 
             {/* Features */}
@@ -366,7 +396,8 @@ export default function BoothopBusiness() {
                   { icon: Lock,        title: 'Business-only access', body: 'Verified business accounts only. No personal users on the platform.' },
                   { icon: Star,        title: 'Rated carriers',       body: 'All our carriers are verified, rated, and background-checked.' },
                 ].map(({ icon: Icon, title, body }) => (
-                  <div key={title} className="flex items-start gap-4 bg-white/3 border border-white/8 rounded-2xl p-5">
+                  <div key={title} className="group relative overflow-hidden flex items-start gap-4 bg-white/3 border border-white/8 rounded-2xl p-5 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10">
+                    <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0">
                       <Icon className="h-5 w-5 text-emerald-400" />
                     </div>

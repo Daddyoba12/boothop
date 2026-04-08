@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() { return new Resend(process.env.RESEND_API_KEY); }
 const FROM = 'BootHop <noreply@boothop.com>';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://boothop-one.vercel.app';
 
@@ -112,7 +112,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
     ${bodyText('Need help? Our support team is always here for you at <a href="mailto:support@boothop.com" style="color:#00b4d8;">support@boothop.com</a>')}
   `);
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: '🎉 Welcome to BootHop — Send Packages Globally!',
@@ -154,7 +154,7 @@ export async function sendMatchNotificationEmail(props: MatchEmailProps) {
     ${bodyText('<strong style="color:#ffffff;">⏱ Note:</strong> Matches expire after 24 hours if not confirmed by both parties.')}
   `);
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: `🤝 New Match on BootHop — ${from} → ${to_location}`,
@@ -208,7 +208,7 @@ export async function sendPaymentConfirmationEmail(props: PaymentEmailProps) {
     ${button('View Transaction →', `${APP_URL}/dashboard`)}
   `);
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: `${emoji} Payment ${isSender ? 'Confirmed' : 'Received'} — ${amount} | BootHop`,
@@ -241,7 +241,7 @@ export async function sendKycRequiredEmail(to: string, name: string, matchId: st
     ${bodyText('<strong style="color:#f59e0b;">⚠️ Note:</strong> No contact details will be shared until both parties complete verification and payment is secured.')}
   `);
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: '🔐 Action needed — verify your identity to proceed | BootHop',
@@ -266,7 +266,7 @@ export async function sendKycCompleteEmail(
     ${isSender ? button('Pay into Escrow →', `${APP_URL}/kyc/${matchId}`) : ''}
   `);
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: '✅ Both verified — ' + (isSender ? 'please pay into escrow' : 'waiting for payment') + ' | BootHop',
@@ -290,7 +290,7 @@ export async function sendPasswordResetEmail(to: string, name: string, resetUrl:
     </div>
   `);
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: '🔑 Reset your BootHop password',
@@ -302,7 +302,7 @@ export async function sendPasswordResetEmail(to: string, name: string, resetUrl:
 // GENERIC sendEmail — used by /api/notifications/send
 // ════════════════════════════════════════════════════════════════════════════
 export async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
-  return resend.emails.send({ from: FROM, to, subject, html });
+  return getResend().emails.send({ from: FROM, to, subject, html });
 }
 
 // ════════════════════════════════════════════════════════════════════════════

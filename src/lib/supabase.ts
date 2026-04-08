@@ -7,10 +7,14 @@ let browserClient: ReturnType<typeof createBrowserClient> | null = null;
 
 export function createSupabaseClient() {
   if (!browserClient) {
-    browserClient = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) {
+      // Env vars are absent during static build — return a placeholder that satisfies
+      // the type. This code path is never reached at runtime.
+      return createClient('https://placeholder.supabase.co', 'placeholder-key');
+    }
+    browserClient = createBrowserClient(url, key);
   }
   return browserClient;
 }

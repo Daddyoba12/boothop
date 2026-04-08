@@ -16,8 +16,8 @@ import RoleToggle from '@/components/RoleToggle';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'placeholder-key'
 );
 
 type Mode = 'send' | 'travel';
@@ -37,6 +37,7 @@ const navLinks = [
   { href: '/about', label: 'About' },
   { href: '/trust-safety', label: 'Trust & Safety' },
   { href: '/journeys', label: 'Live Journeys' },
+  { href: '/business', label: 'For Business' },
 ];
 
 const testimonials = [

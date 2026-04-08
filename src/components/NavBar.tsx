@@ -12,6 +12,7 @@ const links = [
   { href: '/pricing',         label: 'Pricing' },
   { href: '/about',           label: 'About' },
   { href: '/trust-safety',    label: 'Trust & Safety' },
+  { href: '/business',        label: 'For Business' },
 ];
 
 export default function NavBar() {
