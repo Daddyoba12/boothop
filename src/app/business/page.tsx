@@ -611,7 +611,8 @@ export default function BoothopBusiness() {
                     initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
                     className="overflow-hidden max-w-xl mx-auto mt-4 mb-2">
-                    <div className="bg-white/5 border border-blue-500/25 rounded-2xl p-6 text-left">
+                    <div className="group relative overflow-hidden bg-white/5 border border-blue-500/25 rounded-2xl p-6 text-left transition-all duration-300 hover:border-blue-500/40 hover:shadow-lg hover:shadow-blue-500/10 touch-blue">
+                      <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-24 bg-blue-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                       <div className="flex items-center gap-2 mb-4">
                         <Truck className="h-5 w-5 text-blue-400" />
                         <h3 className="text-white font-black">Register as a Booter</h3>
@@ -665,7 +666,8 @@ export default function BoothopBusiness() {
                     initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
                     className="overflow-hidden max-w-xl mx-auto mt-4 mb-2">
-                    <div className="bg-white/5 border border-emerald-500/25 rounded-2xl p-6 text-left">
+                    <div className="group relative overflow-hidden bg-white/5 border border-emerald-500/25 rounded-2xl p-6 text-left transition-all duration-300 hover:border-emerald-500/40 hover:shadow-lg hover:shadow-emerald-500/10 touch-emerald">
+                      <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-24 bg-emerald-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                       <div className="flex items-center gap-2 mb-4">
                         <Package className="h-5 w-5 text-emerald-400" />
                         <h3 className="text-white font-black">Register as a Hooper</h3>
@@ -751,7 +753,8 @@ export default function BoothopBusiness() {
 
             {/* Pricing — sign in required */}
             <div className="max-w-3xl mx-auto px-8 pb-20">
-              <div className="bg-white/3 border border-white/8 rounded-2xl p-10 text-center">
+              <div className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-10 text-center transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.97] touch-emerald">
+                <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 bg-emerald-500/15 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-5">
                   <Lock className="h-6 w-6 text-emerald-400" />
                 </div>
@@ -791,7 +794,8 @@ export default function BoothopBusiness() {
 
             {/* ── Contact Us ── */}
             <div id="biz-contact" className="max-w-3xl mx-auto px-8 pb-20">
-              <div className="bg-white/3 border border-white/8 rounded-3xl p-10">
+              <div className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-3xl p-10 transition-all duration-300 hover:border-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/8 touch-emerald">
+                <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
                     <Mail className="h-5 w-5 text-emerald-400" />
@@ -868,7 +872,8 @@ export default function BoothopBusiness() {
                 <h2 className="text-3xl font-black mt-4 mb-2">Enter your business email</h2>
                 <p className="text-white/40 text-sm">Personal email addresses are not accepted</p>
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 space-y-4">
+              <div className="group relative overflow-hidden bg-white/5 border border-white/10 rounded-2xl p-8 space-y-4 transition-all duration-300 hover:border-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/8">
+                <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 {authError && <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">{authError}</div>}
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
@@ -904,7 +909,8 @@ export default function BoothopBusiness() {
                 <p className="text-white/40 text-sm">We sent a 6-digit code to</p>
                 <p className="text-emerald-400 font-semibold text-sm mt-0.5">{emailInput}</p>
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 space-y-4">
+              <div className="group relative overflow-hidden bg-white/5 border border-white/10 rounded-2xl p-8 space-y-4 transition-all duration-300 hover:border-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/8">
+                <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 {authError && <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">{authError}</div>}
                 <input type="text" inputMode="numeric"
                   value={otpInput} onChange={e => setOtpInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
@@ -968,7 +974,8 @@ export default function BoothopBusiness() {
 
               {/* Retainer Programme */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-                className="mb-12 bg-white/3 border border-white/8 rounded-2xl p-8">
+                className="group relative overflow-hidden mb-12 bg-white/3 border border-white/8 rounded-2xl p-8 transition-all duration-300 hover:border-emerald-500/25 hover:shadow-lg hover:shadow-emerald-500/8 touch-emerald">
+                <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
                     <Star className="h-5 w-5 text-emerald-400" />
@@ -1000,7 +1007,8 @@ export default function BoothopBusiness() {
 
               {/* Pricing */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                className="mb-12 bg-white/3 border border-white/8 rounded-2xl p-8">
+                className="group relative overflow-hidden mb-12 bg-white/3 border border-white/8 rounded-2xl p-8 transition-all duration-300 hover:border-emerald-500/25 hover:shadow-lg hover:shadow-emerald-500/8 touch-emerald">
+                <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <h2 className="text-xl font-black mb-2">Pricing structure</h2>
                 <p className="text-white/40 text-sm mb-6">All prices are estimates. Final price confirmed on job assignment.</p>
                 <div className="grid md:grid-cols-2 gap-4 mb-6">
@@ -1061,7 +1069,8 @@ export default function BoothopBusiness() {
                     { icon: Truck,       step: '03', title: 'Collection & delivery',   body: 'Carrier collects from your pickup address and delivers directly.' },
                     { icon: CheckCircle, step: '04', title: 'Confirmed & invoiced',    body: 'Delivery confirmed by both parties. Invoice issued on net terms.' },
                   ].map(({ icon: Icon, step, title, body }) => (
-                    <div key={step} className="bg-white/3 border border-white/8 rounded-2xl p-5">
+                    <div key={step} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-5 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.97] touch-emerald">
+                      <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                       <div className="flex items-center gap-3 mb-3">
                         <div className="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
                           <Icon className="h-4 w-4 text-emerald-400" />
@@ -1436,7 +1445,8 @@ export default function BoothopBusiness() {
                       : null;
 
                     return (
-                      <div key={job.id} className="bg-white/3 border border-white/8 rounded-2xl p-6">
+                      <div key={job.id} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/8 active:scale-[0.98] touch-emerald">
+                        <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-24 bg-emerald-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         <div className="flex items-start justify-between gap-4 flex-wrap">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-3 flex-wrap mb-2">
