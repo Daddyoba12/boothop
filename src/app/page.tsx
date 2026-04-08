@@ -202,10 +202,12 @@ function HomePageContent() {
   };
 
   const loadTrips = useCallback(async () => {
-    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
     const { data, error } = await supabase
       .from('trips').select('id, from_city, to_city, travel_date, type, weight')
-      .gte('travel_date', today).order('travel_date', { ascending: true }).limit(50);
+      .gte('travel_date', tomorrowStr).order('travel_date', { ascending: true }).limit(50);
     if (!error) setTrips((data as RecentTrip[]) || []);
   }, []);
 
@@ -866,14 +868,10 @@ function HomePageContent() {
 
           <div className="bg-white/3 border border-white/8 rounded-3xl p-8 reveal">
             {/* WhatsApp CTA */}
-            <a href="/api/whatsapp" target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-3 bg-[#25D366]/10 border border-[#25D366]/25 text-[#25D366] rounded-2xl px-5 py-3.5 mb-6 hover:bg-[#25D366]/15 transition-all font-semibold text-sm">
-              <MessageCircle className="h-5 w-5 flex-shrink-0" />
-              <div>
-                <p className="font-bold">WhatsApp us</p>
-                <p className="text-[#25D366]/60 text-xs font-normal">Quickest way to reach us</p>
-              </div>
-              <ArrowRight className="h-4 w-4 ml-auto flex-shrink-0" />
+            <a href="/api/whatsapp"
+              className="inline-flex items-center gap-2.5 bg-[#25D366] text-white font-bold text-sm px-5 py-3 rounded-full mb-6 hover:bg-[#1ebe5d] transition-all">
+              <MessageCircle className="h-5 w-5" />
+              Chat on WhatsApp
             </a>
 
             {contactStatus === 'ok' ? (
@@ -916,11 +914,11 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* Floating WhatsApp button */}
-      <a href="/api/whatsapp" target="_blank" rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-[#25D366] text-white font-bold text-sm px-5 py-3 rounded-full shadow-2xl shadow-[#25D366]/40 hover:scale-105 active:scale-95 transition-all">
-        <MessageCircle className="h-5 w-5" />
-        WhatsApp us
+      {/* Floating WhatsApp button — icon only */}
+      <a href="/api/whatsapp"
+        className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-2xl shadow-[#25D366]/40 hover:scale-110 active:scale-95 transition-all"
+        aria-label="Chat on WhatsApp">
+        <MessageCircle className="h-7 w-7" />
       </a>
 
       <Footer />
