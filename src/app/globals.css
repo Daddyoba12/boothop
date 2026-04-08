@@ -278,10 +278,10 @@ body {
     filter: drop-shadow(0 0 8px currentColor);
   }
 
-  /* Push animation on tap — instant press feel */
+  /* Push animation on tap — scale only, no Y change (avoids double-shift) */
   .touch-blue:active, .touch-emerald:active, .touch-violet:active,
   .touch-amber:active, .touch-red:active {
-    transform: translateY(0px) scale(0.97) !important;
+    transform: translateY(-2px) scale(0.97) !important;
     transition: transform 0.08s ease !important;
   }
 }
