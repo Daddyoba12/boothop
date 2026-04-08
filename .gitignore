@@ -42,7 +42,14 @@ next-env.d.ts
 
 .vercel
 
-# Large video files — serve from CDN, not git
-#  public/videos/
-
-#  .vercel
+# Large media files — keep locally, never commit
+promo/output/
+promo/clips_final/
+promo/clips_v2/
+promo/tmp_patch/
+promo/*.mp3
+promo/*.mp4
+*.mp4
+*.mp3
+*.webm
+ffmpeg2pass-*
