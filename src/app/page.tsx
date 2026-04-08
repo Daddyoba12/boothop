@@ -574,7 +574,8 @@ function HomePageContent() {
               { emoji: '⚡', step: '02', title: 'Get matched securely', body: 'Our engine finds verified matches on the same route. Both sides confirm before any payment.', gradient: 'from-violet-500 to-purple-400', badge: 'bg-purple-400', shadow: 'shadow-violet-500/50', hover: 'hover:border-violet-500/40 hover:shadow-violet-500/15', touch: 'touch-violet', delay: 'd2' },
               { emoji: '💸', step: '03', title: 'Deliver and get paid', body: 'Funds are held in escrow and released only after the recipient confirms safe delivery.', gradient: 'from-emerald-500 to-teal-400', badge: 'bg-teal-400', shadow: 'shadow-emerald-500/50', hover: 'hover:border-emerald-500/40 hover:shadow-emerald-500/15', touch: 'touch-emerald', delay: 'd3' },
             ].map((item) => (
-              <div key={item.step} className={`reveal ${item.delay} group flex items-center gap-6 rounded-2xl border border-white/8 bg-white/3 p-6 transition-all duration-300 hover:bg-white/5 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 cursor-pointer ${item.hover} ${item.touch}`}>
+              <div key={item.step} className={`reveal ${item.delay} group relative overflow-hidden flex items-center gap-6 rounded-2xl border border-white/8 bg-white/3 p-6 transition-all duration-300 hover:bg-white/5 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 cursor-pointer ${item.hover} ${item.touch}`}>
+                <div className="pointer-events-none absolute -top-8 left-1/4 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: item.touch === 'touch-blue' ? 'rgba(59,130,246,0.18)' : item.touch === 'touch-violet' ? 'rgba(139,92,246,0.18)' : 'rgba(16,185,129,0.18)' }} />
                 <div className="relative flex-shrink-0">
                   <div className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} text-2xl shadow-lg ${item.shadow} group-hover:scale-110 transition-transform duration-300`}>
                     {item.emoji}
@@ -609,7 +610,8 @@ function HomePageContent() {
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             {/* Senders */}
-            <div className="reveal d1 group rounded-3xl border border-white/8 bg-white/3 p-8 transition-all duration-300 hover:border-emerald-500/25 hover:bg-white/5 hover:shadow-[0_24px_60px_rgba(16,185,129,0.08)] hover:-translate-y-1 touch-emerald">
+            <div className="reveal d1 group relative overflow-hidden rounded-3xl border border-white/8 bg-white/3 p-8 transition-all duration-300 hover:border-emerald-500/25 hover:bg-white/5 hover:shadow-[0_24px_60px_rgba(16,185,129,0.08)] hover:-translate-y-1 active:scale-[0.98] touch-emerald">
+              <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 w-32 h-32 bg-emerald-500/15 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-400">
                 <Package className="h-6 w-6" />
               </div>
@@ -629,7 +631,8 @@ function HomePageContent() {
             </div>
 
             {/* Travellers */}
-            <div className="reveal d2 group rounded-3xl border border-white/8 bg-white/3 p-8 transition-all duration-300 hover:border-blue-500/25 hover:bg-white/5 hover:shadow-[0_24px_60px_rgba(59,130,246,0.08)] hover:-translate-y-1 touch-blue">
+            <div className="reveal d2 group relative overflow-hidden rounded-3xl border border-white/8 bg-white/3 p-8 transition-all duration-300 hover:border-blue-500/25 hover:bg-white/5 hover:shadow-[0_24px_60px_rgba(59,130,246,0.08)] hover:-translate-y-1 active:scale-[0.98] touch-blue">
+              <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 w-32 h-32 bg-blue-500/15 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-400">
                 <Plane className="h-6 w-6" />
               </div>
