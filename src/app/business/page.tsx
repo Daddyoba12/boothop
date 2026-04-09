@@ -221,18 +221,6 @@ export default function BoothopBusiness() {
   const [contactLoading, setContactLoading] = useState(false);
   const [contactStatus,  setContactStatus]  = useState<'idle' | 'ok' | 'err'>('idle');
 
-  // Hero banner registration panels
-  const [heroPanel,      setHeroPanel]      = useState<null | 'booter' | 'hooper'>(null);
-
-  // Booter (carrier) application form
-  const [carrierForm,    setCarrierForm]    = useState({ name: '', email: '', phone: '', city: '', vehicle: '', about: '' });
-  const [carrierLoading, setCarrierLoading] = useState(false);
-  const [carrierStatus,  setCarrierStatus]  = useState<'idle' | 'ok' | 'err'>('idle');
-
-  // Hooper (business sender) interest form
-  const [hooperForm,     setHooperForm]     = useState({ company: '', email: '', phone: '', needs: '' });
-  const [hooperLoading,  setHooperLoading]  = useState(false);
-  const [hooperStatus,   setHooperStatus]   = useState<'idle' | 'ok' | 'err'>('idle');
 
   // Priority Partner
   const [companyName,     setCompanyName]     = useState('');
@@ -432,40 +420,6 @@ export default function BoothopBusiness() {
     finally { setContactLoading(false); }
   };
 
-  // ── Booter (carrier) application submit ──────────────────────────────────
-  const submitCarrier = async () => {
-    if (!carrierForm.name || !carrierForm.email || !carrierForm.phone) return;
-    setCarrierLoading(true);
-    try {
-      const res = await fetch('/api/booter-apply', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(carrierForm),
-      });
-      setCarrierStatus(res.ok ? 'ok' : 'err');
-      if (res.ok) setCarrierForm({ name: '', email: '', phone: '', city: '', vehicle: '', about: '' });
-    } catch { setCarrierStatus('err'); }
-    finally { setCarrierLoading(false); }
-  };
-
-  // ── Hooper (business sender) interest submit ──────────────────────────────
-  const submitHooper = async () => {
-    if (!hooperForm.company || !hooperForm.email || !hooperForm.phone) return;
-    setHooperLoading(true);
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: hooperForm.company,
-          email: hooperForm.email,
-          topic: 'Hooper Registration',
-          message: `Company: ${hooperForm.company}\nPhone: ${hooperForm.phone}\nDelivery needs: ${hooperForm.needs || 'Not provided'}`,
-        }),
-      });
-      setHooperStatus(res.ok ? 'ok' : 'err');
-      if (res.ok) setHooperForm({ company: '', email: '', phone: '', needs: '' });
-    } catch { setHooperStatus('err'); }
-    finally { setHooperLoading(false); }
-  };
 
   // ── Priority Partner apply ────────────────────────────────────────────────
   const submitPriorityApply = async () => {
@@ -613,132 +567,14 @@ export default function BoothopBusiness() {
                 BootHop Business connects your company to a network of verified carriers.
                 Fast, insured, and built for time-critical deliveries.
               </motion.p>
-              {/* Registration buttons */}
+              {/* Hero CTA */}
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-                className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4 flex-wrap">
-                <button
-                  onClick={() => setHeroPanel(p => p === 'booter' ? null : 'booter')}
-                  className={`inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl font-black text-sm transition-all border ${heroPanel === 'booter' ? 'bg-blue-500 border-blue-400 text-white shadow-lg shadow-blue-500/30' : 'bg-white/5 border-white/15 text-white/70 hover:bg-white/10 hover:text-white'}`}>
-                  <Truck className="h-4 w-4" />
-                  Register as a Booter {heroPanel === 'booter' ? '▲' : '▼'}
-                </button>
-                <button
-                  onClick={() => setHeroPanel(p => p === 'hooper' ? null : 'hooper')}
-                  className={`inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl font-black text-sm transition-all border ${heroPanel === 'hooper' ? 'bg-emerald-500 border-emerald-400 text-black shadow-lg shadow-emerald-500/30' : 'bg-white/5 border-white/15 text-white/70 hover:bg-white/10 hover:text-white'}`}>
-                  <Package className="h-4 w-4" />
-                  Register as a Hooper {heroPanel === 'hooper' ? '▲' : '▼'}
-                </button>
+                className="flex items-center justify-center mb-4">
                 <button onClick={() => setStage('email')}
                   className="inline-flex items-center gap-2.5 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-sm px-7 py-3.5 rounded-2xl hover:scale-105 transition-all shadow-2xl shadow-emerald-500/30">
                   Request a delivery <ArrowRight className="h-4 w-4" />
                 </button>
-                <a href="/business/priority-partner"
-                  className="inline-flex items-center gap-2.5 bg-gradient-to-r from-amber-500/20 to-orange-500/10 border border-amber-500/30 text-amber-400 font-black text-sm px-7 py-3.5 rounded-2xl hover:bg-amber-500/25 hover:border-amber-500/50 transition-all">
-                  <Star className="h-4 w-4" /> Priority Partner
-                </a>
               </motion.div>
-
-              {/* Dropdown registration panels */}
-              <AnimatePresence mode="wait">
-                {heroPanel === 'booter' && (
-                  <motion.div key="booter-panel"
-                    initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden max-w-xl mx-auto mt-4 mb-2">
-                    <div className="group relative overflow-hidden bg-white/5 border border-blue-500/25 rounded-2xl p-6 text-left transition-all duration-300 hover:border-blue-500/40 hover:shadow-lg hover:shadow-blue-500/10 touch-blue">
-                      <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-24 bg-blue-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      <div className="flex items-center gap-2 mb-4">
-                        <Truck className="h-5 w-5 text-blue-400" />
-                        <h3 className="text-white font-black">Register as a Booter</h3>
-                        <span className="text-xs text-blue-400/70 ml-1">— Carry goods, get paid</span>
-                      </div>
-                      {carrierStatus === 'ok' ? (
-                        <div className="text-center py-4">
-                          <CheckCircle className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-                          <p className="text-white font-bold">Application received!</p>
-                          <p className="text-white/40 text-sm mt-1">We&apos;ll review and get back to you.</p>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {carrierStatus === 'err' && <p className="text-red-400 text-xs">Something went wrong — try again.</p>}
-                          <div className="grid grid-cols-2 gap-3">
-                            <input value={carrierForm.name} onChange={e => setCarrierForm(p => ({ ...p, name: e.target.value }))}
-                              placeholder="Full name *" className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-                            <input value={carrierForm.email} onChange={e => setCarrierForm(p => ({ ...p, email: e.target.value }))}
-                              type="email" placeholder="Email *" className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-                            <input value={carrierForm.phone} onChange={e => setCarrierForm(p => ({ ...p, phone: e.target.value }))}
-                              type="tel" placeholder="Phone *" className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-                            <input value={carrierForm.city} onChange={e => setCarrierForm(p => ({ ...p, city: e.target.value }))}
-                              placeholder="Your city" className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-                          </div>
-                          <select value={carrierForm.vehicle} onChange={e => setCarrierForm(p => ({ ...p, vehicle: e.target.value }))}
-                            className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                            <option value="" className="bg-[#0a1628]">How do you travel?</option>
-                            <option value="car" className="bg-[#0a1628]">Car</option>
-                            <option value="van" className="bg-[#0a1628]">Van</option>
-                            <option value="motorbike" className="bg-[#0a1628]">Motorbike / scooter</option>
-                            <option value="international" className="bg-[#0a1628]">Frequent international traveller</option>
-                            <option value="other" className="bg-[#0a1628]">Other</option>
-                          </select>
-                          <textarea value={carrierForm.about} onChange={e => setCarrierForm(p => ({ ...p, about: e.target.value }))}
-                            rows={2} placeholder="Tell us about yourself and routes you cover…"
-                            className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none" />
-                          <button onClick={submitCarrier}
-                            disabled={carrierLoading || !carrierForm.name || !carrierForm.email || !carrierForm.phone}
-                            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-500 text-white font-black disabled:opacity-40 hover:bg-blue-400 transition-all text-sm">
-                            {carrierLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                            {carrierLoading ? 'Submitting…' : 'Apply as a Booter'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-
-                {heroPanel === 'hooper' && (
-                  <motion.div key="hooper-panel"
-                    initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden max-w-xl mx-auto mt-4 mb-2">
-                    <div className="group relative overflow-hidden bg-white/5 border border-emerald-500/25 rounded-2xl p-6 text-left transition-all duration-300 hover:border-emerald-500/40 hover:shadow-lg hover:shadow-emerald-500/10 touch-emerald">
-                      <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-24 bg-emerald-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      <div className="flex items-center gap-2 mb-4">
-                        <Package className="h-5 w-5 text-emerald-400" />
-                        <h3 className="text-white font-black">Register as a Hooper</h3>
-                        <span className="text-xs text-emerald-400/70 ml-1">— Send goods, we carry them</span>
-                      </div>
-                      {hooperStatus === 'ok' ? (
-                        <div className="text-center py-4">
-                          <CheckCircle className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
-                          <p className="text-white font-bold">Registration received!</p>
-                          <p className="text-white/40 text-sm mt-1">We&apos;ll be in touch to set up your account.</p>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {hooperStatus === 'err' && <p className="text-red-400 text-xs">Something went wrong — try again.</p>}
-                          <div className="grid grid-cols-2 gap-3">
-                            <input value={hooperForm.company} onChange={e => setHooperForm(p => ({ ...p, company: e.target.value }))}
-                              placeholder="Company name *" className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
-                            <input value={hooperForm.email} onChange={e => setHooperForm(p => ({ ...p, email: e.target.value }))}
-                              type="email" placeholder="Business email *" className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
-                            <input value={hooperForm.phone} onChange={e => setHooperForm(p => ({ ...p, phone: e.target.value }))}
-                              type="tel" placeholder="Phone number *" className="px-3.5 py-2.5 col-span-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
-                          </div>
-                          <textarea value={hooperForm.needs} onChange={e => setHooperForm(p => ({ ...p, needs: e.target.value }))}
-                            rows={2} placeholder="What do you need delivered? (routes, frequency, type of goods…)"
-                            className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm resize-none" />
-                          <button onClick={submitHooper}
-                            disabled={hooperLoading || !hooperForm.company || !hooperForm.email || !hooperForm.phone}
-                            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black disabled:opacity-40 hover:scale-[1.02] transition-all text-sm">
-                            {hooperLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                            {hooperLoading ? 'Submitting…' : 'Register as a Hooper'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
 
               <p className="text-white/20 text-xs mt-5">Business email required for delivery requests · Personal accounts not accepted</p>
             </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -32,9 +32,20 @@ const STEPS = [
 export default function PriorityPartnerPage() {
   const router = useRouter();
 
+  const [authChecked, setAuthChecked] = useState(false);
   const [form, setForm]       = useState({ email: '', company_name: '', phone: '', delivery_type: '' as '' | 'uk' | 'international', notes: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/business/auth/me')
+      .then(r => r.json())
+      .then(d => {
+        if (!d.authenticated) router.replace('/business');
+        else setAuthChecked(true);
+      })
+      .catch(() => router.replace('/business'));
+  }, [router]);
 
   const fee = form.delivery_type ? FEES[form.delivery_type] : null;
 
@@ -57,6 +68,12 @@ export default function PriorityPartnerPage() {
       setLoading(false);
     }
   };
+
+  if (!authChecked) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)' }}>
+      <Star className="h-8 w-8 text-amber-400 animate-pulse" />
+    </div>
+  );
 
   return (
     <div
