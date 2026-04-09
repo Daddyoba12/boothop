@@ -621,24 +621,6 @@ export default function BoothopBusiness() {
               </div>
             </div>
 
-            {/* Pricing — sign in required */}
-            <div className="max-w-3xl mx-auto px-8 pb-20">
-              <div className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-10 text-center transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98] touch-emerald">
-                <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 bg-emerald-500/15 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform duration-300">
-                  <Lock className="h-6 w-6 text-emerald-400" />
-                </div>
-                <h2 className="text-2xl font-black mb-3 group-hover:text-emerald-300 transition-colors duration-300">Pricing available on sign-in</h2>
-                <p className="text-white/40 text-sm leading-relaxed max-w-md mx-auto mb-6">
-                  Our pricing is tailored to route, distance, and delivery type. Sign in with your business email to view full pricing details, retainer requirements, and insurance terms.
-                </p>
-                <button onClick={() => setStage('email')}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-400 border border-emerald-500/30 px-5 py-2.5 rounded-xl hover:bg-emerald-500/10 transition-all duration-200">
-                  Sign in to view pricing <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-
             {/* Features */}
             <div className="max-w-5xl mx-auto px-8 pb-20">
               <div className="grid md:grid-cols-2 gap-4">
