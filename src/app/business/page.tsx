@@ -64,7 +64,13 @@ export default function BoothopBusiness() {
       if (!res.ok) { setAuthError(j.error); return; }
       // Check partner status to route to the right portal
       const me = await fetch('/api/business/auth/me').then(r => r.json());
-      router.push(me.partner_status === 'active' ? '/business/portal/priority' : '/business/portal');
+      if (me.partner_status === 'active') {
+        router.push('/business/portal/priority');
+      } else if (loginIntent === 'priority') {
+        router.push('/business/priority-partner'); // not yet a partner — take them to apply & pay
+      } else {
+        router.push('/business/portal');
+      }
     } catch { setAuthError('Verification failed. Please try again.'); }
     finally { setAuthLoading(false); }
   };
@@ -248,10 +254,10 @@ export default function BoothopBusiness() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-3 shrink-0">
-                    <a href="/business/priority-partner"
+                    <button onClick={() => { setLoginIntent('priority'); setStage('email'); }}
                       className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-orange-400 text-black font-black px-8 py-4 rounded-2xl hover:scale-105 active:scale-[0.98] transition-all shadow-2xl shadow-amber-500/25 text-sm whitespace-nowrap">
-                      <Star className="h-4 w-4" /> Apply &amp; Pay — full details
-                    </a>
+                      <Star className="h-4 w-4" /> Apply &amp; Pay — sign in first
+                    </button>
                     <p className="text-white/20 text-xs text-center">UK £10,000 · International £15,000 · Annual retainer</p>
                   </div>
                 </div>
