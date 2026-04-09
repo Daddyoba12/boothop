@@ -195,6 +195,7 @@ const TC_SECTIONS = [
 // ─────────────────────────────────────────────────────────────────────────────
 export default function BoothopBusiness() {
   const [stage,        setStage]        = useState<Stage>('loading');
+  const [loginIntent,  setLoginIntent]  = useState<'priority' | 'oneoff' | null>(null);
   const [bizEmail,     setBizEmail]     = useState('');
   const [emailInput,   setEmailInput]   = useState('');
   const [otpInput,     setOtpInput]     = useState('');
@@ -253,6 +254,7 @@ export default function BoothopBusiness() {
           if (d.partner_status)         setPartnerStatus(d.partner_status);
           if (d.partner_discount)       setPartnerDiscount(d.partner_discount);
           setPriorityForm(p => ({ ...p, email: d.email }));
+          setLoginIntent(d.partner_status === 'active' ? 'priority' : 'oneoff');
           setStage('portal');
         } else {
           setStage('landing');
@@ -333,7 +335,23 @@ export default function BoothopBusiness() {
       });
       const j = await res.json();
       if (!res.ok) { setAuthError(j.error); return; }
-      setBizEmail(j.email); setStage('portal');
+      // Hydrate partner profile after verification
+      const me = await fetch('/api/business/auth/me').then(r => r.json());
+      setBizEmail(j.email);
+      if (me.company_name)   setCompanyName(me.company_name);
+      if (me.partner_tier)   setPartnerTier(me.partner_tier);
+      if (me.partner_status) setPartnerStatus(me.partner_status);
+      if (me.partner_discount) setPartnerDiscount(me.partner_discount);
+      setPriorityForm(p => ({ ...p, email: j.email }));
+      // Route: active partner → full portal; one-off → direct to form; priority intent but not active → portal shows guidance
+      if (me.partner_status === 'active') {
+        setLoginIntent('priority');
+        setStage('portal');
+      } else if (loginIntent === 'oneoff') {
+        setStage('form');
+      } else {
+        setStage('portal'); // priority intent but no active membership — portal shows guidance
+      }
     } catch { setAuthError('Verification failed. Please try again.'); }
     finally { setAuthLoading(false); }
   };
@@ -537,7 +555,7 @@ export default function BoothopBusiness() {
                   className="text-sm font-semibold text-white/40 hover:text-white transition-colors hidden sm:block">
                   How It Works
                 </button>
-                <button onClick={() => document.getElementById('biz-priority')?.scrollIntoView({ behavior: 'smooth' })}
+                <button onClick={() => { setLoginIntent('priority'); setStage('email'); }}
                   className="text-sm font-semibold text-amber-400/60 hover:text-amber-400 transition-colors hidden sm:block">
                   Priority Partner
                 </button>
@@ -545,7 +563,7 @@ export default function BoothopBusiness() {
                   className="text-sm font-semibold text-white/40 hover:text-white transition-colors hidden sm:block">
                   Contact
                 </button>
-                <button onClick={() => setStage('email')}
+                <button onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
                   className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-sm px-5 py-2.5 rounded-xl hover:scale-105 transition-all">
                   Book a Delivery
                 </button>
@@ -567,16 +585,40 @@ export default function BoothopBusiness() {
                 BootHop Business connects your company to a network of verified carriers.
                 Fast, insured, and built for time-critical deliveries.
               </motion.p>
-              {/* Hero CTA */}
+              {/* Hero CTA — two entry points */}
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-                className="flex items-center justify-center mb-4">
-                <button onClick={() => setStage('email')}
-                  className="inline-flex items-center gap-2.5 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-sm px-7 py-3.5 rounded-2xl hover:scale-105 transition-all shadow-2xl shadow-emerald-500/30">
-                  Request a delivery <ArrowRight className="h-4 w-4" />
-                </button>
-              </motion.div>
+                className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-6">
 
-              <p className="text-white/20 text-xs mt-5">Business email required for delivery requests · Personal accounts not accepted</p>
+                {/* Priority Partner login */}
+                <button onClick={() => { setLoginIntent('priority'); setStage('email'); }}
+                  className="group relative overflow-hidden bg-amber-500/5 border border-amber-500/25 rounded-2xl p-6 text-left transition-all duration-300 hover:border-amber-500/50 hover:bg-amber-500/8 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/15 active:scale-[0.98]">
+                  <div className="pointer-events-none absolute -top-6 right-0 w-24 h-24 bg-amber-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Star className="h-5 w-5 text-amber-400" />
+                  </div>
+                  <h3 className="text-white font-black mb-1.5 group-hover:text-amber-300 transition-colors duration-300">Priority Partner</h3>
+                  <p className="text-white/40 text-xs leading-relaxed mb-4">Existing member? Sign in for your dedicated portal — 2-hour guaranteed response, volume discounts &amp; account manager.</p>
+                  <span className="inline-flex items-center gap-1.5 text-amber-400 text-xs font-black">
+                    Sign in <ArrowRight className="h-3.5 w-3.5" />
+                  </span>
+                </button>
+
+                {/* One-off / Book a delivery */}
+                <button onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
+                  className="group relative overflow-hidden bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-6 text-left transition-all duration-300 hover:border-emerald-500/40 hover:bg-emerald-500/8 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/15 active:scale-[0.98]">
+                  <div className="pointer-events-none absolute -top-6 right-0 w-24 h-24 bg-emerald-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Zap className="h-5 w-5 text-emerald-400" />
+                  </div>
+                  <h3 className="text-white font-black mb-1.5 group-hover:text-emerald-300 transition-colors duration-300">Book a Delivery</h3>
+                  <p className="text-white/40 text-xs leading-relaxed mb-4">New or one-off customer? Sign in with your business email for an instant quote and same-day booking.</p>
+                  <span className="inline-flex items-center gap-1.5 text-emerald-400 text-xs font-black">
+                    Get started <ArrowRight className="h-3.5 w-3.5" />
+                  </span>
+                </button>
+
+              </motion.div>
+              <p className="text-white/20 text-xs">Business email required · Personal accounts not accepted</p>
             </div>
 
             {/* How it works */}
@@ -783,22 +825,31 @@ export default function BoothopBusiness() {
           <motion.div key="email" {...FADE} className="min-h-screen flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-md">
               <div className="text-center mb-8">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 ${loginIntent === 'priority' ? 'bg-amber-500/20' : 'bg-emerald-500/20'}`}>
+                  {loginIntent === 'priority' ? <Star className="h-7 w-7 text-amber-400" /> : <Zap className="h-7 w-7 text-emerald-400" />}
+                </div>
                 <p className="text-xl font-black mb-1">Boot<span className="text-emerald-400">Hop</span> <span className="text-white/40 font-normal">Business</span></p>
-                <h2 className="text-3xl font-black mt-4 mb-2">Enter your business email</h2>
-                <p className="text-white/40 text-sm">Personal email addresses are not accepted</p>
+                <h2 className="text-3xl font-black mt-4 mb-2">
+                  {loginIntent === 'priority' ? 'Priority Partner sign-in' : 'Book a delivery'}
+                </h2>
+                <p className="text-white/40 text-sm">
+                  {loginIntent === 'priority'
+                    ? 'Enter your registered Priority Partner email'
+                    : 'Enter your business email — personal addresses not accepted'}
+                </p>
               </div>
-              <div className="group relative overflow-hidden bg-white/5 border border-white/10 rounded-2xl p-8 space-y-4 transition-all duration-300 hover:border-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/8">
-                <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className={`group relative overflow-hidden bg-white/5 border rounded-2xl p-8 space-y-4 transition-all duration-300 hover:shadow-lg ${loginIntent === 'priority' ? 'border-amber-500/15 hover:border-amber-500/30 hover:shadow-amber-500/8' : 'border-white/10 hover:border-emerald-500/20 hover:shadow-emerald-500/8'}`}>
+                <div className={`pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${loginIntent === 'priority' ? 'bg-amber-500/10' : 'bg-emerald-500/10'}`} />
                 {authError && <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">{authError}</div>}
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
                   <input type="email" value={emailInput} onChange={e => setEmailInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && sendOtp()}
                     placeholder="you@yourcompany.com" autoFocus
-                    className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm" />
+                    className={`w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none text-sm ${loginIntent === 'priority' ? 'focus:ring-2 focus:ring-amber-500' : 'focus:ring-2 focus:ring-emerald-500'}`} />
                 </div>
                 <button onClick={sendOtp} disabled={authLoading || !emailInput.trim()}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black disabled:opacity-40 hover:scale-[1.02] transition-all">
+                  className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-black disabled:opacity-40 hover:scale-[1.02] transition-all ${loginIntent === 'priority' ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-black' : 'bg-gradient-to-r from-emerald-400 to-teal-400 text-black'}`}>
                   {authLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
                   {authLoading ? 'Sending code…' : 'Send verification code'}
                 </button>
@@ -902,6 +953,54 @@ export default function BoothopBusiness() {
                     : ' Review the information below before placing your first job.'}
                 </p>
               </motion.div>
+
+              {/* Not a Priority Partner — shown when user signed in via priority route but has no active membership */}
+              {loginIntent === 'priority' && partnerStatus !== 'active' && partnerStatus !== 'pending' && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
+                  className="group relative overflow-hidden mb-12 bg-amber-500/5 border border-amber-500/25 rounded-2xl p-8 transition-all duration-300 hover:border-amber-500/40 hover:shadow-lg hover:shadow-amber-500/10">
+                  <div className="pointer-events-none absolute -top-8 right-0 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl" />
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                      <Star className="h-5 w-5 text-amber-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-black">No Priority Partner account found</h2>
+                      <p className="text-white/40 text-xs mt-0.5">Your email is not linked to an active Priority Partner membership</p>
+                    </div>
+                  </div>
+                  <p className="text-white/50 text-sm leading-relaxed mb-6">
+                    Priority Partners get a guaranteed 2-hour response, a dedicated account manager, automatic volume discounts, and priority carrier matching. To activate membership, complete your application and bank transfer.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <a href="/business/priority-partner"
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-400 text-black font-black text-sm px-5 py-2.5 rounded-xl hover:scale-105 transition-all shadow-lg shadow-amber-500/20">
+                      <Star className="h-4 w-4" /> Apply for Priority Partner
+                    </a>
+                    <button onClick={() => setStage('form')}
+                      className="inline-flex items-center gap-2 bg-white/5 border border-white/15 text-white/70 font-semibold text-sm px-5 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-all">
+                      Book a one-off delivery <ArrowRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Partner application pending */}
+              {loginIntent === 'priority' && partnerStatus === 'pending' && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
+                  className="mb-12 bg-white/3 border border-amber-500/20 rounded-2xl p-6 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
+                    <Clock className="h-5 w-5 text-amber-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-white font-bold text-sm">Priority Partner application under review</p>
+                    <p className="text-white/40 text-xs mt-0.5">Our team will activate your account within 24 hours of payment clearing.</p>
+                  </div>
+                  <button onClick={() => setStage('form')}
+                    className="inline-flex items-center gap-2 bg-white/5 border border-white/15 text-white/70 font-semibold text-sm px-4 py-2 rounded-xl hover:bg-white/10 transition-all shrink-0">
+                    Book now <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </motion.div>
+              )}
 
               {/* Priority Partner upsell / status (post-login) */}
               {(!partnerStatus || partnerStatus === 'rejected') && (
