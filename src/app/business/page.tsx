@@ -24,6 +24,12 @@ export default function BoothopBusiness() {
   const [authError,   setAuthError]   = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
 
+  // ── Pre-fill email from last login ────────────────────────────────────────
+  useEffect(() => {
+    const saved = localStorage.getItem('boothop_biz_email');
+    if (saved) setEmailInput(saved);
+  }, []);
+
   // ── Session check ──────────────────────────────────────────────────────────
   useEffect(() => {
     fetch('/api/business/auth/me')
@@ -48,6 +54,7 @@ export default function BoothopBusiness() {
       });
       const j = await res.json();
       if (!res.ok) { setAuthError(j.error); return; }
+      localStorage.setItem('boothop_biz_email', emailInput.trim());
       setStage('otp');
     } catch { setAuthError('Could not send code. Please try again.'); }
     finally { setAuthLoading(false); }
