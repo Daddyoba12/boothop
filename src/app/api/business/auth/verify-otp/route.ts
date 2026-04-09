@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import {
   getBizOtp, signBizOtp, signBizSession,
   getBizCookieName, getBizOtpCookieName,
+  signBizRemember, getBizRememberCookieName,
 } from '@/lib/auth/session';
 
 const MAX_ATTEMPTS = 5;
@@ -56,6 +57,15 @@ export async function POST(request: NextRequest) {
       secure:   process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge:   60 * 60 * 24 * 7, // 7 days
+      path:     '/',
+    });
+
+    // Set 30-day remember-me cookie so future logins skip OTP
+    cookieStore.set(getBizRememberCookieName(), signBizRemember(pending.email), {
+      httpOnly: true,
+      secure:   process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge:   60 * 60 * 24 * 30,
       path:     '/',
     });
 

@@ -55,6 +55,12 @@ export default function BoothopBusiness() {
       const j = await res.json();
       if (!res.ok) { setAuthError(j.error); return; }
       localStorage.setItem('boothop_biz_email', emailInput.trim());
+      // Trusted returning user — server re-issued session, skip OTP
+      if (j.skipOtp) {
+        const me = await fetch('/api/business/auth/me').then(r => r.json());
+        router.push(me.partner_status === 'active' ? '/business/portal/priority' : loginIntent === 'priority' ? '/business/priority-partner' : '/business/portal');
+        return;
+      }
       setStage('otp');
     } catch { setAuthError('Could not send code. Please try again.'); }
     finally { setAuthLoading(false); }

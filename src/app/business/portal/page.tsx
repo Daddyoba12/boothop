@@ -8,7 +8,7 @@ import {
   Zap, Clock, MapPin, Package, Star, Building2, Truck,
   LogOut, List, XCircle, AlertCircle, User, ChevronLeft,
   Phone, Plane, Globe, FileText, AlertTriangle,
-  MessageCircle,
+  MessageCircle, Pencil, X,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -234,6 +234,14 @@ export default function BusinessPortalPage() {
   const [cancellingId,   setCancellingId]   = useState<string | null>(null);
   const [showPricing,    setShowPricing]    = useState(false);
 
+  // Edit job modal
+  type EditForm = { pickup: string; dropoff: string; description: string; urgency: 'same_day' | 'next_day'; delivery_date: string; expected_delivery_date: string };
+  const EMPTY_EDIT: EditForm = { pickup: '', dropoff: '', description: '', urgency: 'same_day', delivery_date: '', expected_delivery_date: '' };
+  const [editingJob,     setEditingJob]     = useState<MyJob | null>(null);
+  const [editForm,       setEditForm]       = useState<EditForm>(EMPTY_EDIT);
+  const [editLoading,    setEditLoading]    = useState(false);
+  const [editError,      setEditError]      = useState<string | null>(null);
+
   const [showTerms,      setShowTerms]      = useState(false);
   const [termsScrolled,  setTermsScrolled]  = useState(false);
   const [termsAccepted,  setTermsAccepted]  = useState(false);
@@ -355,6 +363,40 @@ export default function BusinessPortalPage() {
       }
     } catch { alert('Something went wrong.'); }
     finally { setCancellingId(null); }
+  };
+
+  const openEdit = (job: MyJob) => {
+    setEditForm({
+      pickup:                  job.pickup,
+      dropoff:                 job.dropoff,
+      description:             '',
+      urgency:                 job.urgency as 'same_day' | 'next_day',
+      delivery_date:           '',
+      expected_delivery_date:  '',
+    });
+    setEditError(null);
+    setEditingJob(job);
+  };
+
+  const saveEdit = async () => {
+    if (!editingJob) return;
+    if (!editForm.pickup || !editForm.dropoff) { setEditError('Pickup and drop-off are required.'); return; }
+    setEditLoading(true);
+    setEditError(null);
+    try {
+      const res = await fetch('/api/business/update-job', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: editingJob.id, ...editForm }),
+      });
+      const j = await res.json();
+      if (!res.ok) { setEditError(j.error || 'Could not update job.'); return; }
+      setMyJobs(prev => prev.map(job => job.id === editingJob.id
+        ? { ...job, pickup: editForm.pickup, dropoff: editForm.dropoff, urgency: editForm.urgency }
+        : job));
+      setEditingJob(null);
+    } catch { setEditError('Something went wrong.'); }
+    finally { setEditLoading(false); }
   };
 
   // ── Computed ─────────────────────────────────────────────────────────────────
@@ -1242,10 +1284,15 @@ export default function BusinessPortalPage() {
                       failed:     'text-orange-400 bg-orange-500/10 border-orange-500/20',
                     };
                     const statusLabels: Record<string, string> = {
-                      pending: 'Pending', assigned: 'Driver assigned', in_transit: 'In transit',
-                      delivered: 'Delivered', cancelled: 'Cancelled', failed: 'Failed',
+                      pending:    'Pending — awaiting assignment',
+                      assigned:   'Driver assigned',
+                      in_transit: 'In transit',
+                      delivered:  'Delivered ✓',
+                      cancelled:  'Cancelled',
+                      failed:     'Failed delivery',
                     };
                     const canCancel = ['pending', 'assigned'].includes(job.status);
+                    const canEdit   = ['pending', 'assigned'].includes(job.status);
                     const fmt = (ts: string | null) =>
                       ts
                         ? new Date(ts).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
@@ -1287,9 +1334,18 @@ export default function BusinessPortalPage() {
                               </div>
                             )}
                           </div>
-                          <div className="flex items-center gap-3 flex-shrink-0">
+                          <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
                             {job.estimated_price !== null && (
                               <span className="text-emerald-400 font-black text-lg">£{job.estimated_price}</span>
+                            )}
+                            {canEdit && (
+                              <button
+                                onClick={() => openEdit(job)}
+                                className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/40 hover:text-emerald-400 bg-white/5 border border-white/10 hover:border-emerald-500/20 hover:bg-emerald-500/10 px-3 py-2 rounded-xl transition-all"
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                                Amend
+                              </button>
                             )}
                             {canCancel && (
                               <button
@@ -1375,6 +1431,110 @@ export default function BusinessPortalPage() {
       >
         <MessageCircle className="h-7 w-7" />
       </a>
+
+      {/* ── Edit job modal ── */}
+      {editingJob && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative w-full max-w-lg bg-[#0d1117] border border-white/10 rounded-2xl p-6 shadow-2xl"
+          >
+            <button
+              onClick={() => setEditingJob(null)}
+              className="absolute top-4 right-4 text-white/30 hover:text-white transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <h3 className="text-lg font-black mb-1">Amend job</h3>
+            <p className="text-white/30 text-xs mb-6 font-mono">{editingJob.job_ref}</p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-white/40 uppercase tracking-wider mb-1.5">Pickup location</label>
+                <input
+                  type="text"
+                  value={editForm.pickup}
+                  onChange={e => setEditForm(f => ({ ...f, pickup: e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-white/40 uppercase tracking-wider mb-1.5">Drop-off location</label>
+                <input
+                  type="text"
+                  value={editForm.dropoff}
+                  onChange={e => setEditForm(f => ({ ...f, dropoff: e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-white/40 uppercase tracking-wider mb-1.5">Description (optional)</label>
+                <textarea
+                  rows={2}
+                  value={editForm.description}
+                  onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition-colors resize-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-white/40 uppercase tracking-wider mb-1.5">Urgency</label>
+                  <select
+                    value={editForm.urgency}
+                    onChange={e => setEditForm(f => ({ ...f, urgency: e.target.value as 'same_day' | 'next_day' }))}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  >
+                    <option value="same_day" className="bg-[#0d1117]">Same day</option>
+                    <option value="next_day" className="bg-[#0d1117]">Next day</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-white/40 uppercase tracking-wider mb-1.5">Collection date</label>
+                  <input
+                    type="date"
+                    value={editForm.delivery_date}
+                    onChange={e => setEditForm(f => ({ ...f, delivery_date: e.target.value }))}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-white/40 uppercase tracking-wider mb-1.5">Expected delivery date</label>
+                <input
+                  type="date"
+                  value={editForm.expected_delivery_date}
+                  onChange={e => setEditForm(f => ({ ...f, expected_delivery_date: e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                />
+              </div>
+            </div>
+
+            {editError && (
+              <p className="mt-4 text-xs text-red-400 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />{editError}
+              </p>
+            )}
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setEditingJob(null)}
+                className="flex-1 text-sm font-semibold text-white/30 hover:text-white bg-white/5 border border-white/10 hover:border-white/20 px-4 py-3 rounded-xl transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveEdit}
+                disabled={editLoading}
+                className="flex-1 text-sm font-black text-black bg-emerald-400 hover:bg-emerald-300 px-4 py-3 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {editLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save changes'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

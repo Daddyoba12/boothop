@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { signBizOtp, getBizOtp, getBizOtpCookieName } from '@/lib/auth/session';
+import { signBizOtp, getBizOtp, getBizOtpCookieName, getBizRemember, signBizSession, getBizCookieName } from '@/lib/auth/session';
 import { sendBusinessOtpEmail } from '@/lib/email/sendBusinessEmail';
 
 const PERSONAL_DOMAINS = new Set([
@@ -42,6 +42,20 @@ export async function POST(request: NextRequest) {
     }
 
     const cookieStore = await cookies();
+
+    // Check remember-me cookie — skip OTP for trusted returning users
+    const remembered = getBizRemember(cookieStore);
+    if (remembered && remembered.email === email.toLowerCase()) {
+      const sessionToken = signBizSession(remembered.email);
+      cookieStore.set(getBizCookieName(), sessionToken, {
+        httpOnly: true,
+        secure:   process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge:   60 * 60 * 24 * 7,
+        path:     '/',
+      });
+      return NextResponse.json({ ok: true, skipOtp: true, email: remembered.email });
+    }
 
     // Rate limit: prevent resending within 60 seconds
     const existing = getBizOtp(cookieStore);

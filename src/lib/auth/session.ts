@@ -81,6 +81,33 @@ export function getBizSession(
   } catch { return null; }
 }
 
+// ── Business remember-me cookie (30 days, skips OTP on return visits) ────────
+const BIZ_REMEMBER_COOKIE = 'boothop_biz_remember';
+
+export function getBizRememberCookieName() { return BIZ_REMEMBER_COOKIE; }
+
+export function signBizRemember(email: string) {
+  const secret = process.env.APP_SESSION_SECRET;
+  if (!secret) throw new Error('APP_SESSION_SECRET is missing');
+  return jwt.sign({ email, type: 'biz_remember' }, secret, {
+    expiresIn: '30d', issuer: 'boothop', audience: 'boothop-business',
+  });
+}
+
+export function getBizRemember(
+  cookieStore: { get: (name: string) => { value: string } | undefined }
+): { email: string } | null {
+  try {
+    const cookie = cookieStore.get(BIZ_REMEMBER_COOKIE);
+    if (!cookie?.value) return null;
+    const payload = jwt.verify(cookie.value, process.env.APP_SESSION_SECRET!, {
+      issuer: 'boothop', audience: 'boothop-business',
+    }) as { email: string; type: string };
+    if (payload.type !== 'biz_remember') return null;
+    return { email: payload.email };
+  } catch { return null; }
+}
+
 export function getBizOtp(
   cookieStore: { get: (name: string) => { value: string } | undefined }
 ): { email: string; code: string; attempts: number; iat?: number } | null {
