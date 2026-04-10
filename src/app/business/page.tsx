@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import {
   Loader2, Mail, ShieldCheck, CheckCircle, ArrowRight,
   Zap, Lock, Clock, Star, Building2, Truck,
@@ -201,6 +202,63 @@ export default function BoothopBusiness() {
                     <p className="text-white/30 text-xs mt-0.5">{s.sub}</p>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Use-case photos */}
+            <div className="max-w-5xl mx-auto px-8 pb-16">
+              <p className="text-xs font-black text-white/25 uppercase tracking-widest mb-6 text-center">Who uses BootHop Business</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[
+                  {
+                    img: '/images/delivery.jpg',
+                    tag: 'Engineering & Manufacturing',
+                    body: 'Urgent spare parts, production line recovery, maintenance components.',
+                  },
+                  {
+                    img: '/images/Handover.jpg',
+                    tag: 'Aerospace & AOG',
+                    body: 'Aircraft-on-ground parts and time-critical engineering tools under 20 kg.',
+                  },
+                  {
+                    img: '/images/Customs1.jpg',
+                    tag: 'International & Customs',
+                    body: 'Hand-carry across borders with full customs declaration support.',
+                  },
+                ].map(({ img, tag, body }) => (
+                  <div key={tag} className="relative overflow-hidden rounded-2xl border border-white/8 group cursor-pointer" onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}>
+                    <div className="relative h-44 w-full">
+                      <Image src={img} alt={tag} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <p className="text-xs font-black text-emerald-400 uppercase tracking-widest mb-1">{tag}</p>
+                      <p className="text-white/60 text-xs leading-relaxed">{body}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* "Why not cheap?" callout */}
+            <div className="max-w-5xl mx-auto px-8 pb-16">
+              <div className="relative overflow-hidden rounded-2xl border border-white/8">
+                <div className="relative h-48 sm:h-56 w-full">
+                  <Image src="/images/Handover.jpg" alt="BootHop direct handover" fill className="object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
+                </div>
+                <div className="absolute inset-0 flex items-center px-8 sm:px-12">
+                  <div className="max-w-lg">
+                    <p className="text-xs font-black text-emerald-400 uppercase tracking-widest mb-3">Why aren't we cheap?</p>
+                    <p className="text-white font-black text-xl sm:text-2xl leading-tight mb-3">
+                      We're not a courier.<br />We're a downtime solution.
+                    </p>
+                    <p className="text-white/50 text-sm leading-relaxed">
+                      Factory downtime costs £10,000/hr. An aircraft delay can cost £100,000+.
+                      A BootHop delivery costs £500–£1,500. The value is clear.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 

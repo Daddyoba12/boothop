@@ -12,6 +12,8 @@ import {
   calculateQuote, RouteType, DeliveryMode, UrgencyTier,
   ROUTE_META, MODE_META, URGENCY_META, CATEGORIES, QuoteBreakdown,
 } from '@/lib/business/pricing';
+import { AirportInput } from '@/components/business/AirportInput';
+import { PlacesInput } from '@/components/ui/PlacesInput';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -667,25 +669,41 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
 
       case 4: return (
         <div>
-          <SectionHead icon={MapPin} title="Route details" sub={isIntl ? 'Airports and any extra collection or delivery addresses.' : 'Exact collection and delivery addresses.'} />
+          <SectionHead icon={MapPin} title="Route details" sub={isIntl ? 'Select airports and add any extra collection or delivery address.' : 'Enter exact collection and delivery addresses.'} />
           <div className="space-y-4">
             {isIntl ? (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label>Origin airport *</Label>
-                    <Input placeholder="e.g. London Heathrow (LHR)" value={form.originAirport} onChange={e => up('originAirport', e.target.value)} />
-                  </div>
-                  <div>
-                    <Label>Destination airport *</Label>
-                    <Input placeholder="e.g. Amsterdam Schiphol (AMS)" value={form.destAirport} onChange={e => up('destAirport', e.target.value)} />
-                  </div>
+                  <AirportInput
+                    label="Origin airport *"
+                    value={form.originAirport}
+                    onSelect={(display) => up('originAirport', display)}
+                    onClear={() => up('originAirport', '')}
+                    disabledIata={form.destAirport ? form.destAirport.match(/\(([A-Z]{3})\)/)?.[1] : undefined}
+                    placeholder="Search city or IATA code…"
+                  />
+                  <AirportInput
+                    label="Destination airport *"
+                    value={form.destAirport}
+                    onSelect={(display) => up('destAirport', display)}
+                    onClear={() => up('destAirport', '')}
+                    disabledIata={form.originAirport ? form.originAirport.match(/\(([A-Z]{3})\)/)?.[1] : undefined}
+                    placeholder="Search city or IATA code…"
+                  />
+                </div>
+                <div className="p-3 bg-white/3 border border-white/8 rounded-xl flex items-start gap-2">
+                  <Info className="h-4 w-4 text-white/25 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-white/30">Airport-to-airport is included in the base price. Extra collection or delivery beyond the airport is charged per mile.</p>
                 </div>
                 {(form.deliveryMode === 'door_airport' || form.deliveryMode === 'door_door') && (
-                  <div>
-                    <Label>Collection address</Label>
-                    <Textarea placeholder="Full address including postcode" value={form.collectionAddress} onChange={e => up('collectionAddress', e.target.value)} />
-                    <div className="mt-2">
+                  <div className="space-y-3">
+                    <PlacesInput
+                      label="Collection address"
+                      value={form.collectionAddress}
+                      onChange={v => up('collectionAddress', v)}
+                      placeholder="Full address including postcode"
+                    />
+                    <div>
                       <Label>Extra pickup miles from nearest airport</Label>
                       <Input type="number" min="0" placeholder="0" value={form.extraPickupMiles} onChange={e => up('extraPickupMiles', e.target.value)} />
                       <p className="text-xs text-white/25 mt-1">Charged at {form.urgency === 'planned' ? '£3' : '£6.50'}/mile</p>
@@ -693,10 +711,14 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
                   </div>
                 )}
                 {(form.deliveryMode === 'airport_door' || form.deliveryMode === 'door_door') && (
-                  <div>
-                    <Label>Final delivery address</Label>
-                    <Textarea placeholder="Full address including postcode" value={form.deliveryAddress} onChange={e => up('deliveryAddress', e.target.value)} />
-                    <div className="mt-2">
+                  <div className="space-y-3">
+                    <PlacesInput
+                      label="Final delivery address"
+                      value={form.deliveryAddress}
+                      onChange={v => up('deliveryAddress', v)}
+                      placeholder="Full address including postcode"
+                    />
+                    <div>
                       <Label>Extra drop miles from destination airport</Label>
                       <Input type="number" min="0" placeholder="0" value={form.extraDropMiles} onChange={e => up('extraDropMiles', e.target.value)} />
                       <p className="text-xs text-white/25 mt-1">Charged at {form.urgency === 'planned' ? '£3' : '£6.50'}/mile</p>
@@ -706,14 +728,18 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
               </>
             ) : (
               <>
-                <div>
-                  <Label>Collection address / postcode *</Label>
-                  <Textarea placeholder="Full address or postcode" value={form.collectionAddress} onChange={e => up('collectionAddress', e.target.value)} />
-                </div>
-                <div>
-                  <Label>Delivery address / postcode *</Label>
-                  <Textarea placeholder="Full address or postcode" value={form.deliveryAddress} onChange={e => up('deliveryAddress', e.target.value)} />
-                </div>
+                <PlacesInput
+                  label="Collection address / postcode *"
+                  value={form.collectionAddress}
+                  onChange={v => up('collectionAddress', v)}
+                  placeholder="Start typing address or postcode…"
+                />
+                <PlacesInput
+                  label="Delivery address / postcode *"
+                  value={form.deliveryAddress}
+                  onChange={v => up('deliveryAddress', v)}
+                  placeholder="Start typing address or postcode…"
+                />
                 <div>
                   <Label>Total journey distance (miles)</Label>
                   <Input type="number" min="0" placeholder="Enter approx. miles" value={form.extraPickupMiles} onChange={e => up('extraPickupMiles', e.target.value)} />
