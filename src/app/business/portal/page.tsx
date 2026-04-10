@@ -33,6 +33,7 @@ const EMPTY_EDIT: EditForm = { pickup: '', dropoff: '', description: '', urgency
 const FADE = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -12 } };
 
 const STATUS_COLORS: Record<string, string> = {
+  pending_payment: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
   pending:    'text-amber-400 bg-amber-500/10 border-amber-500/20',
   review:     'text-purple-400 bg-purple-500/10 border-purple-500/20',
   assigned:   'text-blue-400 bg-blue-500/10 border-blue-500/20',
@@ -43,6 +44,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const STATUS_LABELS: Record<string, string> = {
+  pending_payment: 'Payment pending',
   pending:    'Pending — awaiting assignment',
   review:     'Under review',
   assigned:   'Driver assigned',
@@ -66,10 +68,13 @@ const LANES = [
 export default function BusinessPortalPage() {
   const router = useRouter();
 
-  const [stage,       setStage]       = useState<Stage>('loading');
-  const [bizEmail,    setBizEmail]    = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [jobRef,      setJobRef]      = useState('');
+  const [stage,            setStage]           = useState<Stage>('loading');
+  const [bizEmail,         setBizEmail]        = useState('');
+  const [companyName,      setCompanyName]     = useState('');
+  const [jobRef,           setJobRef]          = useState('');
+  const [isPaid,           setIsPaid]          = useState(false);
+  const [paymentCancelled, setPaymentCancelled]= useState(false);
+  const [uploads,          setUploads]         = useState<Record<string, { uploading: boolean; done: boolean; name: string; error: string | null }>>({});
 
   const [myJobs,      setMyJobs]      = useState<MyJob[]>([]);
   const [jobsLoading, setJobsLoading] = useState(false);
@@ -89,7 +94,16 @@ export default function BusinessPortalPage() {
         if (d.partner_status === 'active') { router.replace('/business/portal/priority'); return; }
         setBizEmail(d.email ?? '');
         if (d.company_name) setCompanyName(d.company_name);
-        setStage('hub');
+        const params    = new URLSearchParams(window.location.search);
+        const payResult = params.get('payment');
+        const payRef    = params.get('jobRef');
+        if (payResult === 'success' && payRef) {
+          setJobRef(payRef); setIsPaid(true); setStage('success');
+        } else if (payResult === 'cancelled') {
+          setPaymentCancelled(true); setStage('hub');
+        } else {
+          setStage('hub');
+        }
       })
       .catch(() => router.replace('/business'));
   }, [router]);
@@ -156,7 +170,7 @@ export default function BusinessPortalPage() {
         tier="standard"
         bizEmail={bizEmail}
         companyName={companyName}
-        onSuccess={ref => { setJobRef(ref); setStage('success'); }}
+        onSuccess={(ref, paid) => { setJobRef(ref); setIsPaid(paid); setStage('success'); }}
         onCancel={() => setStage('hub')}
       />
     );
@@ -184,6 +198,18 @@ export default function BusinessPortalPage() {
         {/* ══ HUB ══ */}
         {stage === 'hub' && (
           <motion.div key="hub" {...FADE} className="max-w-5xl mx-auto px-6 py-12">
+
+            {/* Payment cancelled banner */}
+            {paymentCancelled && (
+              <div className="mb-8 flex items-start gap-3 bg-orange-500/10 border border-orange-500/20 rounded-2xl px-5 py-4">
+                <AlertCircle className="h-5 w-5 text-orange-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold text-orange-400">Payment cancelled</p>
+                  <p className="text-xs text-white/35 mt-0.5">Your booking was not completed. No charge was made — you can try again whenever you're ready.</p>
+                </div>
+                <button onClick={() => setPaymentCancelled(false)} className="ml-auto text-white/20 hover:text-white transition-colors"><X className="h-4 w-4" /></button>
+              </div>
+            )}
 
             {/* Welcome */}
             <div className="mb-10">
@@ -385,28 +411,85 @@ export default function BusinessPortalPage() {
 
         {/* ══ SUCCESS ══ */}
         {stage === 'success' && (
-          <motion.div key="success" {...FADE} className="min-h-[80vh] flex items-center justify-center px-6">
-            <div className="text-center max-w-md">
+          <motion.div key="success" {...FADE} className="max-w-lg mx-auto px-6 py-12">
+            <div className="text-center mb-8">
               <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="h-10 w-10 text-emerald-400" />
               </div>
-              <h2 className="text-4xl font-black mb-3">Booking received</h2>
-              <p className="text-white/40 mb-8 leading-relaxed">
-                Your delivery request has been submitted. Our team will assign an operator and contact you with confirmation.
-              </p>
-              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-8 py-5 inline-block mb-6">
+              {isPaid ? (
+                <>
+                  <h2 className="text-4xl font-black mb-3">Payment received</h2>
+                  <p className="text-white/40 mb-2 leading-relaxed">Your payment has been received. Your job is now under review — we'll confirm dispatch and send you full details by email.</p>
+                  <p className="text-emerald-400/70 text-sm mb-6">Usually confirmed within 2–4 hours during business hours.</p>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-4xl font-black mb-3">Submitted for review</h2>
+                  <p className="text-white/40 mb-6 leading-relaxed">Your delivery request requires manual review. Our team will be in touch within 2 hours to confirm pricing and dispatch.</p>
+                </>
+              )}
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-8 py-5 inline-block mb-4">
                 <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-1">Reference</p>
                 <p className="text-emerald-400 font-mono font-black text-2xl tracking-widest">{jobRef}</p>
               </div>
-              <p className="text-white/20 text-sm mb-8">Confirmation sent to <span className="text-white/35">{bizEmail}</span></p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button onClick={() => { setStage('hub'); }} className="text-emerald-400 hover:text-emerald-300 text-sm font-bold transition-colors">
-                  Back to portal →
-                </button>
-                <button onClick={() => { setStage('jobs'); loadMyJobs(); }} className="text-white/35 hover:text-white text-sm font-semibold transition-colors">
-                  View all jobs →
-                </button>
+              <p className="text-white/20 text-sm">Confirmation sent to <span className="text-white/35">{bizEmail}</span></p>
+            </div>
+
+            {/* Document upload */}
+            <div className="bg-white/3 border border-white/8 rounded-2xl p-6 mb-8">
+              <p className="text-xs font-black text-white/25 uppercase tracking-widest mb-1">Supporting documents</p>
+              <p className="text-white/30 text-xs mb-5">Optional — attach commercial invoice, packing list, or other paperwork. PDF, JPG, PNG or Word · max 10 MB.</p>
+              <div className="space-y-2.5">
+                {[
+                  { key: 'commercial_invoice',    label: 'Commercial Invoice' },
+                  { key: 'packing_list',          label: 'Packing List' },
+                  { key: 'certificate_of_origin', label: 'Certificate of Origin' },
+                  { key: 'other',                 label: 'Other document' },
+                ].map(({ key, label }) => {
+                  const u = uploads[key];
+                  return (
+                    <label key={key} className="flex items-center justify-between gap-3 bg-white/4 hover:bg-white/6 border border-white/8 hover:border-emerald-500/20 rounded-xl px-4 py-3 cursor-pointer transition-all group">
+                      <span className="text-xs font-semibold text-white/50 group-hover:text-white/70 transition-colors">{label}</span>
+                      {u?.done ? (
+                        <span className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold shrink-0"><CheckCircle className="h-3.5 w-3.5" /> Uploaded</span>
+                      ) : u?.uploading ? (
+                        <Spin className="h-4 w-4 text-emerald-400 animate-spin shrink-0" />
+                      ) : u?.error ? (
+                        <span className="text-xs text-red-400 shrink-0 max-w-[140px] text-right">{u.error}</span>
+                      ) : (
+                        <span className="text-xs text-white/20 font-semibold shrink-0">Choose file</span>
+                      )}
+                      <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
+                        onChange={e => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const fd = new FormData();
+                          fd.append('file', file);
+                          fd.append('jobRef', jobRef);
+                          fd.append('docType', key);
+                          setUploads(prev => ({ ...prev, [key]: { uploading: true, done: false, name: file.name, error: null } }));
+                          fetch('/api/business/upload-document', { method: 'POST', body: fd })
+                            .then(r => r.json().then(j => ({ ok: r.ok, j })))
+                            .then(({ ok, j }) => {
+                              if (!ok) throw new Error(j.error || 'Upload failed');
+                              setUploads(prev => ({ ...prev, [key]: { uploading: false, done: true, name: file.name, error: null } }));
+                            })
+                            .catch(err => setUploads(prev => ({ ...prev, [key]: { uploading: false, done: false, name: file.name, error: err.message } })));
+                        }}
+                      />
+                    </label>
+                  );
+                })}
               </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button onClick={() => setStage('hub')} className="text-emerald-400 hover:text-emerald-300 text-sm font-bold transition-colors">
+                Back to portal →
+              </button>
+              <button onClick={() => { setStage('jobs'); loadMyJobs(); }} className="text-white/35 hover:text-white text-sm font-semibold transition-colors">
+                View all jobs →
+              </button>
             </div>
           </motion.div>
         )}
