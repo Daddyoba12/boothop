@@ -12,5 +12,5 @@ jobs:
       - name: Call auto-match cron
         run: |
           curl -s -f \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
             https://www.boothop.com/api/cron/auto-match
