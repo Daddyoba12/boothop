@@ -99,7 +99,7 @@ export default function BoothopBusiness() {
   }
 
   return (
-    <div className="min-h-screen text-white relative" style={{ background: BG, backgroundAttachment: 'fixed' }}>
+    <div className="min-h-screen text-white relative" style={{ background: 'rgb(2,6,23)' }}>
       <AnimatePresence mode="wait">
 
         {/* ══════════════════════════════════════════
@@ -108,87 +108,99 @@ export default function BoothopBusiness() {
         {stage === 'landing' && (
           <motion.div key="landing" {...FADE} transition={{ duration: 0.4 }}>
 
-            {/* Nav */}
-            <nav className="px-6 py-5 flex items-center justify-between border-b border-white/5">
-              <div className="flex items-center gap-4">
-                <a href="/" className="text-white/30 hover:text-white/70 text-xs font-semibold transition-colors hidden sm:block">← BootHop</a>
-                <div className="text-xl font-black tracking-tight">
-                  Boot<span className="text-emerald-400">Hop</span>
-                  <span className="ml-2 text-xs font-semibold bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full uppercase tracking-widest">Business</span>
+            {/* ── FULL-SCREEN VIDEO HERO ───────────────────────────── */}
+            <div className="relative h-screen w-full overflow-hidden">
+
+              {/* Background video */}
+              <video
+                autoPlay muted loop playsInline
+                className="absolute inset-0 w-full h-full object-cover scale-105"
+                src="/business/hero-reel.mp4"
+              />
+
+              {/* Gradient overlay — heavier at bottom, lighter at top */}
+              <div className="absolute inset-0" style={{
+                background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.45) 40%, rgba(0,0,0,0.80) 80%, rgba(2,6,23,1) 100%)'
+              }} />
+
+              {/* Nav — float over video */}
+              <nav className="absolute top-0 left-0 right-0 z-20 px-6 py-5 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <a href="/" className="text-white/40 hover:text-white/70 text-xs font-semibold transition-colors hidden sm:block">← BootHop</a>
+                  <div className="text-xl font-black tracking-tight drop-shadow-lg">
+                    Boot<span className="text-emerald-400">Hop</span>
+                    <span className="ml-2 text-xs font-semibold bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-2.5 py-1 rounded-full uppercase tracking-widest backdrop-blur-sm">Business</span>
+                  </div>
                 </div>
+                <div className="flex items-center gap-3">
+                  <a href="/business/how-it-works" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">How It Works</a>
+                  <button onClick={() => { setLoginIntent('priority'); setStage('email'); }} className="text-sm font-semibold text-amber-400/70 hover:text-amber-400 transition-colors hidden sm:block">Priority Partner</button>
+                  <a href="/business/contact" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">Contact</a>
+                  <button onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
+                    className="inline-flex items-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-black font-black text-sm px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-400/40 hover:scale-105 active:scale-95">
+                    Book a Delivery
+                  </button>
+                </div>
+              </nav>
+
+              {/* Centred hero content */}
+              <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6 pb-20">
+
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                  className="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold px-4 py-2 rounded-full mb-8 uppercase tracking-widest backdrop-blur-sm">
+                  <Zap className="h-3.5 w-3.5" /> Premium business logistics
+                </motion.div>
+
+                <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                  className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-6 drop-shadow-2xl">
+                  Same-day delivery<br /><span className="text-emerald-400">across the UK.</span>
+                </motion.h1>
+
+                <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+                  className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
+                  Verified carriers. Time-critical delivery. Built for businesses where delays are not acceptable.
+                </motion.p>
+
+                {/* Dual login cards */}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+                  className="grid sm:grid-cols-2 gap-4 w-full max-w-2xl mb-4">
+
+                  <button onClick={() => { setLoginIntent('priority'); setStage('email'); }}
+                    className="group relative overflow-hidden bg-amber-500/10 border border-amber-500/30 backdrop-blur-md rounded-2xl p-6 text-left transition-all duration-300 hover:border-amber-500/60 hover:bg-amber-500/15 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/20 active:scale-[0.98]">
+                    <div className="pointer-events-none absolute -top-6 right-0 w-24 h-24 bg-amber-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/25 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                      <Star className="h-5 w-5 text-amber-400" />
+                    </div>
+                    <h3 className="text-white font-black mb-1.5 group-hover:text-amber-300 transition-colors">Priority Partner</h3>
+                    <p className="text-white/45 text-xs leading-relaxed mb-4">Existing member? Sign in for your dedicated portal — 2-hour guaranteed response, volume discounts &amp; account manager.</p>
+                    <span className="inline-flex items-center gap-1.5 text-amber-400 text-xs font-black">Sign in <ArrowRight className="h-3.5 w-3.5" /></span>
+                  </button>
+
+                  <button onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
+                    className="group relative overflow-hidden bg-emerald-500/10 border border-emerald-500/25 backdrop-blur-md rounded-2xl p-6 text-left transition-all duration-300 hover:border-emerald-500/50 hover:bg-emerald-500/15 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/20 active:scale-[0.98]">
+                    <div className="pointer-events-none absolute -top-6 right-0 w-24 h-24 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/25 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                      <Zap className="h-5 w-5 text-emerald-400" />
+                    </div>
+                    <h3 className="text-white font-black mb-1.5 group-hover:text-emerald-300 transition-colors">Book a Delivery</h3>
+                    <p className="text-white/45 text-xs leading-relaxed mb-4">New or one-off customer? Sign in with your business email for an instant quote and same-day booking.</p>
+                    <span className="inline-flex items-center gap-1.5 text-emerald-400 text-xs font-black">Get started <ArrowRight className="h-3.5 w-3.5" /></span>
+                  </button>
+
+                </motion.div>
+                <p className="text-white/25 text-xs">Business email required · Personal accounts not accepted</p>
               </div>
-              <div className="flex items-center gap-3">
-                <a href="/business/how-it-works"
-                  className="text-sm font-semibold text-white/40 hover:text-white transition-colors hidden sm:block">
-                  How It Works
-                </a>
-                <button onClick={() => { setLoginIntent('priority'); setStage('email'); }}
-                  className="text-sm font-semibold text-amber-400/60 hover:text-amber-400 transition-colors hidden sm:block">
-                  Priority Partner
-                </button>
-                <a href="/business/contact"
-                  className="text-sm font-semibold text-white/40 hover:text-white transition-colors hidden sm:block">
-                  Contact
-                </a>
-                <button onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-sm px-5 py-2.5 rounded-xl hover:scale-105 transition-all shadow-lg shadow-emerald-500/20">
-                  Book a Delivery
-                </button>
-              </div>
-            </nav>
 
-            {/* Hero */}
-            <div className="max-w-5xl mx-auto px-8 pt-24 pb-16 text-center">
-              <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold px-4 py-2 rounded-full mb-8 uppercase tracking-widest">
-                <Zap className="h-3.5 w-3.5" /> Premium business logistics
+              {/* Scroll cue */}
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30 z-10">
+                <p className="text-xs font-semibold uppercase tracking-widest">Scroll</p>
+                <div className="w-px h-10 bg-gradient-to-b from-white/30 to-transparent" />
               </motion.div>
-              <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-                className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-6">
-                Same-day delivery<br /><span className="text-emerald-400">across the UK.</span>
-              </motion.h1>
-              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                className="text-white/50 text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
-                BootHop Business connects your company to a network of verified carriers.
-                Fast, insured, and built for time-critical deliveries.
-              </motion.p>
-
-              {/* Dual login cards */}
-              <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-                className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-6">
-
-                <button onClick={() => { setLoginIntent('priority'); setStage('email'); }}
-                  className="group relative overflow-hidden bg-amber-500/5 border border-amber-500/25 rounded-2xl p-6 text-left transition-all duration-300 hover:border-amber-500/50 hover:bg-amber-500/8 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/15 active:scale-[0.98]">
-                  <div className="pointer-events-none absolute -top-6 right-0 w-24 h-24 bg-amber-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <Star className="h-5 w-5 text-amber-400" />
-                  </div>
-                  <h3 className="text-white font-black mb-1.5 group-hover:text-amber-300 transition-colors duration-300">Priority Partner</h3>
-                  <p className="text-white/40 text-xs leading-relaxed mb-4">Existing member? Sign in for your dedicated portal — 2-hour guaranteed response, volume discounts &amp; account manager.</p>
-                  <span className="inline-flex items-center gap-1.5 text-amber-400 text-xs font-black">
-                    Sign in <ArrowRight className="h-3.5 w-3.5" />
-                  </span>
-                </button>
-
-                <button onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
-                  className="group relative overflow-hidden bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-6 text-left transition-all duration-300 hover:border-emerald-500/40 hover:bg-emerald-500/8 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/15 active:scale-[0.98]">
-                  <div className="pointer-events-none absolute -top-6 right-0 w-24 h-24 bg-emerald-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <Zap className="h-5 w-5 text-emerald-400" />
-                  </div>
-                  <h3 className="text-white font-black mb-1.5 group-hover:text-emerald-300 transition-colors duration-300">Book a Delivery</h3>
-                  <p className="text-white/40 text-xs leading-relaxed mb-4">New or one-off customer? Sign in with your business email for an instant quote and same-day booking.</p>
-                  <span className="inline-flex items-center gap-1.5 text-emerald-400 text-xs font-black">
-                    Get started <ArrowRight className="h-3.5 w-3.5" />
-                  </span>
-                </button>
-
-              </motion.div>
-              <p className="text-white/20 text-xs">Business email required · Personal accounts not accepted</p>
             </div>
 
             {/* Stats */}
-            <div className="max-w-5xl mx-auto px-8 pb-16">
+            <div className="max-w-5xl mx-auto px-8 pt-20 pb-16">
               <div className="grid grid-cols-3 gap-4">
                 {[
                   { value: '£200+',    label: 'Local from',  sub: 'UK-to-UK distance pricing' },
