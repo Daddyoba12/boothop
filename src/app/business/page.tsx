@@ -111,22 +111,25 @@ export default function BoothopBusiness() {
             {/* ── FULL-SCREEN VIDEO HERO ───────────────────────────── */}
             <div className="relative h-screen w-full overflow-hidden" style={{ background: BG }}>
 
-              {/* Background video — browser-level blur hides any remaining artefacts */}
+              {/* Background video — slow-mo cinematic bokeh */}
               <video
                 autoPlay muted loop playsInline
                 className="absolute inset-0 w-full h-full object-cover"
-                style={{ transform: 'scale(1.08)', filter: 'blur(2px) brightness(0.75)' }}
+                style={{ transform: 'scale(1.08)', filter: 'blur(2px) brightness(0.65)' }}
                 src="/business/hero-reel.mp4"
               />
 
-              {/* Multi-stop gradient: readable centre, strong dark at top & bottom */}
+              {/* Layer 1 — solid dark base (matches HeroV2 bg-black/60) */}
+              <div className="absolute inset-0 bg-black/60" />
+
+              {/* Layer 2 — directional gradient: readable centre, pitch black at edges */}
               <div className="absolute inset-0" style={{
                 background: `
                   linear-gradient(to bottom,
-                    rgba(2,6,35,0.70) 0%,
-                    rgba(2,6,35,0.30) 30%,
-                    rgba(2,6,35,0.30) 60%,
-                    rgba(2,6,35,0.88) 88%,
+                    rgba(2,6,35,0.75) 0%,
+                    rgba(2,6,35,0.20) 28%,
+                    rgba(2,6,35,0.20) 58%,
+                    rgba(2,6,35,0.90) 88%,
                     #020617 100%
                   )`
               }} />
@@ -173,25 +176,29 @@ export default function BoothopBusiness() {
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
                   className="grid sm:grid-cols-2 gap-4 w-full max-w-2xl mb-4">
 
+                  {/* Priority Partner card — glass */}
                   <button onClick={() => { setLoginIntent('priority'); setStage('email'); }}
-                    className="group relative overflow-hidden bg-amber-500/10 border border-amber-500/30 backdrop-blur-md rounded-2xl p-6 text-left transition-all duration-300 hover:border-amber-500/60 hover:bg-amber-500/15 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/20 active:scale-[0.98]">
-                    <div className="pointer-events-none absolute -top-6 right-0 w-24 h-24 bg-amber-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/25 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    className="group relative overflow-hidden bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-6 text-left transition-all duration-300 hover:border-amber-400/50 hover:bg-white/15 hover:-translate-y-1 hover:shadow-amber-500/20 active:scale-[0.98]">
+                    <div className="pointer-events-none absolute -top-6 right-0 w-24 h-24 bg-amber-500/25 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent" />
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/25 border border-amber-400/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                       <Star className="h-5 w-5 text-amber-400" />
                     </div>
                     <h3 className="text-white font-black mb-1.5 group-hover:text-amber-300 transition-colors">Priority Partner</h3>
-                    <p className="text-white/45 text-xs leading-relaxed mb-4">Existing member? Sign in for your dedicated portal — 2-hour guaranteed response, volume discounts &amp; account manager.</p>
+                    <p className="text-white/50 text-xs leading-relaxed mb-4">Existing member? Sign in for your dedicated portal — 2-hour guaranteed response, volume discounts &amp; account manager.</p>
                     <span className="inline-flex items-center gap-1.5 text-amber-400 text-xs font-black">Sign in <ArrowRight className="h-3.5 w-3.5" /></span>
                   </button>
 
+                  {/* Book a Delivery card — glass */}
                   <button onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
-                    className="group relative overflow-hidden bg-emerald-500/10 border border-emerald-500/25 backdrop-blur-md rounded-2xl p-6 text-left transition-all duration-300 hover:border-emerald-500/50 hover:bg-emerald-500/15 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/20 active:scale-[0.98]">
-                    <div className="pointer-events-none absolute -top-6 right-0 w-24 h-24 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/25 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    className="group relative overflow-hidden bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-6 text-left transition-all duration-300 hover:border-emerald-400/50 hover:bg-white/15 hover:-translate-y-1 hover:shadow-emerald-500/20 active:scale-[0.98]">
+                    <div className="pointer-events-none absolute -top-6 right-0 w-24 h-24 bg-emerald-500/25 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent" />
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/25 border border-emerald-400/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                       <Zap className="h-5 w-5 text-emerald-400" />
                     </div>
                     <h3 className="text-white font-black mb-1.5 group-hover:text-emerald-300 transition-colors">Book a Delivery</h3>
-                    <p className="text-white/45 text-xs leading-relaxed mb-4">New or one-off customer? Sign in with your business email for an instant quote and same-day booking.</p>
+                    <p className="text-white/50 text-xs leading-relaxed mb-4">New or one-off customer? Sign in with your business email for an instant quote and same-day booking.</p>
                     <span className="inline-flex items-center gap-1.5 text-emerald-400 text-xs font-black">Get started <ArrowRight className="h-3.5 w-3.5" /></span>
                   </button>
 
@@ -215,7 +222,8 @@ export default function BoothopBusiness() {
                   { value: '100%',     label: 'Insured',     sub: 'Every single delivery' },
                   { value: 'Same day', label: 'Delivery',    sub: 'For urgent business needs' },
                 ].map(s => (
-                  <div key={s.label} className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 text-center transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98]">
+                  <div key={s.label} className="group relative overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20 shadow-xl rounded-2xl p-6 text-center transition-all duration-300 hover:border-emerald-400/40 hover:bg-white/15 hover:-translate-y-1 hover:shadow-emerald-500/15 active:scale-[0.98]">
+                    <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent" />
                     <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <p className="text-3xl font-black text-emerald-400 mb-1">{s.value}</p>
                     <p className="text-white font-semibold text-sm group-hover:text-emerald-300 transition-colors duration-300">{s.label}</p>
@@ -296,7 +304,8 @@ export default function BoothopBusiness() {
                   { icon: Truck,       title: 'UK-wide + International', body: 'Local UK deliveries and international airport-to-airport routes.' },
                   { icon: Building2,   title: 'Priority Partnership',    body: 'Upgrade to Priority Partner for dedicated support and volume discounts.' },
                 ].map(({ icon: Icon, title, body }) => (
-                  <div key={title} className="group relative overflow-hidden flex items-start gap-4 bg-white/3 border border-white/8 rounded-2xl p-5 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98]">
+                  <div key={title} className="group relative overflow-hidden flex items-start gap-4 bg-white/10 backdrop-blur-sm border border-white/20 shadow-xl rounded-2xl p-5 transition-all duration-300 hover:border-emerald-400/40 hover:bg-white/15 hover:-translate-y-1 hover:shadow-emerald-500/15 active:scale-[0.98]">
+                    <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent" />
                     <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
                       <Icon className="h-5 w-5 text-emerald-400" />
@@ -389,15 +398,16 @@ export default function BoothopBusiness() {
                     : 'Enter your business email — personal addresses not accepted'}
                 </p>
               </div>
-              <div className={`group relative overflow-hidden bg-white/5 border rounded-2xl p-8 space-y-4 transition-all duration-300 hover:shadow-lg ${loginIntent === 'priority' ? 'border-amber-500/15 hover:border-amber-500/30 hover:shadow-amber-500/8' : 'border-white/10 hover:border-emerald-500/20 hover:shadow-emerald-500/8'}`}>
-                <div className={`pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${loginIntent === 'priority' ? 'bg-amber-500/10' : 'bg-emerald-500/10'}`} />
+              <div className={`group relative overflow-hidden bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-8 space-y-4 transition-all duration-300 ${loginIntent === 'priority' ? 'hover:border-amber-400/40 hover:shadow-amber-500/15' : 'hover:border-emerald-400/40 hover:shadow-emerald-500/15'}`}>
+                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent" />
+                <div className={`pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${loginIntent === 'priority' ? 'bg-amber-500/15' : 'bg-emerald-500/15'}`} />
                 {authError && <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">{authError}</div>}
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
                   <input type="email" value={emailInput} onChange={e => setEmailInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && sendOtp()}
                     placeholder="you@yourcompany.com" autoFocus
-                    className={`w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none text-sm ${loginIntent === 'priority' ? 'focus:ring-2 focus:ring-amber-500' : 'focus:ring-2 focus:ring-emerald-500'}`} />
+                    className={`w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/20 border border-white/20 text-white placeholder-white/30 focus:outline-none text-sm ${loginIntent === 'priority' ? 'focus:ring-2 focus:ring-amber-400' : 'focus:ring-2 focus:ring-emerald-400'}`} />
                 </div>
                 <button onClick={sendOtp} disabled={authLoading || !emailInput.trim()}
                   className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-black disabled:opacity-40 hover:scale-[1.02] transition-all ${loginIntent === 'priority' ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-black' : 'bg-gradient-to-r from-emerald-400 to-teal-400 text-black'}`}>
@@ -426,14 +436,15 @@ export default function BoothopBusiness() {
                 <p className="text-white/40 text-sm">We sent a 6-digit code to</p>
                 <p className={`font-semibold text-sm mt-0.5 ${loginIntent === 'priority' ? 'text-amber-400' : 'text-emerald-400'}`}>{emailInput}</p>
               </div>
-              <div className={`group relative overflow-hidden bg-white/5 border rounded-2xl p-8 space-y-4 transition-all duration-300 hover:shadow-lg ${loginIntent === 'priority' ? 'border-amber-500/15 hover:border-amber-500/30 hover:shadow-amber-500/8' : 'border-white/10 hover:border-emerald-500/20 hover:shadow-emerald-500/8'}`}>
-                <div className={`pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${loginIntent === 'priority' ? 'bg-amber-500/10' : 'bg-emerald-500/10'}`} />
+              <div className={`group relative overflow-hidden bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-8 space-y-4 transition-all duration-300 ${loginIntent === 'priority' ? 'hover:border-amber-400/40 hover:shadow-amber-500/15' : 'hover:border-emerald-400/40 hover:shadow-emerald-500/15'}`}>
+                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent" />
+                <div className={`pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${loginIntent === 'priority' ? 'bg-amber-500/15' : 'bg-emerald-500/15'}`} />
                 {authError && <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">{authError}</div>}
                 <input type="text" inputMode="numeric"
                   value={otpInput} onChange={e => setOtpInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   onKeyDown={e => e.key === 'Enter' && verifyOtp()}
                   placeholder="000000" autoFocus
-                  className={`w-full text-center text-4xl font-mono tracking-[0.6em] py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/10 focus:outline-none ${loginIntent === 'priority' ? 'focus:ring-2 focus:ring-amber-500' : 'focus:ring-2 focus:ring-emerald-500'}`} />
+                  className={`w-full text-center text-4xl font-mono tracking-[0.6em] py-4 rounded-xl bg-white/20 border border-white/20 text-white placeholder-white/20 focus:outline-none ${loginIntent === 'priority' ? 'focus:ring-2 focus:ring-amber-400' : 'focus:ring-2 focus:ring-emerald-400'}`} />
                 <button onClick={verifyOtp} disabled={authLoading || otpInput.length < 6}
                   className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-black disabled:opacity-40 hover:scale-[1.02] transition-all ${loginIntent === 'priority' ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-black' : 'bg-gradient-to-r from-emerald-400 to-teal-400 text-black'}`}>
                   {authLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
