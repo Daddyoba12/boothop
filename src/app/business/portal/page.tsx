@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Loader2, CheckCircle, ArrowRight, LogOut, Pencil,
@@ -219,6 +220,21 @@ export default function BusinessPortalPage() {
                 BootHop moves high-value, time-sensitive components directly — no depots, no delays.
                 Hours, not days.
               </p>
+            </div>
+
+            {/* Portal photo strip */}
+            <div className="grid grid-cols-3 gap-3 mb-10">
+              {[
+                { src: '/images/businessImage/biz-hero.jpg',      label: 'Engineering & Manufacturing' },
+                { src: '/images/businessImage/biz-team.jpg',       label: 'Aerospace & Industrial' },
+                { src: '/images/businessImage/biz-handshake.jpg',  label: 'Verified operators' },
+              ].map(({ src, label }) => (
+                <div key={label} className="relative overflow-hidden rounded-xl h-28 group cursor-pointer" onClick={() => setStage('wizard')}>
+                  <Image src={src} alt={label} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  <p className="absolute bottom-2 left-2 right-2 text-[10px] font-bold text-white/80 uppercase tracking-wider leading-tight">{label}</p>
+                </div>
+              ))}
             </div>
 
             {/* CTA */}

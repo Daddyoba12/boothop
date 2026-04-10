@@ -53,3 +53,7 @@ promo/*.mp4
 *.mp3
 *.webm
 ffmpeg2pass-*
+
+# Allow branded business videos served by Next.js
+!public/business/*.mp4
+!public/videos/*.mp4

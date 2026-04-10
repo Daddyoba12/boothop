@@ -240,18 +240,21 @@ export default function BoothopBusiness() {
               </div>
             </div>
 
-            {/* "Why not cheap?" callout */}
+            {/* "Why not cheap?" callout — video background */}
             <div className="max-w-5xl mx-auto px-8 pb-16">
               <div className="relative overflow-hidden rounded-2xl border border-white/8">
-                <div className="relative h-48 sm:h-56 w-full">
-                  <Image src="/images/businessImage/biz-handshake.jpg" alt="BootHop direct handover" fill className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
-                </div>
+                {/* Branded reel: train + plane + bus */}
+                <video
+                  autoPlay muted loop playsInline
+                  className="w-full h-48 sm:h-64 object-cover"
+                  src="/business/biz-reel.mp4"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
                 <div className="absolute inset-0 flex items-center px-8 sm:px-12">
                   <div className="max-w-lg">
-                    <p className="text-xs font-black text-emerald-400 uppercase tracking-widest mb-3">Why aren't we cheap?</p>
+                    <p className="text-xs font-black text-emerald-400 uppercase tracking-widest mb-3">Why aren&apos;t we cheap?</p>
                     <p className="text-white font-black text-xl sm:text-2xl leading-tight mb-3">
-                      We're not a courier.<br />We're a downtime solution.
+                      We&apos;re not a courier.<br />We&apos;re a downtime solution.
                     </p>
                     <p className="text-white/50 text-sm leading-relaxed">
                       Factory downtime costs £10,000/hr. An aircraft delay can cost £100,000+.
