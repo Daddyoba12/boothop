@@ -76,7 +76,7 @@ export async function POST(request: Request) {
       traveler_email:   travelerEmail,
       offered_price:    finalOfferedPrice,
       interest_type:    interestType,
-      status:           'pending',
+      status:           'matched',
     });
 
     if (matchErr) {
