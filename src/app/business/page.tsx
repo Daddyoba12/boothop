@@ -213,8 +213,8 @@ export default function BoothopBusiness() {
               </motion.div>
             </div>
 
-            {/* ── Premium ambient glow layer — visible below the hero fold ── */}
-            <div className="pointer-events-none absolute left-0 right-0 overflow-hidden" style={{ top: '100vh', height: '320vh', zIndex: 0 }}>
+            {/* ── Premium ambient glow layer — fixed so it never adds scroll height ── */}
+            <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
               {/* Emerald glow — top left */}
               <div className="absolute top-[5%]  left-[2%]  w-[560px] h-[560px] bg-emerald-500/10 rounded-full blur-[160px]" />
               {/* Blue glow — top right */}
