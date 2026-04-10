@@ -99,7 +99,7 @@ export default function BoothopBusiness() {
   }
 
   return (
-    <div className="min-h-screen text-white relative" style={{ background: 'rgb(2,6,23)' }}>
+    <div className="min-h-screen text-white relative" style={{ background: BG }}>
       <AnimatePresence mode="wait">
 
         {/* ══════════════════════════════════════════
@@ -109,7 +109,7 @@ export default function BoothopBusiness() {
           <motion.div key="landing" {...FADE} transition={{ duration: 0.4 }}>
 
             {/* ── FULL-SCREEN VIDEO HERO ───────────────────────────── */}
-            <div className="relative h-screen w-full overflow-hidden">
+            <div className="relative h-screen w-full overflow-hidden" style={{ background: BG }}>
 
               {/* Background video */}
               <video
@@ -118,9 +118,9 @@ export default function BoothopBusiness() {
                 src="/business/hero-reel.mp4"
               />
 
-              {/* Gradient overlay — heavier at bottom, lighter at top */}
+              {/* Gradient overlay — lighter over video, fades into site blue at bottom */}
               <div className="absolute inset-0" style={{
-                background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.45) 40%, rgba(0,0,0,0.80) 80%, rgba(2,6,23,1) 100%)'
+                background: 'linear-gradient(to bottom, rgba(2,6,35,0.50) 0%, rgba(2,6,35,0.40) 40%, rgba(2,6,35,0.82) 80%, #020617 100%)'
               }} />
 
               {/* Nav — float over video */}
