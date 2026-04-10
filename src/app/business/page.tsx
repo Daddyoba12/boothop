@@ -141,6 +141,11 @@ export default function BoothopBusiness() {
                   transparent
                   rightSlot={
                     <>
+                      <a href="/" className="text-sm font-semibold text-white/35 hover:text-white/70 transition-colors hidden sm:flex items-center gap-1.5">
+                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+                        BootHop
+                      </a>
+                      <span className="text-white/15 hidden sm:block">|</span>
                       <a href="/business/how-it-works" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">How It Works</a>
                       <button onClick={() => { setLoginIntent('priority'); setStage('email'); }} className="text-sm font-semibold text-amber-400/70 hover:text-amber-400 transition-colors hidden sm:block">Priority Partner</button>
                       <a href="/business/contact" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">Contact</a>
@@ -385,7 +390,7 @@ export default function BoothopBusiness() {
               <a href="/business/how-it-works" className="hover:text-white/60 transition-colors">How It Works</a>
               <a href="/business/priority-partner" className="hover:text-amber-400 transition-colors text-amber-400/40">Priority Partner</a>
               <a href="/business/contact" className="hover:text-white/60 transition-colors">Contact Us</a>
-              <a href="/" className="hover:text-white/60 transition-colors">← BootHop</a>
+              <a href="/" className="hover:text-white/70 transition-colors text-white/40">← Back to BootHop</a>
             </div>
 
           </motion.div>
