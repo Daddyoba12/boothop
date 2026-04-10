@@ -1,0 +1,16 @@
+name: Auto Match — every 15 minutes
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # allows manual trigger from GitHub UI
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call auto-match cron
+        run: |
+          curl -s -f \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            https://www.boothop.com/api/cron/auto-match
