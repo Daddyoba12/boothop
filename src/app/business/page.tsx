@@ -111,16 +111,24 @@ export default function BoothopBusiness() {
             {/* ── FULL-SCREEN VIDEO HERO ───────────────────────────── */}
             <div className="relative h-screen w-full overflow-hidden" style={{ background: BG }}>
 
-              {/* Background video */}
+              {/* Background video — browser-level blur hides any remaining artefacts */}
               <video
                 autoPlay muted loop playsInline
-                className="absolute inset-0 w-full h-full object-cover scale-105"
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ transform: 'scale(1.08)', filter: 'blur(2px) brightness(0.75)' }}
                 src="/business/hero-reel.mp4"
               />
 
-              {/* Gradient overlay — lighter over video, fades into site blue at bottom */}
+              {/* Multi-stop gradient: readable centre, strong dark at top & bottom */}
               <div className="absolute inset-0" style={{
-                background: 'linear-gradient(to bottom, rgba(2,6,35,0.50) 0%, rgba(2,6,35,0.40) 40%, rgba(2,6,35,0.82) 80%, #020617 100%)'
+                background: `
+                  linear-gradient(to bottom,
+                    rgba(2,6,35,0.70) 0%,
+                    rgba(2,6,35,0.30) 30%,
+                    rgba(2,6,35,0.30) 60%,
+                    rgba(2,6,35,0.88) 88%,
+                    #020617 100%
+                  )`
               }} />
 
               {/* Nav — float over video */}
