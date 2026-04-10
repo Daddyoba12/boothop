@@ -67,21 +67,21 @@ export default function HowItWorksPage() {
       <div className="max-w-5xl mx-auto px-8 pb-16">
         <div className="grid grid-cols-3 gap-3 rounded-2xl overflow-hidden">
           <div className="relative h-36 sm:h-48 rounded-xl overflow-hidden">
-            <Image src="/images/delivery.jpg" alt="Time-critical delivery" fill className="object-cover" />
+            <Image src="/images/businessImage/biz-hero.jpg" alt="Time-critical delivery" fill className="object-cover" />
             <div className="absolute inset-0 bg-black/30" />
             <div className="absolute bottom-3 left-3">
               <p className="text-xs font-black text-emerald-400 uppercase tracking-widest">UK · EU · Global</p>
             </div>
           </div>
           <div className="relative h-36 sm:h-48 rounded-xl overflow-hidden">
-            <Image src="/images/Handover.jpg" alt="Verified handover" fill className="object-cover" />
+            <Image src="/images/businessImage/biz-handshake.jpg" alt="Verified handover" fill className="object-cover" />
             <div className="absolute inset-0 bg-black/30" />
             <div className="absolute bottom-3 left-3">
               <p className="text-xs font-black text-white/80 uppercase tracking-widest">Verified operators</p>
             </div>
           </div>
           <div className="relative h-36 sm:h-48 rounded-xl overflow-hidden">
-            <Image src="/images/Customs1.jpg" alt="Customs and documentation" fill className="object-cover" />
+            <Image src="/images/businessImage/biz-team.jpg" alt="Business team coordination" fill className="object-cover" />
             <div className="absolute inset-0 bg-black/30" />
             <div className="absolute bottom-3 left-3">
               <p className="text-xs font-black text-white/80 uppercase tracking-widest">Full documentation</p>

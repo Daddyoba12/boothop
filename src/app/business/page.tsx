@@ -211,17 +211,17 @@ export default function BoothopBusiness() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {[
                   {
-                    img: '/images/delivery.jpg',
+                    img: '/images/businessImage/biz-hero.jpg',
                     tag: 'Engineering & Manufacturing',
                     body: 'Urgent spare parts, production line recovery, maintenance components.',
                   },
                   {
-                    img: '/images/Handover.jpg',
+                    img: '/images/businessImage/biz-team.jpg',
                     tag: 'Aerospace & AOG',
                     body: 'Aircraft-on-ground parts and time-critical engineering tools under 20 kg.',
                   },
                   {
-                    img: '/images/Customs1.jpg',
+                    img: '/images/businessImage/biz-handshake.jpg',
                     tag: 'International & Customs',
                     body: 'Hand-carry across borders with full customs declaration support.',
                   },
@@ -244,7 +244,7 @@ export default function BoothopBusiness() {
             <div className="max-w-5xl mx-auto px-8 pb-16">
               <div className="relative overflow-hidden rounded-2xl border border-white/8">
                 <div className="relative h-48 sm:h-56 w-full">
-                  <Image src="/images/Handover.jpg" alt="BootHop direct handover" fill className="object-cover" />
+                  <Image src="/images/businessImage/biz-handshake.jpg" alt="BootHop direct handover" fill className="object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
                 </div>
                 <div className="absolute inset-0 flex items-center px-8 sm:px-12">

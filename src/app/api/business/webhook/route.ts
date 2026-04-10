@@ -12,8 +12,9 @@ export async function POST(req: NextRequest) {
   const stripeKey     = process.env.STRIPE_SECRET_KEY;
 
   if (!webhookSecret || !stripeKey) {
-    console.error('business/webhook: missing env vars');
-    return NextResponse.json({ error: 'Webhook not configured.' }, { status: 500 });
+    // Secret not yet configured — acknowledge so Stripe doesn't retry
+    console.warn('business/webhook: STRIPE_BUSINESS_WEBHOOK_SECRET not set, skipping verification');
+    return NextResponse.json({ ok: true });
   }
 
   const stripe = new Stripe(stripeKey, { apiVersion: '2026-02-25.clover' as const });
