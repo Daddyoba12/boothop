@@ -89,7 +89,7 @@ export async function GET(request: Request) {
   ]);
 
   if (!senders?.length || !travellers?.length) {
-    return NextResponse.json({ ok: true, matched: 0, message: 'Not enough trips to match.' });
+    return NextResponse.json({ ok: true, matched: 0, message: 'Not enough trips to match.', debug: { senders: senders?.length ?? 0, travellers: travellers?.length ?? 0 } });
   }
 
   /* Fetch existing matches to avoid duplicates */
@@ -102,17 +102,27 @@ export async function GET(request: Request) {
   );
 
   const created: string[] = [];
+  const skipped: object[] = [];
 
   for (const send of senders) {
     for (const travel of travellers) {
       const pairKey = `${send.id}__${travel.id}`;
-      if (alreadyMatched.has(pairKey)) continue;
+      if (alreadyMatched.has(pairKey)) {
+        skipped.push({ reason: 'already_matched', send: send.from_city, travel: travel.from_city });
+        continue;
+      }
 
       const score = calcScore(send, travel);
-      if (score < 60) continue;
+      if (score < 60) {
+        skipped.push({ reason: 'low_score', score, sendFrom: normalizeCity(send.from_city), sendTo: normalizeCity(send.to_city), travelFrom: normalizeCity(travel.from_city), travelTo: normalizeCity(travel.to_city) });
+        continue;
+      }
 
       const inRange = await withinPickupRange(normalizeCity(send.from_city), normalizeCity(travel.from_city));
-      if (!inRange) continue;
+      if (!inRange) {
+        skipped.push({ reason: 'out_of_range', sendFrom: normalizeCity(send.from_city), travelFrom: normalizeCity(travel.from_city) });
+        continue;
+      }
 
       const agreedPrice = (send.price && travel.price)
         ? Math.round(((send.price + travel.price) / 2) * 100) / 100
@@ -168,5 +178,5 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.json({ ok: true, matched: created.length, matchIds: created });
+  return NextResponse.json({ ok: true, matched: created.length, matchIds: created, skipped });
 }
