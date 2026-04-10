@@ -68,9 +68,9 @@ function calcScore(send: any, travel: any): number {
 }
 
 export async function GET(request: Request) {
-  /* Verify cron secret so only Vercel can invoke this */
-  const secret = request.headers.get('x-cron-secret') ?? new URL(request.url).searchParams.get('secret');
-  if (secret !== process.env.CRON_SECRET) {
+  /* Verify cron secret — Vercel sends Authorization: Bearer <CRON_SECRET> */
+  const authHeader = request.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
