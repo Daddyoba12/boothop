@@ -48,10 +48,15 @@ async function withinPickupRange(city1: string, city2: string): Promise<boolean>
   return haversineMiles(c1.lat, c1.lng, c2.lat, c2.lng) <= 20;
 }
 
+/** Strip country suffix so "London, UK" and "London" both normalise to "london" */
+function normalizeCity(city: string): string {
+  return (city ?? '').toLowerCase().split(',')[0].trim();
+}
+
 function calcScore(send: any, travel: any): number {
   let score = 0;
-  if (send.from_city?.toLowerCase() === travel.from_city?.toLowerCase() &&
-      send.to_city?.toLowerCase()   === travel.to_city?.toLowerCase()) {
+  if (normalizeCity(send.from_city) === normalizeCity(travel.from_city) &&
+      normalizeCity(send.to_city)   === normalizeCity(travel.to_city)) {
     score += 50;
   }
   const daysDiff = Math.abs(
@@ -106,7 +111,7 @@ export async function GET(request: Request) {
       const score = calcScore(send, travel);
       if (score < 60) continue;
 
-      const inRange = await withinPickupRange(send.from_city, travel.from_city);
+      const inRange = await withinPickupRange(normalizeCity(send.from_city), normalizeCity(travel.from_city));
       if (!inRange) continue;
 
       const agreedPrice = (send.price && travel.price)
