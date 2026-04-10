@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Mail, MessageCircle, Send, CheckCircle, Loader2,
-  Building2, ChevronLeft, Star, Phone,
+  Building2, Star, Phone,
 } from 'lucide-react';
+import { BusinessNav } from '@/components/business/BusinessNav';
 
 const FADE = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 } };
 
@@ -45,23 +46,7 @@ export default function BusinessContactPage() {
         backgroundAttachment: 'fixed',
       }}
     >
-      {/* Nav */}
-      <nav className="px-6 py-5 flex items-center justify-between border-b border-white/5">
-        <div className="flex items-center gap-4">
-          <a
-            href="/business"
-            className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-semibold transition-colors"
-          >
-            <ChevronLeft className="h-4 w-4" /> Business
-          </a>
-        </div>
-        <div className="text-xl font-black tracking-tight">
-          Boot<span className="text-emerald-400">Hop</span>
-          <span className="ml-2 text-xs font-semibold bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full uppercase tracking-widest">
-            Business
-          </span>
-        </div>
-      </nav>
+      <BusinessNav />
 
       {/* Hero */}
       <div className="max-w-5xl mx-auto px-8 pt-20 pb-12 text-center">

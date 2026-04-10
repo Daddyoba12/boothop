@@ -7,8 +7,9 @@ import Image from 'next/image';
 import {
   Loader2, Mail, ShieldCheck, CheckCircle, ArrowRight,
   Zap, Lock, Clock, Star, Building2, Truck,
-  ChevronLeft, MessageCircle,
+  MessageCircle,
 } from 'lucide-react';
+import { BusinessNav } from '@/components/business/BusinessNav';
 
 type Stage = 'loading' | 'landing' | 'email' | 'otp';
 
@@ -135,24 +136,22 @@ export default function BoothopBusiness() {
               }} />
 
               {/* Nav — float over video */}
-              <nav className="absolute top-0 left-0 right-0 z-20 px-6 py-5 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <a href="/" className="text-white/40 hover:text-white/70 text-xs font-semibold transition-colors hidden sm:block">← BootHop</a>
-                  <div className="text-xl font-black tracking-tight drop-shadow-lg">
-                    Boot<span className="text-emerald-400">Hop</span>
-                    <span className="ml-2 text-xs font-semibold bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-2.5 py-1 rounded-full uppercase tracking-widest backdrop-blur-sm">Business</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <a href="/business/how-it-works" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">How It Works</a>
-                  <button onClick={() => { setLoginIntent('priority'); setStage('email'); }} className="text-sm font-semibold text-amber-400/70 hover:text-amber-400 transition-colors hidden sm:block">Priority Partner</button>
-                  <a href="/business/contact" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">Contact</a>
-                  <button onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
-                    className="inline-flex items-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-black font-black text-sm px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-400/40 hover:scale-105 active:scale-95">
-                    Book a Delivery
-                  </button>
-                </div>
-              </nav>
+              <div className="absolute top-0 left-0 right-0 z-20">
+                <BusinessNav
+                  transparent
+                  rightSlot={
+                    <>
+                      <a href="/business/how-it-works" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">How It Works</a>
+                      <button onClick={() => { setLoginIntent('priority'); setStage('email'); }} className="text-sm font-semibold text-amber-400/70 hover:text-amber-400 transition-colors hidden sm:block">Priority Partner</button>
+                      <a href="/business/contact" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">Contact</a>
+                      <button onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
+                        className="inline-flex items-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-black font-black text-sm px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-400/40 hover:scale-105 active:scale-95">
+                        Book a Delivery
+                      </button>
+                    </>
+                  }
+                />
+              </div>
 
               {/* Centred hero content */}
               <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6 pb-20">
@@ -214,8 +213,22 @@ export default function BoothopBusiness() {
               </motion.div>
             </div>
 
+            {/* ── Premium ambient glow layer — visible below the hero fold ── */}
+            <div className="pointer-events-none absolute left-0 right-0 overflow-hidden" style={{ top: '100vh', height: '320vh', zIndex: 0 }}>
+              {/* Emerald glow — top left */}
+              <div className="absolute top-[5%]  left-[2%]  w-[560px] h-[560px] bg-emerald-500/10 rounded-full blur-[160px]" />
+              {/* Blue glow — top right */}
+              <div className="absolute top-[12%] right-[3%] w-[440px] h-[440px] bg-blue-600/10  rounded-full blur-[140px]" />
+              {/* Violet glow — mid */}
+              <div className="absolute top-[38%] left-[40%] w-[380px] h-[380px] bg-violet-500/7  rounded-full blur-[130px]" />
+              {/* Teal glow — lower left */}
+              <div className="absolute top-[62%] left-[8%]  w-[320px] h-[320px] bg-teal-500/8   rounded-full blur-[120px]" />
+              {/* Rose glow — lower right */}
+              <div className="absolute top-[75%] right-[8%] w-[300px] h-[300px] bg-rose-500/5    rounded-full blur-[110px]" />
+            </div>
+
             {/* Stats */}
-            <div className="max-w-5xl mx-auto px-8 pt-20 pb-16">
+            <div className="relative z-10 max-w-5xl mx-auto px-8 pt-20 pb-16">
               <div className="grid grid-cols-3 gap-4">
                 {[
                   { value: '£200+',    label: 'Local from',  sub: 'UK-to-UK distance pricing' },
@@ -234,7 +247,7 @@ export default function BoothopBusiness() {
             </div>
 
             {/* Use-case photos */}
-            <div className="max-w-5xl mx-auto px-8 pb-16">
+            <div className="relative z-10 max-w-5xl mx-auto px-8 pb-16">
               <p className="text-xs font-black text-white/25 uppercase tracking-widest mb-6 text-center">Who uses BootHop Business</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {[
@@ -269,7 +282,7 @@ export default function BoothopBusiness() {
             </div>
 
             {/* "Why not cheap?" callout — video background */}
-            <div className="max-w-5xl mx-auto px-8 pb-16">
+            <div className="relative z-10 max-w-5xl mx-auto px-8 pb-16">
               <div className="relative overflow-hidden rounded-2xl border border-white/8">
                 {/* Branded reel: train + plane + bus */}
                 <video
@@ -294,7 +307,7 @@ export default function BoothopBusiness() {
             </div>
 
             {/* Features */}
-            <div className="max-w-5xl mx-auto px-8 pb-20">
+            <div className="relative z-10 max-w-5xl mx-auto px-8 pb-20">
               <div className="grid md:grid-cols-2 gap-4">
                 {[
                   { icon: ShieldCheck, title: 'Fully insured',         body: 'Every delivery is insured to the declared value of goods.' },
@@ -320,7 +333,7 @@ export default function BoothopBusiness() {
             </div>
 
             {/* Priority Partner teaser */}
-            <div className="max-w-5xl mx-auto px-8 pb-20">
+            <div className="relative z-10 max-w-5xl mx-auto px-8 pb-20">
               <div className="group relative overflow-hidden bg-gradient-to-br from-amber-500/5 to-orange-500/5 border border-amber-500/20 rounded-3xl p-10 transition-all duration-300 hover:border-amber-500/35 hover:shadow-2xl hover:shadow-amber-500/10 active:scale-[0.99]">
                 <div className="pointer-events-none absolute -top-10 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl" />
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -368,7 +381,7 @@ export default function BoothopBusiness() {
             </div>
 
             {/* Footer links */}
-            <div className="max-w-5xl mx-auto px-8 pb-16 flex flex-wrap items-center justify-center gap-6 text-sm text-white/25">
+            <div className="relative z-10 max-w-5xl mx-auto px-8 pb-16 flex flex-wrap items-center justify-center gap-6 text-sm text-white/25">
               <a href="/business/how-it-works" className="hover:text-white/60 transition-colors">How It Works</a>
               <a href="/business/priority-partner" className="hover:text-amber-400 transition-colors text-amber-400/40">Priority Partner</a>
               <a href="/business/contact" className="hover:text-white/60 transition-colors">Contact Us</a>

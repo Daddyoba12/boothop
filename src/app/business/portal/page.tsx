@@ -9,6 +9,7 @@ import {
   XCircle, User, Loader2 as Spin, AlertCircle, X, MessageCircle,
   Zap, Globe, Truck, Shield, Clock, Package,
 } from 'lucide-react';
+import { BusinessNav } from '@/components/business/BusinessNav';
 import { BusinessBookingWizard } from '@/components/business/BookingWizard';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -157,9 +158,11 @@ export default function BusinessPortalPage() {
 
   // ── Render ───────────────────────────────────────────────────────────────────
 
+  const BG = 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)';
+
   if (stage === 'loading') {
     return (
-      <div className="min-h-screen bg-[#080c10] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: BG }}>
         <Loader2 className="h-8 w-8 text-emerald-400 animate-spin" />
       </div>
     );
@@ -178,27 +181,34 @@ export default function BusinessPortalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080c10] text-white">
+    <div className="relative min-h-screen text-white" style={{ background: BG }}>
+
+      {/* Premium ambient orbs */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
+        <div className="absolute top-[10%] left-[3%]  w-[500px] h-[500px] bg-emerald-500/8  rounded-full blur-[150px]" />
+        <div className="absolute top-[30%] right-[5%] w-[400px] h-[400px] bg-blue-600/8   rounded-full blur-[130px]" />
+        <div className="absolute top-[65%] left-[35%] w-[360px] h-[360px] bg-violet-500/6  rounded-full blur-[120px]" />
+      </div>
 
       {/* Nav bar */}
-      <nav className="border-b border-white/6 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-emerald-400 font-black text-xl tracking-tight">BootHop</span>
-          <span className="text-white/20 text-sm">Business</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-white/30 text-sm hidden sm:block">{bizEmail}</span>
-          <button onClick={logout} className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white transition-colors">
-            <LogOut className="h-3.5 w-3.5" /> Sign out
-          </button>
-        </div>
-      </nav>
+      <div className="relative z-10">
+        <BusinessNav
+          rightSlot={
+            <>
+              <span className="text-white/30 text-sm hidden sm:block">{bizEmail}</span>
+              <button onClick={logout} className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white transition-colors">
+                <LogOut className="h-3.5 w-3.5" /> Sign out
+              </button>
+            </>
+          }
+        />
+      </div>
 
       <AnimatePresence mode="wait">
 
         {/* ══ HUB ══ */}
         {stage === 'hub' && (
-          <motion.div key="hub" {...FADE} className="max-w-5xl mx-auto px-6 py-12">
+          <motion.div key="hub" {...FADE} className="relative z-10 max-w-5xl mx-auto px-6 py-12">
 
             {/* Payment cancelled banner */}
             {paymentCancelled && (

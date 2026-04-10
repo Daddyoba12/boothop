@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Star, Clock, ShieldCheck, Zap, User, CheckCircle,
-  ArrowRight, Loader2, Send, ChevronLeft, Lock,
+  ArrowRight, Loader2, Send, Lock,
   Truck, Plane,
 } from 'lucide-react';
+import { BusinessNav } from '@/components/business/BusinessNav';
 
 // Annual membership fee — update here to change pricing
 const FEES: Record<'uk' | 'international', number> = {
@@ -80,16 +81,13 @@ export default function PriorityPartnerPage() {
       className="min-h-screen text-white"
       style={{ background: 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)', backgroundAttachment: 'fixed' }}
     >
-      {/* Nav */}
-      <nav className="px-6 py-5 flex items-center justify-between border-b border-white/5 max-w-5xl mx-auto">
-        <a href="/business" className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-semibold transition-colors">
-          <ChevronLeft className="h-4 w-4" /> BootHop Business
-        </a>
-        <div className="text-xl font-black tracking-tight">
-          Boot<span className="text-emerald-400">Hop</span>
-          <span className="ml-2 text-xs font-semibold bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-full uppercase tracking-widest">Priority Partner</span>
-        </div>
-      </nav>
+      <BusinessNav
+        rightSlot={
+          <span className="text-xs font-semibold bg-amber-500/20 border border-amber-500/30 text-amber-400 px-2.5 py-1 rounded-full uppercase tracking-widest">
+            Priority Partner
+          </span>
+        }
+      />
 
       <div className="max-w-5xl mx-auto px-6 py-16">
 
