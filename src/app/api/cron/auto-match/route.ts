@@ -178,5 +178,56 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.json({ ok: true, matched: created.length, matchIds: created, skipped });
+  /* ── Re-notify orphaned matches (matched status but no action tokens yet) ── */
+  const { data: orphans } = await supabase
+    .from('matches')
+    .select(`
+      id, sender_email, traveler_email, agreed_price,
+      sender_trip:trips!matches_sender_trip_id_fkey(from_city, to_city, travel_date),
+      traveler_trip:trips!matches_traveler_trip_id_fkey(from_city, to_city, travel_date)
+    `)
+    .eq('status', 'matched');
+
+  const notified: string[] = [];
+
+  for (const orphan of orphans ?? []) {
+    // Check if action tokens already exist for this match
+    const { data: tokens } = await supabase
+      .from('action_tokens')
+      .select('id')
+      .eq('entity_id', orphan.id)
+      .limit(1);
+
+    if (tokens?.length) continue; // already has tokens, skip
+
+    const senderTrip   = Array.isArray(orphan.sender_trip)   ? orphan.sender_trip[0]   : orphan.sender_trip;
+    const travelerTrip = Array.isArray(orphan.traveler_trip) ? orphan.traveler_trip[0] : orphan.traveler_trip;
+    const trip         = senderTrip ?? travelerTrip;
+    if (!trip) continue;
+
+    const emailPromises = [];
+    for (const [email, role] of [[orphan.sender_email, 'sender'], [orphan.traveler_email, 'traveler']] as [string, string][]) {
+      if (!email) continue;
+      const [acceptToken, declineToken] = await Promise.all([
+        createActionToken(supabase, email, 'accept_match', orphan.id, { role }),
+        createActionToken(supabase, email, 'decline_match', orphan.id, { role }),
+      ]);
+      emailPromises.push(
+        sendMatchConfirmedEmail({
+          toEmail:      email,
+          fromCity:     trip.from_city,
+          toCity:       trip.to_city,
+          travelDate:   trip.travel_date,
+          price:        orphan.agreed_price ?? 0,
+          matchId:      orphan.id,
+          acceptToken,
+          declineToken,
+        }),
+      );
+    }
+    await Promise.allSettled(emailPromises);
+    notified.push(orphan.id);
+  }
+
+  return NextResponse.json({ ok: true, matched: created.length, matchIds: created, notified, skipped });
 }
