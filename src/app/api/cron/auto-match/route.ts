@@ -101,14 +101,27 @@ async function runAutoMatch() {
   const supabase = createSupabaseAdminClient();
   const today    = new Date().toISOString().split('T')[0];
 
-  /* Fetch all future unmatched trips — exclude only cancelled/completed */
-  const [{ data: senders }, { data: travellers }] = await Promise.all([
-    supabase.from('trips').select('*').eq('type', 'send').not('status', 'in', '("cancelled","completed")').gte('travel_date', today),
-    supabase.from('trips').select('*').eq('type', 'travel').not('status', 'in', '("cancelled","completed")').gte('travel_date', today),
+  /* Fetch all future trips — active or NULL status (old trips before status field existed).
+     .not('in') silently drops NULLs in PostgreSQL so we use .or() instead. */
+  const [{ data: senders, error: sendErr }, { data: travellers, error: travErr }] = await Promise.all([
+    supabase.from('trips').select('*').eq('type', 'send').or('status.eq.active,status.is.null').gte('travel_date', today),
+    supabase.from('trips').select('*').eq('type', 'travel').or('status.eq.active,status.is.null').gte('travel_date', today),
   ]);
 
+  if (sendErr || travErr) {
+    return NextResponse.json({ ok: false, error: sendErr?.message ?? travErr?.message });
+  }
+
   if (!senders?.length || !travellers?.length) {
-    return NextResponse.json({ ok: true, matched: 0, message: 'Not enough trips to match.', debug: { senders: senders?.length ?? 0, travellers: travellers?.length ?? 0 } });
+    return NextResponse.json({
+      ok: true, matched: 0, message: 'Not enough trips to match.',
+      debug: {
+        senders:    senders?.length ?? 0,
+        travellers: travellers?.length ?? 0,
+        senderCities:    senders?.map(s => `${s.from_city} → ${s.to_city} (${s.travel_date}) status:${s.status}`),
+        travellerCities: travellers?.map(t => `${t.from_city} → ${t.to_city} (${t.travel_date}) status:${t.status}`),
+      },
+    });
   }
 
   /* Fetch existing matches to avoid duplicates */
@@ -132,14 +145,9 @@ async function runAutoMatch() {
       }
 
       const score = calcScore(send, travel);
-      if (score < 60) {
+      // Threshold 50 = route match only (cities). Date/price add bonus points.
+      if (score < 50) {
         skipped.push({ reason: 'low_score', score, sendFrom: normalizeCity(send.from_city), sendTo: normalizeCity(send.to_city), travelFrom: normalizeCity(travel.from_city), travelTo: normalizeCity(travel.to_city) });
-        continue;
-      }
-
-      const inRange = await withinPickupRange(normalizeCity(send.from_city), normalizeCity(travel.from_city));
-      if (!inRange) {
-        skipped.push({ reason: 'out_of_range', sendFrom: normalizeCity(send.from_city), travelFrom: normalizeCity(travel.from_city) });
         continue;
       }
 
@@ -248,5 +256,17 @@ async function runAutoMatch() {
     notified.push(orphan.id);
   }
 
-  return NextResponse.json({ ok: true, matched: created.length, matchIds: created, notified, skipped });
+  return NextResponse.json({
+    ok: true,
+    matched: created.length,
+    matchIds: created,
+    notified,
+    skipped,
+    debug: {
+      senders:    senders.length,
+      travellers: travellers.length,
+      senderCities:    senders.map(s => `${s.from_city} → ${s.to_city} (${s.travel_date}) status:${s.status}`),
+      travellerCities: travellers.map(t => `${t.from_city} → ${t.to_city} (${t.travel_date}) status:${t.status}`),
+    },
+  });
 }
