@@ -92,7 +92,7 @@ export async function POST(request: Request) {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
       if (appUrl && process.env.CRON_SECRET) {
         fetch(`${appUrl}/api/cron/auto-match`, {
-          headers: { 'x-cron-secret': process.env.CRON_SECRET },
+          headers: { 'Authorization': `Bearer ${process.env.CRON_SECRET}` },
         }).catch((e) => console.error('auto-match trigger failed', e));
       }
     }
@@ -105,8 +105,7 @@ export async function POST(request: Request) {
       const { count: tripCount } = await supabase
         .from('trips')
         .select('id', { count: 'exact', head: true })
-        .eq('email', email)
-        .limit(1);
+        .eq('email', email);
 
       if ((tripCount ?? 0) === 0) redirectTo = '/journeys';
     }
