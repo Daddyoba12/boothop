@@ -79,6 +79,7 @@ export async function POST(request: Request) {
         travel_date: p.date,
         weight:      p.weight || null,
         price:       priceNum,
+        status:      'active',
       });
 
       if (tripErr) {

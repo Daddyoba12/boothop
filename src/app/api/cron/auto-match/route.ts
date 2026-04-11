@@ -72,20 +72,39 @@ function calcScore(send: any, travel: any): number {
   return score;
 }
 
-export async function GET(request: Request) {
-  /* Verify cron secret — Vercel sends Authorization: Bearer <CRON_SECRET> */
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+function isAuthorized(request: Request): boolean {
+  const auth     = request.headers.get('authorization');
+  const adminKey = request.headers.get('x-admin-key');
+  return (
+    auth === `Bearer ${process.env.CRON_SECRET}` ||
+    adminKey === process.env.ADMIN_SECRET
+  );
+}
+
+/* POST — manual trigger via admin key (for testing) */
+export async function POST(request: Request) {
+  if (!isAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  return runAutoMatch();
+}
+
+export async function GET(request: Request) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  return runAutoMatch();
+}
+
+async function runAutoMatch() {
 
   const supabase = createSupabaseAdminClient();
   const today    = new Date().toISOString().split('T')[0];
 
-  /* Fetch all future active trips only */
+  /* Fetch all future unmatched trips — exclude only cancelled/completed */
   const [{ data: senders }, { data: travellers }] = await Promise.all([
-    supabase.from('trips').select('*').eq('type', 'send').eq('status', 'active').gte('travel_date', today),
-    supabase.from('trips').select('*').eq('type', 'travel').eq('status', 'active').gte('travel_date', today),
+    supabase.from('trips').select('*').eq('type', 'send').not('status', 'in', '("cancelled","completed")').gte('travel_date', today),
+    supabase.from('trips').select('*').eq('type', 'travel').not('status', 'in', '("cancelled","completed")').gte('travel_date', today),
   ]);
 
   if (!senders?.length || !travellers?.length) {
