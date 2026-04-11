@@ -7,7 +7,7 @@ import Link from 'next/link';
 import {
   Package, Plane, CheckCircle, Clock, XCircle,
   ArrowRight, DollarSign, MapPin, Calendar, TrendingUp,
-  User, Shield, AlertCircle, FileEdit, Rocket
+  User, Shield, AlertCircle, FileEdit, Rocket, Trash2, PlusCircle,
 } from 'lucide-react';
 
 const supabase = createClient(
@@ -30,6 +30,7 @@ export default function DashboardPage() {
   const [drafts, setDrafts] = useState<any[]>([]);
   const [publishingDraft, setPublishingDraft] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'matches' | 'trips' | 'drafts'>('matches');
+  const [deletingTrip, setDeletingTrip] = useState<string | null>(null);
 
   useEffect(() => {
     loadDashboard();
@@ -128,6 +129,32 @@ export default function DashboardPage() {
     }
   };
 
+  const deleteTrip = async (tripId: string) => {
+    setDeletingTrip(tripId);
+    try {
+      const res = await fetch('/api/trips/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tripId }),
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error || 'Could not delete trip'); return; }
+      setTrips(prev => prev.filter(t => t.id !== tripId));
+    } finally {
+      setDeletingTrip(null);
+    }
+  };
+
+  // A trip is "active" if its travel date is today or in the future and it isn't cancelled
+  const today = new Date().toISOString().split('T')[0];
+  const INACTIVE_STATUSES = ['cancelled'];
+  const activeTrips = trips.filter(
+    t => t.travel_date >= today && !INACTIVE_STATUSES.includes(t.status),
+  );
+  const hasActiveListings = activeTrips.length > 0 || matches.some(m =>
+    !['cancelled', 'declined', 'completed'].includes(m.status),
+  );
+
   const getMatchStatus = (match: any) => {
     switch (match.status) {
       case 'matched':                return { label: 'Matched',            color: 'blue',   icon: Clock };
@@ -155,7 +182,7 @@ export default function DashboardPage() {
     );
   }
 
-  // Empty state — no trips and no matches → guide user to create first journey
+  // Scenario A — brand new user, nothing at all
   if (!loading && trips.length === 0 && matches.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex flex-col items-center justify-center px-6 text-center">
@@ -167,22 +194,90 @@ export default function DashboardPage() {
           Create your first journey to get matched with senders or travellers on your route.
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            href="/register?type=travel"
-            className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl transition-all"
-          >
+          <Link href="/register?type=travel" className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl transition-all">
             <Plane className="h-4 w-4" /> I&apos;m Travelling
           </Link>
-          <Link
-            href="/register?type=send"
-            className="flex items-center justify-center gap-2 border border-white/12 hover:bg-white/5 text-white font-semibold px-6 py-3 rounded-xl transition-all"
-          >
+          <Link href="/register?type=send" className="flex items-center justify-center gap-2 border border-white/12 hover:bg-white/5 text-white font-semibold px-6 py-3 rounded-xl transition-all">
             <Package className="h-4 w-4" /> I Want to Send
           </Link>
         </div>
         <Link href="/journeys" className="mt-6 text-sm text-slate-500 hover:text-cyan-400 transition-colors">
           Or browse live journeys →
         </Link>
+      </div>
+    );
+  }
+
+  // Scenario B — returning user but no active listings (all trips are past / cancelled)
+  if (!loading && !hasActiveListings) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
+        {/* NAV */}
+        <nav className="bg-white/10 backdrop-blur-xl border-b border-white/10">
+          <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <Plane className="text-blue-400" />
+              <span className="font-bold text-white">Boot<span className="text-blue-400">Hop</span></span>
+            </Link>
+            <div className="flex items-center gap-4">
+              <span className="text-white/50 text-sm hidden sm:block">{user?.email}</span>
+              <button onClick={async () => { await fetch('/api/auth/logout', { method: 'POST' }); router.push('/'); }}
+                className="text-white/70 hover:text-white text-sm transition-colors">Logout</button>
+            </div>
+          </div>
+        </nav>
+
+        <div className="max-w-4xl mx-auto px-6 py-12">
+          {/* Banner */}
+          <div className="mb-10 p-6 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-start gap-4">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0">
+              <AlertCircle className="w-5 h-5 text-amber-400" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-lg font-bold text-white mb-1">No active listings</h2>
+              <p className="text-slate-400 text-sm">You don&apos;t have any live journeys or delivery requests right now. Your past listings are shown below — you can delete them or create a new one.</p>
+            </div>
+            <Link href="/register"
+              className="shrink-0 flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-blue-500/30">
+              <PlusCircle className="w-4 h-4" /> New listing
+            </Link>
+          </div>
+
+          {/* Past trips — read-only + delete */}
+          <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-4">Past listings</h3>
+          <div className="space-y-3">
+            {trips.map(trip => (
+              <div key={trip.id} className="flex items-center gap-4 p-4 rounded-2xl bg-white/4 border border-white/8">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${trip.type === 'travel' ? 'bg-blue-500/15' : 'bg-purple-500/15'}`}>
+                  {trip.type === 'travel'
+                    ? <Plane className="w-4 h-4 text-blue-400" />
+                    : <Package className="w-4 h-4 text-purple-400" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-medium text-sm truncate">{trip.from_city} → {trip.to_city}</p>
+                  <p className="text-slate-500 text-xs">
+                    {trip.travel_date ? new Date(trip.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                    {' · '}{trip.type === 'travel' ? 'Travelling' : 'Sending'}
+                    {trip.status === 'cancelled' ? ' · Cancelled' : ''}
+                  </p>
+                </div>
+                <button
+                  onClick={() => deleteTrip(trip.id)}
+                  disabled={deletingTrip === trip.id}
+                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20 text-xs font-medium transition-all disabled:opacity-50"
+                >
+                  {deletingTrip === trip.id
+                    ? <Clock className="w-3.5 h-3.5 animate-spin" />
+                    : <Trash2 className="w-3.5 h-3.5" />}
+                  Delete
+                </button>
+              </div>
+            ))}
+            {trips.length === 0 && (
+              <p className="text-slate-600 text-sm text-center py-8">No past listings found.</p>
+            )}
+          </div>
+        </div>
       </div>
     );
   }
@@ -468,7 +563,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-3 gap-4 text-sm">
+                  <div className="grid md:grid-cols-3 gap-4 text-sm mb-4">
                     <div>
                       <p className="text-white/60">Date</p>
                       <p className="text-white">{new Date(trip.travel_date).toLocaleDateString()}</p>
@@ -482,6 +577,14 @@ export default function DashboardPage() {
                       <p className="text-white">{new Date(trip.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
+                  <button
+                    onClick={() => deleteTrip(trip.id)}
+                    disabled={deletingTrip === trip.id}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20 text-xs font-medium transition-all disabled:opacity-50"
+                  >
+                    {deletingTrip === trip.id ? <Clock className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                    Delete listing
+                  </button>
                 </div>
               ))
             )}
