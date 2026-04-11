@@ -5,8 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   ArrowRight, Shield, Clock, CheckCircle, Mail,
-  RefreshCw, Package, Plane, PlusCircle, AlertCircle,
-  MapPin, X, Home, Sparkles,
+  RefreshCw, PlusCircle, AlertCircle,
+  X, Home, Sparkles,
 } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
 
@@ -257,7 +257,7 @@ export default function LoginPage() {
           )}
 
           {/* ══════════════════════════
-              STEP 2 — Listings + OTP
+              STEP 2 — OTP only
           ══════════════════════════ */}
           {step === 'verify' && (
             <>
@@ -265,42 +265,12 @@ export default function LoginPage() {
                 ← Change email
               </button>
 
-              {/* Listings */}
               <div className="mb-6">
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">
-                  Your listings ({trips.length})
-                </p>
-                <div className="space-y-2">
-                  {trips.map((t) => (
-                    <div key={t.id} className="flex items-center gap-3 rounded-xl border border-slate-700/50 bg-slate-800/40 px-4 py-3 backdrop-blur-sm">
-                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
-                        t.type === 'travel' || t.type === 'booter'
-                          ? 'bg-blue-500/20 text-blue-400'
-                          : 'bg-emerald-500/20 text-emerald-400'
-                      }`}>
-                        {t.type === 'travel' || t.type === 'booter' ? <Plane className="h-4 w-4" /> : <Package className="h-4 w-4" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{t.from_city} → {t.to_city}</p>
-                        <p className="text-xs text-slate-400">
-                          {t.travel_date ? new Date(t.travel_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Date TBC'}
-                          {t.weight ? ` · ${t.weight}` : ''}
-                          {' · '}
-                          <span className={`font-medium ${
-                            t.status === 'active'     ? 'text-emerald-400' :
-                            t.status === 'matched'    ? 'text-blue-400'    :
-                            t.status === 'completed'  ? 'text-slate-500'   : 'text-amber-400'
-                          }`}>{t.status}</span>
-                        </p>
-                      </div>
-                      <MapPin className="h-3.5 w-3.5 text-slate-600 shrink-0" />
-                    </div>
-                  ))}
+                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/25 rounded-full px-4 py-1.5 mb-4 backdrop-blur-sm">
+                  <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
+                  <span className="text-xs text-cyan-300 font-semibold">Code sent</span>
                 </div>
-              </div>
-
-              <div className="mb-1">
-                <h2 className="text-xl font-black text-white mb-1">Enter your code</h2>
+                <h2 className="text-2xl font-black text-white mb-1">Check your email</h2>
                 <p className="text-sm text-slate-400">
                   We sent a 5-character code to <span className="font-medium text-cyan-400">{email}</span>
                 </p>
