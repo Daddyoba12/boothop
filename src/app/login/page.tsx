@@ -5,16 +5,35 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   ArrowRight, Shield, Clock, CheckCircle, Mail,
-  RefreshCw, AlertCircle, Sparkles,
+  RefreshCw, PlusCircle, AlertCircle,
+  X, Home, Sparkles,
 } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
 
 const bgImages = ['/images/D_login1.jpg', '/images/D_login2.jpg'];
 
+type Trip = {
+  id: string;
+  type: string;
+  from_city: string;
+  to_city: string;
+  travel_date: string | null;
+  status: string;
+  weight: string | null;
+};
+
+const data = await res.json();
+
+if (data.token) {
+  localStorage.setItem('boothop_token', data.token);
+}
+
 export default function LoginPage() {
   const [email, setEmail]             = useState('');
   const [code, setCode]               = useState('');
   const [step, setStep]               = useState<'email' | 'verify'>('email');
+  const [trips, setTrips]             = useState<Trip[]>([]);
+  const [showNoListingModal, setShowNoListingModal] = useState(false);
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState<string | null>(null);
   const [resendTimer, setResendTimer] = useState(0);
@@ -36,34 +55,53 @@ export default function LoginPage() {
     if (step === 'verify') setTimeout(() => codeRef.current?.focus(), 300);
   }, [step]);
 
-  // ── Send OTP ────────────────────────────────────────────────────────────
+  // ── On mount: if we already know the email, skip step 1 entirely ────────
+  useEffect(() => {
+    const saved = localStorage.getItem('boothop_login_email');
+    if (!saved) return;
+    setEmail(saved);
+    sendOtp(saved);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Core: send OTP for a known email (no listing check needed) ──────────
   const sendOtp = async (addr: string) => {
     setLoading(true);
     setError(null);
     const res  = await fetch('/api/auth/request-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', // ✅ ADDED
       body: JSON.stringify({ email: addr }),
     });
     const data = await res.json();
     setLoading(false);
-    if (!res.ok) { 
-      setError(data.error || 'Unable to send code. Please try again.'); 
-      return; 
-    }
+    if (!res.ok) { setError(data.error || 'Unable to send code. Please try again.'); return; }
     setStep('verify');
     setResendTimer(60);
   };
 
-  // ── Step 1: User submits email → send OTP ────────────────────────────────
+  // ── Step 1: check listings first, then send OTP ──────────────────────────
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) { 
-      setError('Please enter your email address.'); 
-      return; 
+    if (!email) { setError('Please enter your email address.'); return; }
+    setLoading(true);
+    setError(null);
+
+    const tripsRes = await fetch('/api/auth/user-trips', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const tripsData = tripsRes.ok ? await tripsRes.json() : { trips: [] };
+    const found: Trip[] = tripsData.trips || [];
+    setLoading(false);
+
+    if (found.length === 0) {
+      setShowNoListingModal(true);
+      return;
     }
-    
+
+    setTrips(found);
     localStorage.setItem('boothop_login_email', email);
     await sendOtp(email);
   };
@@ -73,17 +111,13 @@ export default function LoginPage() {
   const verifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = code.trim().toUpperCase();
-    if (trimmed.length < 5) { 
-      setError('Please enter the full 5-character code.'); 
-      return; 
-    }
+    if (trimmed.length < 5) { setError('Please enter the full 5-character code.'); return; }
     setLoading(true);
     setError(null);
 
     const res = await fetch('/api/auth/verify-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', // ✅ ADDED
       body: JSON.stringify({ email, code: trimmed }),
     });
     const data = await res.json();
@@ -95,7 +129,7 @@ export default function LoginPage() {
     }
 
     localStorage.setItem('boothop_login_email', email);
-    window.location.assign('/dashboard'); // ✅ CHANGED from .href to .assign()
+    window.location.href = data.redirectTo || '/dashboard';
   };
 
   const resetToEmail = () => {
@@ -104,6 +138,7 @@ export default function LoginPage() {
     setEmail('');
     setCode('');
     setError(null);
+    setTrips([]);
   };
 
   const inputCls = "w-full py-3 rounded-xl border border-slate-700/50 bg-slate-800/50 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/70 focus:border-transparent backdrop-blur-sm transition text-sm";
@@ -185,7 +220,7 @@ export default function LoginPage() {
                   <span className="text-xs text-cyan-300 font-semibold">Sign in to BootHop</span>
                 </div>
                 <h1 className="text-3xl font-black text-white mb-2">Welcome back</h1>
-                <p className="text-slate-400 text-sm">Enter your email to access your account.</p>
+                <p className="text-slate-400 text-sm">Enter your email to access your listings.</p>
               </div>
 
               {error && (
@@ -215,7 +250,7 @@ export default function LoginPage() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                       </svg>
-                      Sending code…
+                      Checking…
                     </span>
                   ) : (
                     <>Continue <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" /></>
@@ -224,14 +259,14 @@ export default function LoginPage() {
               </form>
 
               <p className="text-center text-sm text-slate-500 mt-6">
-                Don&apos;t have an account?{' '}
+                Don&apos;t have a listing?{' '}
                 <Link href="/register" className="text-cyan-400 hover:text-cyan-300 font-medium transition">Create one →</Link>
               </p>
             </>
           )}
 
           {/* ══════════════════════════
-              STEP 2 — OTP
+              STEP 2 — OTP only
           ══════════════════════════ */}
           {step === 'verify' && (
             <>
@@ -294,6 +329,81 @@ export default function LoginPage() {
             <span className="flex items-center gap-1 text-slate-500"><CheckCircle className="h-3.5 w-3.5 text-emerald-500/70" /> Verified</span>
           </div>
         </div>
+
+        {/* ══════════════════════════════════════════════════════
+            NO-LISTING MODAL — luxury dark theme
+        ══════════════════════════════════════════════════════ */}
+        {showNoListingModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+              onClick={() => setShowNoListingModal(false)}
+            />
+
+            {/* Modal card */}
+            <div className="relative w-full max-w-sm bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-slate-700/50 rounded-3xl shadow-2xl shadow-black/50 overflow-hidden">
+
+              {/* Top gradient accent bar */}
+              <div className="h-1 w-full bg-gradient-to-r from-amber-500 via-orange-400 to-yellow-400" />
+
+              {/* Glow blob */}
+              <div className="absolute -top-12 -right-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/8 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Close button */}
+              <button
+                onClick={() => setShowNoListingModal(false)}
+                className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800/60 transition z-10"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              <div className="relative px-7 py-7">
+                {/* Gradient icon */}
+                <div className="flex h-13 w-13 mb-5">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-yellow-400 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/40">
+                    <Mail className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+
+                <h2 className="text-xl font-black text-white mb-2">No listings found</h2>
+                <p className="text-sm text-slate-400 leading-relaxed mb-1">
+                  We couldn&apos;t find any journeys or delivery requests linked to
+                </p>
+                <p className="text-sm font-bold text-cyan-400 mb-4 break-all">{email}</p>
+
+                <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+                  To log in, you need an active listing. Would you like to create one?
+                </p>
+
+                {/* Actions */}
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href="/register"
+                    className="group flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] text-white font-semibold py-3 px-4 rounded-xl transition-all text-sm"
+                  >
+                    <PlusCircle className="h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
+                    Create a journey
+                  </Link>
+                  <Link
+                    href="/"
+                    className="flex items-center justify-center gap-2 border border-slate-700/60 text-slate-300 hover:bg-slate-800/60 hover:border-slate-600 hover:text-white font-medium py-3 px-4 rounded-xl transition text-sm"
+                  >
+                    <Home className="h-4 w-4" /> Go to home page
+                  </Link>
+                  <button
+                    onClick={() => setShowNoListingModal(false)}
+                    className="text-sm text-slate-600 hover:text-slate-400 transition py-1"
+                  >
+                    Try a different email
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

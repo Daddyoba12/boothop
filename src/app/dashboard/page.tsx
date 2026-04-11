@@ -39,7 +39,10 @@ export default function DashboardPage() {
   const loadDashboard = async () => {
     try {
       // Use our custom cookie session (not Supabase Auth)
-      const meRes = await fetch('/api/auth/me');
+    //  const meRes = await fetch('/api/auth/me');
+      const meRes = await fetch('/api/auth/me', {
+  credentials: 'include',
+});
       if (!meRes.ok) {
         router.push('/login');
         return;

@@ -103,13 +103,14 @@ export async function POST(request: Request) {
     const token = signAppSession({ email, verified: true });
 
     const response = NextResponse.json({
-      ok: true,
-      email,
-      hasDraft,
-      tripSaved: hasDraft,
-      journeyPayload: record.journey_payload,
-      redirectTo,
-    });
+  ok: true,
+  email,
+  token, // ✅ ADD THIS (HYBRID SUPPORT)
+  hasDraft,
+  tripSaved: hasDraft,
+  journeyPayload: record.journey_payload,
+  redirectTo,
+});
 
     response.cookies.set(getSessionCookieName(), token, {
       httpOnly: true,
