@@ -49,7 +49,32 @@ export default function LoginPage() {
     if (step === 'verify') setTimeout(() => codeRef.current?.focus(), 300);
   }, [step]);
 
-  // ── Step 1: check listings first. Only send OTP if listings exist. ──────
+  // ── On mount: if we already know the email, skip step 1 entirely ────────
+  useEffect(() => {
+    const saved = localStorage.getItem('boothop_login_email');
+    if (!saved) return;
+    setEmail(saved);
+    sendOtp(saved);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Core: send OTP for a known email (no listing check needed) ──────────
+  const sendOtp = async (addr: string) => {
+    setLoading(true);
+    setError(null);
+    const res  = await fetch('/api/auth/request-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: addr }),
+    });
+    const data = await res.json();
+    setLoading(false);
+    if (!res.ok) { setError(data.error || 'Unable to send code. Please try again.'); return; }
+    setStep('verify');
+    setResendTimer(60);
+  };
+
+  // ── Step 1: check listings first, then send OTP ──────────────────────────
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) { setError('Please enter your email address.'); return; }
@@ -63,44 +88,19 @@ export default function LoginPage() {
     });
     const tripsData = tripsRes.ok ? await tripsRes.json() : { trips: [] };
     const found: Trip[] = tripsData.trips || [];
+    setLoading(false);
 
     if (found.length === 0) {
-      setLoading(false);
       setShowNoListingModal(true);
       return;
     }
 
-    const codeRes = await fetch('/api/auth/request-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-    const codeData = await codeRes.json();
-    setLoading(false);
-
-    if (!codeRes.ok) {
-      setError(codeData.error || 'Unable to send code. Please try again.');
-      return;
-    }
-
     setTrips(found);
-    setStep('verify');
-    setResendTimer(60);
+    localStorage.setItem('boothop_login_email', email);
+    await sendOtp(email);
   };
 
-  const resendCode = async () => {
-    setLoading(true);
-    setError(null);
-    const res = await fetch('/api/auth/request-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) { setError(data.error || 'Unable to resend code.'); return; }
-    setResendTimer(60);
-  };
+  const resendCode = () => sendOtp(email);
 
   const verifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,11 +122,14 @@ export default function LoginPage() {
       return;
     }
 
+    localStorage.setItem('boothop_login_email', email);
     window.location.href = data.redirectTo || '/dashboard';
   };
 
   const resetToEmail = () => {
+    localStorage.removeItem('boothop_login_email');
     setStep('email');
+    setEmail('');
     setCode('');
     setError(null);
     setTrips([]);
