@@ -44,6 +44,33 @@ export function getAppSession(
   }
 }
 
+// ── Peer-to-peer remember-me cookie (30 days, skips OTP on return visits) ────
+const APP_REMEMBER_COOKIE = 'boothop_remember';
+
+export function getAppRememberCookieName() { return APP_REMEMBER_COOKIE; }
+
+export function signAppRemember(email: string) {
+  const secret = process.env.APP_SESSION_SECRET;
+  if (!secret) throw new Error('APP_SESSION_SECRET is missing');
+  return jwt.sign({ email, type: 'app_remember' }, secret, {
+    expiresIn: '30d', issuer: 'boothop', audience: 'boothop-users',
+  });
+}
+
+export function getAppRemember(
+  cookieStore: { get: (name: string) => { value: string } | undefined }
+): { email: string } | null {
+  try {
+    const cookie = cookieStore.get(APP_REMEMBER_COOKIE);
+    if (!cookie?.value) return null;
+    const payload = jwt.verify(cookie.value, process.env.APP_SESSION_SECRET!, {
+      issuer: 'boothop', audience: 'boothop-users',
+    }) as { email: string; type: string };
+    if (payload.type !== 'app_remember') return null;
+    return { email: payload.email };
+  } catch { return null; }
+}
+
 // ── Business portal session ───────────────────────────────────────────────────
 const BIZ_COOKIE   = 'boothop_biz_session';
 const BIZ_OTP_COOKIE = 'boothop_biz_otp';

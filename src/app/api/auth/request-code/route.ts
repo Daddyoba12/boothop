@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { generateVerificationCode, hashCode, normalizeEmail } from '@/lib/auth/code';
 import { sendVerificationEmail } from '@/lib/email/sendVerificationEmail';
+import {
+  getAppRemember, signAppSession, getSessionCookieName,
+} from '@/lib/auth/session';
 
 const WINDOW_MINUTES = 10;
 const MAX_REQUESTS_PER_WINDOW = 3;
@@ -14,6 +18,22 @@ export async function POST(request: Request) {
 
     if (!email || !email.includes('@')) {
       return NextResponse.json({ error: 'A valid email address is required.' }, { status: 400 });
+    }
+
+    // ── Remember-me: if valid 30-day cookie exists for this email, skip OTP ──
+    const cookieStore = await cookies();
+    const remembered  = getAppRemember(cookieStore);
+    if (remembered && remembered.email === email) {
+      const sessionToken = signAppSession({ email, verified: true });
+      const res = NextResponse.json({ ok: true, skipOtp: true, email });
+      res.cookies.set(getSessionCookieName(), sessionToken, {
+        httpOnly: true,
+        secure:   process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path:     '/',
+        maxAge:   60 * 60 * 24 * 7,
+      });
+      return res;
     }
 
     const supabase = createSupabaseAdminClient();

@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { getSessionCookieName, signAppSession } from '@/lib/auth/session';
+import {
+  getSessionCookieName, signAppSession,
+  getAppRememberCookieName, signAppRemember,
+} from '@/lib/auth/session';
 import { hashCode, normalizeEmail } from '@/lib/auth/code';
 
 export async function POST(request: Request) {
@@ -118,6 +121,15 @@ export async function POST(request: Request) {
       sameSite: 'lax',
       path:     '/',
       maxAge:   60 * 60 * 24 * 7,
+    });
+
+    // 30-day remember-me — future logins will skip OTP for this device
+    response.cookies.set(getAppRememberCookieName(), signAppRemember(email), {
+      httpOnly: true,
+      secure:   process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path:     '/',
+      maxAge:   60 * 60 * 24 * 30,
     });
 
     return response;
