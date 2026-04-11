@@ -43,6 +43,7 @@ export default function LoginPage() {
     const res  = await fetch('/api/auth/request-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', // ✅ ADDED
       body: JSON.stringify({ email: addr }),
     });
     const data = await res.json();
@@ -82,6 +83,7 @@ export default function LoginPage() {
     const res = await fetch('/api/auth/verify-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', // ✅ ADDED
       body: JSON.stringify({ email, code: trimmed }),
     });
     const data = await res.json();
@@ -93,7 +95,7 @@ export default function LoginPage() {
     }
 
     localStorage.setItem('boothop_login_email', email);
-    window.location.href = '/dashboard';
+    window.location.assign('/dashboard'); // ✅ CHANGED from .href to .assign()
   };
 
   const resetToEmail = () => {
