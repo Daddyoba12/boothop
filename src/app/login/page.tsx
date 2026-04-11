@@ -49,13 +49,10 @@ export default function LoginPage() {
     if (step === 'verify') setTimeout(() => codeRef.current?.focus(), 300);
   }, [step]);
 
-  // ── On mount: if we already know the email, skip step 1 entirely ────────
+  // ── On mount: pre-fill email from localStorage (no auto-submit) ────────
   useEffect(() => {
     const saved = localStorage.getItem('boothop_login_email');
-    if (!saved) return;
-    setEmail(saved);
-    sendOtp(saved);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (saved) setEmail(saved);
   }, []);
 
   // ── Core: send OTP (or skip entirely if remember-me cookie is valid) ───────
@@ -68,13 +65,17 @@ export default function LoginPage() {
       body: JSON.stringify({ email: addr }),
     });
     const data = await res.json();
-    setLoading(false);
-    if (!res.ok) { setError(data.error || 'Unable to send code. Please try again.'); return; }
+    if (!res.ok) {
+      setLoading(false);
+      setError(data.error || 'Unable to send code. Please try again.');
+      return;
+    }
     // Server recognised remember-me cookie — session already issued, go straight in
     if (data.skipOtp) {
       window.location.assign('/dashboard');
       return;
     }
+    setLoading(false);
     setStep('verify');
     setResendTimer(60);
   };
@@ -128,10 +129,6 @@ export default function LoginPage() {
     }
 
     localStorage.setItem('boothop_login_email', email);
-    if (data.token) {
-    localStorage.setItem('boothop_token', data.token);
-  }
-
     //window.location.href = data.redirectTo || '/dashboard';
     window.location.assign(data.redirectTo || '/dashboard');
   };
