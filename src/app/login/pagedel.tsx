@@ -22,6 +22,7 @@ type Trip = {
   weight: string | null;
 };
 
+
 export default function LoginPage() {
   const [email, setEmail]             = useState('');
   const [code, setCode]               = useState('');
@@ -123,12 +124,7 @@ export default function LoginPage() {
     }
 
     localStorage.setItem('boothop_login_email', email);
-    if (data.token) {
-    localStorage.setItem('boothop_token', data.token);
-  }
-
-    //window.location.href = data.redirectTo || '/dashboard';
-    window.location.assign(data.redirectTo || '/dashboard');
+    window.location.href = data.redirectTo || '/dashboard';
   };
 
   const resetToEmail = () => {
