@@ -97,18 +97,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Decide redirect:
-    let redirectTo = '/dashboard';
-    if (hasDraft) {
-      redirectTo = '/journeys?listing=new';
-    } else {
-      const { count: tripCount } = await supabase
-        .from('trips')
-        .select('id', { count: 'exact', head: true })
-        .eq('email', email);
-
-      if ((tripCount ?? 0) === 0) redirectTo = '/journeys';
-    }
+    // Always go to dashboard — it handles both new and returning users
+    const redirectTo = hasDraft ? '/dashboard?listing=new' : '/dashboard';
 
     const token = signAppSession({ email, verified: true });
 
