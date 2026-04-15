@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Search, Plane, Calendar, Package, ArrowRight, X, Filter,
-  Sparkles, CheckCircle, Tag, ChevronLeft, Mail, Shield,
+  Sparkles, CheckCircle, Tag, ChevronLeft, Mail, Shield, Globe,
 } from 'lucide-react';
 import RoleToggle from '@/components/RoleToggle';
 import { createSupabaseClient } from '@/lib/supabase';
@@ -64,6 +64,10 @@ type Trip = {
   email?: string;
   from_city: string;
   to_city: string;
+  from_city_en?: string;
+  to_city_en?: string;
+  language?: string;
+  translated?: boolean;
   travel_date: string;
   price: number | null;
   weight: string | null;
@@ -97,6 +101,16 @@ export default function LiveJourneysPage() {
   const [fieldError, setFieldError]     = useState('');
   const [blockingError, setBlockingError] = useState('');
   const [pendingOpenId, setPendingOpenId] = useState<string | null>(null);
+  // Track which trip cards are showing their original (non-English) text
+  const [showOriginalIds, setShowOriginalIds] = useState<Set<string>>(new Set());
+  const toggleOriginal = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowOriginalIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
 
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
@@ -129,13 +143,15 @@ export default function LiveJourneysPage() {
   };
 
   const filtered = trips.filter(t => {
-    const from = (t.from_city ?? '').toLowerCase();
-    const to   = (t.to_city   ?? '').toLowerCase();
-    const q    = searchTerm.toLowerCase();
+    const from   = (t.from_city    ?? '').toLowerCase();
+    const to     = (t.to_city      ?? '').toLowerCase();
+    const fromEn = (t.from_city_en ?? from).toLowerCase();
+    const toEn   = (t.to_city_en   ?? to).toLowerCase();
+    const q      = searchTerm.toLowerCase();
     return (
-      (!q         || from.includes(q) || to.includes(q)) &&
-      (!fromCity  || from.includes(fromCity.toLowerCase())) &&
-      (!toCity    || to.includes(toCity.toLowerCase())) &&
+      (!q         || from.includes(q)   || to.includes(q)   || fromEn.includes(q) || toEn.includes(q)) &&
+      (!fromCity  || from.includes(fromCity.toLowerCase())   || fromEn.includes(fromCity.toLowerCase())) &&
+      (!toCity    || to.includes(toCity.toLowerCase())       || toEn.includes(toCity.toLowerCase())) &&
       (!dateFilter || (t.travel_date ?? '') >= dateFilter)
     );
   });
@@ -365,10 +381,26 @@ export default function LiveJourneysPage() {
                       <Plane className="h-5 w-5 text-white" />
                     </div>
                     <div className="min-w-0">
+                      {/* City names — show English by default, original on toggle */}
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-black text-white text-base group-hover:text-cyan-400 transition-colors">{trip.from_city}</span>
+                        <span className="font-black text-white text-base group-hover:text-cyan-400 transition-colors">
+                          {showOriginalIds.has(trip.id) ? trip.from_city : (trip.from_city_en || trip.from_city)}
+                        </span>
                         <ArrowRight className="h-4 w-4 text-slate-600 flex-shrink-0" />
-                        <span className="font-black text-white text-base group-hover:text-cyan-400 transition-colors">{trip.to_city}</span>
+                        <span className="font-black text-white text-base group-hover:text-cyan-400 transition-colors">
+                          {showOriginalIds.has(trip.id) ? trip.to_city : (trip.to_city_en || trip.to_city)}
+                        </span>
+                        {/* Language badge + toggle — only shown when trip was translated */}
+                        {trip.translated && trip.language && trip.language !== 'en' && (
+                          <button
+                            onClick={(e) => toggleOriginal(trip.id, e)}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/25 text-blue-400 text-[10px] font-semibold hover:bg-blue-500/25 transition-colors ml-1"
+                            title={showOriginalIds.has(trip.id) ? 'Show English' : 'Show original language'}
+                          >
+                            <Globe className="h-2.5 w-2.5" />
+                            {showOriginalIds.has(trip.id) ? 'EN' : trip.language.toUpperCase()}
+                          </button>
+                        )}
                       </div>
                       <div className="flex items-center gap-3 mt-0.5 flex-wrap">
                         {trip.travel_date && (
@@ -451,7 +483,14 @@ export default function LiveJourneysPage() {
                   <Sparkles className="h-4 w-4 text-cyan-400" />
                   <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">Live Journey</span>
                 </div>
-                <h2 className="text-xl font-black text-white">{selectedTrip.from_city} → {selectedTrip.to_city}</h2>
+                <h2 className="text-xl font-black text-white">
+                  {selectedTrip.from_city_en || selectedTrip.from_city} → {selectedTrip.to_city_en || selectedTrip.to_city}
+                  {selectedTrip.translated && selectedTrip.language && selectedTrip.language !== 'en' && (
+                    <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/25 text-blue-400 text-xs font-semibold align-middle">
+                      <Globe className="h-3 w-3" /> {selectedTrip.language.toUpperCase()}
+                    </span>
+                  )}
+                </h2>
               </div>
               <button onClick={closeModal} className="p-2 text-slate-500 hover:text-white transition-colors flex-shrink-0">
                 <X className="h-5 w-5" />

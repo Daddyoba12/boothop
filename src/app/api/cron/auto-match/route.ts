@@ -53,10 +53,16 @@ function normalizeCity(city: string): string {
   return (city ?? '').toLowerCase().split(',')[0].trim();
 }
 
+/** Prefer the English translation if available, otherwise use the original */
+function cityEn(trip: any, field: 'from_city' | 'to_city'): string {
+  const enField = field === 'from_city' ? 'from_city_en' : 'to_city_en';
+  return trip[enField] || trip[field] || '';
+}
+
 function calcScore(send: any, travel: any): number {
   let score = 0;
-  if (normalizeCity(send.from_city) === normalizeCity(travel.from_city) &&
-      normalizeCity(send.to_city)   === normalizeCity(travel.to_city)) {
+  if (normalizeCity(cityEn(send, 'from_city')) === normalizeCity(cityEn(travel, 'from_city')) &&
+      normalizeCity(cityEn(send, 'to_city'))   === normalizeCity(cityEn(travel, 'to_city'))) {
     score += 50;
   }
   const daysDiff = Math.abs(
@@ -147,7 +153,7 @@ async function runAutoMatch() {
       const score = calcScore(send, travel);
       // Threshold 50 = route match only (cities). Date/price add bonus points.
       if (score < 50) {
-        skipped.push({ reason: 'low_score', score, sendFrom: normalizeCity(send.from_city), sendTo: normalizeCity(send.to_city), travelFrom: normalizeCity(travel.from_city), travelTo: normalizeCity(travel.to_city) });
+        skipped.push({ reason: 'low_score', score, sendFrom: normalizeCity(cityEn(send,'from_city')), sendTo: normalizeCity(cityEn(send,'to_city')), travelFrom: normalizeCity(cityEn(travel,'from_city')), travelTo: normalizeCity(cityEn(travel,'to_city')) });
         continue;
       }
 

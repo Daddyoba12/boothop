@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getSessionCookieName, verifyAppSession } from '@/lib/auth/session';
+import { translateTripCities } from '@/lib/translation';
 import { Resend } from 'resend';
 
 export async function POST(request: Request) {
@@ -35,23 +36,41 @@ export async function POST(request: Request) {
     }
     if (!userId) return NextResponse.json({ error: 'User account not found — please contact support' }, { status: 400 });
 
-    // Insert into trips
-    const { data: trip, error: tripErr } = await supabase
-      .from('trips')
-      .insert({
-        user_id:     userId,
-        type:        draft.type,
-        from_city:   draft.from_city,
-        to_city:     draft.to_city,
-        travel_date: draft.travel_date,
-        weight:      draft.weight,
-        price:       draft.price,
-        status:      'active',
-      })
-      .select()
-      .single();
+    // Auto-translate if non-English (best-effort)
+    const translation = await translateTripCities(draft.from_city, draft.to_city).catch(() => ({
+      fromEn: draft.from_city, toEn: draft.to_city, language: 'en', translated: false,
+    }));
 
-    if (tripErr || !trip) throw tripErr || new Error('Failed to create trip');
+    // Insert into trips — with translation columns, fall back to core if columns don't exist yet
+    let trip: any = null;
+    const coreInsert = {
+      user_id:     userId,
+      type:        draft.type,
+      from_city:   draft.from_city,
+      to_city:     draft.to_city,
+      travel_date: draft.travel_date,
+      weight:      draft.weight,
+      price:       draft.price,
+      status:      'active',
+    };
+    const { data: tripFull, error: tripErr } = await supabase
+      .from('trips')
+      .insert({ ...coreInsert, from_city_en: translation.fromEn, to_city_en: translation.toEn, language: translation.language, translated: translation.translated })
+      .select().single();
+
+    if (tripErr) {
+      if (tripErr.message?.includes('column') || tripErr.code === 'PGRST204') {
+        const { data: tripCore, error: fallbackErr } = await supabase.from('trips').insert(coreInsert).select().single();
+        if (fallbackErr || !tripCore) throw fallbackErr || new Error('Failed to create trip');
+        trip = tripCore;
+      } else {
+        throw tripErr;
+      }
+    } else {
+      trip = tripFull;
+    }
+
+    if (!trip) throw new Error('Failed to create trip');
 
     // Mark draft as published
     await supabase.from('journey_drafts').update({ status: 'published' }).eq('id', draftId);

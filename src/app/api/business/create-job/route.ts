@@ -6,6 +6,7 @@ import {
   sendBusinessJobConfirmationEmail,
   sendBusinessJobAdminAlertEmail,
 } from '@/lib/email/sendBusinessEmail';
+import { translateTripCities } from '@/lib/translation';
 
 function generateRef(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -48,6 +49,11 @@ export async function POST(request: NextRequest) {
     if (!phone) {
       return NextResponse.json({ error: 'Phone number is required.' }, { status: 400 });
     }
+
+    // Translate pickup/dropoff if non-English (best-effort)
+    const translation = await translateTripCities(pickup, dropoff).catch(() => ({
+      fromEn: pickup, toEn: dropoff, language: 'en', translated: false,
+    }));
 
     const jobRef   = generateRef();
     const supabase = createSupabaseAdminClient();
@@ -99,6 +105,11 @@ export async function POST(request: NextRequest) {
         night_service, weekend, dedicated_driver, immediate_dispatch,
         meet_greet_origin, meet_greet_dest,
         is_priority: is_priority ?? false,
+        // Translation data (best-effort)
+        pickup_en:  translation.fromEn,
+        dropoff_en: translation.toEn,
+        language:   translation.language,
+        translated: translation.translated,
       },
     };
 

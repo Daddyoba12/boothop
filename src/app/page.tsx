@@ -114,10 +114,18 @@ function TestimonialsSection() {
   );
 }
 
+const HERO_VIDEOS = [
+  '/videos/onecall/test1/Aboutusbus.mp4',
+  '/videos/onecall/test1/Boxoff.mp4',
+  '/videos/onecall/test1/boxoff5.mp4',
+];
+
 function HomePageContent() {
   useScrollReveal();
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('send');
+  const [bgIdx,    setBgIdx]    = useState(0);
+  const [fading,   setFading]   = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
@@ -191,6 +199,20 @@ function HomePageContent() {
     }, 350);
     return () => clearTimeout(timer);
   }, [queryTo, sessionToken, toSelected, mapsReady]);
+
+  const advanceSlide = useCallback((targetIdx?: number) => {
+    setFading(true);
+    setTimeout(() => {
+      setBgIdx(i => targetIdx !== undefined ? targetIdx : (i + 1) % HERO_VIDEOS.length);
+      setFading(false);
+    }, 500);
+  }, []);
+
+  // Auto-rotate every 8 seconds (videos are short, also advance onEnded)
+  useEffect(() => {
+    const id = setInterval(() => advanceSlide(), 8000);
+    return () => clearInterval(id);
+  }, [advanceSlide]);
 
   const trustItems = useMemo(() => ['Identity verified', 'Secure escrow', '95% satisfaction', 'Free to join'], []);
 
@@ -295,9 +317,35 @@ function HomePageContent() {
     setSubmitting(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSubmitting(false); alert('Please verify your email first.'); return; }
-    const { data: savedTrip, error } = await supabase.from('trips')
-      .insert([{ from_city: trip.from, to_city: trip.to, travel_date: trip.date, price: trip.price ? Number(trip.price) : null, weight: trip.weight, user_id: user.id, type: mode }])
+
+    // Auto-translate from/to if non-English (best-effort — never blocks trip creation)
+    let fromEn = trip.from, toEn = trip.to, lang = 'en', translated = false;
+    try {
+      const transRes = await fetch('/api/translate', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: trip.from, to: trip.to }),
+      });
+      if (transRes.ok) {
+        const t = await transRes.json();
+        fromEn = t.fromEn || trip.from; toEn = t.toEn || trip.to;
+        lang = t.language || 'en'; translated = !!t.translated;
+      }
+    } catch { /* translation failed — proceed without */ }
+
+    // Try insert with translation columns; fall back to core fields if columns don't exist
+    let savedTrip: any = null;
+    const coreFields = { from_city: trip.from, to_city: trip.to, travel_date: trip.date, price: trip.price ? Number(trip.price) : null, weight: trip.weight, user_id: user.id, type: mode };
+    const { data: full, error } = await supabase.from('trips')
+      .insert([{ ...coreFields, from_city_en: fromEn, to_city_en: toEn, language: lang, translated }])
       .select().single();
+    if (error) {
+      // Fallback to core fields only
+      const { data: core, error: coreErr } = await supabase.from('trips').insert([coreFields]).select().single();
+      if (coreErr || !core) { setSubmitting(false); alert('Error saving trip.'); return; }
+      savedTrip = core;
+    } else {
+      savedTrip = full;
+    }
     if (error || !savedTrip) { setSubmitting(false); alert('Error saving trip.'); return; }
     try {
       const matchResponse = await fetch('/api/match-engine', {
@@ -318,13 +366,13 @@ function HomePageContent() {
     setSubmitting(false); resetForm(); loadTrips();
   };
 
-  const inputClass = "w-full rounded-xl border border-white/15 bg-white/8 px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/60 backdrop-blur-md transition-all duration-200 hover:bg-white/12 text-sm";
+  const inputClass = "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/45 focus:outline-none focus:ring-2 focus:ring-blue-400/70 focus:border-blue-400/50 backdrop-blur-xl transition-all duration-200 hover:bg-white/15 hover:border-white/30 text-sm shadow-inner shadow-black/10";
 
   return (
     <div className="min-h-screen bg-[#07111f] text-white overflow-x-hidden">
 
       {/* ── NAV ── */}
-      <nav className={`fixed top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'border-b border-white/8 bg-[#07111f]/95 shadow-lg backdrop-blur-2xl' : 'bg-transparent'}`}>
+      <nav className={`fixed top-0 z-50 w-full transition-all duration-500 ${scrolled ? 'border-b border-white/10 bg-[#07111f]/90 shadow-xl backdrop-blur-2xl' : 'bg-transparent backdrop-blur-sm'}`}>
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 md:px-8">
           <Link href="/" className="flex items-center">
             <BootHopLogo
@@ -370,25 +418,57 @@ function HomePageContent() {
       </nav>
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden pt-16">
-        {/* Subtle dual radial glow */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.10),transparent_35%)]" />
+      <section className="relative min-h-screen overflow-hidden flex flex-col justify-center pt-16">
 
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-20 md:grid-cols-2 md:px-8 md:py-28">
+        {/* ── ROTATING VIDEO BACKGROUND — single element, remounts on advance ── */}
+        <div className={`absolute inset-0 transition-opacity duration-500 ${fading ? 'opacity-0' : 'opacity-100'}`}>
+          <video
+            key={bgIdx}
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+            onEnded={() => advanceSlide()}
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source src={HERO_VIDEOS[bgIdx]} type="video/mp4" />
+          </video>
+        </div>
+
+        {/* Dark overlay — keeps text readable while video shows through */}
+        <div className="absolute inset-0 bg-black/50 pointer-events-none" />
+        {/* Bottom fade to blend into dark sections below */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07111f] via-[#07111f]/10 to-transparent pointer-events-none" />
+        {/* Left vignette for text contrast */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-transparent to-transparent pointer-events-none" />
+
+        {/* Dot indicators */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+          {HERO_VIDEOS.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => advanceSlide(i)}
+              aria-label={`Slide ${i + 1}`}
+              className={`rounded-full transition-all duration-300 ${i === bgIdx ? 'w-6 h-2 bg-white shadow-lg shadow-white/30' : 'w-2 h-2 bg-white/35 hover:bg-white/65'}`}
+            />
+          ))}
+        </div>
+
+        <div className="relative z-10 mx-auto grid max-w-7xl w-full items-center gap-12 px-6 py-20 md:grid-cols-2 md:px-8 md:py-28">
 
           {/* LEFT — copy + form */}
           <div className="relative z-10">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur">
-              <div className="h-1.5 w-1.5 rounded-full bg-green-400" />
-              <span className="text-xs font-medium text-white/70">UK–Nigeria routes now live</span>
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 backdrop-blur-md shadow-lg shadow-black/30">
+              <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse shadow-sm shadow-green-400/60" />
+              <span className="text-xs font-semibold text-white/85 tracking-wide">UK–Nigeria routes now live</span>
             </div>
 
-            <h1 className="mb-5 max-w-xl text-4xl font-semibold tracking-tight text-white md:text-5xl md:leading-[1.08] lg:text-6xl lg:leading-[1.05]">
+            <h1 className="mb-5 max-w-xl text-4xl font-bold tracking-tight text-white drop-shadow-lg md:text-5xl md:leading-[1.06] lg:text-[3.5rem] lg:leading-[1.04]">
               Send packages cheaper —{' '}
-              <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">or earn from your luggage space</span>
+              <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent drop-shadow-none">or earn from your luggage space</span>
             </h1>
 
-            <p className="mb-6 max-w-lg text-base text-white/60 md:text-lg">
+            <p className="mb-6 max-w-lg text-base text-white/75 drop-shadow md:text-lg leading-relaxed">
               BootHop connects senders with verified travellers already heading the same way. Save on delivery costs or turn spare luggage space into extra income.
             </p>
 
@@ -411,17 +491,17 @@ function HomePageContent() {
             </div>
 
             {/* Mode toggle */}
-            <div className="mb-5 inline-flex rounded-xl border border-white/10 bg-white/5 p-1 backdrop-blur">
-              <button onClick={() => setMode('send')} className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'send' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-white/55 hover:text-white'}`}>
+            <div className="mb-5 inline-flex rounded-xl border border-white/20 bg-white/10 p-1 backdrop-blur-xl shadow-lg shadow-black/30 ring-1 ring-white/5">
+              <button onClick={() => setMode('send')} className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'send' ? 'bg-blue-500 text-white shadow-xl shadow-blue-500/40 scale-[1.02]' : 'text-white/60 hover:text-white hover:bg-white/8'}`}>
                 📦 Send Item
               </button>
-              <button onClick={() => setMode('travel')} className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'travel' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-white/55 hover:text-white'}`}>
+              <button onClick={() => setMode('travel')} className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'travel' ? 'bg-blue-500 text-white shadow-xl shadow-blue-500/40 scale-[1.02]' : 'text-white/60 hover:text-white hover:bg-white/8'}`}>
                 ✈️ I&apos;m Travelling
               </button>
             </div>
 
             {/* Form */}
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.3)]">
+            <div className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-2xl shadow-[0_32px_80px_rgba(0,0,0,0.55)] ring-1 ring-white/5">
               <div className="grid gap-2.5 sm:grid-cols-2">
                 <div className="relative pb-4">
                   <input placeholder="From (City)" value={queryFrom}
@@ -476,54 +556,61 @@ function HomePageContent() {
                   {formErrors.price && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.price}</p>}
                 </div>
                 <button onClick={handleSubmit}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-3 font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)] active:translate-y-0">
-                  Register <ArrowRight className="h-4 w-4" />
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 py-3.5 font-bold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(59,130,246,0.55)] active:translate-y-0 shadow-lg shadow-blue-500/30 tracking-wide">
+                  Get Started <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </div>
 
             {/* Trust row */}
-            <div className="mt-5 flex flex-wrap gap-4 text-xs text-white/45">
+            <div className="mt-5 flex flex-wrap gap-4 text-xs text-white/60 drop-shadow">
               {trustItems.map((item) => (
-                <span key={item} className="flex items-center gap-1.5">
-                  <CheckCircle className="h-3.5 w-3.5 text-green-400/80" />{item}
+                <span key={item} className="flex items-center gap-1.5 font-medium">
+                  <CheckCircle className="h-3.5 w-3.5 text-green-400" />{item}
                 </span>
               ))}
             </div>
           </div>
 
-          {/* RIGHT — premium image card */}
+          {/* RIGHT — premium glass image card */}
           <div className="relative z-10 hidden md:block">
-            <div className="rounded-[32px] border border-white/10 bg-white/5 p-3 shadow-[0_24px_80px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+            {/* Main image frame — deep glass card */}
+            <div className="rounded-[32px] border border-white/25 bg-white/10 p-3 shadow-[0_40px_120px_rgba(0,0,0,0.6)] backdrop-blur-xl ring-1 ring-white/10">
               <div className="relative overflow-hidden rounded-[24px]" style={{ aspectRatio: '4/5' }}>
                 <Image src="/images/drealboothop.jpg" alt="BootHop community" fill priority className="object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                {/* Gradient for text legibility inside the card */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                {/* Live activity badge inside image */}
+                <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3 py-1.5 backdrop-blur-xl">
+                  <div className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-xs font-semibold text-white/90">Live platform</span>
+                </div>
               </div>
             </div>
 
-            {/* Floating route card */}
-            <div className="absolute -bottom-4 -left-8 rounded-2xl border border-white/12 bg-[#0b1829]/95 p-4 shadow-2xl backdrop-blur-xl">
+            {/* Floating route glass card */}
+            <div className="absolute -bottom-4 -left-8 rounded-2xl border border-white/25 bg-white/12 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl ring-1 ring-white/10">
               <p className="mb-2 text-xs font-semibold text-white/50 uppercase tracking-wider">Live Match</p>
               <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/20">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/25 ring-1 ring-blue-400/30">
                   <Plane className="h-4 w-4 text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">London → Lagos</p>
-                  <p className="text-xs text-white/45">Verified traveller · 3 slots left</p>
+                  <p className="text-sm font-bold text-white">London → Lagos</p>
+                  <p className="text-xs text-white/50">Verified traveller · 3 slots left</p>
                 </div>
               </div>
             </div>
 
-            {/* Floating trust card */}
-            <div className="absolute -top-4 -right-4 rounded-2xl border border-green-500/20 bg-[#0b1829]/95 p-3 shadow-2xl backdrop-blur-xl">
-              <div className="flex items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-green-500/20">
-                  <CheckCircle className="h-3.5 w-3.5 text-green-400" />
+            {/* Floating trust glass card */}
+            <div className="absolute -top-4 -right-4 rounded-2xl border border-green-500/30 bg-white/12 p-3.5 shadow-[0_20px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl ring-1 ring-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500/25 ring-1 ring-green-400/30">
+                  <CheckCircle className="h-4 w-4 text-green-400" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-white">ID Verified</p>
-                  <p className="text-[10px] text-white/45">Secure escrow held</p>
+                  <p className="text-xs font-bold text-white">ID Verified</p>
+                  <p className="text-[10px] text-white/50">Secure escrow held</p>
                 </div>
               </div>
             </div>

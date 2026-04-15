@@ -112,12 +112,11 @@ export default function BoothopBusiness() {
             {/* ── FULL-SCREEN VIDEO HERO ───────────────────────────── */}
             <div className="relative h-screen w-full overflow-hidden" style={{ background: BG }}>
 
-              {/* Background video — slow-mo cinematic bokeh */}
+              {/* Background video */}
               <video
-                autoPlay muted loop playsInline
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ transform: 'scale(1.08)', filter: 'blur(2px) brightness(0.65)' }}
-                src="/business/hero-reel.mp4"
+                autoPlay muted loop playsInline preload="auto"
+                className="absolute inset-0 w-full h-full object-cover brightness-[0.65]"
+                src="/videos/onecall/boxxoff4.mp4"
               />
 
               {/* Layer 1 — solid dark base (matches HeroV2 bg-black/60) */}

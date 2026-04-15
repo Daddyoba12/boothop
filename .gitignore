@@ -57,3 +57,6 @@ ffmpeg2pass-*
 # Allow branded business videos served by Next.js
 !public/business/*.mp4
 !public/videos/*.mp4
+!public/videos/**/*.mp4
+!public/videos/**/*.mov
+!public/videos/**/*.webm

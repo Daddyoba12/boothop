@@ -10,6 +10,12 @@ import {
 } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 
+// ── Country validation ────────────────────────────────────────────────────────
+interface Airport { name: string; city: string; country: string; iata: string; }
+
+const BLOCKED_COUNTRIES       = ['KP', 'IR', 'SY', 'CU', 'SD', 'SS', 'BY', 'RU', 'VE', 'AF'];
+const CONTACT_FIRST_COUNTRIES = ['ZA', 'ZW', 'NG', 'GH', 'CD', 'CG'];
+
 const weightOptions = [
   { value: 'letter', label: 'Letter (<1kg)' },
   { value: 'small',  label: 'Small (<5kg)' },
@@ -35,6 +41,7 @@ function RegisterForm() {
   const [mode, setMode]         = useState<'travel' | 'send'>(initialMode as 'travel' | 'send');
   const [form, setForm]         = useState({ from: prefillFrom, to: prefillTo, date: prefillDate, weight: '', price: '', email: '' });
   const [step, setStep]         = useState<'trip' | 'email' | 'sent' | 'success'>('trip');
+  const [authedEmail, setAuthedEmail] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<{ from: string; to: string; date: string; type: string; redirectTo: string } | null>(null);
   const [codeInput, setCodeInput] = useState('');
   const [loading, setLoading]   = useState(false);
@@ -54,6 +61,24 @@ function RegisterForm() {
   const [toOk, setToOk]             = useState(!!prefillTo);
   const [mapsReady, setMapsReady]   = useState(false);
   const sessionTokenRef             = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
+
+  // Airport suggestions
+  const [fromAirports, setFromAirports] = useState<Airport[]>([]);
+  const [toAirports,   setToAirports]   = useState<Airport[]>([]);
+  const [fromAirportData, setFromAirportData] = useState<Airport | null>(null);
+  const [toAirportData,   setToAirportData]   = useState<Airport | null>(null);
+
+  // Country validation
+  const [countryBlocked,   setCountryBlocked]   = useState(false);
+  const [contactFirst,     setContactFirst]     = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+
+  // Check if already logged in
+  useEffect(() => {
+    fetch('/api/auth/me').then(r => r.json()).then(d => {
+      if (d.authenticated && d.user?.email) setAuthedEmail(d.user.email);
+    }).catch(() => {});
+  }, []);
 
   // Init currency
   useEffect(() => {
@@ -90,28 +115,54 @@ function RegisterForm() {
     return () => clearInterval(id);
   }, []);
 
-  // From city autocomplete
+  // Geolocation — check user country on mount
   useEffect(() => {
-    if (fromOk || !mapsReady) return;
-    const t = setTimeout(() => {
-      if (!fromQuery || fromQuery.length < 3) { setFromSugg([]); return; }
-      new google.maps.places.AutocompleteService().getPlacePredictions(
-        { input: fromQuery, types: ['(cities)'], sessionToken: sessionTokenRef.current || undefined },
-        (p) => setFromSugg(p ? p.map((x) => x.description) : [])
-      );
+    fetch('/api/location/check').then(r => r.json()).then(d => {
+      const code: string | null = d.country_code;
+      if (!code) return;
+      if (BLOCKED_COUNTRIES.includes(code))       setCountryBlocked(true);
+      if (CONTACT_FIRST_COUNTRIES.includes(code)) setContactFirst(true);
+    }).catch(() => {});
+  }, []);
+
+  // From city + airport autocomplete
+  useEffect(() => {
+    if (fromOk) return;
+    const t = setTimeout(async () => {
+      if (!fromQuery || fromQuery.length < 2) { setFromSugg([]); setFromAirports([]); return; }
+      // Airport search (always — covers IATA codes like LHR as well as city names)
+      try {
+        const res = await fetch(`/api/airports/search?q=${encodeURIComponent(fromQuery)}`);
+        setFromAirports(await res.json());
+      } catch { setFromAirports([]); }
+      // City search (Google Places — needs 3+ chars)
+      if (mapsReady && fromQuery.length >= 3) {
+        new google.maps.places.AutocompleteService().getPlacePredictions(
+          { input: fromQuery, types: ['(cities)'], sessionToken: sessionTokenRef.current || undefined },
+          (p) => setFromSugg(p ? p.map((x) => x.description) : [])
+        );
+      }
     }, 350);
     return () => clearTimeout(t);
   }, [fromQuery, fromOk, mapsReady]);
 
-  // To city autocomplete
+  // To city + airport autocomplete
   useEffect(() => {
-    if (toOk || !mapsReady) return;
-    const t = setTimeout(() => {
-      if (!toQuery || toQuery.length < 3) { setToSugg([]); return; }
-      new google.maps.places.AutocompleteService().getPlacePredictions(
-        { input: toQuery, types: ['(cities)'], sessionToken: sessionTokenRef.current || undefined },
-        (p) => setToSugg(p ? p.map((x) => x.description) : [])
-      );
+    if (toOk) return;
+    const t = setTimeout(async () => {
+      if (!toQuery || toQuery.length < 2) { setToSugg([]); setToAirports([]); return; }
+      // Airport search
+      try {
+        const res = await fetch(`/api/airports/search?q=${encodeURIComponent(toQuery)}`);
+        setToAirports(await res.json());
+      } catch { setToAirports([]); }
+      // City search
+      if (mapsReady && toQuery.length >= 3) {
+        new google.maps.places.AutocompleteService().getPlacePredictions(
+          { input: toQuery, types: ['(cities)'], sessionToken: sessionTokenRef.current || undefined },
+          (p) => setToSugg(p ? p.map((x) => x.description) : [])
+        );
+      }
     }, 350);
     return () => clearTimeout(t);
   }, [toQuery, toOk, mapsReady]);
@@ -123,14 +174,47 @@ function RegisterForm() {
     setForm({ from: '', to: '', date: '', weight: '', price: '', email: '' });
     setFromQuery(''); setToQuery('');
     setFromSugg([]); setToSugg([]);
+    setFromAirports([]); setToAirports([]);
+    setFromAirportData(null); setToAirportData(null);
     setFromOk(false); setToOk(false);
+  };
+
+  // Airport selection helpers
+  const selectFromAirport = (a: Airport) => {
+    const display = `${a.city} (${a.iata})`;
+    setFromQuery(display); setForm(p => ({ ...p, from: display }));
+    setFromAirports([]); setFromSugg([]); setFromOk(true); setFromAirportData(a);
+    if (window.google?.maps?.places)
+      sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+  };
+
+  const selectToAirport = (a: Airport) => {
+    const display = `${a.city} (${a.iata})`;
+    setToQuery(display); setForm(p => ({ ...p, to: display }));
+    setToAirports([]); setToSugg([]); setToOk(true); setToAirportData(a);
+    if (window.google?.maps?.places)
+      sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+  };
+
+  // Detect international route (used for contact-first check)
+  const isInternationalRoute = () => {
+    if (fromAirportData && toAirportData) return fromAirportData.country !== toAirportData.country;
+    const ukPatterns = ['united kingdom', ', uk', ', england', ', scotland', ', wales', ', northern ireland'];
+    const fromUK = ukPatterns.some(p => form.from.toLowerCase().includes(p));
+    const toUK   = ukPatterns.some(p => form.to.toLowerCase().includes(p));
+    return !(fromUK && toUK);
   };
 
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
-  const handleTripSubmit = (e: React.FormEvent) => {
+  const handleTripSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // Country validation
+    if (countryBlocked) { setError('BootHop is not available in your region.'); return; }
+    if (contactFirst && isInternationalRoute()) { setShowContactModal(true); return; }
+
     if (!form.from || !form.to || !form.date || !form.weight || !form.price) {
       setError('Please fill in all fields including price.');
       return;
@@ -142,6 +226,26 @@ function RegisterForm() {
       setError('Please select a future date — same-day trips cannot be listed or matched.');
       return;
     }
+
+    // Already logged in — create listing directly, no email/OTP needed
+    if (authedEmail) {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/trips/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ from: form.from, to: form.to, date: form.date, weight: form.weight, price: `${currency}${form.price}`, mode }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to create listing');
+        window.location.href = data.redirectTo || '/dashboard?listing=new';
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to create listing');
+        setLoading(false);
+      }
+      return;
+    }
+
     setStep('email');
   };
 
@@ -476,6 +580,14 @@ function RegisterForm() {
                   </div>
                 )}
 
+                {countryBlocked && (
+                  <div className="mb-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-center">
+                    <AlertCircle className="h-7 w-7 text-red-400 mx-auto mb-2" />
+                    <p className="text-red-300 font-bold text-sm mb-1">Service unavailable in your region</p>
+                    <p className="text-slate-400 text-xs">BootHop cannot process deliveries from your country due to international shipping restrictions. Please contact us for assistance.</p>
+                  </div>
+                )}
+
                 <form onSubmit={handleTripSubmit} className="relative space-y-4">
 
                   {/* From city */}
@@ -489,12 +601,23 @@ function RegisterForm() {
                       onChange={(e) => { setFromQuery(e.target.value); setForm(p => ({ ...p, from: e.target.value })); setFromOk(false); }}
                       className={`${inputCls} pl-9 ${fromQuery && !fromOk ? 'ring-2 ring-amber-400/40' : ''}`}
                     />
-                    {fromSugg.length > 0 && (
+                    {(fromAirports.length > 0 || fromSugg.length > 0) && (
                       <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-52 overflow-auto rounded-xl border border-white/10 bg-slate-900/95 backdrop-blur-xl shadow-2xl">
+                        {fromAirports.map((a) => (
+                          <div key={a.iata} onClick={() => selectFromAirport(a)}
+                            className="cursor-pointer px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors flex items-center gap-2">
+                            <Plane className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
+                            <span className="font-mono font-bold text-xs text-cyan-400 w-9 shrink-0">{a.iata}</span>
+                            <div className="min-w-0">
+                              <span className="font-medium">{a.city}</span>
+                              <span className="text-slate-500 text-xs ml-1 truncate">· {a.name}</span>
+                            </div>
+                          </div>
+                        ))}
                         {fromSugg.map((s, i) => (
-                          <div key={i} onClick={() => {
+                          <div key={`city-${i}`} onClick={() => {
                             setFromQuery(s); setForm(p => ({ ...p, from: s }));
-                            setFromSugg([]); setFromOk(true);
+                            setFromSugg([]); setFromAirports([]); setFromOk(true); setFromAirportData(null);
                             if (window.google?.maps?.places)
                               sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
                           }} className="cursor-pointer px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors flex items-center gap-2">
@@ -517,12 +640,23 @@ function RegisterForm() {
                       onChange={(e) => { setToQuery(e.target.value); setForm(p => ({ ...p, to: e.target.value })); setToOk(false); }}
                       className={`${inputCls} pl-9 ${toQuery && !toOk ? 'ring-2 ring-amber-400/40' : ''}`}
                     />
-                    {toSugg.length > 0 && (
+                    {(toAirports.length > 0 || toSugg.length > 0) && (
                       <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-52 overflow-auto rounded-xl border border-white/10 bg-slate-900/95 backdrop-blur-xl shadow-2xl">
+                        {toAirports.map((a) => (
+                          <div key={a.iata} onClick={() => selectToAirport(a)}
+                            className="cursor-pointer px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors flex items-center gap-2">
+                            <Plane className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
+                            <span className="font-mono font-bold text-xs text-cyan-400 w-9 shrink-0">{a.iata}</span>
+                            <div className="min-w-0">
+                              <span className="font-medium">{a.city}</span>
+                              <span className="text-slate-500 text-xs ml-1 truncate">· {a.name}</span>
+                            </div>
+                          </div>
+                        ))}
                         {toSugg.map((s, i) => (
-                          <div key={i} onClick={() => {
+                          <div key={`city-${i}`} onClick={() => {
                             setToQuery(s); setForm(p => ({ ...p, to: s }));
-                            setToSugg([]); setToOk(true);
+                            setToSugg([]); setToAirports([]); setToOk(true); setToAirportData(null);
                             if (window.google?.maps?.places)
                               sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
                           }} className="cursor-pointer px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors flex items-center gap-2">
@@ -562,8 +696,8 @@ function RegisterForm() {
 
                   <p className="text-xs text-slate-600">Same-day trips cannot be listed — please select a future date.</p>
 
-                  <button type="submit"
-                    className="group w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-4 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 mt-2">
+                  <button type="submit" disabled={countryBlocked}
+                    className="group w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-4 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 mt-2">
                     Register <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </button>
                 </form>
@@ -574,6 +708,29 @@ function RegisterForm() {
         </div>
       </div>
       </div>{/* end pt-20 wrapper */}
+
+      {/* Contact-first modal */}
+      {showContactModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="w-full max-w-sm rounded-3xl border border-amber-500/30 bg-gradient-to-br from-slate-900 to-slate-800 p-8 shadow-2xl">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/20">
+              <AlertCircle className="h-7 w-7 text-amber-400" />
+            </div>
+            <h2 className="text-xl font-black text-white text-center mb-2">Contact us first</h2>
+            <p className="text-slate-400 text-sm text-center mb-6">
+              For international shipments originating from your country, we need to speak with you before you proceed. Please contact us to declare your shipping intention and ensure compliance.
+            </p>
+            <a href="/business/contact"
+              className="block w-full text-center bg-gradient-to-r from-amber-600 to-orange-500 py-3 rounded-xl text-sm font-bold text-white mb-3 hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-300">
+              Contact us to proceed
+            </a>
+            <button onClick={() => setShowContactModal(false)}
+              className="w-full text-sm text-slate-500 hover:text-slate-300 transition text-center">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
