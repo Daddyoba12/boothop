@@ -1,0 +1,3 @@
+# Large local video files — never deploy these
+public/videos/onecall/test_v/
+public/videos/planexcpy.mp4
