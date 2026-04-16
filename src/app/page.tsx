@@ -481,9 +481,25 @@ function HomePageContent() {
               Move Anything. Anywhere. Same Day.
             </h1>
 
-            <p className="mb-6 max-w-lg text-base text-white/70 drop-shadow md:text-lg leading-relaxed">
-              Airport-to-airport delivery powered by verified travellers already in motion.
+            <p className="mb-2 max-w-lg text-base text-white/70 drop-shadow md:text-lg leading-relaxed">
+              Same-day logistics powered by verified travellers already in motion.
             </p>
+
+            <p className="mb-6 text-sm text-white/40 drop-shadow">
+              UK &amp; Europe · 2-hour collection · Airport-to-airport delivery
+            </p>
+
+            <div className="flex flex-wrap gap-3 mb-7">
+              <button
+                onClick={() => document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' })}
+                className="bg-white text-black px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-white/90 transition-all hover:-translate-y-0.5">
+                Send Package
+              </button>
+              <Link href="/business"
+                className="border border-white/30 px-6 py-2.5 rounded-full text-sm font-semibold text-white hover:bg-white/[0.08] transition-all hover:-translate-y-0.5">
+                For Business
+              </Link>
+            </div>
 
             {/* Hero image — mobile only (desktop version is in the right column) */}
             <div className="relative mb-6 md:hidden mx-auto w-full max-w-sm">
@@ -514,7 +530,7 @@ function HomePageContent() {
             </div>
 
             {/* Form */}
-            <div className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-2xl shadow-[0_32px_80px_rgba(0,0,0,0.55)] ring-1 ring-white/5">
+            <div id="booking-form" className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-2xl shadow-[0_32px_80px_rgba(0,0,0,0.55)] ring-1 ring-white/5">
               <div className="grid gap-2.5 sm:grid-cols-2">
                 <div className="relative pb-4">
                   <input placeholder="From (City)" value={queryFrom}
@@ -692,8 +708,23 @@ function HomePageContent() {
         </div>
       </section>
 
+      {/* ── HOW IT WORKS ── */}
+      <section className="py-28 text-center px-6 bg-[#07111f]">
+        <h2 className="text-3xl font-semibold text-white mb-12 reveal">How it works</h2>
+        <div className="space-y-5 max-w-sm mx-auto">
+          {['Post your request', 'Match with a verified traveller', 'Delivered same-day'].map((item, i) => (
+            <p key={i} className={`reveal d${i + 1} text-white/70 text-lg`}>
+              {i + 1}. {item}
+            </p>
+          ))}
+        </div>
+        <Link href="/how-it-works" className="mt-10 inline-flex items-center gap-2 text-sm text-white/40 hover:text-white/70 transition-colors reveal">
+          Learn more <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </section>
+
       {/* ── VIDEO — Not a courier ── */}
-      <section className="relative h-[60vh] overflow-hidden">
+      <section className="relative h-[65vh] overflow-hidden">
         {/* 4 videos — slow Apple crossfade */}
         {WHY_VIDEOS.map((src, i) => (
           <video
@@ -706,31 +737,16 @@ function HomePageContent() {
             <source src={src} type="video/mp4" />
           </video>
         ))}
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center">
-          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-white text-center px-6 drop-shadow-[0_2px_20px_rgba(0,0,0,0.8)]">
+        {/* Scrim + text */}
+        <div className="absolute inset-0 bg-black/65 flex flex-col items-center justify-center text-center px-6">
+          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.8)]">
             Not a courier.<br />
             <span className="text-white/60">A faster way to move.</span>
           </h2>
+          <p className="mt-4 text-white/50 text-base max-w-md">
+            Built for time-critical movement across cities and borders.
+          </p>
         </div>
-      </section>
-
-      {/* ── HOW IT WORKS ── */}
-      <section className="py-28 text-center px-6">
-        <h2 className="text-3xl font-semibold text-white mb-10">How it works</h2>
-        <div className="space-y-4 text-white/70 text-lg max-w-sm mx-auto">
-          {['Post your request', 'Match with a verified traveller', 'Delivered same-day'].map((item, i) => (
-            <p
-              key={i}
-              className="opacity-0 translate-y-4"
-              style={{ animation: `fadeUp 0.6s ease forwards`, animationDelay: `${i * 0.2}s` }}
-            >
-              {item}
-            </p>
-          ))}
-        </div>
-        <Link href="/how-it-works" className="mt-10 inline-flex items-center gap-2 text-sm text-white/40 hover:text-white/70 transition-colors">
-          Learn more <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
       </section>
 
       {/* ── FEATURED ROUTES ── */}
@@ -775,25 +791,30 @@ function HomePageContent() {
       </section>
 
 
-      {/* ── QUICK LINK CARDS ── */}
-      <section className="py-8 bg-[#07111f]">
-        <div className="mx-auto max-w-4xl px-6 md:px-8">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Link href="/trust-safety"
-              className="group flex items-center justify-between rounded-2xl border border-white/8 bg-white/3 px-6 py-5 transition-all duration-200 hover:border-blue-500/25 hover:bg-white/5">
-              <div>
-                <p className="text-sm font-semibold text-white">ID verified · Escrow payments · 8-stage pipeline</p>
-                <p className="mt-0.5 text-xs text-white/40">How we keep every match safe →</p>
+      {/* ── TRUST SECTION ── */}
+      <section className="py-20 bg-[#07111f]">
+        <div className="mx-auto max-w-7xl px-6 md:px-8">
+          <div className="text-center mb-12 reveal">
+            <h2 className="text-3xl font-semibold text-white md:text-4xl">Built for trust at every step</h2>
+            <p className="mt-4 text-white/50 text-base max-w-xl mx-auto">Every match is ID-verified, every payment held in escrow, every delivery tracked.</p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: Shield,       title: 'ID Verified',       desc: 'Every traveller is identity-checked before they can carry',       color: 'text-blue-400' },
+              { icon: Zap,          title: 'Secure Escrow',     desc: 'Payment held until delivery is confirmed by both sides',          color: 'text-emerald-400' },
+              { icon: Users,        title: '95% Satisfaction',  desc: 'Community-rated matching with full dispute resolution',           color: 'text-violet-400' },
+              { icon: CheckCircle,  title: 'Free to Join',      desc: 'No subscription. You only pay when a match is made',             color: 'text-amber-400' },
+            ].map(({ icon: Icon, title, desc, color }, i) => (
+              <div key={title} className={`reveal d${i + 1} rounded-2xl border border-white/8 bg-white/3 p-6 text-center hover:border-white/15 hover:bg-white/5 transition-all duration-200`}>
+                <Icon className={`h-7 w-7 mx-auto mb-3 ${color}`} />
+                <p className="text-sm font-semibold text-white mb-1">{title}</p>
+                <p className="text-xs text-white/45 leading-relaxed">{desc}</p>
               </div>
-              <ArrowRight className="h-4 w-4 shrink-0 text-white/25 transition-transform group-hover:translate-x-1 group-hover:text-blue-400" />
-            </Link>
-            <Link href="/pricing"
-              className="group flex items-center justify-between rounded-2xl border border-white/8 bg-white/3 px-6 py-5 transition-all duration-200 hover:border-emerald-500/25 hover:bg-white/5">
-              <div>
-                <p className="text-sm font-semibold text-white">Senders +3% · Travellers −5% · No hidden fees</p>
-                <p className="mt-0.5 text-xs text-white/40">See full pricing & courier comparison →</p>
-              </div>
-              <ArrowRight className="h-4 w-4 shrink-0 text-white/25 transition-transform group-hover:translate-x-1 group-hover:text-emerald-400" />
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <Link href="/trust-safety" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white/70 transition-colors">
+              How we keep every match safe <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>
