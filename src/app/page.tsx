@@ -689,6 +689,78 @@ function HomePageContent() {
         </div>
       </section>
 
+      {/* ── WHY BOOTHOP ── */}
+      <section className="relative py-24 md:py-32 overflow-hidden">
+        {/* Ambient glow */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-blue-500/5 rounded-full blur-[140px]" />
+        </div>
+
+        <div className="mx-auto max-w-6xl px-6 md:px-8">
+
+          {/* Headline */}
+          <div className="text-center mb-20">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-blue-400">Why BootHop</p>
+            <h2 className="text-4xl md:text-5xl lg:text-[3.5rem] font-semibold tracking-tight text-white leading-[1.08]">
+              Not a courier.
+              <br />
+              <span className="text-white/45">A faster way to move.</span>
+            </h2>
+            <p className="mt-6 text-white/45 text-lg max-w-2xl mx-auto leading-relaxed">
+              BootHop uses people already travelling to move goods instantly —
+              no warehouses, no delays, no bottlenecks.
+            </p>
+          </div>
+
+          {/* Value cards */}
+          <div className="grid md:grid-cols-3 gap-5">
+
+            {/* Card 1 — Speed */}
+            <div className="reveal d1 group relative overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl p-8 transition-all duration-500 hover:-translate-y-2 hover:border-blue-500/20 hover:bg-white/[0.07] hover:shadow-[0_32px_80px_rgba(0,0,0,0.3)]">
+              <div className="pointer-events-none absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 border border-blue-500/15 group-hover:scale-110 transition-transform duration-300">
+                <Zap className="h-5 w-5 text-blue-400" />
+              </div>
+              <p className="text-3xl font-black text-blue-400 mb-0.5">&lt; 24h</p>
+              <p className="text-[10px] text-white/30 uppercase tracking-widest mb-6">average delivery</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Same-day delivery</h3>
+              <p className="text-sm text-white/45 leading-relaxed">
+                Move critical items across cities in hours, not days. Matched to a verified traveller already on your route.
+              </p>
+            </div>
+
+            {/* Card 2 — Cost */}
+            <div className="reveal d2 group relative overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl p-8 transition-all duration-500 hover:-translate-y-2 hover:border-emerald-500/20 hover:bg-white/[0.07] hover:shadow-[0_32px_80px_rgba(0,0,0,0.3)]">
+              <div className="pointer-events-none absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/15 group-hover:scale-110 transition-transform duration-300">
+                <Shield className="h-5 w-5 text-emerald-400" />
+              </div>
+              <p className="text-3xl font-black text-emerald-400 mb-0.5">70%</p>
+              <p className="text-[10px] text-white/30 uppercase tracking-widest mb-6">cheaper than couriers</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Lower cost</h3>
+              <p className="text-sm text-white/45 leading-relaxed">
+                Use available luggage space instead of paying for full logistics chains. A fraction of DHL or FedEx prices.
+              </p>
+            </div>
+
+            {/* Card 3 — Trust */}
+            <div className="reveal d3 group relative overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl p-8 transition-all duration-500 hover:-translate-y-2 hover:border-violet-500/20 hover:bg-white/[0.07] hover:shadow-[0_32px_80px_rgba(0,0,0,0.3)]">
+              <div className="pointer-events-none absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-48 bg-violet-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-500/10 border border-violet-500/15 group-hover:scale-110 transition-transform duration-300">
+                <Users className="h-5 w-5 text-violet-400" />
+              </div>
+              <p className="text-3xl font-black text-violet-400 mb-0.5">95%</p>
+              <p className="text-[10px] text-white/30 uppercase tracking-widest mb-6">satisfaction rate</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Verified network</h3>
+              <p className="text-sm text-white/45 leading-relaxed">
+                Every traveller is KYC-verified, tracked, and secured through the platform. Escrow-protected payments throughout.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* ── HOW IT WORKS ── */}
       <section className="relative py-20 md:py-28 bg-[#07111f]">
         <div className="mx-auto max-w-4xl px-6 md:px-8">
