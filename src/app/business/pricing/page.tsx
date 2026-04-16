@@ -32,81 +32,90 @@ export default function BusinessPricingPage() {
         </motion.p>
       </div>
 
-      {/* Pricing cards */}
-      <div className="max-w-5xl mx-auto px-8 pb-12">
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+      {/* Pricing — single combined box */}
+      <div className="max-w-5xl mx-auto px-8 pb-8">
+        <motion.div {...FADE} transition={{ delay: 0.2 }}
+          className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-8 transition-all duration-300 hover:border-emerald-500/25 hover:bg-white/5 hover:shadow-2xl hover:shadow-emerald-500/8">
+          <div className="pointer-events-none absolute -top-10 right-0 w-56 h-56 bg-emerald-500/8 rounded-full blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-10 left-0 w-48 h-48 bg-blue-500/8 rounded-full blur-3xl" />
 
-          {/* UK card */}
-          <motion.div {...FADE} transition={{ delay: 0.2 }}
-            className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-8 transition-all duration-300 hover:border-emerald-500/40 hover:bg-white/5 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/10">
-            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-24 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <Truck className="h-5 w-5 text-emerald-400" />
-              </div>
-              <div>
-                <p className="text-white font-black group-hover:text-emerald-300 transition-colors">🇬🇧 Local UK</p>
-                <p className="text-white/35 text-xs">Distance-based pricing</p>
-              </div>
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+              <Truck className="h-5 w-5 text-emerald-400" />
             </div>
-            <p className="text-emerald-400 font-black text-4xl mb-1">
-              £200 <span className="text-base font-semibold text-white/40">per 30km</span>
-            </p>
-            <p className="text-white/40 text-sm mb-6 leading-relaxed">
-              Charged per 30km band (or part thereof) of direct route distance. Minimum £200.
-            </p>
-            <div className="space-y-2.5 text-sm">
-              {[
-                ['Up to 30km',          '£200'],
-                ['31 – 60km',           '£400'],
-                ['61 – 90km',           '£600'],
-                ['91 – 120km',          '£800'],
-                ['Each additional 30km', '+£200'],
-              ].map(([range, price]) => (
-                <div key={range} className="flex items-center justify-between border-b border-white/5 pb-2.5 last:border-0">
-                  <span className="text-white/50">{range}</span>
-                  <span className="text-emerald-400 font-black">{price}</span>
-                </div>
-              ))}
+            <div>
+              <p className="text-white font-black">Our Delivery Services</p>
+              <p className="text-white/35 text-xs">Two services — one platform. All prices are estimates.</p>
             </div>
-          </motion.div>
+          </div>
 
-          {/* International card */}
-          <motion.div {...FADE} transition={{ delay: 0.25 }}
-            className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-8 transition-all duration-300 hover:border-blue-500/40 hover:bg-white/5 hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-500/10">
-            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <Plane className="h-5 w-5 text-blue-400" />
-              </div>
-              <div>
-                <p className="text-white font-black group-hover:text-blue-300 transition-colors">✈️ International</p>
-                <p className="text-white/35 text-xs">Airport-to-airport</p>
-              </div>
-            </div>
-            <p className="text-blue-400 font-black text-4xl mb-1">
-              From £1,000 <span className="text-base font-semibold text-white/40">per consignment</span>
-            </p>
-            <p className="text-white/40 text-sm mb-6 leading-relaxed">
-              All international routes priced from £1,000. Exact quote confirmed on assignment.
-            </p>
-            <div className="space-y-2.5 text-sm">
-              {[
-                ['UK → Lagos (LHR → LOS)',    'From £1,000'],
-                ['UK → Dubai (LHR → DXB)',    'From £1,000'],
-                ['Other international routes', 'Quote on request'],
-              ].map(([route, price]) => (
-                <div key={route} className="flex items-center justify-between border-b border-white/5 pb-2.5 last:border-0">
-                  <span className="text-white/50">{route}</span>
-                  <span className="text-blue-400 font-black">{price}</span>
+          {/* Two service columns */}
+          <div className="grid md:grid-cols-2 gap-0 md:divide-x divide-white/6">
+
+            {/* UK Local */}
+            <div className="pb-6 md:pb-0 md:pr-8 border-b border-white/6 md:border-b-0">
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                  <Truck className="h-3.5 w-3.5 text-emerald-400" />
                 </div>
-              ))}
+                <div>
+                  <p className="text-white font-black text-sm">🇬🇧 Local UK</p>
+                  <p className="text-white/35 text-xs">Distance-based · min £200</p>
+                </div>
+              </div>
+              <p className="text-emerald-400 font-black text-2xl mb-4">
+                £200 <span className="text-xs font-semibold text-white/40">per 30km band</span>
+              </p>
+              <div className="space-y-2 text-xs">
+                {[
+                  ['Up to 30km',           '£200'],
+                  ['31 – 60km',            '£400'],
+                  ['61 – 90km',            '£600'],
+                  ['91 – 120km',           '£800'],
+                  ['Each extra 30km',      '+£200'],
+                ].map(([range, price]) => (
+                  <div key={range} className="flex justify-between border-b border-white/5 pb-2 last:border-0">
+                    <span className="text-white/45">{range}</span>
+                    <span className="text-emerald-400 font-black">{price}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <p className="text-white/25 text-xs mt-4">
-              UK→Lagos direct flight: approx. 6 hours. Carrier checks in at departure airport.
-            </p>
-          </motion.div>
-        </div>
+
+            {/* International */}
+            <div className="pt-6 md:pt-0 md:pl-8">
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-7 h-7 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                  <Plane className="h-3.5 w-3.5 text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-white font-black text-sm">✈️ International</p>
+                  <p className="text-white/35 text-xs">Airport-to-airport · quote confirmed on assignment</p>
+                </div>
+              </div>
+              <p className="text-blue-400 font-black text-2xl mb-4">
+                From £1,000 <span className="text-xs font-semibold text-white/40">per consignment</span>
+              </p>
+              <div className="space-y-2 text-xs">
+                {[
+                  ['UK → Lagos (LHR → LOS)',    'From £1,000'],
+                  ['UK → Dubai (LHR → DXB)',    'From £1,000'],
+                  ['Other routes',              'Quote on request'],
+                ].map(([route, price]) => (
+                  <div key={route} className="flex justify-between border-b border-white/5 pb-2 last:border-0">
+                    <span className="text-white/45">{route}</span>
+                    <span className="text-blue-400 font-black">{price}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-white/20 text-xs mt-3">
+                UK→Lagos approx. 6 hrs · carrier checks in at departure airport
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
 
         {/* Insurance */}
         <motion.div {...FADE} transition={{ delay: 0.3 }}
