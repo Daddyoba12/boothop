@@ -435,7 +435,7 @@ function HomePageContent() {
       <section className="relative min-h-screen overflow-hidden flex flex-col justify-center pt-16">
 
         {/* ── ROTATING VIDEO BACKGROUND — single element, remounts on advance ── */}
-        <div className={`absolute inset-0 transition-opacity duration-500 ${fading ? 'opacity-0' : 'opacity-100'}`}>
+        <div className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${fading ? 'opacity-0' : 'opacity-100'}`}>
           <video
             key={bgIdx}
             autoPlay
@@ -443,7 +443,7 @@ function HomePageContent() {
             playsInline
             preload="auto"
             onEnded={() => advanceSlide()}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover animate-zoom"
           >
             <source src={HERO_VIDEOS[bgIdx]} type="video/mp4" />
           </video>
@@ -477,13 +477,12 @@ function HomePageContent() {
               <span className="text-xs font-semibold text-white/85 tracking-wide">UK–Nigeria routes now live</span>
             </div>
 
-            <h1 className="mb-5 max-w-xl text-4xl font-bold tracking-tight text-white drop-shadow-lg md:text-5xl md:leading-[1.06] lg:text-[3.5rem] lg:leading-[1.04]">
-              Send packages cheaper —{' '}
-              <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent drop-shadow-none">or earn from your luggage space</span>
+            <h1 className="mb-5 max-w-xl text-4xl font-semibold tracking-tight text-white drop-shadow-lg md:text-5xl md:leading-[1.06] lg:text-[3.25rem] lg:leading-[1.08]">
+              Move Anything. Anywhere. Same Day.
             </h1>
 
-            <p className="mb-6 max-w-lg text-base text-white/75 drop-shadow md:text-lg leading-relaxed">
-              BootHop connects senders with verified travellers already heading the same way. Save on delivery costs or turn spare luggage space into extra income.
+            <p className="mb-6 max-w-lg text-base text-white/70 drop-shadow md:text-lg leading-relaxed">
+              Airport-to-airport delivery powered by verified travellers already in motion.
             </p>
 
             {/* Hero image — mobile only (desktop version is in the right column) */}
@@ -683,170 +682,67 @@ function HomePageContent() {
         </div>
       )}
 
-      {/* ── WHY BOOTHOP — video background + Apple glass cards ── */}
-      <section className="relative z-10 py-32 px-6 overflow-hidden">
-
-        {/* Video background — 4 clips, slow Apple crossfade */}
-        <div className="absolute inset-0 -z-10">
-          {WHY_VIDEOS.map((src, i) => (
-            <video
-              key={src}
-              autoPlay muted loop playsInline
-              preload={i === 0 ? 'auto' : 'none'}
-              className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[3000ms] ease-in-out"
-              style={{ opacity: i === whyVid ? 1 : 0 }}
-            >
-              <source src={src} type="video/mp4" />
-            </video>
-          ))}
-          {/* Page blend — top and bottom only, centre stays open */}
-          <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#07111f] to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#07111f] to-transparent" />
-          {/* Light scrim for text readability */}
-          <div className="absolute inset-0 bg-black/30" />
+      {/* ── BUSINESS STRIP ── */}
+      <section className="py-6 flex justify-center px-6">
+        <div className="backdrop-blur-xl bg-white/[0.05] border border-white/[0.1] rounded-full px-8 py-3 flex flex-wrap items-center justify-center gap-4">
+          <span className="text-white/80 text-sm">💼 For Businesses: Same-day critical logistics</span>
+          <Link href="/business" className="text-blue-400 hover:text-blue-300 text-sm font-semibold transition-colors">
+            Request Access →
+          </Link>
         </div>
+      </section>
 
-        {/* Content — follows instructions.docx exactly */}
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight drop-shadow-[0_2px_20px_rgba(0,0,0,0.9)]">
-            Not a courier.
-            <br />
+      {/* ── VIDEO — Not a courier ── */}
+      <section className="relative h-[60vh] overflow-hidden">
+        {/* 4 videos — slow Apple crossfade */}
+        {WHY_VIDEOS.map((src, i) => (
+          <video
+            key={src}
+            autoPlay muted loop playsInline
+            preload={i === 0 ? 'auto' : 'none'}
+            className="absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-[3000ms] ease-in-out"
+            style={{ opacity: i === whyVid ? 1 : 0 }}
+          >
+            <source src={src} type="video/mp4" />
+          </video>
+        ))}
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center">
+          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-white text-center px-6 drop-shadow-[0_2px_20px_rgba(0,0,0,0.8)]">
+            Not a courier.<br />
             <span className="text-white/60">A faster way to move.</span>
           </h2>
-          <p className="mt-6 text-white/50 text-lg max-w-2xl mx-auto drop-shadow-[0_1px_10px_rgba(0,0,0,0.8)]">
-            BootHop uses people already travelling to move goods instantly —
-            no warehouses, no delays, no bottlenecks.
-          </p>
-        </div>
-
-        {/* Value cards — exactly from instructions.docx */}
-        <div className="mt-20 grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-
-          <div className="reveal d1 backdrop-blur-xl bg-white/[0.04] border border-white/[0.08] rounded-3xl p-8 transition-all duration-300 hover:-translate-y-[6px]">
-            <h3 className="text-xl font-medium text-white">Same-day delivery</h3>
-            <p className="mt-4 text-white/50 text-sm leading-relaxed">
-              Move critical items across cities in hours, not days.
-            </p>
-          </div>
-
-          <div className="reveal d2 backdrop-blur-xl bg-white/[0.04] border border-white/[0.08] rounded-3xl p-8 transition-all duration-300 hover:-translate-y-[6px]">
-            <h3 className="text-xl font-medium text-white">Lower cost</h3>
-            <p className="mt-4 text-white/50 text-sm leading-relaxed">
-              Use available luggage space instead of paying for full logistics chains.
-            </p>
-          </div>
-
-          <div className="reveal d3 backdrop-blur-xl bg-white/[0.04] border border-white/[0.08] rounded-3xl p-8 transition-all duration-300 hover:-translate-y-[6px]">
-            <h3 className="text-xl font-medium text-white">Verified network</h3>
-            <p className="mt-4 text-white/50 text-sm leading-relaxed">
-              Every traveller is verified, tracked, and secured through the platform.
-            </p>
-          </div>
-
         </div>
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="relative py-20 md:py-28 bg-[#07111f]">
-        <div className="mx-auto max-w-4xl px-6 md:px-8">
-          <div className="mb-12 text-center">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400">Simple Process</p>
-            <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">How BootHop works</h2>
-            <p className="mx-auto mt-4 max-w-xl text-base text-white/50">Three steps from post to delivery — fully verified and insured.</p>
-          </div>
-          <div className="space-y-4">
-            {[
-              { emoji: '✈️', step: '01', title: 'Post your trip or request', body: 'Register your journey dates and route, or submit a delivery request with weight and budget.', gradient: 'from-blue-500 to-cyan-400', badge: 'bg-cyan-400', shadow: 'shadow-blue-500/50', hover: 'hover:border-blue-500/40 hover:shadow-blue-500/15', touch: 'touch-blue', delay: 'd1' },
-              { emoji: '⚡', step: '02', title: 'Get matched securely', body: 'Our engine finds verified matches on the same route. Both sides confirm before any payment.', gradient: 'from-violet-500 to-purple-400', badge: 'bg-purple-400', shadow: 'shadow-violet-500/50', hover: 'hover:border-violet-500/40 hover:shadow-violet-500/15', touch: 'touch-violet', delay: 'd2' },
-              { emoji: '💸', step: '03', title: 'Deliver and get paid', body: 'Funds are held in escrow and released only after the recipient confirms safe delivery.', gradient: 'from-emerald-500 to-teal-400', badge: 'bg-teal-400', shadow: 'shadow-emerald-500/50', hover: 'hover:border-emerald-500/40 hover:shadow-emerald-500/15', touch: 'touch-emerald', delay: 'd3' },
-            ].map((item) => (
-              <div key={item.step} className={`reveal ${item.delay} group relative overflow-hidden flex items-center gap-6 rounded-2xl border border-white/8 bg-white/3 p-6 transition-all duration-300 hover:bg-white/5 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 cursor-pointer ${item.hover} ${item.touch}`}>
-                <div className="pointer-events-none absolute -top-8 left-1/4 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: item.touch === 'touch-blue' ? 'rgba(59,130,246,0.18)' : item.touch === 'touch-violet' ? 'rgba(139,92,246,0.18)' : 'rgba(16,185,129,0.18)' }} />
-                <div className="relative flex-shrink-0">
-                  <div className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} text-2xl shadow-lg ${item.shadow} group-hover:scale-110 transition-transform duration-300`}>
-                    {item.emoji}
-                  </div>
-                  <div className={`absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full ${item.badge} text-xs font-bold text-slate-900`}>
-                    {item.step}
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className={`mb-1.5 text-base font-bold text-white transition-colors duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:${item.gradient}`}>{item.title}</h3>
-                  <p className="text-sm leading-relaxed text-white/50">{item.body}</p>
-                </div>
-                <ArrowRight className="h-4 w-4 shrink-0 text-white/15 transition-all duration-300 group-hover:text-white/40 group-hover:translate-x-1" />
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <Link href="/how-it-works" className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-6 py-3 text-sm font-medium text-white/60 transition-all duration-200 hover:border-white/20 hover:bg-white/8 hover:text-white">
-              See the full process <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+      <section className="py-28 text-center px-6">
+        <h2 className="text-3xl font-semibold text-white mb-10">How it works</h2>
+        <div className="space-y-4 text-white/70 text-lg max-w-sm mx-auto">
+          {['Post your request', 'Match with a verified traveller', 'Delivered same-day'].map((item, i) => (
+            <p
+              key={i}
+              className="opacity-0 translate-y-4"
+              style={{ animation: `fadeUp 0.6s ease forwards`, animationDelay: `${i * 0.2}s` }}
+            >
+              {item}
+            </p>
+          ))}
         </div>
-      </section>
-
-      {/* ── TWO-SIDED VALUE ── */}
-      <section className="relative py-20 md:py-28">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.06),transparent_60%)]" />
-        <div className="mx-auto max-w-7xl px-6 md:px-8">
-          <div className="mb-12 text-center">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400">Who It&apos;s For</p>
-            <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Built for both sides of the journey</h2>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Senders */}
-            <div className="reveal d1 group relative overflow-hidden rounded-3xl border border-white/8 bg-white/3 p-8 transition-all duration-300 hover:border-emerald-500/25 hover:bg-white/5 hover:shadow-[0_24px_60px_rgba(16,185,129,0.08)] hover:-translate-y-1 active:scale-[0.98] touch-emerald">
-              <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 w-32 h-32 bg-emerald-500/15 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-400">
-                <Package className="h-6 w-6" />
-              </div>
-              <h3 className="mb-2 text-xl font-semibold text-white">For <RoleToggle role="sender" variant="text" /></h3>
-              <p className="mb-6 text-sm text-white/50">Send items with verified travellers at a fraction of courier costs.</p>
-              <ul className="mb-8 space-y-3">
-                {['Cheaper than excess baggage fees', 'Faster than traditional shipping', 'Matched with real, verified travellers', 'Funds held securely in escrow'].map((point) => (
-                  <li key={point} className="flex items-start gap-2.5 text-sm text-white/65">
-                    <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400/70" />{point}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/register?type=hooper"
-                className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 border border-emerald-500/25 px-5 py-2.5 text-sm font-semibold text-emerald-300 transition-all duration-200 hover:bg-emerald-500/25 hover:-translate-y-0.5">
-                Start Sending <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-
-            {/* Travellers */}
-            <div className="reveal d2 group relative overflow-hidden rounded-3xl border border-white/8 bg-white/3 p-8 transition-all duration-300 hover:border-blue-500/25 hover:bg-white/5 hover:shadow-[0_24px_60px_rgba(59,130,246,0.08)] hover:-translate-y-1 active:scale-[0.98] touch-blue">
-              <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 w-32 h-32 bg-blue-500/15 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-400">
-                <Plane className="h-6 w-6" />
-              </div>
-              <h3 className="mb-2 text-xl font-semibold text-white">For <RoleToggle role="travel" variant="text" /></h3>
-              <p className="mb-6 text-sm text-white/50">Earn from unused luggage space on trips you&apos;re already taking.</p>
-              <ul className="mb-8 space-y-3">
-                {['Earn from unused luggage space', 'Choose what you carry', 'Turn trips into extra income', 'Full identity protection'].map((point) => (
-                  <li key={point} className="flex items-start gap-2.5 text-sm text-white/65">
-                    <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-blue-400/70" />{point}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/register?type=booter"
-                className="inline-flex items-center gap-2 rounded-full bg-blue-500/15 border border-blue-500/25 px-5 py-2.5 text-sm font-semibold text-blue-300 transition-all duration-200 hover:bg-blue-500/25 hover:-translate-y-0.5">
-                Start Earning <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
+        <Link href="/how-it-works" className="mt-10 inline-flex items-center gap-2 text-sm text-white/40 hover:text-white/70 transition-colors">
+          Learn more <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </section>
 
       {/* ── FEATURED ROUTES ── */}
       <section className="relative py-20 md:py-28 bg-[#07111f]">
         <div className="mx-auto max-w-7xl px-6 md:px-8">
           <div className="mb-12 text-center">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400">Active Corridors</p>
-            <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Popular routes</h2>
-            <p className="mx-auto mt-4 max-w-xl text-base text-white/50">Real routes with active travellers right now. Post your trip to get matched instantly.</p>
+            <div className="inline-flex items-center gap-2 text-green-400 text-sm mb-4">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-ping inline-block" />
+              Live
+            </div>
+            <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Active Corridors</h2>
+            <p className="mx-auto mt-4 max-w-xl text-base text-white/50">Real-time routes with travellers already in motion.</p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {featuredRoutes.map((route) => (
@@ -878,8 +774,6 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ── */}
-      <TestimonialsSection />
 
       {/* ── QUICK LINK CARDS ── */}
       <section className="py-8 bg-[#07111f]">
@@ -1022,6 +916,19 @@ function HomePageContent() {
             <p className="mt-4 text-xs text-white/30">Free to join · No subscription · Cancel anytime</p>
           </div>
         </div>
+      </section>
+
+      {/* ── Final CTA ──────────────────────────────────────────────────────── */}
+      <section className="py-28 px-6 text-center">
+        <h2 className="text-3xl md:text-4xl font-semibold text-white mb-6 tracking-tight">
+          Built for speed.<br />
+          <span className="text-white/50">Built for urgency.</span>
+        </h2>
+        <Link href="/register"
+          className="inline-flex items-center gap-2 bg-white text-black px-8 py-3.5 rounded-full font-semibold text-sm hover:bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(255,255,255,0.15)]">
+          Get Started <ArrowRight className="h-4 w-4" />
+        </Link>
+        <p className="mt-4 text-xs text-white/25">Free to join · No subscription · Cancel anytime</p>
       </section>
 
       {/* ── Contact Us ─────────────────────────────────────────────────────── */}
