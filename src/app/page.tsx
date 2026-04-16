@@ -704,7 +704,7 @@ function HomePageContent() {
       </section>
 
       {/* ── WHY BOOTHOP — cinematic video + Apple-style cards ── */}
-      <section className="relative py-28 md:py-36 overflow-hidden">
+      <section className="relative z-10 py-28 md:py-36 overflow-hidden">
 
         {/* 4 videos — slow Apple crossfade */}
         <div className="absolute inset-0">
@@ -719,10 +719,11 @@ function HomePageContent() {
               <source src={src} type="video/mp4" />
             </video>
           ))}
-          {/* Blend into surrounding page sections */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#07111f] via-transparent to-[#07111f]" />
-          {/* Edge vignette — keeps centre video visible, edges dark */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(7,17,31,0.65)_100%)]" />
+          {/* Thin top/bottom fade to blend into page — not full dark cover */}
+          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#07111f] to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#07111f] to-transparent" />
+          {/* Very subtle edge darkening only */}
+          <div className="absolute inset-0 bg-black/20" />
         </div>
 
         {/* Content */}
