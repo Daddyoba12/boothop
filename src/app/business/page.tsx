@@ -336,57 +336,10 @@ export default function BoothopBusiness() {
               </div>
             </div>
 
-            {/* Priority Partner teaser */}
-            <div className="relative z-10 max-w-5xl mx-auto px-8 pb-20">
-              <div className="group relative overflow-hidden bg-gradient-to-br from-amber-500/5 to-orange-500/5 border border-amber-500/20 rounded-3xl p-10 transition-all duration-300 hover:border-amber-500/35 hover:shadow-2xl hover:shadow-amber-500/10 active:scale-[0.99]">
-                <div className="pointer-events-none absolute -top-10 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl" />
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <Star className="h-6 w-6 text-amber-400" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h2 className="text-2xl font-black group-hover:text-amber-300 transition-colors duration-300">Priority Partner</h2>
-                          <span className="text-xs font-bold bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-full uppercase tracking-widest">Exclusive</span>
-                        </div>
-                        <p className="text-white/40 text-sm mt-0.5">For businesses that deliver regularly</p>
-                      </div>
-                    </div>
-                    <div className="grid sm:grid-cols-2 gap-3">
-                      {[
-                        { icon: Clock,       label: '2-hour response',        sub: 'Guaranteed, every time' },
-                        { icon: CheckCircle, label: 'Dedicated account team', sub: 'Named contact at BootHop' },
-                        { icon: Zap,         label: 'Priority carrier match', sub: 'Front of the queue' },
-                        { icon: ShieldCheck, label: 'Volume discounts',        sub: 'Auto-applied at invoice' },
-                      ].map(({ icon: Icon, label, sub }) => (
-                        <div key={label} className="flex items-start gap-2.5">
-                          <div className="w-7 h-7 rounded-lg bg-amber-500/15 flex items-center justify-center shrink-0 mt-0.5">
-                            <Icon className="h-3.5 w-3.5 text-amber-400" />
-                          </div>
-                          <div>
-                            <p className="text-white font-bold text-sm">{label}</p>
-                            <p className="text-white/35 text-xs">{sub}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-3 shrink-0">
-                    <button onClick={() => { setLoginIntent('priority'); setStage('email'); }}
-                      className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-orange-400 text-black font-black px-8 py-4 rounded-2xl hover:scale-105 active:scale-[0.98] transition-all shadow-2xl shadow-amber-500/25 text-sm whitespace-nowrap">
-                      <Star className="h-4 w-4" /> Apply &amp; Pay — sign in first
-                    </button>
-                    <p className="text-white/20 text-xs text-center">UK £10,000 · International £15,000 · Annual retainer</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Footer links */}
             <div className="relative z-10 max-w-5xl mx-auto px-8 pb-16 flex flex-wrap items-center justify-center gap-6 text-sm text-white/25">
               <a href="/business/how-it-works" className="hover:text-white/60 transition-colors">How It Works</a>
+              <a href="/business/pricing" className="hover:text-emerald-400 transition-colors text-emerald-400/40">Pricing</a>
               <a href="/business/priority-partner" className="hover:text-amber-400 transition-colors text-amber-400/40">Priority Partner</a>
               <a href="/business/contact" className="hover:text-white/60 transition-colors">Contact Us</a>
               <a href="/" className="hover:text-white/70 transition-colors text-white/40">← Back to BootHop</a>
