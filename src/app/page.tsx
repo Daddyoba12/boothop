@@ -115,9 +115,10 @@ function TestimonialsSection() {
 }
 
 const HERO_VIDEOS = [
-  '/videos/onecall/test1/Aboutusbus.mp4',
-  '/videos/onecall/test1/Boxoff.mp4',
-  '/videos/onecall/test1/boxoff5.mp4',
+  '/videos/onecall/test_v/video1.mp4',
+  '/videos/onecall/test_v/video2.mp4',
+  '/videos/onecall/test_v/video3.mp4',
+  '/videos/onecall/test_v/video4.mp4',
 ];
 
 const WHY_VIDEOS = [
