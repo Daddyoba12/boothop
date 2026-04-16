@@ -16,6 +16,14 @@ type Stage = 'loading' | 'landing' | 'email' | 'otp';
 const FADE = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -16 } };
 const BG   = 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)';
 
+const BIZ_VIDEOS = [
+  '/videos/onecall/test1/test2/video1.mp4',
+  '/videos/onecall/test1/test2/video2.mp4',
+  '/videos/onecall/test1/test2/video3.mp4',
+  '/videos/onecall/test1/test2/video4.mp4',
+];
+
+
 export default function BoothopBusiness() {
   const router = useRouter();
 
@@ -25,6 +33,13 @@ export default function BoothopBusiness() {
   const [otpInput,    setOtpInput]    = useState('');
   const [authError,   setAuthError]   = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
+  const [bizVid,      setBizVid]      = useState(0);
+
+  // Apple-style slow video crossfade — 7s interval
+  useEffect(() => {
+    const id = setInterval(() => setBizVid(v => (v + 1) % BIZ_VIDEOS.length), 7000);
+    return () => clearInterval(id);
+  }, []);
 
   // ── Pre-fill email from last login ────────────────────────────────────────
   useEffect(() => {
@@ -231,76 +246,69 @@ export default function BoothopBusiness() {
               <div className="absolute top-[75%] right-[8%] w-[300px] h-[300px] bg-rose-500/5    rounded-full blur-[110px]" />
             </div>
 
-            {/* ── BOTTOM SECTION — video behind, glass panel on top ── */}
-            <section className="relative z-10 py-20 px-8 overflow-hidden">
+            {/* ── BOTTOM SECTION — Apple-style cinematic video + glass panel ── */}
+            <section className="relative z-10 py-28 px-8 overflow-hidden">
 
-              {/* Full-bleed video background */}
+              {/* All 4 videos stacked — Apple opacity crossfade, 3s transition */}
               <div className="absolute inset-0">
-                <video autoPlay muted loop playsInline
-                  className="w-full h-full object-cover brightness-[0.35]"
-                  src="/videos/onecall/boxxoff4.mp4"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/60 via-transparent to-[#020617]/80" />
+                {BIZ_VIDEOS.map((src, i) => (
+                  <video
+                    key={src}
+                    autoPlay muted loop playsInline
+                    preload={i === 0 ? 'auto' : 'none'}
+                    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[3000ms] ease-in-out"
+                    style={{ opacity: i === bizVid ? 1 : 0 }}
+                  >
+                    <source src={src} type="video/mp4" />
+                  </video>
+                ))}
+                {/* Blend into page sections above and below — no overlay on the video itself */}
+                <div className="absolute inset-0 bg-gradient-to-b from-[#020617] via-transparent to-[#020617]" />
+                {/* Subtle left/right vignette so glass panel text is readable */}
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(2,6,23,0.55)_100%)]" />
               </div>
 
-              {/* Glass panel floating over video */}
-              <div className="relative max-w-5xl mx-auto rounded-3xl backdrop-blur-xl bg-white/5 border border-white/10 p-10 shadow-[0_32px_80px_rgba(0,0,0,0.6)]">
+              {/* Content — no glass box, text blends directly onto the video */}
+              <div className="relative max-w-5xl mx-auto px-2">
 
                 {/* Label */}
-                <p className="text-xs font-black text-emerald-400 uppercase tracking-[0.2em] mb-5">
+                <p className="text-xs font-black text-emerald-400 uppercase tracking-[0.2em] mb-6 drop-shadow-lg">
                   Why BootHop Business
                 </p>
 
-                {/* Headline */}
-                <h2 className="text-4xl md:text-5xl font-black text-white leading-tight mb-5">
+                {/* Headline — large, sharp, directly on video */}
+                <h2 className="text-5xl md:text-6xl font-black text-white leading-[1.05] mb-6 drop-shadow-[0_2px_24px_rgba(0,0,0,0.9)]">
                   We don&apos;t deliver parcels.<br />
                   <span className="text-emerald-400">We eliminate downtime.</span>
                 </h2>
 
                 {/* Sub-copy */}
-                <p className="text-white/60 text-base max-w-2xl leading-relaxed mb-12">
+                <p className="text-white/75 text-lg max-w-2xl leading-relaxed mb-16 drop-shadow-[0_1px_12px_rgba(0,0,0,0.8)]">
                   Downtime costs £10,000+ per hour. Delays cost more.
                   BootHop moves critical items the moment they matter —
                   verified carriers, fully insured, same-day.
                 </p>
 
-                {/* Use cases — pure text, no images */}
-                <div className="grid md:grid-cols-3 gap-8 mb-12">
+                {/* Use cases — separated by thin lines, no boxes */}
+                <div className="grid md:grid-cols-3 gap-0 mb-16 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-sm bg-black/20">
                   {[
-                    {
-                      title: 'Engineering & Manufacturing',
-                      body: 'Spare parts, production line recovery, maintenance components.',
-                    },
-                    {
-                      title: 'Aerospace & AOG',
-                      body: 'Aircraft-on-ground parts and time-critical tools under 20 kg.',
-                    },
-                    {
-                      title: 'International & Customs',
-                      body: 'Hand-carry across borders with full customs coordination.',
-                    },
-                  ].map(({ title, body }) => (
-                    <div key={title}>
-                      <h3 className="text-white font-black mb-2">{title}</h3>
-                      <p className="text-white/50 text-sm leading-relaxed">{body}</p>
+                    { title: 'Engineering &\nManufacturing', body: 'Spare parts, production line recovery, maintenance components.' },
+                    { title: 'Aerospace & AOG',              body: 'Aircraft-on-ground parts and time-critical tools under 20 kg.' },
+                    { title: 'International\n& Customs',     body: 'Hand-carry across borders with full customs coordination.' },
+                  ].map(({ title, body }, i) => (
+                    <div key={title} className={`p-7 ${i < 2 ? 'border-r border-white/8' : ''}`}>
+                      <h3 className="text-white font-black mb-2 whitespace-pre-line leading-tight drop-shadow-lg">{title}</h3>
+                      <p className="text-white/55 text-sm leading-relaxed">{body}</p>
                     </div>
                   ))}
                 </div>
 
-                {/* Metrics bar */}
-                <div className="flex flex-wrap items-center justify-between gap-5 border-t border-white/10 pt-7 text-sm">
-                  <span className="text-white/60">
-                    <strong className="text-white font-black">£200+</strong> local from
-                  </span>
-                  <span className="text-white/60">
-                    <strong className="text-white font-black">Same-day</strong> delivery
-                  </span>
-                  <span className="text-white/60">
-                    <strong className="text-white font-black">Fully</strong> insured
-                  </span>
-                  <span className="text-white/60">
-                    <strong className="text-white font-black">Business-only</strong> verified
-                  </span>
+                {/* Metrics — inline, borderless, blends into video */}
+                <div className="flex flex-wrap items-center justify-between gap-5 border-t border-white/15 pt-7 text-sm drop-shadow-lg">
+                  <span className="text-white/70"><strong className="text-white font-black">£200+</strong> local from</span>
+                  <span className="text-white/70"><strong className="text-white font-black">Same-day</strong> delivery</span>
+                  <span className="text-white/70"><strong className="text-white font-black">Fully</strong> insured</span>
+                  <span className="text-white/70"><strong className="text-white font-black">Business-only</strong> verified</span>
                   <a href="/business/pricing"
                     className="inline-flex items-center gap-1.5 text-emerald-400 font-black hover:text-emerald-300 transition-colors group">
                     View pricing <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />

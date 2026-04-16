@@ -117,9 +117,10 @@ export default function BusinessPricingPage() {
         </motion.div>
       </div>
 
-        {/* Insurance */}
+      {/* Insurance */}
+      <div className="max-w-5xl mx-auto px-8 pb-8">
         <motion.div {...FADE} transition={{ delay: 0.3 }}
-          className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-8 mb-8 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/10">
+          className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-8 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/10">
           <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-24 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -147,8 +148,10 @@ export default function BusinessPricingPage() {
             </div>
           </div>
         </motion.div>
+      </div>
 
-        {/* Priority Partner pricing callout */}
+      {/* Priority Partner pricing callout */}
+      <div className="max-w-5xl mx-auto px-8 pb-12">
         <motion.div {...FADE} transition={{ delay: 0.35 }}
           className="group relative overflow-hidden bg-gradient-to-br from-amber-500/5 to-orange-500/5 border border-amber-500/20 rounded-2xl p-8 transition-all duration-300 hover:border-amber-500/35 hover:shadow-2xl hover:shadow-amber-500/10">
           <div className="pointer-events-none absolute -top-10 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl" />
