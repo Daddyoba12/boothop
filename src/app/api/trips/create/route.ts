@@ -59,6 +59,14 @@ export async function POST(request: Request) {
       }
     }
 
+    // Fire auto-match (best-effort, non-blocking)
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+    if (appUrl && process.env.CRON_SECRET) {
+      fetch(`${appUrl}/api/cron/auto-match`, {
+        headers: { 'Authorization': `Bearer ${process.env.CRON_SECRET}` },
+      }).catch(() => {});
+    }
+
     return NextResponse.json({ ok: true, redirectTo: '/dashboard?listing=new' });
   } catch (error) {
     console.error('trips/create error', error);

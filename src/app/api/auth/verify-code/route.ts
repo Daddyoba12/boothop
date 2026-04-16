@@ -92,6 +92,13 @@ export async function POST(request: Request) {
 
       hasDraft = true;
 
+      // Fire auto-match cron inline (best-effort, non-blocking)
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+      if (appUrl && process.env.CRON_SECRET) {
+        fetch(`${appUrl}/api/cron/auto-match`, {
+          headers: { 'Authorization': `Bearer ${process.env.CRON_SECRET}` },
+        }).catch((e) => console.error('auto-match trigger failed', e));
+      }
     }
 
     // Always go to dashboard — it handles both new and returning users
