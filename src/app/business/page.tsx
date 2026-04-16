@@ -231,110 +231,84 @@ export default function BoothopBusiness() {
               <div className="absolute top-[75%] right-[8%] w-[300px] h-[300px] bg-rose-500/5    rounded-full blur-[110px]" />
             </div>
 
-            {/* Stats */}
-            <div className="relative z-10 max-w-5xl mx-auto px-8 pt-20 pb-16">
-              <div className="grid grid-cols-3 gap-4">
-                {[
-                  { value: '£200+',    label: 'Local from',  sub: 'UK-to-UK distance pricing' },
-                  { value: '100%',     label: 'Insured',     sub: 'Every single delivery' },
-                  { value: 'Same day', label: 'Delivery',    sub: 'For urgent business needs' },
-                ].map(s => (
-                  <div key={s.label} className="group relative overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20 shadow-xl rounded-2xl p-6 text-center transition-all duration-300 hover:border-emerald-400/40 hover:bg-white/15 hover:-translate-y-1 hover:shadow-emerald-500/15 active:scale-[0.98]">
-                    <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent" />
-                    <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <p className="text-3xl font-black text-emerald-400 mb-1">{s.value}</p>
-                    <p className="text-white font-semibold text-sm group-hover:text-emerald-300 transition-colors duration-300">{s.label}</p>
-                    <p className="text-white/30 text-xs mt-0.5">{s.sub}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* ── BOTTOM SECTION — video behind, glass panel on top ── */}
+            <section className="relative z-10 py-20 px-8 overflow-hidden">
 
-            {/* Use-case photos */}
-            <div className="relative z-10 max-w-5xl mx-auto px-8 pb-16">
-              <p className="text-xs font-black text-white/25 uppercase tracking-widest mb-6 text-center">Who uses BootHop Business</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {[
-                  {
-                    img: '/images/businessImage/biz-hero.jpg',
-                    tag: 'Engineering & Manufacturing',
-                    body: 'Urgent spare parts, production line recovery, maintenance components.',
-                  },
-                  {
-                    img: '/images/businessImage/biz-team.jpg',
-                    tag: 'Aerospace & AOG',
-                    body: 'Aircraft-on-ground parts and time-critical engineering tools under 20 kg.',
-                  },
-                  {
-                    img: '/images/businessImage/biz-handshake.jpg',
-                    tag: 'International & Customs',
-                    body: 'Hand-carry across borders with full customs declaration support.',
-                  },
-                ].map(({ img, tag, body }) => (
-                  <div key={tag} className="relative overflow-hidden rounded-2xl border border-white/8 group cursor-pointer" onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}>
-                    <div className="relative h-44 w-full">
-                      <Image src={img} alt={tag} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <p className="text-xs font-black text-emerald-400 uppercase tracking-widest mb-1">{tag}</p>
-                      <p className="text-white/60 text-xs leading-relaxed">{body}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* "Why not cheap?" callout — video background */}
-            <div className="relative z-10 max-w-5xl mx-auto px-8 pb-16">
-              <div className="relative overflow-hidden rounded-2xl border border-white/8">
-                {/* Branded reel: train + plane + bus */}
-                <video
-                  autoPlay muted loop playsInline
-                  className="w-full h-48 sm:h-64 object-cover"
-                  src="/business/biz-reel.mp4"
+              {/* Full-bleed video background */}
+              <div className="absolute inset-0">
+                <video autoPlay muted loop playsInline
+                  className="w-full h-full object-cover brightness-[0.35]"
+                  src="/videos/onecall/boxxoff4.mp4"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
-                <div className="absolute inset-0 flex items-center px-8 sm:px-12">
-                  <div className="max-w-lg">
-                    <p className="text-xs font-black text-emerald-400 uppercase tracking-widest mb-3">Why aren&apos;t we cheap?</p>
-                    <p className="text-white font-black text-xl sm:text-2xl leading-tight mb-3">
-                      We&apos;re not a courier.<br />We&apos;re a downtime solution.
-                    </p>
-                    <p className="text-white/50 text-sm leading-relaxed">
-                      Factory downtime costs £10,000/hr. An aircraft delay can cost £100,000+.
-                      A BootHop delivery costs £500–£1,500. The value is clear.
-                    </p>
-                  </div>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/60 via-transparent to-[#020617]/80" />
               </div>
-            </div>
 
-            {/* Features */}
-            <div className="relative z-10 max-w-5xl mx-auto px-8 pb-20">
-              <div className="grid md:grid-cols-2 gap-4">
-                {[
-                  { icon: ShieldCheck, title: 'Fully insured',         body: 'Every delivery is insured to the declared value of goods.' },
-                  { icon: Clock,       title: 'Same-day available',     body: 'Submit before midday for same-day delivery on most routes.' },
-                  { icon: Lock,        title: 'Business-only access',   body: 'Verified business accounts only. No personal users on the platform.' },
-                  { icon: Star,        title: 'Rated carriers',         body: 'All our carriers are verified, rated, and background-checked.' },
-                  { icon: Truck,       title: 'UK-wide + International', body: 'Local UK deliveries and international airport-to-airport routes.' },
-                  { icon: Building2,   title: 'Priority Partnership',    body: 'Upgrade to Priority Partner for dedicated support and volume discounts.' },
-                ].map(({ icon: Icon, title, body }) => (
-                  <div key={title} className="group relative overflow-hidden flex items-start gap-4 bg-white/10 backdrop-blur-sm border border-white/20 shadow-xl rounded-2xl p-5 transition-all duration-300 hover:border-emerald-400/40 hover:bg-white/15 hover:-translate-y-1 hover:shadow-emerald-500/15 active:scale-[0.98]">
-                    <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent" />
-                    <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
-                      <Icon className="h-5 w-5 text-emerald-400" />
+              {/* Glass panel floating over video */}
+              <div className="relative max-w-5xl mx-auto rounded-3xl backdrop-blur-xl bg-white/5 border border-white/10 p-10 shadow-[0_32px_80px_rgba(0,0,0,0.6)]">
+
+                {/* Label */}
+                <p className="text-xs font-black text-emerald-400 uppercase tracking-[0.2em] mb-5">
+                  Why BootHop Business
+                </p>
+
+                {/* Headline */}
+                <h2 className="text-4xl md:text-5xl font-black text-white leading-tight mb-5">
+                  We don&apos;t deliver parcels.<br />
+                  <span className="text-emerald-400">We eliminate downtime.</span>
+                </h2>
+
+                {/* Sub-copy */}
+                <p className="text-white/60 text-base max-w-2xl leading-relaxed mb-12">
+                  Downtime costs £10,000+ per hour. Delays cost more.
+                  BootHop moves critical items the moment they matter —
+                  verified carriers, fully insured, same-day.
+                </p>
+
+                {/* Use cases — pure text, no images */}
+                <div className="grid md:grid-cols-3 gap-8 mb-12">
+                  {[
+                    {
+                      title: 'Engineering & Manufacturing',
+                      body: 'Spare parts, production line recovery, maintenance components.',
+                    },
+                    {
+                      title: 'Aerospace & AOG',
+                      body: 'Aircraft-on-ground parts and time-critical tools under 20 kg.',
+                    },
+                    {
+                      title: 'International & Customs',
+                      body: 'Hand-carry across borders with full customs coordination.',
+                    },
+                  ].map(({ title, body }) => (
+                    <div key={title}>
+                      <h3 className="text-white font-black mb-2">{title}</h3>
+                      <p className="text-white/50 text-sm leading-relaxed">{body}</p>
                     </div>
-                    <div>
-                      <p className="text-white font-bold mb-1 group-hover:text-emerald-300 transition-colors duration-300">{title}</p>
-                      <p className="text-white/40 text-sm leading-relaxed">{body}</p>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                {/* Metrics bar */}
+                <div className="flex flex-wrap items-center justify-between gap-5 border-t border-white/10 pt-7 text-sm">
+                  <span className="text-white/60">
+                    <strong className="text-white font-black">£200+</strong> local from
+                  </span>
+                  <span className="text-white/60">
+                    <strong className="text-white font-black">Same-day</strong> delivery
+                  </span>
+                  <span className="text-white/60">
+                    <strong className="text-white font-black">Fully</strong> insured
+                  </span>
+                  <span className="text-white/60">
+                    <strong className="text-white font-black">Business-only</strong> verified
+                  </span>
+                  <a href="/business/pricing"
+                    className="inline-flex items-center gap-1.5 text-emerald-400 font-black hover:text-emerald-300 transition-colors group">
+                    View pricing <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  </a>
+                </div>
+
               </div>
-            </div>
+            </section>
 
             {/* Footer links */}
             <div className="relative z-10 max-w-5xl mx-auto px-8 pb-16 flex flex-wrap items-center justify-center gap-6 text-sm text-white/25">
