@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -116,12 +116,7 @@ function TestimonialsSection() {
   );
 }
 
-const HERO_VIDEOS = [
-  '/videos/onecall/test_v/video1.mp4',
-  '/videos/onecall/test_v/video2.mp4',
-  '/videos/onecall/test_v/video3.mp4',
-  '/videos/onecall/test_v/video4.mp4',
-];
+const HERO_VIDEO = '/videos/onecall/plane2.mp4';
 
 const WHY_VIDEOS = [
   '/videos/onecall/test1/Aboutusbus.mp4',
@@ -133,8 +128,6 @@ function HomePageContent() {
   useScrollReveal();
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('send');
-  const [bgIdx,    setBgIdx]    = useState(0);
-  const [fading,   setFading]   = useState(false);
   const [whyVid,   setWhyVid]   = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -209,20 +202,6 @@ function HomePageContent() {
     }, 350);
     return () => clearTimeout(timer);
   }, [queryTo, sessionToken, toSelected, mapsReady]);
-
-  const advanceSlide = useCallback((targetIdx?: number) => {
-    setFading(true);
-    setTimeout(() => {
-      setBgIdx(i => targetIdx !== undefined ? targetIdx : (i + 1) % HERO_VIDEOS.length);
-      setFading(false);
-    }, 500);
-  }, []);
-
-  // Auto-rotate every 8 seconds (videos are short, also advance onEnded)
-  useEffect(() => {
-    const id = setInterval(() => advanceSlide(), 8000);
-    return () => clearInterval(id);
-  }, [advanceSlide]);
 
   // Why BootHop section — slow 7s crossfade
   useEffect(() => {
@@ -438,151 +417,116 @@ function HomePageContent() {
       {/* ── HERO ── */}
       <section className="relative min-h-screen overflow-hidden flex flex-col justify-center pt-16">
 
-        {/* ── ROTATING VIDEO BACKGROUND — single element, remounts on advance ── */}
-        <div className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${fading ? 'opacity-0' : 'opacity-100'}`}>
-          <video
-            key={bgIdx}
-            autoPlay
-            muted
-            playsInline
-            preload="auto"
-            onEnded={() => advanceSlide()}
-            className="absolute inset-0 w-full h-full object-cover animate-zoom"
-          >
-            <source src={HERO_VIDEOS[bgIdx]} type="video/mp4" />
-          </video>
-        </div>
+        {/* PLANE VIDEO — SPEED SIGNAL */}
+        <video autoPlay muted loop playsInline
+          className="absolute inset-0 w-full h-full object-cover">
+          <source src={HERO_VIDEO} type="video/mp4" />
+        </video>
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
 
-        {/* Dark overlay — keeps text readable while video shows through */}
-        <div className="absolute inset-0 bg-black/50 pointer-events-none" />
-        {/* Bottom fade to blend into dark sections below */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#07111f] via-[#07111f]/10 to-transparent pointer-events-none" />
-        {/* Left vignette for text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-transparent to-transparent pointer-events-none" />
+        {/* CONTENT */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 h-full flex items-center py-24 md:py-0">
+          <div className="grid md:grid-cols-2 gap-12 items-center w-full">
 
-        {/* Dot indicators */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
-          {HERO_VIDEOS.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => advanceSlide(i)}
-              aria-label={`Slide ${i + 1}`}
-              className={`rounded-full transition-all duration-300 ${i === bgIdx ? 'w-6 h-2 bg-white shadow-lg shadow-white/30' : 'w-2 h-2 bg-white/35 hover:bg-white/65'}`}
-            />
-          ))}
-        </div>
-
-        <div className="relative z-10 mx-auto grid max-w-7xl w-full items-center gap-12 px-6 py-20 md:grid-cols-2 md:px-8 md:py-28">
-
-          {/* LEFT — copy + form */}
-          <div className="relative z-10">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 backdrop-blur-md shadow-lg shadow-black/30">
-              <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse shadow-sm shadow-green-400/60" />
-              <span className="text-xs font-semibold text-white/85 tracking-wide">Free to join · No subscription · No hidden fees</span>
-            </div>
-
-            <h1 className="mb-5 max-w-xl text-4xl font-semibold tracking-tight text-white drop-shadow-lg md:text-5xl md:leading-[1.06] lg:text-[3.25rem] lg:leading-[1.08]">
-              Move Anything. Anywhere. Same Day.
-            </h1>
-
-            <p className="mb-2 max-w-lg text-base text-white/70 drop-shadow md:text-lg leading-relaxed">
-              Same-day logistics powered by verified travellers already in motion.
-            </p>
-
-            <p className="mb-6 text-sm text-white/40 drop-shadow">
-              UK &amp; Europe · 2-hour collection · Airport-to-airport delivery
-            </p>
-
-            <div className="flex flex-wrap gap-3 mb-7">
-              <Link href="/business"
-                className="border border-white/30 px-5 py-2 rounded-full text-sm font-medium text-white/70 hover:text-white hover:bg-white/[0.08] transition-all">
-                💼 For Business
-              </Link>
-            </div>
-
-            {/* Hero image — mobile only (desktop version is in the right column) */}
-            <div className="relative mb-6 md:hidden mx-auto w-full max-w-sm">
-              <div className="relative overflow-hidden rounded-2xl border border-white/10 shadow-[0_16px_48px_rgba(0,0,0,0.4)]" style={{ aspectRatio: '4/3' }}>
-                <Image src="/images/drealboothop.jpg" alt="BootHop delivery community" fill priority className="object-cover object-center" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+            {/* LEFT */}
+            <div>
+              {/* Trust tag */}
+              <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white/80 text-sm backdrop-blur-md">
+                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                Free to join · No subscription · No hidden fees
               </div>
-              {/* Floating trust badge on mobile image */}
-              <div className="absolute -bottom-3 left-4 rounded-xl border border-green-500/20 bg-[#0b1829]/95 px-3 py-2 shadow-xl backdrop-blur-xl flex items-center gap-2">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-500/20">
-                  <CheckCircle className="h-3.5 w-3.5 text-green-400" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-white leading-none">ID Verified</p>
-                  <p className="text-[10px] text-white/45 leading-none mt-0.5">Secure escrow held</p>
-                </div>
+
+              <h1 className="text-4xl md:text-6xl font-semibold text-white leading-tight mb-6 tracking-tight">
+                Move Anything.<br />Anywhere. Same Day.
+              </h1>
+
+              <p className="text-white/80 text-lg mb-3 max-w-xl leading-relaxed">
+                Your fastest delivery option is already moving.
+              </p>
+              <p className="text-white/55 text-sm mb-7">
+                UK &amp; Europe · 2-hour collection · Airport-to-airport delivery
+              </p>
+
+              {/* CTAs */}
+              <div className="flex flex-wrap gap-4 mb-4">
+                <Link href="#booking-form"
+                  onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
+                  className="px-7 py-3 rounded-full bg-white text-black font-semibold text-sm hover:scale-105 hover:shadow-[0_12px_32px_rgba(255,255,255,0.2)] transition-all">
+                  Send a Package
+                </Link>
+                <Link href="/business"
+                  className="px-7 py-3 rounded-full border border-white/30 text-white text-sm font-medium hover:bg-white/10 transition-all">
+                  For Business
+                </Link>
+              </div>
+
+              <p className="text-white/55 text-sm mb-7">⚡ Get matched with a verified traveller in minutes</p>
+
+              {/* Micro How It Works */}
+              <div className="flex flex-wrap items-center gap-2 text-white/45 text-sm mb-6">
+                {['Post', 'Match', 'Meet', 'Deliver'].map((step, i, arr) => (
+                  <span key={step} className="flex items-center gap-2">
+                    <span className="text-white/70 font-medium">{step}</span>
+                    {i < arr.length - 1 && <ArrowRight className="h-3 w-3 text-white/25" />}
+                  </span>
+                ))}
+              </div>
+
+              {/* Trust strip */}
+              <div className="flex flex-wrap gap-5 text-white/55 text-xs">
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Identity verified</span>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Secure escrow</span>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />95% satisfaction</span>
               </div>
             </div>
 
-            {/* CTA buttons */}
-            <div className="flex flex-wrap gap-3 mb-8">
-              <Link href="#booking-form"
-                onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
-                className="bg-white text-black px-7 py-3 rounded-full text-sm font-bold hover:bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(255,255,255,0.15)]">
-                Send a Package
-              </Link>
-              <Link href="/business"
-                className="border border-white/25 px-7 py-3 rounded-full text-sm font-semibold text-white hover:bg-white/[0.08] transition-all hover:-translate-y-0.5">
-                For Business
-              </Link>
-            </div>
-
-            {/* Trust row */}
-            <div className="flex flex-wrap gap-4 text-xs text-white/55 drop-shadow">
-              {trustItems.map((item) => (
-                <span key={item} className="flex items-center gap-1.5 font-medium">
-                  <CheckCircle className="h-3.5 w-3.5 text-green-400" />{item}
-                </span>
-              ))}
+            {/* RIGHT — live glass card */}
+            <div className="relative hidden md:block">
+              <div className="rounded-3xl border border-white/20 bg-white/5 backdrop-blur-xl p-3 shadow-[0_40px_120px_rgba(0,0,0,0.6)]">
+                <div className="relative overflow-hidden rounded-2xl" style={{ aspectRatio: '4/5' }}>
+                  <Image src="/images/drealboothop.jpg" alt="BootHop delivery" fill priority className="object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                  {/* Live badge */}
+                  <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3 py-1.5 backdrop-blur-xl">
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+                    <span className="text-xs font-semibold text-white/90">Live platform</span>
+                  </div>
+                  {/* ID Verified badge */}
+                  <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-green-500/20 border border-green-500/30 px-3 py-1.5 backdrop-blur-xl">
+                    <CheckCircle className="h-3 w-3 text-green-400" />
+                    <span className="text-xs text-white font-semibold">ID Verified</span>
+                  </div>
+                  {/* Match found signal */}
+                  <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-xl bg-black/60 px-4 py-2 backdrop-blur-md">
+                    <span className="h-2 w-2 bg-green-400 rounded-full animate-pulse" />
+                    <span className="text-xs text-white font-medium">Match found · 2 mins ago</span>
+                  </div>
+                </div>
+              </div>
+              {/* Floating route card */}
+              <div className="absolute -bottom-4 -left-8 rounded-2xl border border-white/25 bg-white/10 p-4 shadow-2xl backdrop-blur-xl">
+                <p className="mb-1.5 text-[10px] font-semibold text-white/50 uppercase tracking-wider">Live Match</p>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/25">
+                    <Plane className="h-4 w-4 text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-white">London → Lagos</p>
+                    <p className="text-xs text-white/50">Verified traveller · 3 slots left</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* RIGHT — premium glass image card */}
-          <div className="relative z-10 hidden md:block">
-            {/* Main image frame — deep glass card */}
-            <div className="rounded-[32px] border border-white/25 bg-white/10 p-3 shadow-[0_40px_120px_rgba(0,0,0,0.6)] backdrop-blur-xl ring-1 ring-white/10">
-              <div className="relative overflow-hidden rounded-[24px]" style={{ aspectRatio: '4/5' }}>
-                <Image src="/images/drealboothop.jpg" alt="BootHop community" fill priority className="object-cover" />
-                {/* Gradient for text legibility inside the card */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                {/* Live activity badge inside image */}
-                <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3 py-1.5 backdrop-blur-xl">
-                  <div className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-                  <span className="text-xs font-semibold text-white/90">Live platform</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Floating route glass card */}
-            <div className="absolute -bottom-4 -left-8 rounded-2xl border border-white/25 bg-white/12 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl ring-1 ring-white/10">
-              <p className="mb-2 text-xs font-semibold text-white/50 uppercase tracking-wider">Live Match</p>
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/25 ring-1 ring-blue-400/30">
-                  <Plane className="h-4 w-4 text-blue-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-white">London → Lagos</p>
-                  <p className="text-xs text-white/50">Verified traveller · 3 slots left</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Floating trust glass card */}
-            <div className="absolute -top-4 -right-4 rounded-2xl border border-green-500/30 bg-white/12 p-3.5 shadow-[0_20px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl ring-1 ring-white/10">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500/25 ring-1 ring-green-400/30">
-                  <CheckCircle className="h-4 w-4 text-green-400" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-white">ID Verified</p>
-                  <p className="text-[10px] text-white/50">Secure escrow held</p>
-                </div>
-              </div>
-            </div>
+        {/* TRANSPORT STRIP at bottom of hero */}
+        <div className="absolute bottom-0 w-full py-4 bg-black/60 backdrop-blur-md border-t border-white/[0.06]">
+          <div className="flex justify-center gap-8 md:gap-16 text-white/60 text-sm">
+            <span>✈️ Air</span>
+            <span>🚆 Rail</span>
+            <span>🚗 Road</span>
           </div>
         </div>
       </section>
@@ -664,6 +608,59 @@ function HomePageContent() {
         </div>
       </section>
 
+      {/* ── POWERED BY MOVEMENT ── */}
+      <section className="py-20 md:py-28 px-6 bg-[#030A16]">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-14 reveal">
+            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">How We Move</p>
+            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">Powered by Movement</h2>
+            <p className="mt-4 text-white/45 text-base max-w-xl mx-auto">We connect packages with people already moving — by air, rail, or road.</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              {
+                icon: '✈️',
+                mode: 'Air',
+                title: 'Flight-Speed Delivery',
+                desc: 'Match with verified travellers on commercial flights. Ideal for urgent cross-border deliveries, documents, and high-value items.',
+                color: 'from-blue-500/15 to-blue-600/5',
+                border: 'border-blue-500/20',
+                accent: 'text-blue-400',
+                glow: 'hover:shadow-[0_20px_60px_rgba(59,130,246,0.15)]',
+              },
+              {
+                icon: '🚆',
+                mode: 'Rail',
+                title: 'Same-Day UK Corridors',
+                desc: 'Intercity trains connect London, Manchester, Birmingham, Edinburgh and beyond. Perfect for domestic same-day delivery.',
+                color: 'from-emerald-500/15 to-emerald-600/5',
+                border: 'border-emerald-500/20',
+                accent: 'text-emerald-400',
+                glow: 'hover:shadow-[0_20px_60px_rgba(16,185,129,0.15)]',
+              },
+              {
+                icon: '🚗',
+                mode: 'Road',
+                title: 'Door-to-Door Precision',
+                desc: 'Drivers and commuters cover the last mile. Fast, flexible, and ideal for local same-day jobs where flexibility matters most.',
+                color: 'from-violet-500/15 to-violet-600/5',
+                border: 'border-violet-500/20',
+                accent: 'text-violet-400',
+                glow: 'hover:shadow-[0_20px_60px_rgba(139,92,246,0.15)]',
+              },
+            ].map((item, i) => (
+              <div key={item.mode}
+                className={`reveal d${i + 1} rounded-3xl border bg-gradient-to-br ${item.color} ${item.border} p-8 transition-all duration-300 hover:-translate-y-1 ${item.glow}`}>
+                <div className="text-4xl mb-5">{item.icon}</div>
+                <p className={`text-xs font-semibold uppercase tracking-widest mb-2 ${item.accent}`}>{item.mode}</p>
+                <h3 className="text-xl font-semibold text-white mb-3">{item.title}</h3>
+                <p className="text-white/50 text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── HOW IT WORKS + VIDEO (merged) ── */}
       <section className="relative min-h-[80vh] overflow-hidden flex items-center justify-center">
         {/* Cycling video background */}
@@ -684,28 +681,115 @@ function HomePageContent() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#020B18] via-transparent to-[#050D1A] pointer-events-none" />
 
         {/* Content — centred over video */}
-        <div className="relative z-10 text-center px-6 py-20 max-w-2xl mx-auto w-full">
-          <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-6">How it works</p>
+        <div className="relative z-10 px-6 py-20 max-w-5xl mx-auto w-full">
+          <div className="text-center mb-14">
+            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">Simple process</p>
+            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">How BootHop Works</h2>
+            <p className="mt-4 text-white/45 text-base">From posting to delivery in four steps.</p>
+          </div>
 
-          <div className="space-y-8 mb-10">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-14">
             {[
-              { n: '01', title: 'Post your request', sub: 'Tell us the route, date and package size. Takes 30 seconds.' },
-              { n: '02', title: 'Match with a verified traveller', sub: 'We match you with someone already making that journey.' },
-              { n: '03', title: 'Delivered same-day', sub: 'They carry it. You track it. Both sides confirm on arrival.' },
-            ].map(({ n, title, sub }) => (
-              <div key={n} className="flex items-start gap-5 text-left">
-                <span className="text-2xl font-black text-white/15 leading-none w-8 shrink-0">{n}</span>
-                <div>
-                  <p className="text-white font-semibold text-lg leading-tight">{title}</p>
-                  <p className="text-white/45 text-sm mt-1">{sub}</p>
-                </div>
+              { n: '01', title: 'Post Your Request', sub: 'Tell us the route, date, and package size. Takes 30 seconds.', icon: '📦', color: 'border-blue-500/25 hover:border-blue-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(59,130,246,0.18)]' },
+              { n: '02', title: 'Get Matched', sub: 'We connect you with a verified traveller already making that journey.', icon: '🤝', color: 'border-emerald-500/25 hover:border-emerald-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(16,185,129,0.18)]' },
+              { n: '03', title: 'Identity Verified', sub: 'All travellers complete KYC checks before handling any delivery.', icon: '🛡️', color: 'border-violet-500/25 hover:border-violet-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(139,92,246,0.18)]' },
+              { n: '04', title: 'Delivered', sub: 'Both sides confirm. Funds release. Simple, safe, done.', icon: '✅', color: 'border-amber-500/25 hover:border-amber-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(245,158,11,0.18)]' },
+            ].map(({ n, title, sub, icon, color, glow }) => (
+              <div key={n}
+                className={`rounded-2xl border bg-black/40 backdrop-blur-xl p-6 transition-all duration-300 hover:-translate-y-1 ${color} ${glow}`}>
+                <div className="text-3xl mb-4">{icon}</div>
+                <p className="text-[10px] font-bold text-white/25 uppercase tracking-widest mb-2">{n}</p>
+                <p className="text-white font-semibold text-base leading-tight mb-2">{title}</p>
+                <p className="text-white/45 text-xs leading-relaxed">{sub}</p>
               </div>
             ))}
           </div>
 
-          <Link href="/how-it-works" className="inline-flex items-center gap-2 text-sm text-white/35 hover:text-white/65 transition-colors">
-            Full details <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          {/* Trust bar */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { icon: '🔐', label: 'End-to-end encrypted' },
+              { icon: '✅', label: 'ID verified travellers' },
+              { icon: '💰', label: 'Secure payment escrow' },
+              { icon: '🌍', label: '200+ city corridors' },
+            ].map(({ icon, label }) => (
+              <div key={label} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md px-4 py-3">
+                <span className="text-xl">{icon}</span>
+                <span className="text-xs text-white/60 font-medium">{label}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 text-center">
+            <Link href="/how-it-works" className="inline-flex items-center gap-2 text-sm text-white/35 hover:text-white/65 transition-colors">
+              Full process details <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── WHY BOOTHOP WINS ── */}
+      <section className="py-20 md:py-28 px-6 bg-[#040C19]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14 reveal">
+            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">The Difference</p>
+            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">Why BootHop Wins</h2>
+            <p className="mt-4 text-white/45 text-base max-w-lg mx-auto">Traditional couriers were built for a different world. BootHop was built for speed.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-10">
+            {/* Traditional — red tint */}
+            <div className="reveal d1 rounded-3xl border border-red-500/15 bg-red-500/5 p-8">
+              <div className="flex items-center gap-3 mb-7">
+                <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-sm">✕</div>
+                <h3 className="text-white font-semibold text-lg">Traditional Courier</h3>
+              </div>
+              <ul className="space-y-4">
+                {[
+                  '1–5 day delivery windows',
+                  'Fixed pricing with hidden fees',
+                  'No idea who handles your package',
+                  'Customs delays, lost items, no recourse',
+                  'Depot-to-depot — not door-to-door',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-white/50">
+                    <span className="mt-0.5 text-red-400/70 shrink-0">—</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* BootHop — blue/green tint */}
+            <div className="reveal d2 rounded-3xl border border-blue-500/25 bg-gradient-to-br from-blue-500/10 to-emerald-500/5 p-8 shadow-[0_20px_60px_rgba(59,130,246,0.12)]">
+              <div className="flex items-center gap-3 mb-7">
+                <div className="w-8 h-8 rounded-full bg-blue-500/30 flex items-center justify-center text-sm">✓</div>
+                <h3 className="text-white font-semibold text-lg">BootHop</h3>
+              </div>
+              <ul className="space-y-4">
+                {[
+                  'Same-day delivery on most routes',
+                  'You set the price — transparent, no surprises',
+                  'ID-verified traveller, rated by the community',
+                  'Escrow protection — funds held until delivery confirmed',
+                  'Airport-to-door, city-to-city, or wherever you need',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-white/75">
+                    <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="reveal text-center">
+            <Link href="#booking-form"
+              onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
+              className="inline-flex items-center gap-2 bg-blue-500 text-white px-8 py-3.5 rounded-full font-semibold text-sm hover:bg-blue-400 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)]">
+              Try it free <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
