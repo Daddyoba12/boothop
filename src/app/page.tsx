@@ -226,9 +226,9 @@ function HomePageContent() {
     return () => clearInterval(id);
   }, []);
 
-  // Why BootHop Wins video strip — 5s crossfade
+  // Why BootHop Wins background — 6s crossfade between video1 and video2
   useEffect(() => {
-    const id = setInterval(() => setWinsVid(v => (v + 1) % 4), 5000);
+    const id = setInterval(() => setWinsVid(v => (v + 1) % 2), 6000);
     return () => clearInterval(id);
   }, []);
 
@@ -766,18 +766,43 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* ── WHY BOOTHOP WINS ── */}
-      <section className="py-20 md:py-28 px-6 bg-[#040C19]">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14 reveal">
+      {/* ── WHY BOOTHOP WINS — video background + glass cards ── */}
+      <section className="relative py-24 md:py-32 px-6 overflow-hidden">
+
+        {/* Video 1 & 2 crossfading as full background */}
+        {[1, 2].map((n, i) => (
+          <video
+            key={n}
+            autoPlay muted loop playsInline
+            preload={i === 0 ? 'auto' : 'none'}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[3000ms] ease-in-out"
+            style={{ opacity: i === winsVid ? 1 : 0 }}
+          >
+            <source src={`/videos/onecall/test_v/video${n}.mp4`} type="video/mp4" />
+          </video>
+        ))}
+
+        {/* Controlled dark overlay — dim enough for text, light enough to feel the video */}
+        <div className="absolute inset-0 bg-black/58" />
+
+        {/* Soft blue ambient glow — lifts the section */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_60%,rgba(59,130,246,0.10),transparent_70%)]" />
+
+        {/* Fade edges into adjacent sections */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050D1A]/90 via-transparent to-[#040C19]/90 pointer-events-none" />
+
+        {/* Content */}
+        <div className="relative z-10 max-w-5xl mx-auto">
+          <div className="text-center mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">The Difference</p>
             <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">Why BootHop Wins</h2>
-            <p className="mt-4 text-white/45 text-base max-w-lg mx-auto">Traditional couriers were built for a different world. BootHop was built for speed.</p>
+            <p className="mt-4 text-white/55 text-base max-w-lg mx-auto">Traditional couriers were built for a different world. BootHop was built for speed.</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-10">
-            {/* Traditional — red tint */}
-            <div className="reveal d1 rounded-3xl border border-red-500/15 bg-red-500/5 p-8">
+          <div className="grid md:grid-cols-2 gap-6 mb-12">
+
+            {/* Traditional — glass with red tint */}
+            <div className="rounded-3xl border border-red-500/20 bg-black/30 backdrop-blur-xl p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               <div className="flex items-center gap-3 mb-7">
                 <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-sm">✕</div>
                 <h3 className="text-white font-semibold text-lg">Traditional Courier</h3>
@@ -791,17 +816,17 @@ function HomePageContent() {
                   'Depot-to-depot — not door-to-door',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-sm text-white/50">
-                    <span className="mt-0.5 text-red-400/70 shrink-0">—</span>
+                    <span className="mt-0.5 text-red-400/60 shrink-0">—</span>
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* BootHop — blue/green tint */}
-            <div className="reveal d2 rounded-3xl border border-blue-500/25 bg-gradient-to-br from-blue-500/10 to-emerald-500/5 p-8 shadow-[0_20px_60px_rgba(59,130,246,0.12)]">
+            {/* BootHop — glass with blue glow */}
+            <div className="rounded-3xl border border-blue-500/30 bg-blue-950/30 backdrop-blur-xl p-8 shadow-[0_0_60px_rgba(59,130,246,0.15),inset_0_1px_0_rgba(255,255,255,0.08)]">
               <div className="flex items-center gap-3 mb-7">
-                <div className="w-8 h-8 rounded-full bg-blue-500/30 flex items-center justify-center text-sm">✓</div>
+                <div className="w-8 h-8 rounded-full bg-blue-500/25 flex items-center justify-center text-sm">✓</div>
                 <h3 className="text-white font-semibold text-lg">BootHop</h3>
               </div>
               <ul className="space-y-4">
@@ -812,7 +837,7 @@ function HomePageContent() {
                   'Escrow protection — funds held until delivery confirmed',
                   'Airport-to-door, city-to-city, or wherever you need',
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-white/75">
+                  <li key={item} className="flex items-start gap-3 text-sm text-white/80">
                     <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 shrink-0" />
                     {item}
                   </li>
@@ -821,50 +846,13 @@ function HomePageContent() {
             </div>
           </div>
 
-          <div className="reveal text-center mb-14">
+          <div className="text-center">
             <Link href="#booking-form"
               onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
-              className="inline-flex items-center gap-2 bg-blue-500 text-white px-8 py-3.5 rounded-full font-semibold text-sm hover:bg-blue-400 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)]">
+              className="inline-flex items-center gap-2 bg-white text-black px-8 py-3.5 rounded-full font-semibold text-sm hover:bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(255,255,255,0.15)]">
               Try it free <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-
-          {/* ── VIDEO STRIP — real deliveries in motion ── */}
-          <div className="relative w-full rounded-3xl overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.6)]" style={{ height: 'clamp(200px, 36vw, 420px)' }}>
-            {[1, 2, 3, 4].map((n, i) => (
-              <video
-                key={n}
-                autoPlay muted loop playsInline
-                preload={i === 0 ? 'auto' : 'none'}
-                className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[2500ms] ease-in-out"
-                style={{ opacity: i === winsVid ? 1 : 0 }}
-              >
-                <source src={`/videos/onecall/test_v/video${n}.mp4`} type="video/mp4" />
-              </video>
-            ))}
-
-            {/* Dark scrim — keeps it cinematic, not raw footage */}
-            <div className="absolute inset-0 bg-black/45" />
-
-            {/* Edge fade into section background */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#040C19]/80 via-transparent to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#040C19] to-transparent" />
-
-            {/* Label overlay */}
-            <div className="absolute bottom-6 left-7 flex items-center gap-3">
-              <span className="flex h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-xs font-semibold text-white/70 uppercase tracking-widest">Real deliveries. Real people.</span>
-            </div>
-
-            {/* Dot indicators */}
-            <div className="absolute bottom-6 right-7 flex gap-1.5">
-              {[0, 1, 2, 3].map(i => (
-                <button key={i} onClick={() => setWinsVid(i)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${i === winsVid ? 'w-5 bg-white' : 'w-1.5 bg-white/30'}`} />
-              ))}
-            </div>
-          </div>
-
         </div>
       </section>
 
