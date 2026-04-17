@@ -664,24 +664,9 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
-      <section className="py-28 text-center px-6 bg-[#07111f]">
-        <h2 className="text-3xl font-semibold text-white mb-12 reveal">How it works</h2>
-        <div className="space-y-5 max-w-sm mx-auto">
-          {['Post your request', 'Match with a verified traveller', 'Delivered same-day'].map((item, i) => (
-            <p key={i} className={`reveal d${i + 1} text-white/70 text-lg`}>
-              {i + 1}. {item}
-            </p>
-          ))}
-        </div>
-        <Link href="/how-it-works" className="mt-10 inline-flex items-center gap-2 text-sm text-white/40 hover:text-white/70 transition-colors reveal">
-          Learn more <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
-      </section>
-
-      {/* ── VIDEO — Not a courier ── */}
-      <section className="relative h-[65vh] overflow-hidden">
-        {/* 4 videos — slow Apple crossfade */}
+      {/* ── HOW IT WORKS + VIDEO (merged) ── */}
+      <section className="relative min-h-[80vh] overflow-hidden flex items-center justify-center">
+        {/* Cycling video background */}
         {WHY_VIDEOS.map((src, i) => (
           <video
             key={src}
@@ -693,15 +678,34 @@ function HomePageContent() {
             <source src={src} type="video/mp4" />
           </video>
         ))}
-        {/* Scrim + text */}
-        <div className="absolute inset-0 bg-black/65 flex flex-col items-center justify-center text-center px-6">
-          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.8)]">
-            Not a courier.<br />
-            <span className="text-white/60">A faster way to move.</span>
-          </h2>
-          <p className="mt-4 text-white/50 text-base max-w-md">
-            Built for time-critical movement across cities and borders.
-          </p>
+        {/* Dark scrim */}
+        <div className="absolute inset-0 bg-black/72" />
+        {/* Top + bottom fades into adjacent sections */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#020B18] via-transparent to-[#050D1A] pointer-events-none" />
+
+        {/* Content — centred over video */}
+        <div className="relative z-10 text-center px-6 py-20 max-w-2xl mx-auto w-full">
+          <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-6">How it works</p>
+
+          <div className="space-y-8 mb-10">
+            {[
+              { n: '01', title: 'Post your request', sub: 'Tell us the route, date and package size. Takes 30 seconds.' },
+              { n: '02', title: 'Match with a verified traveller', sub: 'We match you with someone already making that journey.' },
+              { n: '03', title: 'Delivered same-day', sub: 'They carry it. You track it. Both sides confirm on arrival.' },
+            ].map(({ n, title, sub }) => (
+              <div key={n} className="flex items-start gap-5 text-left">
+                <span className="text-2xl font-black text-white/15 leading-none w-8 shrink-0">{n}</span>
+                <div>
+                  <p className="text-white font-semibold text-lg leading-tight">{title}</p>
+                  <p className="text-white/45 text-sm mt-1">{sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Link href="/how-it-works" className="inline-flex items-center gap-2 text-sm text-white/35 hover:text-white/65 transition-colors">
+            Full details <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </section>
 
@@ -751,34 +755,6 @@ function HomePageContent() {
       </section>
 
 
-      {/* ── TRUST SECTION ── */}
-      <section className="py-20 bg-[#040C19]">
-        <div className="mx-auto max-w-7xl px-6 md:px-8">
-          <div className="text-center mb-12 reveal">
-            <h2 className="text-3xl font-semibold text-white md:text-4xl">Built for trust at every step</h2>
-            <p className="mt-4 text-white/50 text-base max-w-xl mx-auto">Every match is ID-verified, every payment held in escrow, every delivery tracked.</p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { icon: Shield,       title: 'ID Verified',       desc: 'Every traveller is identity-checked before they can carry',       color: 'text-blue-400' },
-              { icon: Zap,          title: 'Secure Escrow',     desc: 'Payment held until delivery is confirmed by both sides',          color: 'text-emerald-400' },
-              { icon: Users,        title: '95% Satisfaction',  desc: 'Community-rated matching with full dispute resolution',           color: 'text-violet-400' },
-              { icon: CheckCircle,  title: 'Free to Join',      desc: 'No subscription. You only pay when a match is made',             color: 'text-amber-400' },
-            ].map(({ icon: Icon, title, desc, color }, i) => (
-              <div key={title} className={`reveal d${i + 1} rounded-2xl border border-white/8 bg-white/3 p-6 text-center hover:border-white/15 hover:bg-white/5 transition-all duration-200`}>
-                <Icon className={`h-7 w-7 mx-auto mb-3 ${color}`} />
-                <p className="text-sm font-semibold text-white mb-1">{title}</p>
-                <p className="text-xs text-white/45 leading-relaxed">{desc}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <Link href="/trust-safety" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white/70 transition-colors">
-              How we keep every match safe <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* ── LIVE TRIPS — only shown when platform has real activity ── */}
       {trips.length >= 3 && <section className="relative py-20 md:py-28 bg-[#07111f]">
@@ -1008,7 +984,7 @@ function HomePageContent() {
           autoPlay muted loop playsInline
           className="absolute inset-0 w-full h-full object-cover scale-105"
         >
-          <source src="/videos/onecall/test_v/video2.mp4" type="video/mp4" />
+          <source src="/videos/onecall/plane1.mp4" type="video/mp4" />
         </video>
         {/* Strong overlay so text stays sharp */}
         <div className="absolute inset-0 bg-black/75" />
@@ -1032,61 +1008,6 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* ── Contact Us ─────────────────────────────────────────────────────── */}
-      <section className="py-24 px-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-10 reveal">
-            <h2 className="text-3xl font-black mb-3">Get in touch</h2>
-            <p className="text-white/40 text-sm">Questions, partnerships or just saying hello — we&apos;re here.</p>
-          </div>
-
-          <div className="bg-white/3 border border-white/8 rounded-3xl p-8 reveal">
-            {/* WhatsApp CTA */}
-            <a href="/api/whatsapp"
-              className="inline-flex items-center gap-2.5 bg-[#25D366] text-white font-bold text-sm px-5 py-3 rounded-full mb-6 hover:bg-[#1ebe5d] transition-all">
-              <MessageCircle className="h-5 w-5" />
-              Chat on WhatsApp
-            </a>
-
-            {contactStatus === 'ok' ? (
-              <div className="rounded-2xl bg-blue-500/10 border border-blue-500/20 px-6 py-8 text-center">
-                <CheckCircle className="h-8 w-8 text-blue-400 mx-auto mb-3" />
-                <p className="text-white font-bold">Message sent!</p>
-                <p className="text-white/40 text-sm mt-1">We&apos;ll be in touch shortly.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {contactStatus === 'err' && (
-                  <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">
-                    Could not send message. Please try WhatsApp instead.
-                  </div>
-                )}
-                <div className="flex items-center gap-3 mb-1">
-                  <Mail className="h-4 w-4 text-white/30" />
-                  <p className="text-white/50 text-sm font-semibold">Or send us a message</p>
-                </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <input value={contactForm.name} onChange={e => setContactForm(p => ({ ...p, name: e.target.value }))}
-                    placeholder="Your name"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-                  <input value={contactForm.email} onChange={e => setContactForm(p => ({ ...p, email: e.target.value }))}
-                    type="email" placeholder="Email address"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-                </div>
-                <textarea value={contactForm.message} onChange={e => setContactForm(p => ({ ...p, message: e.target.value }))}
-                  rows={4} placeholder="How can we help?"
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none" />
-                <button onClick={submitContact}
-                  disabled={contactLoading || !contactForm.name || !contactForm.email || !contactForm.message}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-blue-500 text-white font-black disabled:opacity-40 hover:scale-[1.02] transition-all text-sm">
-                  {contactLoading ? <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Send className="h-4 w-4" />}
-                  {contactLoading ? 'Sending…' : 'Send message'}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
 
       {/* Floating WhatsApp button — icon only */}
       <a href="/api/whatsapp"
