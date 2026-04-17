@@ -18,7 +18,7 @@ const BG   = 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)';
 
 const BIZ_VIDEOS = [
   '/videos/onecall/test2/compressed/Planeeoff1.mp4',
-  '/videos/onecall/test2/compressed/Planeeoff2.mp4',
+  '/videos/onecall/test2/compressed/Planeoff2.mp4',
 ];
 
 

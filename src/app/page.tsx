@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Suspense, useEffect, useMemo, useState, useCallback } from 'react';
+import { Suspense, useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -157,10 +157,26 @@ function HomePageContent() {
   const [contactStatus,  setContactStatus]  = useState<'idle' | 'ok' | 'err'>('idle');
 
   const [scrollY, setScrollY] = useState(0);
+  const movementSectionRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     const onScroll = () => { setScrollY(window.scrollY); setScrolled(window.scrollY > 20); };
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Cinematic parallax — videos drift slower than content as user scrolls
+  useEffect(() => {
+    const handleParallax = () => {
+      if (!movementSectionRef.current) return;
+      const offset = movementSectionRef.current.offsetTop;
+      const movement = (window.scrollY - offset) * 0.12;
+      movementSectionRef.current.querySelectorAll<HTMLVideoElement>('.parallax-vid').forEach(v => {
+        v.style.transform = `translateY(${movement}px) scale(1.15)`;
+      });
+    };
+    window.addEventListener('scroll', handleParallax, { passive: true });
+    return () => window.removeEventListener('scroll', handleParallax);
   }, []);
 
   useEffect(() => {
@@ -608,55 +624,70 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* ── POWERED BY MOVEMENT ── */}
-      <section className="py-20 md:py-28 px-6 bg-[#030A16]">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-14 reveal">
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">How We Move</p>
-            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">Powered by Movement</h2>
-            <p className="mt-4 text-white/45 text-base max-w-xl mx-auto">We connect packages with people already moving — by air, rail, or road.</p>
+      {/* ── POWERED BY MOVEMENT — cinematic parallax ── */}
+      <section ref={movementSectionRef} className="relative bg-[#020617] py-32 overflow-hidden">
+
+        {/* Three videos side-by-side — low opacity, parallax drift */}
+        <div className="absolute inset-0 opacity-[0.18]">
+          <div className="grid grid-cols-3 h-full">
+            <video autoPlay muted loop playsInline className="parallax-vid w-full h-full object-cover scale-110">
+              <source src="/videos/onecall/plane2.mp4" type="video/mp4" />
+            </video>
+            <video autoPlay muted loop playsInline className="parallax-vid w-full h-full object-cover scale-110">
+              <source src="/videos/onecall/Aboutus_train.mp4" type="video/mp4" />
+            </video>
+            <video autoPlay muted loop playsInline className="parallax-vid w-full h-full object-cover scale-110">
+              <source src="/videos/onecall/test1/Aboutusbus.mp4" type="video/mp4" />
+            </video>
           </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {[
-              {
-                icon: '✈️',
-                mode: 'Air',
-                title: 'Flight-Speed Delivery',
-                desc: 'Match with verified travellers on commercial flights. Ideal for urgent cross-border deliveries, documents, and high-value items.',
-                color: 'from-blue-500/15 to-blue-600/5',
-                border: 'border-blue-500/20',
-                accent: 'text-blue-400',
-                glow: 'hover:shadow-[0_20px_60px_rgba(59,130,246,0.15)]',
-              },
-              {
-                icon: '🚆',
-                mode: 'Rail',
-                title: 'Same-Day UK Corridors',
-                desc: 'Intercity trains connect London, Manchester, Birmingham, Edinburgh and beyond. Perfect for domestic same-day delivery.',
-                color: 'from-emerald-500/15 to-emerald-600/5',
-                border: 'border-emerald-500/20',
-                accent: 'text-emerald-400',
-                glow: 'hover:shadow-[0_20px_60px_rgba(16,185,129,0.15)]',
-              },
-              {
-                icon: '🚗',
-                mode: 'Road',
-                title: 'Door-to-Door Precision',
-                desc: 'Drivers and commuters cover the last mile. Fast, flexible, and ideal for local same-day jobs where flexibility matters most.',
-                color: 'from-violet-500/15 to-violet-600/5',
-                border: 'border-violet-500/20',
-                accent: 'text-violet-400',
-                glow: 'hover:shadow-[0_20px_60px_rgba(139,92,246,0.15)]',
-              },
-            ].map((item, i) => (
-              <div key={item.mode}
-                className={`reveal d${i + 1} rounded-3xl border bg-gradient-to-br ${item.color} ${item.border} p-8 transition-all duration-300 hover:-translate-y-1 ${item.glow}`}>
-                <div className="text-4xl mb-5">{item.icon}</div>
-                <p className={`text-xs font-semibold uppercase tracking-widest mb-2 ${item.accent}`}>{item.mode}</p>
-                <h3 className="text-xl font-semibold text-white mb-3">{item.title}</h3>
-                <p className="text-white/50 text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
+        </div>
+
+        {/* Dark gradient control — fades into adjacent sections */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/95 via-[#020617]/88 to-[#020617]/95" />
+
+        {/* Blue radial glow — depth layer */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.13),transparent_70%)]" />
+
+        {/* Content */}
+        <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
+          <p className="text-blue-400 text-sm font-semibold tracking-[0.2em] uppercase mb-3 reveal">HOW WE MOVE</p>
+          <h2 className="text-4xl md:text-5xl text-white font-semibold mb-4 reveal d1">Powered by Movement</h2>
+          <p className="text-white/55 max-w-2xl mx-auto mb-16 reveal d2">
+            We connect packages with people already moving — by air, rail, or road.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6 items-center">
+
+            {/* AIR */}
+            <div className="reveal d1 backdrop-blur-xl bg-white/[0.04] border border-white/[0.08] rounded-2xl p-7 text-left hover:scale-[1.03] hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(59,130,246,0.12)]">
+              <div className="text-blue-400 text-2xl mb-4">✈️</div>
+              <p className="text-xs font-bold text-blue-400/70 uppercase tracking-widest mb-2">Air</p>
+              <h3 className="text-white text-xl font-semibold mb-3">Flight-Speed Delivery</h3>
+              <p className="text-white/55 text-sm leading-relaxed">
+                Match with verified travellers on commercial flights. Ideal for urgent cross-border deliveries, documents, and high-value items.
+              </p>
+            </div>
+
+            {/* RAIL — focus card, elevated */}
+            <div className="reveal d2 backdrop-blur-xl bg-gradient-to-br from-blue-900/45 to-blue-700/20 border border-blue-500/25 rounded-2xl p-7 text-left scale-[1.06] shadow-[0_0_50px_rgba(59,130,246,0.18),0_20px_60px_rgba(0,0,0,0.4)] hover:scale-[1.10] transition-all duration-500">
+              <div className="text-blue-300 text-2xl mb-4">🚆</div>
+              <p className="text-xs font-bold text-blue-300/70 uppercase tracking-widest mb-2">Rail</p>
+              <h3 className="text-white text-xl font-semibold mb-3">Same-Day UK Corridors</h3>
+              <p className="text-white/65 text-sm leading-relaxed">
+                Intercity trains connect London, Manchester, Birmingham, Edinburgh and beyond. Perfect for domestic same-day delivery.
+              </p>
+            </div>
+
+            {/* ROAD */}
+            <div className="reveal d3 backdrop-blur-xl bg-white/[0.04] border border-white/[0.08] rounded-2xl p-7 text-left hover:scale-[1.03] hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(139,92,246,0.12)]">
+              <div className="text-violet-400 text-2xl mb-4">🚗</div>
+              <p className="text-xs font-bold text-violet-400/70 uppercase tracking-widest mb-2">Road</p>
+              <h3 className="text-white text-xl font-semibold mb-3">Door-to-Door Precision</h3>
+              <p className="text-white/55 text-sm leading-relaxed">
+                Drivers and commuters cover the last mile. Fast, flexible, and ideal for local same-day jobs where flexibility matters most.
+              </p>
+            </div>
+
           </div>
         </div>
       </section>
