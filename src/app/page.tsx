@@ -984,10 +984,8 @@ function HomePageContent() {
           className="absolute inset-0 w-full h-full object-cover scale-105">
           <source src="/videos/onecall/plane1.mp4" type="video/mp4" />
         </video>
-        {/* Overlay — controlled premium feel */}
-        <div className="absolute inset-0 bg-black/65" />
-        {/* Top + bottom fades */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050D1A] via-transparent to-[#050D1A] pointer-events-none" />
+        {/* Single overlay — light enough to see the plane, dark enough for text */}
+        <div className="absolute inset-0 bg-black/50" />
 
         <div className="relative z-10">
           <h2 className="text-4xl md:text-5xl font-semibold text-white mb-4 tracking-tight leading-tight">
