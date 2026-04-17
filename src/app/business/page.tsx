@@ -17,10 +17,8 @@ const FADE = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, ex
 const BG   = 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)';
 
 const BIZ_VIDEOS = [
-  '/videos/onecall/test1/test2/video1.mp4',
-  '/videos/onecall/test1/test2/video2.mp4',
-  '/videos/onecall/test1/test2/video3.mp4',
-  '/videos/onecall/test1/test2/video4.mp4',
+  '/videos/onecall/test2/compressed/Planeeoff1.mp4',
+  '/videos/onecall/test2/compressed/Planeeoff2.mp4',
 ];
 
 
@@ -131,7 +129,7 @@ export default function BoothopBusiness() {
               <video
                 autoPlay muted loop playsInline preload="auto"
                 className="absolute inset-0 w-full h-full object-cover brightness-[0.65]"
-                src="/videos/onecall/boxxoff4.mp4"
+                src="/videos/onecall/test2/compressed/Planeeoff1.mp4"
               />
 
               {/* Layer 1 — solid dark base (matches HeroV2 bg-black/60) */}
@@ -246,10 +244,10 @@ export default function BoothopBusiness() {
               <div className="absolute top-[75%] right-[8%] w-[300px] h-[300px] bg-rose-500/5    rounded-full blur-[110px]" />
             </div>
 
-            {/* ── BOTTOM SECTION — Apple-style cinematic video + glass panel ── */}
+            {/* ── BOTTOM SECTION — Crossfading plane videos + premium glass panel ── */}
             <section className="relative z-10 py-28 px-8 overflow-hidden">
 
-              {/* All 4 videos stacked — Apple opacity crossfade, 3s transition */}
+              {/* Two plane videos — slow opacity crossfade */}
               <div className="absolute inset-0">
                 {BIZ_VIDEOS.map((src, i) => (
                   <video
@@ -262,59 +260,73 @@ export default function BoothopBusiness() {
                     <source src={src} type="video/mp4" />
                   </video>
                 ))}
-                {/* Blend into page sections above and below — no overlay on the video itself */}
+                {/* Dark scrim — enough to read text without killing the planes */}
+                <div className="absolute inset-0 bg-black/55" />
+                {/* Fade into adjacent sections */}
                 <div className="absolute inset-0 bg-gradient-to-b from-[#020617] via-transparent to-[#020617]" />
-                {/* Subtle left/right vignette so glass panel text is readable */}
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(2,6,23,0.55)_100%)]" />
+                {/* Edge vignette */}
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_50%,rgba(2,6,23,0.50)_100%)]" />
               </div>
 
-              {/* Content — no glass box, text blends directly onto the video */}
-              <div className="relative max-w-5xl mx-auto px-2">
+              {/* ── GLASS PANEL — premium frosted card over the video ── */}
+              <div className="relative max-w-5xl mx-auto">
+                <div className="rounded-3xl border border-white/[0.12] bg-white/[0.05] backdrop-blur-2xl shadow-[0_40px_120px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.1)] overflow-hidden">
 
-                {/* Label */}
-                <p className="text-xs font-black text-emerald-400 uppercase tracking-[0.2em] mb-6 drop-shadow-lg">
-                  Why BootHop Business
-                </p>
+                  {/* Top accent line */}
+                  <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent" />
 
-                {/* Headline — large, sharp, directly on video */}
-                <h2 className="text-5xl md:text-6xl font-black text-white leading-[1.05] mb-6 drop-shadow-[0_2px_24px_rgba(0,0,0,0.9)]">
-                  We don&apos;t deliver parcels.<br />
-                  <span className="text-emerald-400">We eliminate downtime.</span>
-                </h2>
+                  <div className="p-10 md:p-14">
 
-                {/* Sub-copy */}
-                <p className="text-white/75 text-lg max-w-2xl leading-relaxed mb-16 drop-shadow-[0_1px_12px_rgba(0,0,0,0.8)]">
-                  Downtime costs £10,000+ per hour. Delays cost more.
-                  BootHop moves critical items the moment they matter —
-                  verified carriers, fully insured, same-day.
-                </p>
+                    {/* Label */}
+                    <p className="text-xs font-black text-emerald-400 uppercase tracking-[0.2em] mb-6">
+                      Why BootHop Business
+                    </p>
 
-                {/* Use cases — separated by thin lines, no boxes */}
-                <div className="grid md:grid-cols-3 gap-0 mb-16 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-sm bg-black/20">
-                  {[
-                    { title: 'Engineering &\nManufacturing', body: 'Spare parts, production line recovery, maintenance components.' },
-                    { title: 'Aerospace & AOG',              body: 'Aircraft-on-ground parts and time-critical tools under 20 kg.' },
-                    { title: 'International\n& Customs',     body: 'Hand-carry across borders with full customs coordination.' },
-                  ].map(({ title, body }, i) => (
-                    <div key={title} className={`p-7 ${i < 2 ? 'border-r border-white/8' : ''}`}>
-                      <h3 className="text-white font-black mb-2 whitespace-pre-line leading-tight drop-shadow-lg">{title}</h3>
-                      <p className="text-white/55 text-sm leading-relaxed">{body}</p>
+                    {/* Headline */}
+                    <h2 className="text-4xl md:text-5xl font-black text-white leading-[1.08] mb-6">
+                      We don&apos;t deliver parcels.<br />
+                      <span className="text-emerald-400">We eliminate downtime.</span>
+                    </h2>
+
+                    {/* Sub-copy */}
+                    <p className="text-white/65 text-lg max-w-2xl leading-relaxed mb-12">
+                      Downtime costs £10,000+ per hour. Delays cost more.
+                      BootHop moves critical items the moment they matter —
+                      verified carriers, fully insured, same-day.
+                    </p>
+
+                    {/* Use cases — frosted inner grid */}
+                    <div className="grid md:grid-cols-3 gap-px bg-white/[0.07] rounded-2xl overflow-hidden mb-12">
+                      {[
+                        { icon: '⚙️', title: 'Engineering &\nManufacturing', body: 'Spare parts, production line recovery, maintenance components.' },
+                        { icon: '✈️', title: 'Aerospace & AOG',              body: 'Aircraft-on-ground parts and time-critical tools under 20 kg.' },
+                        { icon: '🌍', title: 'International\n& Customs',     body: 'Hand-carry across borders with full customs coordination.' },
+                      ].map(({ icon, title, body }) => (
+                        <div key={title} className="bg-white/[0.04] hover:bg-white/[0.08] transition-colors duration-300 p-7">
+                          <div className="text-2xl mb-3">{icon}</div>
+                          <h3 className="text-white font-black mb-2 whitespace-pre-line leading-tight">{title}</h3>
+                          <p className="text-white/50 text-sm leading-relaxed">{body}</p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
 
-                {/* Metrics — inline, borderless, blends into video */}
-                <div className="flex flex-wrap items-center justify-between gap-5 border-t border-white/15 pt-7 text-sm drop-shadow-lg">
-                  <span className="text-white/70"><strong className="text-white font-black">£200+</strong> local from</span>
-                  <span className="text-white/70"><strong className="text-white font-black">Same-day</strong> delivery</span>
-                  <span className="text-white/70"><strong className="text-white font-black">Fully</strong> insured</span>
-                  <span className="text-white/70"><strong className="text-white font-black">Business-only</strong> verified</span>
-                  <a href="/business/pricing"
-                    className="inline-flex items-center gap-1.5 text-emerald-400 font-black hover:text-emerald-300 transition-colors group">
-                    View pricing <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </a>
-                </div>
+                    {/* Metrics strip */}
+                    <div className="flex flex-wrap items-center justify-between gap-5 border-t border-white/10 pt-8 text-sm">
+                      <span className="text-white/60"><strong className="text-white font-black">£200+</strong> local from</span>
+                      <span className="text-white/60"><strong className="text-white font-black">Same-day</strong> delivery</span>
+                      <span className="text-white/60"><strong className="text-white font-black">Fully</strong> insured</span>
+                      <span className="text-white/60"><strong className="text-white font-black">Business-only</strong> verified</span>
+                      <a href="/business/pricing"
+                        className="inline-flex items-center gap-1.5 text-emerald-400 font-black hover:text-emerald-300 transition-colors group">
+                        View pricing <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </a>
+                    </div>
 
+                  </div>
+
+                  {/* Bottom accent line */}
+                  <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                </div>
               </div>
             </section>
 
