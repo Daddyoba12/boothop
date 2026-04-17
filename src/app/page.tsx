@@ -48,13 +48,15 @@ const testimonials = [
 ];
 
 const featuredRoutes = [
-  { from: 'London', to: 'Lagos', tag: 'Most Popular', color: 'from-blue-500/20 to-blue-600/10', border: 'border-blue-500/20', badge: 'bg-blue-500/20 text-blue-300' },
-  { from: 'Manchester', to: 'Lagos', tag: 'High Demand', color: 'from-emerald-500/20 to-emerald-600/10', border: 'border-emerald-500/20', badge: 'bg-emerald-500/20 text-emerald-300' },
-  { from: 'Abuja', to: 'Lagos', tag: 'Domestic Route', color: 'from-green-500/20 to-green-600/10', border: 'border-green-500/20', badge: 'bg-green-500/20 text-green-300' },
-  { from: 'Nottingham', to: 'Lagos', tag: 'Growing Route', color: 'from-purple-500/20 to-purple-600/10', border: 'border-purple-500/20', badge: 'bg-purple-500/20 text-purple-300' },
-  { from: 'London', to: 'New York', tag: 'Transatlantic', color: 'from-cyan-500/20 to-cyan-600/10', border: 'border-cyan-500/20', badge: 'bg-cyan-500/20 text-cyan-300' },
-  { from: 'Birmingham', to: 'Lagos', tag: 'New Corridor', color: 'from-amber-500/20 to-amber-600/10', border: 'border-amber-500/20', badge: 'bg-amber-500/20 text-amber-300' },
-  { from: 'London', to: 'Tokyo', tag: 'International', color: 'from-rose-500/20 to-rose-600/10', border: 'border-rose-500/20', badge: 'bg-rose-500/20 text-rose-300' },
+  { from: 'London', to: 'Lagos',         tag: 'Most Popular',   color: 'from-blue-500/20 to-blue-600/10',    border: 'border-blue-500/20',    badge: 'bg-blue-500/20 text-blue-300',     travellers: 12, departs: 'Today' },
+  { from: 'Manchester', to: 'Lagos',     tag: 'High Demand',    color: 'from-emerald-500/20 to-emerald-600/10', border: 'border-emerald-500/20', badge: 'bg-emerald-500/20 text-emerald-300', travellers: 7, departs: 'Tomorrow' },
+  { from: 'Derby', to: 'Heathrow',       tag: 'UK Domestic',    color: 'from-violet-500/20 to-violet-600/10', border: 'border-violet-500/20',  badge: 'bg-violet-500/20 text-violet-300', travellers: 4, departs: 'Today' },
+  { from: 'London', to: 'Aberdeen',      tag: 'UK Domestic',    color: 'from-sky-500/20 to-sky-600/10',      border: 'border-sky-500/20',     badge: 'bg-sky-500/20 text-sky-300',       travellers: 3, departs: 'Tomorrow' },
+  { from: 'London', to: 'Edinburgh',     tag: 'High Demand',    color: 'from-green-500/20 to-green-600/10',  border: 'border-green-500/20',   badge: 'bg-green-500/20 text-green-300',   travellers: 9, departs: 'Today' },
+  { from: 'London', to: 'New York',      tag: 'Transatlantic',  color: 'from-cyan-500/20 to-cyan-600/10',    border: 'border-cyan-500/20',    badge: 'bg-cyan-500/20 text-cyan-300',     travellers: 5, departs: 'Thu' },
+  { from: 'Birmingham', to: 'Lagos',     tag: 'Growing Route',  color: 'from-amber-500/20 to-amber-600/10',  border: 'border-amber-500/20',   badge: 'bg-amber-500/20 text-amber-300',   travellers: 6, departs: 'Tomorrow' },
+  { from: 'London', to: 'Dubai',         tag: 'International',  color: 'from-orange-500/20 to-orange-600/10', border: 'border-orange-500/20', badge: 'bg-orange-500/20 text-orange-300', travellers: 8, departs: 'Today' },
+  { from: 'Nottingham', to: 'Lagos',     tag: 'New Corridor',   color: 'from-purple-500/20 to-purple-600/10', border: 'border-purple-500/20', badge: 'bg-purple-500/20 text-purple-300', travellers: 2, departs: 'Fri' },
 ];
 
 const weightOptions = [
@@ -122,10 +124,9 @@ const HERO_VIDEOS = [
 ];
 
 const WHY_VIDEOS = [
-  '/videos/onecall/test_v/video1.mp4',
-  '/videos/onecall/test_v/video2.mp4',
-  '/videos/onecall/test_v/video3.mp4',
-  '/videos/onecall/test_v/video4.mp4',
+  '/videos/onecall/test1/Aboutusbus.mp4',
+  '/videos/onecall/test1/Boxoff.mp4',
+  '/videos/onecall/test1/boxoff5.mp4',
 ];
 
 function HomePageContent() {
@@ -278,14 +279,16 @@ function HomePageContent() {
     else if (!toSelected)   errors.to    = 'Select a city from the dropdown';
     if (!trip.date)        errors.date   = 'Please choose a date';
     if (!trip.weight)      errors.weight = 'Please select a weight';
-    if (!trip.price || Number(trip.price) <= 0) errors.price = mode === 'travel' ? 'Please enter your price (£)' : 'Please enter your budget (£)';
     if (Object.keys(errors).length > 0) { setFormErrors(errors); return; }
     setFormErrors({});
     setShowEmail(true);
   };
 
   const sendMagicLink = async () => {
-    if (!trip.email) { setFormErrors({ email: 'Please enter your email address' }); return; }
+    const errs: Record<string, string> = {};
+    if (!trip.price || Number(trip.price) <= 0) errs.price = mode === 'travel' ? 'Please enter your price' : 'Please enter your budget';
+    if (!trip.email) errs.email = 'Please enter your email address';
+    if (Object.keys(errs).length > 0) { setFormErrors(errs); return; }
     setSubmitting(true);
     const journeyPayload = { from: trip.from, to: trip.to, date: trip.date, price: trip.price, weight: trip.weight, mode };
     const res = await fetch('/api/auth/request-code', {
@@ -475,7 +478,7 @@ function HomePageContent() {
           <div className="relative z-10">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 backdrop-blur-md shadow-lg shadow-black/30">
               <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse shadow-sm shadow-green-400/60" />
-              <span className="text-xs font-semibold text-white/85 tracking-wide">UK–Nigeria routes now live</span>
+              <span className="text-xs font-semibold text-white/85 tracking-wide">Free to join · No subscription · No hidden fees</span>
             </div>
 
             <h1 className="mb-5 max-w-xl text-4xl font-semibold tracking-tight text-white drop-shadow-lg md:text-5xl md:leading-[1.06] lg:text-[3.25rem] lg:leading-[1.08]">
@@ -491,14 +494,9 @@ function HomePageContent() {
             </p>
 
             <div className="flex flex-wrap gap-3 mb-7">
-              <button
-                onClick={() => document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-white text-black px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-white/90 transition-all hover:-translate-y-0.5">
-                Send Package
-              </button>
               <Link href="/business"
-                className="border border-white/30 px-6 py-2.5 rounded-full text-sm font-semibold text-white hover:bg-white/[0.08] transition-all hover:-translate-y-0.5">
-                For Business
+                className="border border-white/30 px-5 py-2 rounded-full text-sm font-medium text-white/70 hover:text-white hover:bg-white/[0.08] transition-all">
+                💼 For Business
               </Link>
             </div>
 
@@ -520,80 +518,21 @@ function HomePageContent() {
               </div>
             </div>
 
-            {/* Mode toggle */}
-            <div className="mb-5 inline-flex rounded-xl border border-white/20 bg-white/10 p-1 backdrop-blur-xl shadow-lg shadow-black/30 ring-1 ring-white/5">
-              <button onClick={() => setMode('send')} className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'send' ? 'bg-blue-500 text-white shadow-xl shadow-blue-500/40 scale-[1.02]' : 'text-white/60 hover:text-white hover:bg-white/8'}`}>
-                📦 Send Item
-              </button>
-              <button onClick={() => setMode('travel')} className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'travel' ? 'bg-blue-500 text-white shadow-xl shadow-blue-500/40 scale-[1.02]' : 'text-white/60 hover:text-white hover:bg-white/8'}`}>
-                ✈️ I&apos;m Travelling
-              </button>
-            </div>
-
-            {/* Form */}
-            <div id="booking-form" className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-2xl shadow-[0_32px_80px_rgba(0,0,0,0.55)] ring-1 ring-white/5">
-              <div className="grid gap-2.5 sm:grid-cols-2">
-                <div className="relative pb-4">
-                  <input placeholder="From (City)" value={queryFrom}
-                    onChange={(e) => { setQueryFrom(e.target.value); setTrip({ ...trip, from: e.target.value }); setFromSelected(false); setFormErrors(p => ({ ...p, from: '' })); }}
-                    className={`${inputClass} ${formErrors.from ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
-                  {fromSuggestions.length > 0 && (
-                    <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl">
-                      {fromSuggestions.map((s, i) => (
-                        <div key={i} onClick={() => { setTrip({ ...trip, from: s }); setQueryFrom(s); setFromSuggestions([]); setFromSelected(true); setFormErrors(p => ({ ...p, from: '' })); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
-                          className="cursor-pointer px-4 py-3 text-sm text-white/85 hover:bg-white/8 hover:text-white transition-colors">{s}</div>
-                      ))}
-                    </div>
-                  )}
-                  {formErrors.from
-                    ? <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.from}</p>
-                    : queryFrom && !fromSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-400">Select from list</p>}
-                </div>
-                <div className="relative pb-4">
-                  <input placeholder="To (City)" value={queryTo}
-                    onChange={(e) => { setQueryTo(e.target.value); setTrip({ ...trip, to: e.target.value }); setToSelected(false); setFormErrors(p => ({ ...p, to: '' })); }}
-                    className={`${inputClass} ${formErrors.to ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
-                  {toSuggestions.length > 0 && (
-                    <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl">
-                      {toSuggestions.map((s, i) => (
-                        <div key={i} onClick={() => { setTrip({ ...trip, to: s }); setQueryTo(s); setToSuggestions([]); setToSelected(true); setFormErrors(p => ({ ...p, to: '' })); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
-                          className="cursor-pointer px-4 py-3 text-sm text-white/85 hover:bg-white/8 hover:text-white transition-colors">{s}</div>
-                      ))}
-                    </div>
-                  )}
-                  {formErrors.to
-                    ? <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.to}</p>
-                    : queryTo && !toSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-400">Select from list</p>}
-                </div>
-                <div className="relative pb-4">
-                  <input type="date" value={trip.date} min={new Date().toISOString().split('T')[0]}
-                    onChange={(e) => { setTrip({ ...trip, date: e.target.value }); setFormErrors(p => ({ ...p, date: '' })); }}
-                    className={`${inputClass} [color-scheme:dark] ${formErrors.date ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
-                  {formErrors.date && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.date}</p>}
-                </div>
-                <div className="relative pb-4">
-                  <select value={trip.weight} onChange={(e) => { setTrip({ ...trip, weight: e.target.value }); setFormErrors(p => ({ ...p, weight: '' })); }}
-                    className={`${inputClass} cursor-pointer ${formErrors.weight ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`}>
-                    <option value="" disabled className="bg-slate-900 text-white/50">Weight</option>
-                    {weightOptions.map((o) => <option key={o.value} value={o.value} className="bg-slate-900 text-white">{o.label}</option>)}
-                  </select>
-                  {formErrors.weight && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.weight}</p>}
-                </div>
-                <div className="relative pb-4">
-                  <input type="number" placeholder={mode === 'travel' ? 'Price (£) *' : 'Budget (£) *'}
-                    value={trip.price} onChange={(e) => { setTrip({ ...trip, price: e.target.value }); setFormErrors(p => ({ ...p, price: '' })); }}
-                    className={`${inputClass} ${formErrors.price ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
-                  {formErrors.price && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.price}</p>}
-                </div>
-                <button onClick={handleSubmit}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 py-3.5 font-bold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(59,130,246,0.55)] active:translate-y-0 shadow-lg shadow-blue-500/30 tracking-wide">
-                  Get Started <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
+            {/* CTA buttons */}
+            <div className="flex flex-wrap gap-3 mb-8">
+              <Link href="#booking-form"
+                onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
+                className="bg-white text-black px-7 py-3 rounded-full text-sm font-bold hover:bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(255,255,255,0.15)]">
+                Send a Package
+              </Link>
+              <Link href="/business"
+                className="border border-white/25 px-7 py-3 rounded-full text-sm font-semibold text-white hover:bg-white/[0.08] transition-all hover:-translate-y-0.5">
+                For Business
+              </Link>
             </div>
 
             {/* Trust row */}
-            <div className="mt-5 flex flex-wrap gap-4 text-xs text-white/60 drop-shadow">
+            <div className="flex flex-wrap gap-4 text-xs text-white/55 drop-shadow">
               {trustItems.map((item) => (
                 <span key={item} className="flex items-center gap-1.5 font-medium">
                   <CheckCircle className="h-3.5 w-3.5 text-green-400" />{item}
@@ -654,8 +593,15 @@ function HomePageContent() {
           <div className="w-full max-w-md rounded-2xl border border-white/12 bg-[#0b1829] p-6 shadow-2xl md:p-8">
             {!emailSent ? (
               <>
-                <h2 className="mb-2 text-xl font-semibold text-white md:text-2xl">Verify Your Email</h2>
-                <p className="mb-6 text-sm text-white/50">We&apos;ll send you a secure magic link to continue.</p>
+                <h2 className="mb-2 text-xl font-semibold text-white md:text-2xl">Almost there</h2>
+                <p className="mb-5 text-sm text-white/50">Set your {mode === 'travel' ? 'price' : 'budget'} and enter your email to post.</p>
+                <div className="mb-4 relative">
+                  <label className="block text-xs text-white/40 mb-1.5">{mode === 'travel' ? 'Your price (£) — what you charge to carry' : 'Your budget (£) — what you\'re willing to pay'}</label>
+                  <input type="number" placeholder="e.g. 25" value={trip.price}
+                    onChange={(e) => { setTrip({ ...trip, price: e.target.value }); setFormErrors(p => ({ ...p, price: '' })); }}
+                    className={`w-full rounded-xl border bg-white/5 p-3.5 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all ${formErrors.price ? 'border-red-500/60 ring-1 ring-red-500/40' : 'border-white/12'}`} />
+                  {formErrors.price && <p className="mt-1 text-xs text-red-400">{formErrors.price}</p>}
+                </div>
                 <input type="email" placeholder="Enter your email" value={trip.email}
                   onChange={(e) => { setTrip({ ...trip, email: e.target.value }); setFormErrors(p => ({ ...p, email: '' })); }}
                   className={`mb-1 w-full rounded-xl border bg-white/5 p-3.5 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all ${formErrors.email ? 'border-red-500/60 ring-1 ring-red-500/40' : 'border-white/12'}`} />
@@ -700,11 +646,20 @@ function HomePageContent() {
       )}
 
       {/* ── BUSINESS STRIP ── */}
-      <section className="py-6 flex justify-center px-6">
-        <div className="backdrop-blur-xl bg-white/[0.05] border border-white/[0.1] rounded-full px-8 py-3 flex flex-wrap items-center justify-center gap-4">
-          <span className="text-white/80 text-sm">💼 For Businesses: Same-day critical logistics</span>
-          <Link href="/business" className="text-blue-400 hover:text-blue-300 text-sm font-semibold transition-colors">
-            Request Access →
+      <section className="py-12 px-6 border-y border-white/[0.06] bg-[#020B18]">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-2">For Business</p>
+            <h3 className="text-white font-semibold text-xl leading-snug max-w-lg">
+              Same-day critical logistics for time-sensitive operations
+            </h3>
+            <p className="text-white/45 text-sm mt-2">
+              Pharmaceutical samples · Legal documents · Luxury goods · Tech equipment
+            </p>
+          </div>
+          <Link href="/business"
+            className="shrink-0 bg-blue-500 text-white px-7 py-3 rounded-full text-sm font-semibold hover:bg-blue-400 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.35)] whitespace-nowrap">
+            Explore Business Portal →
           </Link>
         </div>
       </section>
@@ -751,7 +706,7 @@ function HomePageContent() {
       </section>
 
       {/* ── FEATURED ROUTES ── */}
-      <section className="relative py-20 md:py-28 bg-[#07111f]">
+      <section className="relative py-20 md:py-28 bg-[#050D1A]">
         <div className="mx-auto max-w-7xl px-6 md:px-8">
           <div className="mb-12 text-center">
             <div className="inline-flex items-center gap-2 text-green-400 text-sm mb-4">
@@ -765,20 +720,24 @@ function HomePageContent() {
             {featuredRoutes.map((route) => (
               <div key={`${route.from}-${route.to}`}
                 className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${route.color} ${route.border} p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer`}>
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-3 flex items-center justify-between">
                   <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${route.badge}`}>{route.tag}</span>
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/8">
-                    <Plane className="h-3.5 w-3.5 text-white/60" />
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+                    <span className="text-[10px] text-green-400 font-semibold">{route.departs}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mb-2">
                   <span className="text-base font-semibold text-white">{route.from}</span>
                   <ArrowRight className="h-4 w-4 text-white/30" />
                   <span className="text-base font-semibold text-white">{route.to}</span>
                 </div>
-                <p className="mt-1 flex items-center gap-1 text-xs text-white/40">
-                  <MapPin className="h-3 w-3" />Active travellers available
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="flex items-center gap-1 text-xs text-white/40">
+                    <Users className="h-3 w-3" />{route.travellers} traveller{route.travellers !== 1 ? 's' : ''} available
+                  </p>
+                  <span className="text-xs text-white/25 group-hover:text-white/60 transition-colors">Book →</span>
+                </div>
               </div>
             ))}
           </div>
@@ -793,7 +752,7 @@ function HomePageContent() {
 
 
       {/* ── TRUST SECTION ── */}
-      <section className="py-20 bg-[#07111f]">
+      <section className="py-20 bg-[#040C19]">
         <div className="mx-auto max-w-7xl px-6 md:px-8">
           <div className="text-center mb-12 reveal">
             <h2 className="text-3xl font-semibold text-white md:text-4xl">Built for trust at every step</h2>
@@ -821,8 +780,8 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* ── LIVE TRIPS ── */}
-      <section className="relative py-20 md:py-28 bg-[#07111f]">
+      {/* ── LIVE TRIPS — only shown when platform has real activity ── */}
+      {trips.length >= 3 && <section className="relative py-20 md:py-28 bg-[#07111f]">
         <div className="mx-auto max-w-7xl px-6 md:px-8">
           <div className="mb-10 text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-green-400/20 bg-green-500/8 px-4 py-1.5">
@@ -938,19 +897,139 @@ function HomePageContent() {
             <p className="mt-4 text-xs text-white/30">Free to join · No subscription · Cancel anytime</p>
           </div>
         </div>
+      </section>}
+
+      {/* ── BOOKING FORM ── */}
+      <section id="booking-form" className="py-24 px-6 bg-[#030A16]">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-10 reveal">
+            <h2 className="text-3xl font-semibold text-white mb-3">Ready to move something?</h2>
+            <p className="text-white/45 text-base">Post in under 30 seconds. We&apos;ll match you with a verified traveller.</p>
+          </div>
+
+          {/* Mode toggle */}
+          <div className="mb-6 flex justify-center">
+            <div className="inline-flex rounded-xl border border-white/20 bg-white/8 p-1 backdrop-blur-xl">
+              <button onClick={() => setMode('send')} className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'send' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/40' : 'text-white/55 hover:text-white hover:bg-white/8'}`}>
+                📦 Send Item
+              </button>
+              <button onClick={() => setMode('travel')} className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'travel' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/40' : 'text-white/55 hover:text-white hover:bg-white/8'}`}>
+                ✈️ I&apos;m Travelling
+              </button>
+            </div>
+          </div>
+
+          {/* Form card */}
+          <div className="rounded-2xl border border-white/12 bg-white/[0.04] p-6 backdrop-blur-xl shadow-[0_32px_80px_rgba(0,0,0,0.4)]">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="relative pb-4">
+                <input placeholder="From (City)" value={queryFrom}
+                  onChange={(e) => { setQueryFrom(e.target.value); setTrip({ ...trip, from: e.target.value }); setFromSelected(false); setFormErrors(p => ({ ...p, from: '' })); }}
+                  className={`${inputClass} ${formErrors.from ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
+                {fromSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl">
+                    {fromSuggestions.map((s, i) => (
+                      <div key={i} onClick={() => { setTrip({ ...trip, from: s }); setQueryFrom(s); setFromSuggestions([]); setFromSelected(true); setFormErrors(p => ({ ...p, from: '' })); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
+                        className="cursor-pointer px-4 py-3 text-sm text-white/85 hover:bg-white/8 hover:text-white transition-colors">{s}</div>
+                    ))}
+                  </div>
+                )}
+                {formErrors.from
+                  ? <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.from}</p>
+                  : queryFrom && !fromSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-400">Select from list</p>}
+              </div>
+              <div className="relative pb-4">
+                <input placeholder="To (City)" value={queryTo}
+                  onChange={(e) => { setQueryTo(e.target.value); setTrip({ ...trip, to: e.target.value }); setToSelected(false); setFormErrors(p => ({ ...p, to: '' })); }}
+                  className={`${inputClass} ${formErrors.to ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
+                {toSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl">
+                    {toSuggestions.map((s, i) => (
+                      <div key={i} onClick={() => { setTrip({ ...trip, to: s }); setQueryTo(s); setToSuggestions([]); setToSelected(true); setFormErrors(p => ({ ...p, to: '' })); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
+                        className="cursor-pointer px-4 py-3 text-sm text-white/85 hover:bg-white/8 hover:text-white transition-colors">{s}</div>
+                    ))}
+                  </div>
+                )}
+                {formErrors.to
+                  ? <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.to}</p>
+                  : queryTo && !toSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-400">Select from list</p>}
+              </div>
+              <div className="relative pb-4">
+                <input type="date" value={trip.date} min={new Date().toISOString().split('T')[0]}
+                  onChange={(e) => { setTrip({ ...trip, date: e.target.value }); setFormErrors(p => ({ ...p, date: '' })); }}
+                  className={`${inputClass} [color-scheme:dark] ${formErrors.date ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
+                {formErrors.date && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.date}</p>}
+              </div>
+              <div className="relative pb-4">
+                <select value={trip.weight} onChange={(e) => { setTrip({ ...trip, weight: e.target.value }); setFormErrors(p => ({ ...p, weight: '' })); }}
+                  className={`${inputClass} cursor-pointer ${formErrors.weight ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`}>
+                  <option value="" disabled className="bg-slate-900 text-white/50">Package size</option>
+                  {weightOptions.map((o) => <option key={o.value} value={o.value} className="bg-slate-900 text-white">{o.label}</option>)}
+                </select>
+                {formErrors.weight && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.weight}</p>}
+              </div>
+              <button onClick={handleSubmit}
+                className="sm:col-span-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 py-4 font-bold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(59,130,246,0.5)] shadow-lg shadow-blue-500/25 text-base tracking-wide">
+                {mode === 'send' ? 'Find a Traveller' : 'Post My Journey'} <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="mt-4 text-center text-xs text-white/30">Free to join · No subscription · You control your price</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SOCIAL PROOF ── */}
+      <section className="py-16 px-6 bg-[#050D1A]">
+        <div className="max-w-2xl mx-auto">
+          <div className="rounded-3xl border border-white/8 bg-white/3 p-8 md:p-10 relative overflow-hidden">
+            {/* quote mark */}
+            <span className="absolute top-6 right-8 text-6xl text-white/5 font-serif leading-none select-none">&ldquo;</span>
+            <div className="flex items-center gap-0.5 mb-5">
+              {[1,2,3,4,5].map(i => <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />)}
+            </div>
+            <p className="text-white/80 text-lg leading-relaxed italic mb-6">
+              &ldquo;I travelled from Lagos to London and used BootHop to send documents ahead. Everything arrived before I did. Wish I&apos;d known about this sooner.&rdquo;
+            </p>
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/20 text-sm font-bold text-blue-300">T</div>
+              <div>
+                <p className="text-sm font-semibold text-white">Toyin A.</p>
+                <p className="text-xs text-white/40">MSc Student, London · Lagos → London route</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ── Final CTA ──────────────────────────────────────────────────────── */}
-      <section className="py-28 px-6 text-center">
-        <h2 className="text-3xl md:text-4xl font-semibold text-white mb-6 tracking-tight">
-          Built for speed.<br />
-          <span className="text-white/50">Built for urgency.</span>
-        </h2>
-        <Link href="/register"
-          className="inline-flex items-center gap-2 bg-white text-black px-8 py-3.5 rounded-full font-semibold text-sm hover:bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(255,255,255,0.15)]">
-          Get Started <ArrowRight className="h-4 w-4" />
-        </Link>
-        <p className="mt-4 text-xs text-white/25">Free to join · No subscription · Cancel anytime</p>
+      <section className="relative py-36 px-6 text-center overflow-hidden">
+        {/* Atmospheric video background */}
+        <video
+          autoPlay muted loop playsInline
+          className="absolute inset-0 w-full h-full object-cover scale-105"
+        >
+          <source src="/videos/onecall/test_v/video2.mp4" type="video/mp4" />
+        </video>
+        {/* Strong overlay so text stays sharp */}
+        <div className="absolute inset-0 bg-black/75" />
+        {/* Top + bottom fades */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#07111f] via-transparent to-[#07111f] pointer-events-none" />
+
+        <div className="relative z-10">
+          <h2 className="text-4xl md:text-5xl font-semibold text-white mb-4 tracking-tight leading-tight">
+            Built for speed.<br />
+            <span className="text-white/55">Built for urgency.</span>
+          </h2>
+          <p className="text-white/45 text-base mb-8 max-w-md mx-auto">
+            Join thousands of travellers and senders already on the platform.
+          </p>
+          <Link href="#booking-form"
+            onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
+            className="inline-flex items-center gap-2 bg-white text-black px-8 py-3.5 rounded-full font-bold text-sm hover:bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(255,255,255,0.15)]">
+            Get Started <ArrowRight className="h-4 w-4" />
+          </Link>
+          <p className="mt-4 text-xs text-white/25">Free to join · No subscription · Cancel anytime</p>
+        </div>
       </section>
 
       {/* ── Contact Us ─────────────────────────────────────────────────────── */}
