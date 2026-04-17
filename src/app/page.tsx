@@ -679,7 +679,7 @@ function HomePageContent() {
           </video>
         ))}
         {/* Dark scrim */}
-        <div className="absolute inset-0 bg-black/72" />
+        <div className="absolute inset-0 bg-black/50" />
         {/* Top + bottom fades into adjacent sections */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#020B18] via-transparent to-[#050D1A] pointer-events-none" />
 
@@ -984,8 +984,8 @@ function HomePageContent() {
           className="absolute inset-0 w-full h-full object-cover scale-105">
           <source src="/videos/onecall/plane1.mp4" type="video/mp4" />
         </video>
-        {/* Strong overlay so text stays readable */}
-        <div className="absolute inset-0 bg-black/75" />
+        {/* Overlay — light enough to see the plane */}
+        <div className="absolute inset-0 bg-black/55" />
         {/* Top + bottom fades */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#050D1A] via-transparent to-[#050D1A] pointer-events-none" />
 
