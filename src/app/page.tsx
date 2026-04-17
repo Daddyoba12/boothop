@@ -129,6 +129,7 @@ function HomePageContent() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('send');
   const [whyVid,   setWhyVid]   = useState(0);
+  const [winsVid,  setWinsVid]  = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
@@ -222,6 +223,12 @@ function HomePageContent() {
   // Why BootHop section — slow 7s crossfade
   useEffect(() => {
     const id = setInterval(() => setWhyVid(v => (v + 1) % WHY_VIDEOS.length), 7000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Why BootHop Wins video strip — 5s crossfade
+  useEffect(() => {
+    const id = setInterval(() => setWinsVid(v => (v + 1) % 4), 5000);
     return () => clearInterval(id);
   }, []);
 
@@ -814,13 +821,50 @@ function HomePageContent() {
             </div>
           </div>
 
-          <div className="reveal text-center">
+          <div className="reveal text-center mb-14">
             <Link href="#booking-form"
               onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
               className="inline-flex items-center gap-2 bg-blue-500 text-white px-8 py-3.5 rounded-full font-semibold text-sm hover:bg-blue-400 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)]">
               Try it free <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
+
+          {/* ── VIDEO STRIP — real deliveries in motion ── */}
+          <div className="reveal relative rounded-3xl overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.6)]" style={{ aspectRatio: '21/8' }}>
+            {[1, 2, 3, 4].map((n, i) => (
+              <video
+                key={n}
+                autoPlay muted loop playsInline
+                preload={i === 0 ? 'auto' : 'none'}
+                className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[2500ms] ease-in-out"
+                style={{ opacity: i === winsVid ? 1 : 0 }}
+              >
+                <source src={`/videos/onecall/test_v/video${n}.mp4`} type="video/mp4" />
+              </video>
+            ))}
+
+            {/* Dark scrim — keeps it cinematic, not raw footage */}
+            <div className="absolute inset-0 bg-black/45" />
+
+            {/* Edge fade into section background */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#040C19]/80 via-transparent to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#040C19] to-transparent" />
+
+            {/* Label overlay */}
+            <div className="absolute bottom-6 left-7 flex items-center gap-3">
+              <span className="flex h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-xs font-semibold text-white/70 uppercase tracking-widest">Real deliveries. Real people.</span>
+            </div>
+
+            {/* Dot indicators */}
+            <div className="absolute bottom-6 right-7 flex gap-1.5">
+              {[0, 1, 2, 3].map(i => (
+                <button key={i} onClick={() => setWinsVid(i)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${i === winsVid ? 'w-5 bg-white' : 'w-1.5 bg-white/30'}`} />
+              ))}
+            </div>
+          </div>
+
         </div>
       </section>
 
