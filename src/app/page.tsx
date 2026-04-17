@@ -978,17 +978,15 @@ function HomePageContent() {
       </section>
 
       {/* ── Final CTA ──────────────────────────────────────────────────────── */}
-      <section className="relative py-36 px-6 text-center overflow-hidden bg-[#02080F]">
-        {/* Animated gradient orbs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-[480px] h-[480px] bg-blue-600/18 rounded-full blur-[140px]"
-            style={{ animation: 'floatOrb 20s ease-in-out infinite' }} />
-          <div className="absolute bottom-1/4 right-1/4 w-[380px] h-[380px] bg-violet-600/14 rounded-full blur-[120px]"
-            style={{ animation: 'floatOrb 28s ease-in-out infinite reverse' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] bg-blue-400/10 rounded-full blur-[90px]"
-            style={{ animation: 'floatOrb 35s linear infinite' }} />
-        </div>
-        {/* Top + bottom fades blend into adjacent sections */}
+      <section className="relative py-36 px-6 text-center overflow-hidden">
+        {/* Plane video background */}
+        <video autoPlay muted loop playsInline
+          className="absolute inset-0 w-full h-full object-cover scale-105">
+          <source src="/videos/onecall/plane1.mp4" type="video/mp4" />
+        </video>
+        {/* Strong overlay so text stays readable */}
+        <div className="absolute inset-0 bg-black/75" />
+        {/* Top + bottom fades */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#050D1A] via-transparent to-[#050D1A] pointer-events-none" />
 
         <div className="relative z-10">
