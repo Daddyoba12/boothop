@@ -830,7 +830,7 @@ function HomePageContent() {
           </div>
 
           {/* ── VIDEO STRIP — real deliveries in motion ── */}
-          <div className="reveal relative rounded-3xl overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.6)]" style={{ aspectRatio: '21/8' }}>
+          <div className="relative w-full rounded-3xl overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.6)]" style={{ height: 'clamp(200px, 36vw, 420px)' }}>
             {[1, 2, 3, 4].map((n, i) => (
               <video
                 key={n}
