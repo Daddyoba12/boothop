@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Suspense, useEffect, useMemo, useState, useCallback, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -158,26 +158,10 @@ function HomePageContent() {
   const [contactStatus,  setContactStatus]  = useState<'idle' | 'ok' | 'err'>('idle');
 
   const [scrollY, setScrollY] = useState(0);
-  const movementSectionRef = useRef<HTMLElement>(null);
-
   useEffect(() => {
     const onScroll = () => { setScrollY(window.scrollY); setScrolled(window.scrollY > 20); };
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  // Cinematic parallax — videos drift slower than content as user scrolls
-  useEffect(() => {
-    const handleParallax = () => {
-      if (!movementSectionRef.current) return;
-      const offset = movementSectionRef.current.offsetTop;
-      const movement = (window.scrollY - offset) * 0.12;
-      movementSectionRef.current.querySelectorAll<HTMLVideoElement>('.parallax-vid').forEach(v => {
-        v.style.transform = `translateY(${movement}px) scale(1.15)`;
-      });
-    };
-    window.addEventListener('scroll', handleParallax, { passive: true });
-    return () => window.removeEventListener('scroll', handleParallax);
   }, []);
 
   useEffect(() => {
@@ -631,26 +615,27 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* ── POWERED BY MOVEMENT — cinematic parallax ── */}
-      <section ref={movementSectionRef} className="relative bg-[#020617] py-32 overflow-hidden">
+      {/* ── POWERED BY MOVEMENT — cinematic video background ── */}
+      <section className="relative bg-[#020617] py-32 overflow-hidden">
 
-        {/* Three videos side-by-side — low opacity, parallax drift */}
-        <div className="absolute inset-0 opacity-[0.18]">
-          <div className="grid grid-cols-3 h-full">
-            <video autoPlay muted loop playsInline className="parallax-vid w-full h-full object-cover scale-110">
-              <source src="/videos/onecall/plane2.mp4" type="video/mp4" />
-            </video>
-            <video autoPlay muted loop playsInline className="parallax-vid w-full h-full object-cover scale-110">
-              <source src="/videos/onecall/Aboutus_train.mp4" type="video/mp4" />
-            </video>
-            <video autoPlay muted loop playsInline className="parallax-vid w-full h-full object-cover scale-110">
-              <source src="/videos/onecall/test1/Aboutusbus.mp4" type="video/mp4" />
-            </video>
-          </div>
-        </div>
+        {/* WHY_VIDEOS cycling as full background */}
+        {WHY_VIDEOS.map((src, i) => (
+          <video
+            key={src}
+            autoPlay muted loop playsInline
+            preload={i === 0 ? 'auto' : 'none'}
+            className="absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-[3000ms] ease-in-out"
+            style={{ opacity: i === whyVid ? 1 : 0 }}
+          >
+            <source src={src} type="video/mp4" />
+          </video>
+        ))}
 
-        {/* Dark gradient control — fades into adjacent sections */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/95 via-[#020617]/88 to-[#020617]/95" />
+        {/* Dark scrim — controlled visibility */}
+        <div className="absolute inset-0 bg-black/60" />
+
+        {/* Fade into adjacent sections */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/95 via-transparent to-[#020617]/95" />
 
         {/* Blue radial glow — depth layer */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.13),transparent_70%)]" />
@@ -699,27 +684,9 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS + VIDEO (merged) ── */}
-      <section className="relative min-h-[80vh] overflow-hidden flex items-center justify-center">
-        {/* Cycling video background */}
-        {WHY_VIDEOS.map((src, i) => (
-          <video
-            key={src}
-            autoPlay muted loop playsInline
-            preload={i === 0 ? 'auto' : 'none'}
-            className="absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-[3000ms] ease-in-out"
-            style={{ opacity: i === whyVid ? 1 : 0 }}
-          >
-            <source src={src} type="video/mp4" />
-          </video>
-        ))}
-        {/* Dark scrim */}
-        <div className="absolute inset-0 bg-black/62" />
-        {/* Top + bottom fades into adjacent sections */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#020B18] via-transparent to-[#050D1A] pointer-events-none" />
-
-        {/* Content — centred over video */}
-        <div className="relative z-10 px-6 py-20 max-w-5xl mx-auto w-full">
+      {/* ── HOW BOOTHOP WORKS ── */}
+      <section className="py-24 md:py-32 bg-[#050D1A]">
+        <div className="px-6 max-w-5xl mx-auto w-full">
           <div className="text-center mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">Simple process</p>
             <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">How BootHop Works</h2>
