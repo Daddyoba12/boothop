@@ -88,12 +88,14 @@ export async function POST(request: Request) {
 
     // Find opposite type trips (sender looks for traveler, vice versa)
     const oppositeType = newTrip.type === 'send' ? 'travel' : 'send';
-    
+
     const { data: potentialMatches } = await supabase
       .from('trips')
       .select('*')
       .eq('type', oppositeType)
       .eq('status', 'active')
+      // Issue 1 fix: never match a user with their own trip
+      .neq('email', newTrip.email)
       .gte('travel_date', new Date().toISOString().split('T')[0]);
 
     if (!potentialMatches || potentialMatches.length === 0) {
@@ -141,6 +143,16 @@ export async function POST(request: Request) {
       const agreedPrice      = needsNegotiation
         ? null
         : Math.round(((senderPrice || 0) + (travelerPrice || 0)) / 2 * 100) / 100;
+
+      // Skip if this trip pair is already matched (prevents duplicates on re-runs)
+      const { data: existingMatch } = await supabase
+        .from('matches')
+        .select('id')
+        .eq('sender_trip_id', sender_trip_id)
+        .eq('traveler_trip_id', traveler_trip_id)
+        .maybeSingle();
+
+      if (existingMatch) continue;
 
       const { data: matchRecord } = await supabase
         .from('matches')

@@ -20,10 +20,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'A valid email address is required.' }, { status: 400 });
     }
 
-    // ── Remember-me: if valid 30-day cookie exists for this email, skip OTP ──
+    // ── Remember-me: skip OTP only for plain login, never for trip creation ──
+    // Issue 3 fix: when journeyPayload is present the user is posting a trip —
+    // that is a high-value action that must always go through OTP verification.
     const cookieStore = await cookies();
     const remembered  = getAppRemember(cookieStore);
-    if (remembered && remembered.email === email) {
+    if (remembered && remembered.email === email && !journeyPayload) {
       const sessionToken = signAppSession({ email, verified: true });
       const res = NextResponse.json({ ok: true, skipOtp: true, email });
       res.cookies.set(getSessionCookieName(), sessionToken, {

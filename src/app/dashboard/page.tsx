@@ -1,18 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Package, Plane, CheckCircle, Clock, XCircle,
-  ArrowRight, MapPin, Shield, AlertCircle, FileEdit, Rocket, Trash2, PlusCircle,
+  ArrowRight, Shield, AlertCircle, FileEdit, Rocket, Trash2, PlusCircle,
 } from 'lucide-react';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'placeholder-key'
-);
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -30,45 +24,23 @@ export default function DashboardPage() {
 
   const loadDashboard = async () => {
     try {
-      // Use our custom cookie session (not Supabase Auth)
-    //  const meRes = await fetch('/api/auth/me');
-      const meRes = await fetch('/api/auth/me', {
-  credentials: 'include',
-});
-      if (!meRes.ok) {
+      // Use the dashboard API which uses the admin client (bypasses RLS)
+      const dashRes = await fetch('/api/dashboard', { credentials: 'include' });
+      if (!dashRes.ok) {
         router.push('/login');
         return;
       }
+      const dash = await dashRes.json();
+
+      // Resolve email from session
+      const meRes = await fetch('/api/auth/me', { credentials: 'include' });
+      if (!meRes.ok) { router.push('/login'); return; }
       const me = await meRes.json();
-      if (!me.authenticated || !me.user?.email) {
-        router.push('/login');
-        return;
-      }
-      const userEmail = me.user.email;
-      setUser({ email: userEmail });
+      if (!me.authenticated || !me.user?.email) { router.push('/login'); return; }
 
-      // Load matches where user is either sender or traveler
-      const { data: matchesData } = await supabase
-        .from('matches')
-        .select(`
-          *,
-          sender_trip:sender_trip_id(from_city, to_city, travel_date, price),
-          traveler_trip:traveler_trip_id(from_city, to_city, travel_date, price)
-        `)
-        .or(`sender_email.eq.${userEmail},traveler_email.eq.${userEmail}`)
-        .order('created_at', { ascending: false });
-
-      setMatches(matchesData || []);
-
-      // Load user's trips by email
-      const { data: tripsData } = await supabase
-        .from('trips')
-        .select('*')
-        .eq('email', userEmail)
-        .order('created_at', { ascending: false });
-
-      setTrips(tripsData || []);
-
+      setUser({ email: me.user.email });
+      setTrips(dash.trips || []);
+      setMatches(dash.matches || []);
       setLoading(false);
 
       // Load journey drafts

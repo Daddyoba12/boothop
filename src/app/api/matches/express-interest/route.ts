@@ -1,19 +1,29 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { normalizeEmail } from '@/lib/auth/code';
 import { sendInterestEmail } from '@/lib/email/sendMatchEmail';
+import { getAppSession } from '@/lib/auth/session';
 
 export async function POST(request: Request) {
   try {
+    // Require a valid session — unauthenticated interest expressions are not allowed
+    const cookieStore = await cookies();
+    const session = getAppSession(cookieStore);
+    if (!session) {
+      return NextResponse.json({ error: 'You must be logged in to express interest.' }, { status: 401 });
+    }
+
     const body         = await request.json();
     const tripId       = String(body?.tripId || '').trim();
     const interestType = body?.interestType === 'offer' ? 'offer' : 'full_price';
     const discountPct  = interestType === 'offer' ? Number(body?.discountPct ?? 0) : 0;
     const offeredPrice = body?.offeredPrice != null ? Number(body.offeredPrice) : null;
-    const email        = normalizeEmail(body?.email || '');
 
-    if (!tripId)            return NextResponse.json({ error: 'tripId is required.' }, { status: 400 });
-    if (!email.includes('@')) return NextResponse.json({ error: 'Valid email is required.' }, { status: 400 });
+    // Always use the authenticated session email — never trust the body email
+    const email = normalizeEmail(session.email);
+
+    if (!tripId) return NextResponse.json({ error: 'tripId is required.' }, { status: 400 });
 
     const supabase = createSupabaseAdminClient();
 

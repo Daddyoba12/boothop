@@ -6,9 +6,9 @@ import { Suspense, useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import {
-  ArrowRight, CheckCircle, MapPin, Menu, Package,
-  Plane, Search, Star, X, Shield, Zap, Users,
-  MessageCircle, Send, Mail,
+  ArrowRight, CheckCircle, Menu, Package,
+  Plane, Search, Star, X, Users,
+  MessageCircle,
 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import BootHopLogo from '@/components/BootHopLogo';
@@ -24,13 +24,6 @@ const supabase = createClient(
 type Mode = 'send' | 'travel';
 type TripForm = { from: string; to: string; date: string; price: string; email: string; weight: string; };
 type RecentTrip = { id?: string; from_city: string; to_city: string; travel_date: string; type: Mode; weight?: string; };
-
-const stats = [
-  { value: '10K+', label: 'Verified Users' },
-  { value: '50K+', label: 'Successful Deliveries' },
-  { value: '200+', label: 'Cities Worldwide' },
-  { value: '95%', label: 'Satisfaction Rate' },
-];
 
 const navLinks = [
   { href: '/how-it-works', label: 'How It Works' },
@@ -118,12 +111,6 @@ function TestimonialsSection() {
 
 const HERO_VIDEO = '/videos/onecall/plane2.mp4';
 
-const WHY_VIDEOS = [
-  '/videos/onecall/test1/Aboutusbus.mp4',
-  '/videos/onecall/test1/Boxoff.mp4',
-  '/videos/onecall/test1/boxoff5.mp4',
-];
-
 function HomePageContent() {
   useScrollReveal();
   const router = useRouter();
@@ -136,11 +123,6 @@ function HomePageContent() {
   const [codeInput, setCodeInput] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [trips, setTrips] = useState<RecentTrip[]>([]);
-  const [filterFrom, setFilterFrom] = useState('');
-  const [filterTo, setFilterTo] = useState('');
-  const [filterDate, setFilterDate] = useState('');
-  const [visibleCount, setVisibleCount] = useState(6);
-
   const [queryFrom, setQueryFrom] = useState('');
   const [fromSuggestions, setFromSuggestions] = useState<string[]>([]);
   const [queryTo, setQueryTo] = useState('');
@@ -152,9 +134,7 @@ function HomePageContent() {
 
   const [trip, setTrip] = useState<TripForm>({ from: '', to: '', date: '', price: '', email: '', weight: '' });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const [contactForm,    setContactForm]    = useState({ name: '', email: '', message: '' });
-  const [contactLoading, setContactLoading] = useState(false);
-  const [contactStatus,  setContactStatus]  = useState<'idle' | 'ok' | 'err'>('idle');
+  const [otpError, setOtpError] = useState('');
 
   const [scrollY, setScrollY] = useState(0);
   useEffect(() => {
@@ -234,21 +214,10 @@ function HomePageContent() {
   const searchParams = useSearchParams();
   useEffect(() => {
     if (searchParams.get('registered') === 'true') {
-      alert('🎉 Your trip has been registered successfully!');
       window.history.replaceState({}, '', '/');
       loadTrips();
     }
   }, [searchParams, loadTrips]);
-
-  const filteredTrips = trips.filter(t => {
-    const matchFrom = !filterFrom || t.from_city.toLowerCase().includes(filterFrom.toLowerCase());
-    const matchTo = !filterTo || t.to_city.toLowerCase().includes(filterTo.toLowerCase());
-    const matchDate = !filterDate || t.travel_date.startsWith(filterDate);
-    return matchFrom && matchTo && matchDate;
-  });
-
-  const booterTrips = filteredTrips.filter(t => t.type === 'travel');
-  const hooperTrips = filteredTrips.filter(t => t.type === 'send');
 
   const handleSubmit = () => {
     const errors: Record<string, string> = {};
@@ -280,23 +249,10 @@ function HomePageContent() {
     setEmailSent(true);
   };
 
-  const submitContact = async () => {
-    if (!contactForm.name || !contactForm.email || !contactForm.message) return;
-    setContactLoading(true);
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: contactForm.name, email: contactForm.email, topic: 'General Enquiry', message: contactForm.message }),
-      });
-      setContactStatus(res.ok ? 'ok' : 'err');
-      if (res.ok) setContactForm({ name: '', email: '', message: '' });
-    } catch { setContactStatus('err'); }
-    finally { setContactLoading(false); }
-  };
-
   const verifyModalCode = async () => {
     const trimmed = codeInput.trim().toUpperCase();
-    if (trimmed.length < 5) { alert('Please enter the full 5-character code.'); return; }
+    if (trimmed.length < 5) { setOtpError('Please enter the full 5-character code.'); return; }
+    setOtpError('');
     setSubmitting(true);
     const res = await fetch('/api/auth/verify-code', {
       method: 'POST',
@@ -305,62 +261,9 @@ function HomePageContent() {
     });
     const data = await res.json();
     setSubmitting(false);
-    if (!res.ok) { alert(data.error || 'Invalid code. Please try again.'); return; }
-    setShowEmail(false); setEmailSent(false); setCodeInput('');
+    if (!res.ok) { setOtpError(data.error || 'Invalid code. Please try again.'); return; }
+    setShowEmail(false); setEmailSent(false); setCodeInput(''); setOtpError('');
     router.push(data.redirectTo || '/intent');
-  };
-
-  const saveTrip = async () => {
-    setSubmitting(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setSubmitting(false); alert('Please verify your email first.'); return; }
-
-    // Auto-translate from/to if non-English (best-effort — never blocks trip creation)
-    let fromEn = trip.from, toEn = trip.to, lang = 'en', translated = false;
-    try {
-      const transRes = await fetch('/api/translate', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: trip.from, to: trip.to }),
-      });
-      if (transRes.ok) {
-        const t = await transRes.json();
-        fromEn = t.fromEn || trip.from; toEn = t.toEn || trip.to;
-        lang = t.language || 'en'; translated = !!t.translated;
-      }
-    } catch { /* translation failed — proceed without */ }
-
-    // Try insert with translation columns; fall back to core fields if columns don't exist
-    let savedTrip: any = null;
-    const coreFields = { from_city: trip.from, to_city: trip.to, travel_date: trip.date, price: trip.price ? Number(trip.price) : null, weight: trip.weight, user_id: user.id, type: mode };
-    const { data: full, error } = await supabase.from('trips')
-      .insert([{ ...coreFields, from_city_en: fromEn, to_city_en: toEn, language: lang, translated }])
-      .select().single();
-    if (error) {
-      // Fallback to core fields only
-      const { data: core, error: coreErr } = await supabase.from('trips').insert([coreFields]).select().single();
-      if (coreErr || !core) { setSubmitting(false); alert('Error saving trip.'); return; }
-      savedTrip = core;
-    } else {
-      savedTrip = full;
-    }
-    if (error || !savedTrip) { setSubmitting(false); alert('Error saving trip.'); return; }
-    try {
-      const matchResponse = await fetch('/api/match-engine', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tripId: savedTrip.id }),
-      });
-      if (matchResponse.ok) {
-        const matchResult = await matchResponse.json();
-        if (matchResult?.count > 0) {
-          alert(`🎉 Trip saved! We found ${matchResult.count} potential matches.`);
-          if (Array.isArray(matchResult.matches))
-            await Promise.all(matchResult.matches.map((match: { id: string }) =>
-              fetch('/api/send-match-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ matchId: match.id }) })
-            ));
-        } else { alert("Trip saved! We'll notify you when we find a match."); }
-      } else { alert("Trip saved, but matching could not run right now."); }
-    } catch { alert("Trip saved, but matching could not run right now."); }
-    setSubmitting(false); resetForm(); loadTrips();
   };
 
   const inputClass = "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/45 focus:outline-none focus:ring-2 focus:ring-blue-400/70 focus:border-blue-400/50 backdrop-blur-xl transition-all duration-200 hover:bg-white/15 hover:border-white/30 text-sm shadow-inner shadow-black/10";
@@ -522,14 +425,6 @@ function HomePageContent() {
           </div>
         </div>
 
-        {/* TRANSPORT STRIP at bottom of hero */}
-        <div className="absolute bottom-0 w-full py-4 bg-black/60 backdrop-blur-md border-t border-white/[0.06]">
-          <div className="flex justify-center gap-8 md:gap-16 text-white/60 text-sm">
-            <span>✈️ Air</span>
-            <span>🚆 Rail</span>
-            <span>🚗 Road</span>
-          </div>
-        </div>
       </section>
 
       {/* ── EMAIL MODAL ── */}
@@ -574,8 +469,9 @@ function HomePageContent() {
                   placeholder="4827A"
                   className="mb-4 w-full rounded-xl border border-white/12 bg-white/5 p-3.5 text-center text-2xl font-bold tracking-[0.35em] uppercase text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                 />
+                {otpError && <p className="mb-3 text-xs text-red-400 text-center">{otpError}</p>}
                 <div className="flex gap-3">
-                  <button onClick={() => { setEmailSent(false); setCodeInput(''); }}
+                  <button onClick={() => { setEmailSent(false); setCodeInput(''); setOtpError(''); }}
                     className="flex-1 rounded-xl border border-white/12 py-3 text-sm text-white/65 transition-all hover:bg-white/5 hover:text-white">
                     ← Resend
                   </button>
@@ -834,7 +730,7 @@ function HomePageContent() {
           <div className="text-center mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">The Difference</p>
             <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">Why BootHop Wins</h2>
-            <p className="mt-4 text-white/55 text-base max-w-lg mx-auto">Traditional couriers were built for a different world. BootHop was built for speed.</p>
+            <p className="mt-4 text-white/55 text-base max-w-lg mx-auto">Traditional couriers were built for a different world. BootHop was built for speed, precision, and last-mile execution.</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 mb-12">
@@ -908,6 +804,7 @@ function HomePageContent() {
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {featuredRoutes.map((route) => (
               <div key={`${route.from}-${route.to}`}
+                onClick={() => router.push(`/journeys?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`)}
                 className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${route.color} ${route.border} p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer`}>
                 <div className="mb-3 flex items-center justify-between">
                   <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${route.badge}`}>{route.tag}</span>
@@ -940,125 +837,6 @@ function HomePageContent() {
       </section>
 
 
-
-      {/* ── LIVE TRIPS — hidden; data still fetched for future use ── */}
-      {false && trips.length >= 3 && <section className="relative py-20 md:py-28 bg-[#07111f]">
-        <div className="mx-auto max-w-7xl px-6 md:px-8">
-          <div className="mb-10 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-green-400/20 bg-green-500/8 px-4 py-1.5">
-              <div className="h-1.5 w-1.5 rounded-full bg-green-400" />
-              <span className="text-xs font-semibold text-green-300">Live on the platform right now</span>
-            </div>
-            <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Current Trips &amp; Requests</h2>
-            <p className="mt-3 text-sm text-white/40">Search by route or date to find your match</p>
-          </div>
-          <div className="mb-8 grid gap-3 sm:grid-cols-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-              <input placeholder="From city..." value={filterFrom} onChange={(e) => setFilterFrom(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/40 backdrop-blur-md transition-all" />
-            </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-              <input placeholder="To city..." value={filterTo} onChange={(e) => setFilterTo(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/40 backdrop-blur-md transition-all" />
-            </div>
-            <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40 backdrop-blur-md transition-all [color-scheme:dark]" />
-          </div>
-          {trips.length > 0 ? (
-            <div className="grid gap-10 md:grid-cols-2">
-              <div>
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15"><Plane className="h-4 w-4 text-blue-400" /></div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-white">
-                      <RoleToggle role="travel" invert variant="text" /> — <RoleToggle role="travel" variant="text" className="opacity-60" />
-                    </h3>
-                    <p className="text-xs text-white/35">People with space to carry items</p>
-                  </div>
-                  <span className="ml-auto rounded-full border border-blue-400/15 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-300">{booterTrips.length} active</span>
-                </div>
-                <div className="space-y-2.5">
-                  {booterTrips.length > 0 ? (
-                    <>
-                      {booterTrips.slice(0, visibleCount).map((item, i) => (
-                        <div key={item.id ?? i} className="group rounded-2xl border border-white/8 bg-white/3 p-4 transition-all duration-200 hover:border-blue-400/20 hover:bg-white/5 hover:shadow-lg hover:shadow-blue-500/8">
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="min-w-0">
-                              <p className="text-sm font-semibold text-white truncate">{item.from_city} → {item.to_city}</p>
-                              <p className="mt-0.5 text-xs text-white/40">{new Date(item.travel_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-                            </div>
-                            <div className="flex flex-col items-end justify-between gap-2 shrink-0">
-                              <span className={`rounded-full border px-2.5 py-1 text-xs text-blue-300 ${item.weight ? 'bg-blue-500/12 border-blue-400/15' : 'invisible'}`}>
-                                {weightOptions.find(w => w.value === item.weight)?.label || item.weight || '—'}
-                              </span>
-                              <button onClick={() => router.push(`/journeys?open=${item.id}`)} className="rounded-xl bg-blue-500 px-3.5 py-1.5 text-xs font-semibold text-white transition-all opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 hover:shadow-lg hover:shadow-blue-500/30">Request →</button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {booterTrips.length > visibleCount && (
-                        <button onClick={() => setVisibleCount(v => v + 6)} className="w-full rounded-xl border border-white/8 bg-white/3 py-3 text-sm text-white/50 transition-all hover:bg-white/5 hover:text-white/80">Show more ({booterTrips.length - visibleCount} remaining)</button>
-                      )}
-                    </>
-                  ) : (
-                    <div className="rounded-2xl border border-white/8 bg-white/3 p-6 text-center"><p className="text-sm text-white/35">No travellers match your search</p></div>
-                  )}
-                </div>
-              </div>
-              <div>
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15"><Package className="h-4 w-4 text-emerald-400" /></div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-white">
-                      <RoleToggle role="sender" invert variant="text" /> — <RoleToggle role="sender" variant="text" className="opacity-60" />
-                    </h3>
-                    <p className="text-xs text-white/35">People who need items delivered</p>
-                  </div>
-                  <span className="ml-auto rounded-full border border-emerald-400/15 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300">{hooperTrips.length} active</span>
-                </div>
-                <div className="space-y-2.5">
-                  {hooperTrips.length > 0 ? (
-                    <>
-                      {hooperTrips.slice(0, visibleCount).map((item, i) => (
-                        <div key={item.id ?? i} className="group rounded-2xl border border-white/8 bg-white/3 p-4 transition-all duration-200 hover:border-emerald-400/20 hover:bg-white/5 hover:shadow-lg hover:shadow-emerald-500/8">
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="min-w-0">
-                              <p className="text-sm font-semibold text-white truncate">{item.from_city} → {item.to_city}</p>
-                              <p className="mt-0.5 text-xs text-white/40">{new Date(item.travel_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-                            </div>
-                            <div className="flex flex-col items-end justify-between gap-2 shrink-0">
-                              <span className={`rounded-full border px-2.5 py-1 text-xs text-emerald-300 ${item.weight ? 'bg-emerald-500/12 border-emerald-400/15' : 'invisible'}`}>
-                                {weightOptions.find(w => w.value === item.weight)?.label || item.weight || '—'}
-                              </span>
-                              <button onClick={() => router.push(`/journeys?open=${item.id}`)} className="rounded-xl bg-emerald-500 px-3.5 py-1.5 text-xs font-semibold text-white transition-all opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 hover:shadow-lg hover:shadow-emerald-500/30">Carry this →</button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {hooperTrips.length > visibleCount && (
-                        <button onClick={() => setVisibleCount(v => v + 6)} className="w-full rounded-xl border border-white/8 bg-white/3 py-3 text-sm text-white/50 transition-all hover:bg-white/5 hover:text-white/80">Show more ({hooperTrips.length - visibleCount} remaining)</button>
-                      )}
-                    </>
-                  ) : (
-                    <div className="rounded-2xl border border-white/8 bg-white/3 p-6 text-center"><p className="text-sm text-white/35">No send requests match your search</p></div>
-                  )}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="py-12 text-center"><p className="text-white/35">No trips posted yet — be the first!</p></div>
-          )}
-          <div className="mt-10 text-center">
-            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="inline-flex items-center gap-2 rounded-full bg-blue-500 px-8 py-3.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(59,130,246,0.4)]">
-              Post a Trip <ArrowRight className="h-4 w-4" />
-            </button>
-            <p className="mt-4 text-xs text-white/30">Free to join · No subscription · Cancel anytime</p>
-          </div>
-        </div>
-      </section>}
 
       {/* ── TESTIMONIALS ── */}
       <TestimonialsSection />
