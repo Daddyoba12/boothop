@@ -128,7 +128,6 @@ function HomePageContent() {
   useScrollReveal();
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('send');
-  const [whyVid,   setWhyVid]   = useState(0);
   const [winsVid,  setWinsVid]  = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -203,12 +202,6 @@ function HomePageContent() {
     }, 350);
     return () => clearTimeout(timer);
   }, [queryTo, sessionToken, toSelected, mapsReady]);
-
-  // Why BootHop section — slow 7s crossfade
-  useEffect(() => {
-    const id = setInterval(() => setWhyVid(v => (v + 1) % WHY_VIDEOS.length), 7000);
-    return () => clearInterval(id);
-  }, []);
 
   // Why BootHop Wins background — 6s crossfade between video1 and video2
   useEffect(() => {
@@ -596,6 +589,85 @@ function HomePageContent() {
         </div>
       )}
 
+      {/* ── BOOKING FORM — right below hero for instant action ── */}
+      <section id="booking-form" className="py-20 px-6 bg-[#07111f] border-t border-white/[0.05]">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-semibold text-white mb-2">Ready to move something?</h2>
+            <p className="text-white/40 text-sm">Post in under 30 seconds. We&apos;ll match you with a verified traveller.</p>
+          </div>
+
+          {/* Mode toggle */}
+          <div className="mb-5 flex justify-center">
+            <div className="inline-flex rounded-xl border border-white/20 bg-white/8 p-1 backdrop-blur-xl">
+              <button onClick={() => setMode('send')} className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'send' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/40' : 'text-white/55 hover:text-white hover:bg-white/8'}`}>
+                📦 Send Item
+              </button>
+              <button onClick={() => setMode('travel')} className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'travel' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/40' : 'text-white/55 hover:text-white hover:bg-white/8'}`}>
+                ✈️ I&apos;m Travelling
+              </button>
+            </div>
+          </div>
+
+          {/* Form card */}
+          <div className="rounded-2xl border border-white/12 bg-white/[0.04] p-6 backdrop-blur-xl shadow-[0_32px_80px_rgba(0,0,0,0.4)]">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="relative pb-4">
+                <input placeholder="From (City)" value={queryFrom}
+                  onChange={(e) => { setQueryFrom(e.target.value); setTrip({ ...trip, from: e.target.value }); setFromSelected(false); setFormErrors(p => ({ ...p, from: '' })); }}
+                  className={`${inputClass} ${formErrors.from ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
+                {fromSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl">
+                    {fromSuggestions.map((s, i) => (
+                      <div key={i} onClick={() => { setTrip({ ...trip, from: s }); setQueryFrom(s); setFromSuggestions([]); setFromSelected(true); setFormErrors(p => ({ ...p, from: '' })); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
+                        className="cursor-pointer px-4 py-3 text-sm text-white/85 hover:bg-white/8 hover:text-white transition-colors">{s}</div>
+                    ))}
+                  </div>
+                )}
+                {formErrors.from
+                  ? <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.from}</p>
+                  : queryFrom && !fromSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-400">Select from list</p>}
+              </div>
+              <div className="relative pb-4">
+                <input placeholder="To (City)" value={queryTo}
+                  onChange={(e) => { setQueryTo(e.target.value); setTrip({ ...trip, to: e.target.value }); setToSelected(false); setFormErrors(p => ({ ...p, to: '' })); }}
+                  className={`${inputClass} ${formErrors.to ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
+                {toSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl">
+                    {toSuggestions.map((s, i) => (
+                      <div key={i} onClick={() => { setTrip({ ...trip, to: s }); setQueryTo(s); setToSuggestions([]); setToSelected(true); setFormErrors(p => ({ ...p, to: '' })); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
+                        className="cursor-pointer px-4 py-3 text-sm text-white/85 hover:bg-white/8 hover:text-white transition-colors">{s}</div>
+                    ))}
+                  </div>
+                )}
+                {formErrors.to
+                  ? <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.to}</p>
+                  : queryTo && !toSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-400">Select from list</p>}
+              </div>
+              <div className="relative pb-4">
+                <input type="date" value={trip.date} min={new Date().toISOString().split('T')[0]}
+                  onChange={(e) => { setTrip({ ...trip, date: e.target.value }); setFormErrors(p => ({ ...p, date: '' })); }}
+                  className={`${inputClass} [color-scheme:dark] ${formErrors.date ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
+                {formErrors.date && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.date}</p>}
+              </div>
+              <div className="relative pb-4">
+                <select value={trip.weight} onChange={(e) => { setTrip({ ...trip, weight: e.target.value }); setFormErrors(p => ({ ...p, weight: '' })); }}
+                  className={`${inputClass} cursor-pointer ${formErrors.weight ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`}>
+                  <option value="" disabled className="bg-slate-900 text-white/50">Package size</option>
+                  {weightOptions.map((o) => <option key={o.value} value={o.value} className="bg-slate-900 text-white">{o.label}</option>)}
+                </select>
+                {formErrors.weight && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.weight}</p>}
+              </div>
+              <button onClick={handleSubmit}
+                className="sm:col-span-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 py-4 font-bold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(59,130,246,0.5)] shadow-lg shadow-blue-500/25 text-base tracking-wide">
+                {mode === 'send' ? 'Find a Traveller' : 'Post My Journey'} <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="mt-4 text-center text-xs text-white/30">Free to join · No subscription · You control your price</p>
+          </div>
+        </div>
+      </section>
+
       {/* ── BUSINESS STRIP ── */}
       <section className="py-12 px-6 border-y border-white/[0.06] bg-[#020B18]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
@@ -615,29 +687,75 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* ── POWERED BY MOVEMENT — cinematic video background ── */}
+      {/* ── HOW BOOTHOP WORKS ── */}
+      <section className="py-24 md:py-32 bg-[#050D1A]">
+        <div className="px-6 max-w-5xl mx-auto w-full">
+          <div className="text-center mb-14">
+            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">Simple process</p>
+            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">How BootHop Works</h2>
+            <p className="mt-4 text-white/45 text-base">From posting to delivery in four steps.</p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-14">
+            {[
+              { n: '01', title: 'Post Your Request', sub: 'Tell us the route, date, and package size. Takes 30 seconds.', icon: '📦', color: 'border-blue-500/25 hover:border-blue-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(59,130,246,0.18)]' },
+              { n: '02', title: 'Get Matched', sub: 'We connect you with a verified traveller already making that journey.', icon: '🤝', color: 'border-emerald-500/25 hover:border-emerald-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(16,185,129,0.18)]' },
+              { n: '03', title: 'Identity Verified', sub: 'All travellers complete KYC checks before handling any delivery.', icon: '🛡️', color: 'border-violet-500/25 hover:border-violet-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(139,92,246,0.18)]' },
+              { n: '04', title: 'Delivered', sub: 'Both sides confirm. Funds release. Simple, safe, done.', icon: '✅', color: 'border-amber-500/25 hover:border-amber-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(245,158,11,0.18)]' },
+            ].map(({ n, title, sub, icon, color, glow }) => (
+              <div key={n} className={`rounded-2xl border bg-white/[0.03] backdrop-blur-sm p-6 transition-all duration-300 hover:-translate-y-1 ${color} ${glow}`}>
+                <div className="text-3xl mb-4">{icon}</div>
+                <p className="text-[10px] font-bold text-white/25 uppercase tracking-widest mb-2">{n}</p>
+                <p className="text-white font-semibold text-base leading-tight mb-2">{title}</p>
+                <p className="text-white/45 text-xs leading-relaxed">{sub}</p>
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { icon: '🔐', label: 'End-to-end encrypted' },
+              { icon: '✅', label: 'ID verified travellers' },
+              { icon: '💰', label: 'Secure payment escrow' },
+              { icon: '🌍', label: '200+ city corridors' },
+            ].map(({ icon, label }) => (
+              <div key={label} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md px-4 py-3">
+                <span className="text-xl">{icon}</span>
+                <span className="text-xs text-white/60 font-medium">{label}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Link href="/how-it-works" className="inline-flex items-center gap-2 text-sm text-white/35 hover:text-white/65 transition-colors">
+              Full process details <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── POWERED BY MOVEMENT — 3-column transport videos ── */}
       <section className="relative bg-[#020617] py-32 overflow-hidden">
 
-        {/* WHY_VIDEOS cycling as full background */}
-        {WHY_VIDEOS.map((src, i) => (
-          <video
-            key={src}
-            autoPlay muted loop playsInline
-            preload={i === 0 ? 'auto' : 'none'}
-            className="absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-[3000ms] ease-in-out"
-            style={{ opacity: i === whyVid ? 1 : 0 }}
-          >
-            <source src={src} type="video/mp4" />
-          </video>
-        ))}
+        {/* Plane / Train / Bus — each behind its matching card */}
+        <div className="absolute inset-0 opacity-[0.22]">
+          <div className="grid grid-cols-3 h-full">
+            <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+              <source src="/videos/onecall/plane2.mp4" type="video/mp4" />
+            </video>
+            <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+              <source src="/videos/onecall/Aboutus_train.mp4" type="video/mp4" />
+            </video>
+            <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+              <source src="/videos/onecall/test1/Aboutusbus.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
 
-        {/* Dark scrim — controlled visibility */}
-        <div className="absolute inset-0 bg-black/60" />
+        {/* Dark scrim */}
+        <div className="absolute inset-0 bg-black/62" />
 
-        {/* Fade into adjacent sections */}
+        {/* Fade edges into adjacent sections */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/95 via-transparent to-[#020617]/95" />
 
-        {/* Blue radial glow — depth layer */}
+        {/* Blue radial glow */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.13),transparent_70%)]" />
 
         {/* Content */}
@@ -680,55 +798,6 @@ function HomePageContent() {
               </p>
             </div>
 
-          </div>
-        </div>
-      </section>
-
-      {/* ── HOW BOOTHOP WORKS ── */}
-      <section className="py-24 md:py-32 bg-[#050D1A]">
-        <div className="px-6 max-w-5xl mx-auto w-full">
-          <div className="text-center mb-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">Simple process</p>
-            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">How BootHop Works</h2>
-            <p className="mt-4 text-white/45 text-base">From posting to delivery in four steps.</p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-14">
-            {[
-              { n: '01', title: 'Post Your Request', sub: 'Tell us the route, date, and package size. Takes 30 seconds.', icon: '📦', color: 'border-blue-500/25 hover:border-blue-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(59,130,246,0.18)]' },
-              { n: '02', title: 'Get Matched', sub: 'We connect you with a verified traveller already making that journey.', icon: '🤝', color: 'border-emerald-500/25 hover:border-emerald-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(16,185,129,0.18)]' },
-              { n: '03', title: 'Identity Verified', sub: 'All travellers complete KYC checks before handling any delivery.', icon: '🛡️', color: 'border-violet-500/25 hover:border-violet-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(139,92,246,0.18)]' },
-              { n: '04', title: 'Delivered', sub: 'Both sides confirm. Funds release. Simple, safe, done.', icon: '✅', color: 'border-amber-500/25 hover:border-amber-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(245,158,11,0.18)]' },
-            ].map(({ n, title, sub, icon, color, glow }) => (
-              <div key={n}
-                className={`rounded-2xl border bg-black/40 backdrop-blur-xl p-6 transition-all duration-300 hover:-translate-y-1 ${color} ${glow}`}>
-                <div className="text-3xl mb-4">{icon}</div>
-                <p className="text-[10px] font-bold text-white/25 uppercase tracking-widest mb-2">{n}</p>
-                <p className="text-white font-semibold text-base leading-tight mb-2">{title}</p>
-                <p className="text-white/45 text-xs leading-relaxed">{sub}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Trust bar */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { icon: '🔐', label: 'End-to-end encrypted' },
-              { icon: '✅', label: 'ID verified travellers' },
-              { icon: '💰', label: 'Secure payment escrow' },
-              { icon: '🌍', label: '200+ city corridors' },
-            ].map(({ icon, label }) => (
-              <div key={label} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md px-4 py-3">
-                <span className="text-xl">{icon}</span>
-                <span className="text-xs text-white/60 font-medium">{label}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-10 text-center">
-            <Link href="/how-it-works" className="inline-flex items-center gap-2 text-sm text-white/35 hover:text-white/65 transition-colors">
-              Full process details <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
           </div>
         </div>
       </section>
@@ -870,8 +939,8 @@ function HomePageContent() {
 
 
 
-      {/* ── LIVE TRIPS — only shown when platform has real activity ── */}
-      {trips.length >= 3 && <section className="relative py-20 md:py-28 bg-[#07111f]">
+      {/* ── LIVE TRIPS — hidden; data still fetched for future use ── */}
+      {false && trips.length >= 3 && <section className="relative py-20 md:py-28 bg-[#07111f]">
         <div className="mx-auto max-w-7xl px-6 md:px-8">
           <div className="mb-10 text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-green-400/20 bg-green-500/8 px-4 py-1.5">
@@ -989,132 +1058,38 @@ function HomePageContent() {
         </div>
       </section>}
 
-      {/* ── BOOKING FORM ── */}
-      <section id="booking-form" className="py-24 px-6 bg-[#030A16]">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-10 reveal">
-            <h2 className="text-3xl font-semibold text-white mb-3">Ready to move something?</h2>
-            <p className="text-white/45 text-base">Post in under 30 seconds. We&apos;ll match you with a verified traveller.</p>
-          </div>
+      {/* ── TESTIMONIALS ── */}
+      <TestimonialsSection />
 
-          {/* Mode toggle */}
-          <div className="mb-6 flex justify-center">
-            <div className="inline-flex rounded-xl border border-white/20 bg-white/8 p-1 backdrop-blur-xl">
-              <button onClick={() => setMode('send')} className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'send' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/40' : 'text-white/55 hover:text-white hover:bg-white/8'}`}>
-                📦 Send Item
-              </button>
-              <button onClick={() => setMode('travel')} className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'travel' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/40' : 'text-white/55 hover:text-white hover:bg-white/8'}`}>
-                ✈️ I&apos;m Travelling
-              </button>
-            </div>
-          </div>
-
-          {/* Form card */}
-          <div className="rounded-2xl border border-white/12 bg-white/[0.04] p-6 backdrop-blur-xl shadow-[0_32px_80px_rgba(0,0,0,0.4)]">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="relative pb-4">
-                <input placeholder="From (City)" value={queryFrom}
-                  onChange={(e) => { setQueryFrom(e.target.value); setTrip({ ...trip, from: e.target.value }); setFromSelected(false); setFormErrors(p => ({ ...p, from: '' })); }}
-                  className={`${inputClass} ${formErrors.from ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
-                {fromSuggestions.length > 0 && (
-                  <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl">
-                    {fromSuggestions.map((s, i) => (
-                      <div key={i} onClick={() => { setTrip({ ...trip, from: s }); setQueryFrom(s); setFromSuggestions([]); setFromSelected(true); setFormErrors(p => ({ ...p, from: '' })); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
-                        className="cursor-pointer px-4 py-3 text-sm text-white/85 hover:bg-white/8 hover:text-white transition-colors">{s}</div>
-                    ))}
-                  </div>
-                )}
-                {formErrors.from
-                  ? <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.from}</p>
-                  : queryFrom && !fromSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-400">Select from list</p>}
-              </div>
-              <div className="relative pb-4">
-                <input placeholder="To (City)" value={queryTo}
-                  onChange={(e) => { setQueryTo(e.target.value); setTrip({ ...trip, to: e.target.value }); setToSelected(false); setFormErrors(p => ({ ...p, to: '' })); }}
-                  className={`${inputClass} ${formErrors.to ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
-                {toSuggestions.length > 0 && (
-                  <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl">
-                    {toSuggestions.map((s, i) => (
-                      <div key={i} onClick={() => { setTrip({ ...trip, to: s }); setQueryTo(s); setToSuggestions([]); setToSelected(true); setFormErrors(p => ({ ...p, to: '' })); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
-                        className="cursor-pointer px-4 py-3 text-sm text-white/85 hover:bg-white/8 hover:text-white transition-colors">{s}</div>
-                    ))}
-                  </div>
-                )}
-                {formErrors.to
-                  ? <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.to}</p>
-                  : queryTo && !toSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-400">Select from list</p>}
-              </div>
-              <div className="relative pb-4">
-                <input type="date" value={trip.date} min={new Date().toISOString().split('T')[0]}
-                  onChange={(e) => { setTrip({ ...trip, date: e.target.value }); setFormErrors(p => ({ ...p, date: '' })); }}
-                  className={`${inputClass} [color-scheme:dark] ${formErrors.date ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
-                {formErrors.date && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.date}</p>}
-              </div>
-              <div className="relative pb-4">
-                <select value={trip.weight} onChange={(e) => { setTrip({ ...trip, weight: e.target.value }); setFormErrors(p => ({ ...p, weight: '' })); }}
-                  className={`${inputClass} cursor-pointer ${formErrors.weight ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`}>
-                  <option value="" disabled className="bg-slate-900 text-white/50">Package size</option>
-                  {weightOptions.map((o) => <option key={o.value} value={o.value} className="bg-slate-900 text-white">{o.label}</option>)}
-                </select>
-                {formErrors.weight && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.weight}</p>}
-              </div>
-              <button onClick={handleSubmit}
-                className="sm:col-span-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 py-4 font-bold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(59,130,246,0.5)] shadow-lg shadow-blue-500/25 text-base tracking-wide">
-                {mode === 'send' ? 'Find a Traveller' : 'Post My Journey'} <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-            <p className="mt-4 text-center text-xs text-white/30">Free to join · No subscription · You control your price</p>
-          </div>
-        </div>
-      </section>
-
-      {/* ── SOCIAL PROOF ── */}
-      <section className="py-16 px-6 bg-[#050D1A]">
-        <div className="max-w-2xl mx-auto">
-          <div className="rounded-3xl border border-white/8 bg-white/3 p-8 md:p-10 relative overflow-hidden">
-            {/* quote mark */}
-            <span className="absolute top-6 right-8 text-6xl text-white/5 font-serif leading-none select-none">&ldquo;</span>
-            <div className="flex items-center gap-0.5 mb-5">
-              {[1,2,3,4,5].map(i => <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />)}
-            </div>
-            <p className="text-white/80 text-lg leading-relaxed italic mb-6">
-              &ldquo;I travelled from Lagos to London and used BootHop to send documents ahead. Everything arrived before I did. Wish I&apos;d known about this sooner.&rdquo;
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/20 text-sm font-bold text-blue-300">T</div>
-              <div>
-                <p className="text-sm font-semibold text-white">Toyin A.</p>
-                <p className="text-xs text-white/40">MSc Student, London · Lagos → London route</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Final CTA ──────────────────────────────────────────────────────── */}
+      {/* ── Final CTA ── */}
       <section className="relative py-36 px-6 text-center overflow-hidden">
-        {/* Plane video background */}
         <video autoPlay muted loop playsInline
           className="absolute inset-0 w-full h-full object-cover scale-105">
           <source src="/videos/onecall/plane1.mp4" type="video/mp4" />
         </video>
-        {/* Single overlay — light enough to see the plane, dark enough for text */}
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-black/52" />
 
-        <div className="relative z-10">
-          <h2 className="text-4xl md:text-5xl font-semibold text-white mb-4 tracking-tight leading-tight">
-            Built for speed.<br />
-            <span className="text-white/55">Built for urgency.</span>
+        <div className="relative z-10 max-w-2xl mx-auto">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300/80 mb-4">Someone is flying that route today</p>
+          <h2 className="text-4xl md:text-5xl font-semibold text-white mb-5 tracking-tight leading-tight">
+            Your package should<br />
+            <span className="text-white/60">already be moving.</span>
           </h2>
-          <p className="text-white/45 text-base mb-8 max-w-md mx-auto">
-            Join thousands of travellers and senders already on the platform.
+          <p className="text-white/50 text-base mb-10 max-w-sm mx-auto leading-relaxed">
+            Post in 30 seconds. Match with a verified traveller on their way now.
           </p>
-          <Link href="#booking-form"
-            onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
-            className="inline-flex items-center gap-2 bg-white text-black px-8 py-3.5 rounded-full font-bold text-sm hover:bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(255,255,255,0.15)]">
-            Get Started <ArrowRight className="h-4 w-4" />
-          </Link>
-          <p className="mt-4 text-xs text-white/25">Free to join · No subscription · Cancel anytime</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="#booking-form"
+              onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
+              className="inline-flex items-center gap-2 bg-white text-black px-8 py-3.5 rounded-full font-bold text-sm hover:bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(255,255,255,0.18)]">
+              Post a Journey <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/journeys"
+              className="inline-flex items-center gap-2 border border-white/25 text-white/80 px-8 py-3.5 rounded-full text-sm font-medium hover:border-white/50 hover:text-white transition-all">
+              Browse Live Routes
+            </Link>
+          </div>
+          <p className="mt-6 text-xs text-white/25">Free to join · No subscription · Cancel anytime</p>
         </div>
       </section>
 
