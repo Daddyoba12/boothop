@@ -426,26 +426,27 @@ function HomePageContent() {
         <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
 
         {/* CONTENT */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 h-full flex items-center py-24 md:py-0">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 h-full flex items-center pt-8 pb-20 md:py-0">
           <div className="grid md:grid-cols-2 gap-12 items-center w-full">
 
             {/* LEFT */}
             <div>
-              {/* Trust tag */}
-              <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white/80 text-sm backdrop-blur-md">
+              {/* H1 anchored at top — visible immediately above the fold */}
+              <h1 className="text-4xl md:text-6xl font-semibold text-white leading-tight mb-4 tracking-tight">
+                Move Almost Anything.<br />Anywhere. Same Day.
+              </h1>
+
+              {/* Trust tag below headline */}
+              <div className="mb-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white/80 text-sm backdrop-blur-md">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                 Free to join · No subscription · No hidden fees
               </div>
-
-              <h1 className="text-4xl md:text-6xl font-semibold text-white leading-tight mb-6 tracking-tight">
-                Move Anything.<br />Anywhere. Same Day.
-              </h1>
 
               <p className="text-white/80 text-lg mb-3 max-w-xl leading-relaxed">
                 Your fastest delivery option is already moving.
               </p>
               <p className="text-white/55 text-sm mb-7">
-                UK &amp; Europe · 2-hour collection · Airport-to-airport delivery
+                UK &amp; Europe · Hand-carried by verified travellers · <Link href="/trust-safety" className="underline underline-offset-2 hover:text-white/80 transition-colors">What can I send?</Link>
               </p>
 
               {/* CTAs */}
@@ -477,7 +478,7 @@ function HomePageContent() {
               <div className="flex flex-wrap gap-5 text-white/55 text-xs">
                 <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Identity verified</span>
                 <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Secure escrow</span>
-                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />95% satisfaction</span>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />95% satisfaction rate</span>
               </div>
             </div>
 
@@ -645,6 +646,7 @@ function HomePageContent() {
                   : queryTo && !toSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-400">Select from list</p>}
               </div>
               <div className="relative pb-4">
+                <label className="block text-xs text-white/40 mb-1.5 pl-1">Travel / send date</label>
                 <input type="date" value={trip.date} min={new Date().toISOString().split('T')[0]}
                   onChange={(e) => { setTrip({ ...trip, date: e.target.value }); setFormErrors(p => ({ ...p, date: '' })); }}
                   className={`${inputClass} [color-scheme:dark] ${formErrors.date ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
@@ -669,7 +671,7 @@ function HomePageContent() {
       </section>
 
       {/* ── BUSINESS STRIP ── */}
-      <section className="py-12 px-6 border-y border-white/[0.06] bg-[#020B18]">
+      <section className="py-8 px-6 border-y border-white/[0.06] bg-[#020B18]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-2">For Business</p>
@@ -1094,11 +1096,11 @@ function HomePageContent() {
       </section>
 
 
-      {/* Floating WhatsApp button — icon only */}
+      {/* Floating WhatsApp button — smaller on mobile so it never overlaps content */}
       <a href="/api/whatsapp"
-        className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-2xl shadow-[#25D366]/40 hover:scale-110 active:scale-95 transition-all"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-40 flex items-center justify-center w-11 h-11 md:w-13 md:h-13 bg-[#25D366] text-white rounded-full shadow-xl shadow-[#25D366]/35 hover:scale-110 active:scale-95 transition-all"
         aria-label="Chat on WhatsApp">
-        <MessageCircle className="h-7 w-7" />
+        <MessageCircle className="h-5 w-5 md:h-6 md:w-6" />
       </a>
 
       <Footer />
