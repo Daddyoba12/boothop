@@ -78,16 +78,18 @@ type Trip = {
 /* ── Modal step machine ── */
 type ModalStep = 'initial' | 'choose-price' | 'enter-email' | 'enter-otp' | 'confirmed';
 
-export default function LiveJourneysPage() {
+function LiveJourneysContent() {
   const supabase = createSupabaseClient();
+  const searchParams = useSearchParams();
 
   const [trips, setTrips]               = useState<Trip[]>([]);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [fromCity, setFromCity]   = useState('');
-  const [toCity, setToCity]       = useState('');
+  // Pre-populate from ?from= and ?to= query params (e.g. from Active Corridors)
+  const [fromCity, setFromCity]   = useState(() => searchParams.get('from') ?? '');
+  const [toCity, setToCity]       = useState(() => searchParams.get('to')   ?? '');
   const [dateFilter, setDateFilter] = useState('');
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
@@ -730,5 +732,17 @@ export default function LiveJourneysPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function LiveJourneysPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#07111f] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500/50" />
+      </div>
+    }>
+      <LiveJourneysContent />
+    </Suspense>
   );
 }
