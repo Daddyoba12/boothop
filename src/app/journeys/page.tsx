@@ -185,15 +185,10 @@ function LiveJourneysContent() {
     setBusy(false);
     setFieldError('');
     setBlockingError('');
-    // Pre-fill email + flag if already logged in
+    // Pre-fill email if logged in (user must still confirm via OTP)
     fetch('/api/auth/me').then(r => r.json()).then(me => {
-      if (me.authenticated && me.user?.email) {
-        setEmail(me.user.email);
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-      }
-    }).catch(() => { setIsLoggedIn(false); });
+      if (me.authenticated && me.user?.email) setEmail(me.user.email);
+    }).catch(() => {});
   };
 
   const closeModal = () => setSelectedTrip(null);
@@ -679,21 +674,19 @@ function LiveJourneysContent() {
                         <Tag className="h-4 w-4" /> Make Offer
                       </button>
                       <button
-                        onClick={() => { setInterestType('full_price'); if (isLoggedIn) submitDirectly(); else setStep('enter-email'); }}
-                        disabled={busy}
-                        className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                        onClick={() => { setInterestType('full_price'); setStep('enter-email'); }}
+                        className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
                       >
-                        {busy ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                        <CheckCircle className="h-4 w-4" />
                         {selectedTrip.type === 'travel' ? 'Request Carry' : 'I\'ll Carry This'}
                       </button>
                     </>
                   ) : (
                     <button
-                      onClick={() => { setInterestType('full_price'); if (isLoggedIn) submitDirectly(); else setStep('enter-email'); }}
-                      disabled={busy}
-                      className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                      onClick={() => { setInterestType('full_price'); setStep('enter-email'); }}
+                      className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] transition-all"
                     >
-                      {busy ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                      <CheckCircle className="h-4 w-4" />
                       {selectedTrip.type === 'travel' ? 'Request Carry' : 'I\'ll Carry This'}
                     </button>
                   )}
@@ -737,12 +730,9 @@ function LiveJourneysContent() {
                     );
                   })}
                 </div>
-                <button onClick={() => { if (isLoggedIn) submitDirectly(); else setStep('enter-email'); }}
-                  disabled={busy}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed">
-                  {busy
-                    ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Submitting...</>
-                    : <>Continue with £{(Number(selectedTrip.price) * (1 - discountPct / 100)).toFixed(2)} →</>}
+                <button onClick={() => setStep('enter-email')}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                  Continue with £{(Number(selectedTrip.price) * (1 - discountPct / 100)).toFixed(2)} →
                 </button>
               </>
             )}
