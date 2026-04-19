@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Package, Plane, CheckCircle, Clock, XCircle,
-  ArrowRight, Shield, AlertCircle, FileEdit, Rocket, Trash2, PlusCircle,
+  ArrowRight, Shield, AlertCircle, FileEdit, Rocket, Trash2, PlusCircle, ThumbsUp, ThumbsDown,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -18,6 +18,7 @@ export default function DashboardPage() {
   const [publishingDraft, setPublishingDraft] = useState<string | null>(null);
   const [deletingTrip, setDeletingTrip] = useState<string | null>(null);
   const [credit, setCredit] = useState<{ amount_pence: number; redeemed: boolean } | null>(null);
+  const [respondingMatch, setRespondingMatch] = useState<string | null>(null);
 
   useEffect(() => {
     loadDashboard();
@@ -60,6 +61,20 @@ export default function DashboardPage() {
       console.error('Error loading dashboard:', error);
       setLoading(false);
     }
+  };
+
+  const respondToMatch = async (matchId: string, action: 'accept' | 'decline') => {
+    setRespondingMatch(matchId);
+    try {
+      const res = await fetch(`/api/matches/${matchId}/respond`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+        credentials: 'include',
+      });
+      if (res.ok) loadDashboard();
+    } catch { /* ignore */ }
+    finally { setRespondingMatch(null); }
   };
 
   const publishDraft = async (draftId: string) => {
@@ -330,6 +345,32 @@ export default function DashboardPage() {
                         {st.label}
                       </div>
                     </div>
+                    {/* Accept / Decline for incoming interests */}
+                    {match.status === 'matched' && (
+                      match.sender_email !== user?.email
+                        ? (
+                          // Mr A — listing owner sees Accept/Decline
+                          <div className="flex gap-2 mb-2">
+                            <button
+                              onClick={() => respondToMatch(match.id, 'accept')}
+                              disabled={respondingMatch === match.id}
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold rounded-xl transition-all disabled:opacity-50"
+                            >
+                              <ThumbsUp className="w-3.5 h-3.5" /> Accept
+                            </button>
+                            <button
+                              onClick={() => respondToMatch(match.id, 'decline')}
+                              disabled={respondingMatch === match.id}
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/25 text-red-400 text-xs font-bold rounded-xl transition-all disabled:opacity-50"
+                            >
+                              <ThumbsDown className="w-3.5 h-3.5" /> Decline
+                            </button>
+                          </div>
+                        ) : (
+                          // Mr B — waiting for response
+                          <p className="text-xs text-white/30 text-center mb-2">Waiting for listing owner to respond…</p>
+                        )
+                    )}
                     <Link
                       href={`/matches/${match.id}`}
                       className="flex items-center justify-center gap-1.5 w-full py-2 bg-white/6 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold rounded-xl transition-all"

@@ -96,21 +96,13 @@ export async function POST(request: Request) {
 
     const matchId = newMatch.id;
 
-    // Create accept + decline action tokens for the trip owner so they can act directly from email
+    // Create a magic login token for the trip owner so clicking email logs them in and goes to dashboard
     if (trip.email) {
-      const ownerRole = trip.type === 'travel' ? 'traveler' : 'sender';
       const expires_at = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
-
-      const [{ data: acceptData }, { data: declineData }] = await Promise.all([
-        supabase.from('action_tokens').insert({
-          email: trip.email, action_type: 'confirm_match', entity_id: matchId,
-          payload: { role: ownerRole }, expires_at,
-        }).select('token').single(),
-        supabase.from('action_tokens').insert({
-          email: trip.email, action_type: 'decline_match', entity_id: matchId,
-          payload: { role: ownerRole }, expires_at,
-        }).select('token').single(),
-      ]);
+      const { data: tokenData } = await supabase.from('action_tokens').insert({
+        email: trip.email, action_type: 'magic_login', entity_id: matchId,
+        payload: { redirectTo: '/dashboard' }, expires_at,
+      }).select('token').single();
 
       sendInterestEmail({
         toEmail:      trip.email,
@@ -122,8 +114,7 @@ export async function POST(request: Request) {
         listingPrice: trip.price ?? finalOfferedPrice,
         interestType,
         matchId,
-        acceptToken:  acceptData?.token,
-        declineToken: declineData?.token,
+        loginToken:   tokenData?.token,
       }).catch((e) => console.error('sendInterestEmail failed', e));
     }
 

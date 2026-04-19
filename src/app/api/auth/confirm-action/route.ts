@@ -52,6 +52,13 @@ export async function POST(request: Request) {
     let redirectTo = '/dashboard';
     let message = '';
 
+    // Magic login — just authenticate and redirect, no DB action
+    if (action_type === 'magic_login') {
+      redirectTo = (payload as any)?.redirectTo || '/dashboard';
+      message    = 'Logged in successfully.';
+      return NextResponse.json({ ok: true, redirectTo, message, action_type });
+    }
+
     if (action_type === 'confirm_match' || action_type === 'decline_match') {
       const matchId = entity_id;
       redirectTo = `/matches/${matchId}`;
