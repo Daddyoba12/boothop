@@ -25,8 +25,8 @@ export async function sendBusinessOtpEmail(params: { to: string; code: string })
       <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0f172a;background:#ffffff;">
         ${header()}
         <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;">Your verification code</h2>
-        <p style="font-size:15px;color:#475569;margin:0 0 24px;">Enter this code to access the BootHop Business portal. Expires in 10 minutes.</p>
-        <div style="font-size:44px;font-weight:900;letter-spacing:8px;padding:20px 28px;background:#ecfdf5;border:2px solid #6ee7b7;border-radius:16px;display:inline-block;margin:0 0 24px;color:#065f46;font-family:monospace;">${params.code}</div>
+        <p style="font-size:15px;color:#475569;margin:0 0 24px;">Enter this 5-character code to access the BootHop Business portal. Expires in 10 minutes.</p>
+        <div style="font-size:44px;font-weight:900;letter-spacing:10px;padding:20px 28px;background:#ecfdf5;border:2px solid #6ee7b7;border-radius:16px;display:inline-block;margin:0 0 24px;color:#065f46;font-family:monospace;">${params.code}</div>
         ${footer('Only business email addresses are permitted on this portal. Do not share this code. ')}
       </div>
     `,

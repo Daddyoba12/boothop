@@ -88,10 +88,11 @@ export function signBizSession(email: string) {
   });
 }
 
-export function signBizOtp(email: string, code: string, attempts = 0) {
+export function signBizOtp(email: string, codeHash: string, attempts = 0) {
   const secret = process.env.APP_SESSION_SECRET;
   if (!secret) throw new Error('APP_SESSION_SECRET is missing');
-  return jwt.sign({ email, code, attempts, type: 'biz_otp' }, secret, {
+  // Store the SHA-256 hash of the code, never the plaintext
+  return jwt.sign({ email, code_hash: codeHash, attempts, type: 'biz_otp' }, secret, {
     expiresIn: '10m', issuer: 'boothop', audience: 'boothop-business',
   });
 }
@@ -137,12 +138,12 @@ export function getBizRemember(
 
 export function getBizOtp(
   cookieStore: { get: (name: string) => { value: string } | undefined }
-): { email: string; code: string; attempts: number; iat?: number } | null {
+): { email: string; code_hash: string; attempts: number; iat?: number } | null {
   try {
     const cookie = cookieStore.get(BIZ_OTP_COOKIE);
     if (!cookie?.value) return null;
     return jwt.verify(cookie.value, process.env.APP_SESSION_SECRET!, {
       issuer: 'boothop', audience: 'boothop-business',
-    }) as { email: string; code: string; attempts: number; iat?: number };
+    }) as { email: string; code_hash: string; attempts: number; iat?: number };
   } catch { return null; }
 }

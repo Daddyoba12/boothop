@@ -69,7 +69,6 @@ export default function BoothopBusiness() {
       });
       const j = await res.json();
       if (!res.ok) { setAuthError(j.error); return; }
-      localStorage.setItem('boothop_biz_email', emailInput.trim());
       // Trusted returning user — server re-issued session, skip OTP
       if (j.skipOtp) {
         const me = await fetch('/api/business/auth/me').then(r => r.json());
@@ -404,12 +403,12 @@ export default function BoothopBusiness() {
                 <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent" />
                 <div className={`pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${loginIntent === 'priority' ? 'bg-amber-500/15' : 'bg-emerald-500/15'}`} />
                 {authError && <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">{authError}</div>}
-                <input type="text" inputMode="numeric"
-                  value={otpInput} onChange={e => setOtpInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                <input type="text" inputMode="text" autoCapitalize="characters"
+                  value={otpInput} onChange={e => setOtpInput(e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 5))}
                   onKeyDown={e => e.key === 'Enter' && verifyOtp()}
-                  placeholder="000000" autoFocus
-                  className={`w-full text-center text-4xl font-mono tracking-[0.6em] py-4 rounded-xl bg-white/20 border border-white/20 text-white placeholder-white/20 focus:outline-none ${loginIntent === 'priority' ? 'focus:ring-2 focus:ring-amber-400' : 'focus:ring-2 focus:ring-emerald-400'}`} />
-                <button onClick={verifyOtp} disabled={authLoading || otpInput.length < 6}
+                  placeholder="0000A" autoFocus maxLength={5}
+                  className={`w-full text-center text-4xl font-mono tracking-[0.35em] py-4 rounded-xl bg-white/20 border border-white/20 text-white placeholder-white/20 focus:outline-none ${loginIntent === 'priority' ? 'focus:ring-2 focus:ring-amber-400' : 'focus:ring-2 focus:ring-emerald-400'}`} />
+                <button onClick={verifyOtp} disabled={authLoading || otpInput.length < 5}
                   className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-black disabled:opacity-40 hover:scale-[1.02] transition-all ${loginIntent === 'priority' ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-black' : 'bg-gradient-to-r from-emerald-400 to-teal-400 text-black'}`}>
                   {authLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
                   {authLoading ? 'Verifying…' : 'Verify & continue'}

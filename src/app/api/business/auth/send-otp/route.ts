@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { signBizOtp, getBizOtp, getBizOtpCookieName, getBizRemember, signBizSession, getBizCookieName } from '@/lib/auth/session';
+import { generateVerificationCode, hashCode } from '@/lib/auth/code';
 import { sendBusinessOtpEmail } from '@/lib/email/sendBusinessEmail';
 
 const PERSONAL_DOMAINS = new Set([
@@ -21,10 +22,6 @@ function isBusinessEmail(email: string): boolean {
   const domain = email.split('@')[1]?.toLowerCase();
   if (!domain) return false;
   return !PERSONAL_DOMAINS.has(domain);
-}
-
-function generateOtp(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 export async function POST(request: NextRequest) {
@@ -68,8 +65,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const code  = generateOtp();
-    const token = signBizOtp(email.toLowerCase(), code);
+    // Same format as the main app: 4 digits + 1 letter (e.g. 4827A)
+    const code  = generateVerificationCode();
+    const token = signBizOtp(email.toLowerCase(), hashCode(code));
 
     await sendBusinessOtpEmail({ to: email, code });
 

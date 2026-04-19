@@ -5,6 +5,7 @@ import {
   getBizCookieName, getBizOtpCookieName,
   signBizRemember, getBizRememberCookieName,
 } from '@/lib/auth/session';
+import { hashCode } from '@/lib/auth/code';
 
 const MAX_ATTEMPTS = 5;
 
@@ -33,9 +34,12 @@ export async function POST(request: NextRequest) {
       }, { status: 429 });
     }
 
-    if (pending.code !== code.trim()) {
-      // Increment attempts and re-issue the OTP cookie with same code
-      const newToken = signBizOtp(pending.email, pending.code, pending.attempts + 1);
+    // Normalise: uppercase so the letter matches regardless of case the user typed
+    const normalised = code.trim().toUpperCase();
+
+    if (hashCode(normalised) !== pending.code_hash) {
+      // Increment attempts and re-issue the OTP cookie with same hash
+      const newToken = signBizOtp(pending.email, pending.code_hash, pending.attempts + 1);
       const remaining = MAX_ATTEMPTS - (pending.attempts + 1);
       cookieStore.set(getBizOtpCookieName(), newToken, {
         httpOnly: true,
