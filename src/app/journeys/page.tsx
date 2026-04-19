@@ -104,6 +104,7 @@ function LiveJourneysContent() {
   const [busy, setBusy]                 = useState(false);
   const [fieldError, setFieldError]     = useState('');
   const [blockingError, setBlockingError] = useState('');
+  const [isLoggedIn, setIsLoggedIn]     = useState(false);
   const [pendingOpenId, setPendingOpenId] = useState<string | null>(null);
   // Track which trip cards are showing their original (non-English) text
   const [showOriginalIds, setShowOriginalIds] = useState<Set<string>>(new Set());
@@ -184,13 +185,47 @@ function LiveJourneysContent() {
     setBusy(false);
     setFieldError('');
     setBlockingError('');
-    // Pre-fill email if logged in
+    // Pre-fill email + flag if already logged in
     fetch('/api/auth/me').then(r => r.json()).then(me => {
-      if (me.authenticated && me.user?.email) setEmail(me.user.email);
-    }).catch(() => {});
+      if (me.authenticated && me.user?.email) {
+        setEmail(me.user.email);
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+    }).catch(() => { setIsLoggedIn(false); });
   };
 
   const closeModal = () => setSelectedTrip(null);
+
+  /* ── Submit interest directly (logged-in users — no OTP needed) ── */
+  const submitDirectly = async () => {
+    if (!selectedTrip) return;
+    setBusy(true); setFieldError('');
+    try {
+      const res  = await fetch('/api/matches/express-interest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tripId:       selectedTrip.id,
+          interestType,
+          discountPct:  interestType === 'offer' ? discountPct : 0,
+          offeredPrice: computePrice(selectedTrip),
+          email,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        const msg = json.error || 'Could not submit. Please try again.';
+        if (msg.toLowerCase().includes('same person') || msg.toLowerCase().includes('booter and a hooper')) {
+          setBlockingError(msg); return;
+        }
+        throw new Error(msg);
+      }
+      setStep('confirmed');
+    } catch (e: any) { setFieldError(e.message); }
+    finally { setBusy(false); }
+  };
 
   /* ── Step: send OTP ── */
   const sendOtp = async () => {
@@ -644,19 +679,21 @@ function LiveJourneysContent() {
                         <Tag className="h-4 w-4" /> Make Offer
                       </button>
                       <button
-                        onClick={() => { setInterestType('full_price'); setStep('enter-email'); }}
-                        className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                        onClick={() => { setInterestType('full_price'); if (isLoggedIn) submitDirectly(); else setStep('enter-email'); }}
+                        disabled={busy}
+                        className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                       >
-                        <CheckCircle className="h-4 w-4" />
+                        {busy ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <CheckCircle className="h-4 w-4" />}
                         {selectedTrip.type === 'travel' ? 'Request Carry' : 'I\'ll Carry This'}
                       </button>
                     </>
                   ) : (
                     <button
-                      onClick={() => { setInterestType('full_price'); setStep('enter-email'); }}
-                      className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] transition-all"
+                      onClick={() => { setInterestType('full_price'); if (isLoggedIn) submitDirectly(); else setStep('enter-email'); }}
+                      disabled={busy}
+                      className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <CheckCircle className="h-4 w-4" />
+                      {busy ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <CheckCircle className="h-4 w-4" />}
                       {selectedTrip.type === 'travel' ? 'Request Carry' : 'I\'ll Carry This'}
                     </button>
                   )}
@@ -700,9 +737,12 @@ function LiveJourneysContent() {
                     );
                   })}
                 </div>
-                <button onClick={() => setStep('enter-email')}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all">
-                  Continue with £{(Number(selectedTrip.price) * (1 - discountPct / 100)).toFixed(2)} →
+                <button onClick={() => { if (isLoggedIn) submitDirectly(); else setStep('enter-email'); }}
+                  disabled={busy}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-sm font-bold text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+                  {busy
+                    ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Submitting...</>
+                    : <>Continue with £{(Number(selectedTrip.price) * (1 - discountPct / 100)).toFixed(2)} →</>}
                 </button>
               </>
             )}
