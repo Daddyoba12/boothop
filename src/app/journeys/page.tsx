@@ -235,6 +235,8 @@ function LiveJourneysContent() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Failed to send code.');
+      // remember-me cookie still valid — session renewed, no code was sent
+      if (json.skipOtp) { await submitDirectly(); return; }
       setStep('enter-otp');
     } catch (e: any) { setFieldError(e.message); }
     finally { setBusy(false); }
