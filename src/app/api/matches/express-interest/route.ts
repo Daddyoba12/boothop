@@ -77,8 +77,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'You have already expressed interest in this trip.' }, { status: 409 });
     }
 
-    // Upsert interest record into matches table
-    const { error: matchErr } = await supabase.from('matches').insert({
+    // Insert match and get back the generated ID
+    const { data: newMatch, error: matchErr } = await supabase.from('matches').insert({
       trip_id:          tripId,
       sender_trip_id,
       traveler_trip_id,
@@ -87,15 +87,31 @@ export async function POST(request: Request) {
       offered_price:    finalOfferedPrice,
       interest_type:    interestType,
       status:           'matched',
-    });
+    }).select('id').single();
 
-    if (matchErr) {
+    if (matchErr || !newMatch) {
       console.error('match insert error', matchErr);
-      return NextResponse.json({ error: `Could not save interest: ${matchErr.message}` }, { status: 500 });
+      return NextResponse.json({ error: `Could not save interest: ${matchErr?.message}` }, { status: 500 });
     }
 
-    // Fire email to trip owner (best-effort)
+    const matchId = newMatch.id;
+
+    // Create accept + decline action tokens for the trip owner so they can act directly from email
     if (trip.email) {
+      const ownerRole = trip.type === 'travel' ? 'traveler' : 'sender';
+      const expires_at = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
+
+      const [{ data: acceptData }, { data: declineData }] = await Promise.all([
+        supabase.from('action_tokens').insert({
+          email: trip.email, action_type: 'confirm_match', entity_id: matchId,
+          payload: { role: ownerRole }, expires_at,
+        }).select('token').single(),
+        supabase.from('action_tokens').insert({
+          email: trip.email, action_type: 'decline_match', entity_id: matchId,
+          payload: { role: ownerRole }, expires_at,
+        }).select('token').single(),
+      ]);
+
       sendInterestEmail({
         toEmail:      trip.email,
         fromEmail:    email,
@@ -105,7 +121,9 @@ export async function POST(request: Request) {
         offeredPrice: finalOfferedPrice,
         listingPrice: trip.price ?? finalOfferedPrice,
         interestType,
-        matchId:      tripId,
+        matchId,
+        acceptToken:  acceptData?.token,
+        declineToken: declineData?.token,
       }).catch((e) => console.error('sendInterestEmail failed', e));
     }
 

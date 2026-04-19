@@ -75,8 +75,8 @@ export async function sendMatchDeclinedEmail(params: {
 }
 
 export async function sendInterestEmail(params: {
-  toEmail:      string;   // trip owner
-  fromEmail:    string;   // interested party
+  toEmail:      string;
+  fromEmail:    string;
   fromCity:     string;
   toCity:       string;
   travelDate:   string;
@@ -84,10 +84,15 @@ export async function sendInterestEmail(params: {
   listingPrice: number;
   interestType: 'full_price' | 'offer';
   matchId:      string;
+  acceptToken?: string;
+  declineToken?: string;
 }) {
   const discount   = Math.round((1 - params.offeredPrice / params.listingPrice) * 100);
   const isOffer    = params.interestType === 'offer';
   const priceLabel = isOffer ? `£${params.offeredPrice} (${discount}% off)` : `£${params.offeredPrice} (Full Price)`;
+  const acceptUrl  = params.acceptToken  ? `${appUrl}/confirm?token=${params.acceptToken}`  : `${appUrl}/dashboard`;
+  const declineUrl = params.declineToken ? `${appUrl}/confirm?token=${params.declineToken}` : `${appUrl}/dashboard`;
+  const dateStr    = params.travelDate ? new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 
   const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
@@ -95,29 +100,39 @@ export async function sendInterestEmail(params: {
     to: params.toEmail,
     subject: `${isOffer ? 'Offer received' : 'Someone is interested'} — ${params.fromCity} → ${params.toCity}`,
     html: `
-      <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0f172a;background:#ffffff;">
-        <div style="margin-bottom:24px;">
-          <span style="font-size:22px;font-weight:900;color:#1e3a8a;">Boot</span><span style="font-size:22px;font-weight:900;color:#2563eb;">Hop</span>
+      <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;background:#0f172a;color:#f8fafc;border-radius:16px;overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#1e3a5f,#0f172a);padding:28px 36px;text-align:center;border-bottom:2px solid #1e40af;">
+          <div style="font-size:26px;font-weight:900;color:#fff;">Boot<span style="color:#38bdf8;">Hop</span></div>
+          <div style="color:#7dd3fc;font-size:11px;margin-top:4px;letter-spacing:1.5px;text-transform:uppercase;">New ${isOffer ? 'Offer' : 'Interest'}</div>
         </div>
-        <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;">
-          ${isOffer ? '💰 You received an offer!' : '✅ Someone is interested in your trip!'}
-        </h2>
-        <p style="font-size:15px;color:#475569;margin:0 0 24px;">
-          A BootHop user wants to connect with you on your <strong>${params.fromCity} → ${params.toCity}</strong> trip on <strong>${new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>.
-        </p>
-        <div style="background:#eff6ff;border:2px solid #bfdbfe;border-radius:16px;padding:20px 24px;margin:0 0 24px;">
-          <p style="margin:0 0 8px;font-size:13px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Offered Price</p>
-          <p style="margin:0;font-size:32px;font-weight:900;color:#1d4ed8;">${priceLabel}</p>
+        <div style="padding:32px 36px;">
+          <h2 style="color:#f1f5f9;font-size:20px;font-weight:700;margin:0 0 6px;">
+            ${isOffer ? '💰 You received an offer!' : '✅ Someone wants to connect!'}
+          </h2>
+          <p style="color:#94a3b8;font-size:14px;margin:0 0 24px;">
+            A BootHop user is interested in your <strong style="color:#f1f5f9;">${params.fromCity} → ${params.toCity}</strong>${dateStr ? ` trip on <strong style="color:#f1f5f9;">${dateStr}</strong>` : ' trip'}.
+          </p>
+          <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:18px 22px;margin:0 0 24px;">
+            <p style="margin:0 0 4px;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;">Offered Price</p>
+            <p style="margin:0;font-size:30px;font-weight:900;color:#38bdf8;">${priceLabel}</p>
+          </div>
+          <p style="color:#94a3b8;font-size:13px;margin:0 0 20px;">Click below to accept or decline — you'll be logged in automatically, no password needed.</p>
+          <div style="display:flex;gap:12px;margin-bottom:28px;">
+            <a href="${acceptUrl}" style="flex:1;display:block;background:#16a34a;color:#fff;text-decoration:none;padding:14px 16px;border-radius:10px;font-weight:700;font-size:14px;text-align:center;">
+              ✅ Accept
+            </a>
+            <a href="${declineUrl}" style="flex:1;display:block;background:#1e293b;border:1px solid #334155;color:#94a3b8;text-decoration:none;padding:14px 16px;border-radius:10px;font-weight:600;font-size:14px;text-align:center;">
+              ✗ Decline
+            </a>
+          </div>
+          <p style="color:#475569;font-size:11px;margin:0;">Links expire in 72 hours. If you didn't expect this, ignore it — no action needed.</p>
         </div>
-        <a href="${appUrl}/dashboard" style="display:inline-block;background:#2563eb;color:#ffffff;font-weight:700;font-size:15px;padding:14px 28px;border-radius:12px;text-decoration:none;margin:0 0 24px;">
-          View in Dashboard →
-        </a>
-        <p style="font-size:13px;color:#94a3b8;margin:0;border-top:1px solid #f1f5f9;padding-top:16px;">
-          Log in to your BootHop dashboard to accept or decline this ${isOffer ? 'offer' : 'request'}.
-        </p>
+        <div style="background:#0f172a;border-top:1px solid #1e293b;padding:16px 36px;text-align:center;">
+          <p style="color:#334155;font-size:11px;margin:0;">© BootHop · <a href="${appUrl}" style="color:#38bdf8;text-decoration:none;">boothop.com</a></p>
+        </div>
       </div>
     `,
-    text: `Someone is interested in your ${params.fromCity} → ${params.toCity} trip. Offered price: ${priceLabel}. Log in at ${appUrl}/dashboard to respond.`,
+    text: `Someone is interested in your ${params.fromCity} → ${params.toCity} trip. Offered price: ${priceLabel}.\n\nAccept: ${acceptUrl}\nDecline: ${declineUrl}\n\nLinks expire in 72 hours.`,
   });
 }
 
