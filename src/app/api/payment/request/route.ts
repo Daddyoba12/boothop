@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getAppSession } from '@/lib/auth/session';
 import { cookies } from 'next/headers';
-import { sendAdminPaymentAlertEmail, sendPaymentRequestedEmail } from '@/lib/email/sendPaymentEmail';
+import { sendAdminPaymentAlertEmail, sendPaymentRequestedEmail, sendCarrierPaymentProcessingEmail } from '@/lib/email/sendPaymentEmail';
 
-const INSURANCE_RATE = 0.075;
+const INSURANCE_RATE = 0.08;
 
 export async function POST(request: Request) {
   try {
@@ -79,6 +79,14 @@ export async function POST(request: Request) {
         fromCity,
         toCity,
         totalDue,
+        matchId,
+      }),
+      sendCarrierPaymentProcessingEmail({
+        toEmail:     match.traveler_email,
+        fromCity,
+        toCity,
+        travelDate,
+        agreedPrice: match.agreed_price ?? 0,
         matchId,
       }),
     ]);

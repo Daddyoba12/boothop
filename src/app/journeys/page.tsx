@@ -257,7 +257,7 @@ function LiveJourneysContent() {
   /* ── Field wrapper with animated underline ── */
   const Field = ({ id, label, children }: { id: string; label: string; children: React.ReactNode }) => (
     <div className="flex-1 min-w-[120px] relative">
-      <label className={`block text-[10px] font-bold uppercase tracking-widest mb-2 transition-colors duration-300 ${focusedField === id ? 'text-cyan-400' : 'text-slate-500'}`}>
+      <label className={`block text-[10px] font-bold uppercase tracking-widest mb-2 transition-colors duration-300 ${focusedField === id ? 'text-cyan-300' : 'text-white/60'}`}>
         {label}
       </label>
       {children}
@@ -266,7 +266,7 @@ function LiveJourneysContent() {
         style={{ width: focusedField === id ? '100%' : '0%' }} />
     </div>
   );
-  const inputCls = 'w-full bg-transparent pb-3 pt-1 text-sm text-white placeholder:text-slate-600 focus:outline-none';
+  const inputCls = 'w-full bg-transparent pb-3 pt-1 text-sm text-white placeholder:text-white/40 focus:outline-none';
 
   /* ── Discount tiers ── */
   const TIERS: Array<{ pct: 5 | 10 | 15 | 20; label: string; recommended?: true }> = [
@@ -287,65 +287,99 @@ function LiveJourneysContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden flex flex-col">
 
-      {/* AMBIENT BLOBS */}
-      <div className="hidden sm:block fixed inset-0 opacity-20 pointer-events-none z-0">
-        <div className="absolute top-0 -left-4 w-72 h-72 md:w-96 md:h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'4s'}} />
-        <div className="absolute top-0 -right-4 w-72 h-72 md:w-96 md:h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'6s',animationDelay:'2s'}} />
-        <div className="hidden md:block absolute bottom-40 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s',animationDelay:'1s'}} />
+      {/* AMBIENT GLOWS — screen blend works on dark bg */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px]" />
+        <div className="absolute top-1/3 -right-40 w-[400px] h-[400px] bg-cyan-600/15 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 left-1/3 w-[300px] h-[300px] bg-violet-600/10 rounded-full blur-[80px]" />
       </div>
 
       <NavBar />
       <Suspense><ListingBanner onOpenTrip={(id) => setPendingOpenId(id)} /></Suspense>
 
-      {/* HERO */}
-      <section className="relative min-h-[60vh] flex flex-col items-center justify-center text-center overflow-hidden">
-        <div className="absolute inset-0" style={{ backgroundImage:'url(/images/GoingonHols1.jpg)', backgroundSize:'cover', backgroundPosition:'center top' }} />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-900/15 to-slate-950/65" />
-        <div className="relative z-10 pt-28 pb-16 px-6 w-full max-w-3xl mx-auto">
-          <h1 className="text-4xl sm:text-6xl md:text-8xl font-black mb-4 leading-tight drop-shadow-2xl">
-            Live <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">Journeys</span>
-          </h1>
-          <p className="text-white/80 text-lg font-medium drop-shadow-lg">Real trips from verified BootHop travellers</p>
-          <div className="mt-10 max-w-xl mx-auto relative">
-            <Search className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
-            <input type="text" placeholder="Search any city..." value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              onFocus={() => setFocusedField('search')} onBlur={() => setFocusedField(null)}
-              className="w-full bg-transparent border-b border-white/20 py-3 pl-8 pr-8 text-white text-lg placeholder:text-white/35 focus:outline-none focus:border-cyan-400/70 transition-colors duration-300" />
-            {searchTerm && (
-              <button onClick={() => setSearchTerm('')} className="absolute right-0 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors">
-                <X className="h-4 w-4" />
-              </button>
-            )}
+      {/* HERO + FILTERS — everything sits on the image */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+        {/* Background image — centered */}
+        <div className="absolute inset-0">
+          <img
+            src="/images/GoingonHols1.jpg"
+            alt=""
+            className="w-full h-full object-cover object-center"
+          />
+        </div>
+        {/* Overlays — very light so image shows fully */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-950/10 to-slate-950/45" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(59,130,246,0.08),transparent_65%)]" />
+
+        {/* All content floats on the image */}
+        <div className="relative z-10 w-full max-w-3xl mx-auto px-6 pt-32 pb-16 flex flex-col items-center text-center gap-8">
+
+          {/* Live pill — glass */}
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] backdrop-blur-md px-4 py-2 text-xs font-bold text-white uppercase tracking-widest shadow-lg">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            Live now
           </div>
+
+          {/* Heading */}
+          <div>
+            <h1 className="text-5xl sm:text-7xl md:text-8xl font-extrabold leading-[1.0] tracking-tight drop-shadow-2xl">
+              Live{' '}
+              <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
+                Journeys
+              </span>
+            </h1>
+            <p className="mt-4 text-white/70 text-base md:text-lg drop-shadow-lg">
+              Real trips from verified BootHop travellers — ready to match with your delivery.
+            </p>
+          </div>
+
+          {/* Glass search bar */}
+          <div className="w-full max-w-xl">
+            <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white/[0.07] backdrop-blur-xl px-5 py-4 shadow-[0_8px_40px_rgba(0,0,0,0.3)] focus-within:border-blue-400/40 focus-within:bg-white/[0.12] transition-all">
+              <Search className="h-4 w-4 text-white/50 shrink-0" />
+              <input
+                type="text"
+                placeholder="Search any city or route…"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                onFocus={() => setFocusedField('search')}
+                onBlur={() => setFocusedField(null)}
+                className="flex-1 bg-transparent text-sm text-white placeholder:text-white/40 focus:outline-none"
+              />
+              {searchTerm && (
+                <button onClick={() => setSearchTerm('')} className="text-white/40 hover:text-white transition-colors">
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Glass filter strip — sits on the image */}
+          <div className="w-full rounded-2xl border border-white/12 bg-white/[0.06] backdrop-blur-xl shadow-[0_16px_48px_rgba(0,0,0,0.25)] px-6 py-5">
+            <div className="flex flex-wrap items-end gap-6 md:gap-10">
+              <Field id="from" label="From">
+                <input type="text" placeholder="Any city" value={fromCity}
+                  onChange={e => setFromCity(e.target.value)} onFocus={() => setFocusedField('from')} onBlur={() => setFocusedField(null)} className={inputCls} />
+              </Field>
+              <Field id="to" label="To">
+                <input type="text" placeholder="Any city" value={toCity}
+                  onChange={e => setToCity(e.target.value)} onFocus={() => setFocusedField('to')} onBlur={() => setFocusedField(null)} className={inputCls} />
+              </Field>
+              <Field id="date" label="Date from">
+                <input type="date" value={dateFilter} min={tomorrow}
+                  onChange={e => setDateFilter(e.target.value)} onFocus={() => setFocusedField('date')} onBlur={() => setFocusedField(null)}
+                  className={`${inputCls} [color-scheme:dark]`} />
+              </Field>
+              {hasFilters && (
+                <button onClick={clearFilters} className="flex items-center gap-2 text-xs text-white/40 hover:text-cyan-300 transition-colors pb-3">
+                  <X className="h-3.5 w-3.5" /> Clear
+                </button>
+              )}
+            </div>
+          </div>
+
         </div>
       </section>
-
-      {/* FILTER STRIP */}
-      <div className="relative z-10 bg-slate-950/60 backdrop-blur-xl border-b border-white/6">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex flex-wrap items-end gap-4 md:gap-10">
-            <Field id="from" label="From">
-              <input type="text" placeholder="Any city" value={fromCity}
-                onChange={e => setFromCity(e.target.value)} onFocus={() => setFocusedField('from')} onBlur={() => setFocusedField(null)} className={inputCls} />
-            </Field>
-            <Field id="to" label="To">
-              <input type="text" placeholder="Any city" value={toCity}
-                onChange={e => setToCity(e.target.value)} onFocus={() => setFocusedField('to')} onBlur={() => setFocusedField(null)} className={inputCls} />
-            </Field>
-            <Field id="date" label="Date from">
-              <input type="date" value={dateFilter} min={tomorrow}
-                onChange={e => setDateFilter(e.target.value)} onFocus={() => setFocusedField('date')} onBlur={() => setFocusedField(null)}
-                className={`${inputCls} [color-scheme:dark]`} />
-            </Field>
-            {hasFilters && (
-              <button onClick={clearFilters} className="flex items-center gap-2 text-xs text-slate-500 hover:text-cyan-400 transition-colors pb-3">
-                <Filter className="h-3.5 w-3.5" /> Clear filters
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
 
       {/* RESULTS */}
       <div className="relative z-10 flex-1 max-w-7xl mx-auto w-full px-6 py-10">
@@ -393,73 +427,90 @@ function LiveJourneysContent() {
           </div>
         ) : (
           <>
-            <div className="mb-6">
-              <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5">
-                <div className="h-2 w-2 rounded-full bg-blue-400 animate-pulse" />
-                <span className="text-sm text-blue-400 font-semibold">{filtered.length} {filtered.length === 1 ? 'journey' : 'journeys'} live</span>
+            {/* Count + live badge */}
+            <div className="mb-7 flex items-center justify-between">
+              <div className="inline-flex items-center gap-2 rounded-full border border-green-500/25 bg-green-500/8 px-4 py-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-sm text-green-400 font-semibold">
+                  {filtered.length} {filtered.length === 1 ? 'journey' : 'journeys'} live
+                </span>
               </div>
+              <p className="text-xs text-white/25">Tap any card to connect</p>
             </div>
 
-            <div className="space-y-px">
-              {filtered.map((trip, i) => (
-                <div key={trip.id} onClick={() => openModal(trip)}
-                  className="group relative flex flex-col sm:flex-row sm:items-center gap-4 px-6 py-5 border-b border-white/6 hover:bg-white/4 hover:border-white/10 transition-all duration-300 cursor-pointer first:rounded-t-2xl last:rounded-b-2xl last:border-b-0"
-                  style={{ animationDelay:`${i*40}ms` }}>
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-cyan-400 rounded-l-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/40 flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                      <Plane className="h-5 w-5 text-white" />
+            {/* LIST */}
+            <div className="flex flex-col gap-3">
+              {filtered.map((trip) => (
+                <div
+                  key={trip.id}
+                  onClick={() => openModal(trip)}
+                  className="group relative rounded-2xl border border-white/8 bg-white/[0.04] backdrop-blur-sm px-5 py-4 cursor-pointer transition-all duration-200 hover:border-blue-500/30 hover:bg-white/[0.07] hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] overflow-hidden"
+                >
+                  {/* Hover glow */}
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,rgba(59,130,246,0.07),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                  <div className="relative flex items-center gap-4">
+
+                    {/* Type icon */}
+                    <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${
+                      trip.type === 'travel' ? 'bg-blue-500/15 text-blue-400' : 'bg-emerald-500/15 text-emerald-400'
+                    }`}>
+                      {trip.type === 'travel' ? <Plane className="h-4 w-4" /> : <Package className="h-4 w-4" />}
                     </div>
-                    <div className="min-w-0">
-                      {/* City names — show English by default, original on toggle */}
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-black text-white text-base group-hover:text-cyan-400 transition-colors">
+
+                    {/* Route */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-white group-hover:text-cyan-200 transition-colors truncate">
                           {showOriginalIds.has(trip.id) ? trip.from_city : (trip.from_city_en || trip.from_city)}
                         </span>
-                        <ArrowRight className="h-4 w-4 text-slate-600 flex-shrink-0" />
-                        <span className="font-black text-white text-base group-hover:text-cyan-400 transition-colors">
+                        <ArrowRight className="h-3.5 w-3.5 text-blue-400/60 shrink-0" />
+                        <span className="font-bold text-white group-hover:text-cyan-200 transition-colors truncate">
                           {showOriginalIds.has(trip.id) ? trip.to_city : (trip.to_city_en || trip.to_city)}
                         </span>
-                        {/* Language badge + toggle — only shown when trip was translated */}
                         {trip.translated && trip.language && trip.language !== 'en' && (
                           <button
                             onClick={(e) => toggleOriginal(trip.id, e)}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/25 text-blue-400 text-[10px] font-semibold hover:bg-blue-500/25 transition-colors ml-1"
-                            title={showOriginalIds.has(trip.id) ? 'Show English' : 'Show original language'}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/12 border border-blue-500/20 text-blue-400 text-[10px] font-semibold hover:bg-blue-500/20 transition-colors"
                           >
                             <Globe className="h-2.5 w-2.5" />
                             {showOriginalIds.has(trip.id) ? 'EN' : trip.language.toUpperCase()}
                           </button>
                         )}
                       </div>
-                      <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+                      <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                        <span className={`text-[11px] font-semibold ${trip.type === 'travel' ? 'text-blue-400/70' : 'text-emerald-400/70'}`}>
+                          {trip.type === 'travel' ? 'Traveller with space' : 'Sender needs carrier'}
+                        </span>
                         {trip.travel_date && (
-                          <span className="flex items-center gap-1 text-xs text-slate-500">
+                          <span className="inline-flex items-center gap-1 text-[11px] text-white/40">
                             <Calendar className="h-3 w-3" />
                             {new Date(trip.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}
                           </span>
                         )}
                         {trip.weight && (
-                          <span className="flex items-center gap-1 text-xs text-slate-500">
-                            <Package className="h-3 w-3" /> {weightLabel(trip.weight)}
+                          <span className="inline-flex items-center gap-1 text-[11px] text-white/40">
+                            <Package className="h-3 w-3" />
+                            {weightLabel(trip.weight)}
                           </span>
                         )}
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-4 flex-shrink-0 sm:ml-auto">
-                    {trip.type && (
-                      <RoleToggle role={trip.type === 'travel' ? 'travel' : 'sender'} />
-                    )}
-                    {trip.price ? (
-                      <div className="text-right">
-                        <div className="font-black text-lg bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">£{Number(trip.price).toFixed(2)}</div>
-                        <div className="text-xs text-slate-600">budget</div>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-slate-600">Negotiable</span>
-                    )}
-                    <ArrowRight className="h-4 w-4 text-slate-700 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all hidden sm:block" />
+
+                    {/* Price + CTA */}
+                    <div className="shrink-0 text-right">
+                      {trip.price ? (
+                        <p className="font-extrabold text-base bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                          £{Number(trip.price).toFixed(0)}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-white/30 font-medium">Open</p>
+                      )}
+                      <span className="flex items-center justify-end gap-1 mt-1 text-[11px] text-white/25 group-hover:text-cyan-400 transition-all font-semibold">
+                        Connect <ArrowRight className="h-3 w-3" />
+                      </span>
+                    </div>
+
                   </div>
                 </div>
               ))}

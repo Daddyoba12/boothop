@@ -1,18 +1,12 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
 import {
-  CheckCircle, Loader2, Lock, Package, ArrowRight,
-  Shield, Eye, CreditCard,
+  CheckCircle, Lock, ArrowRight,
+  Shield, Eye, CreditCard, Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'placeholder-key'
-);
 
 // Pipeline display (same as KYC page)
 const STAGES = [
@@ -29,53 +23,7 @@ const STAGES = [
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const matchId      = searchParams?.get('match_id');
-  const [processing, setProcessing] = useState(true);
-
-  useEffect(() => {
-    if (matchId) finalizePayment();
-  }, [matchId]);
-
-  const finalizePayment = async () => {
-    try {
-      // Payment is confirmed — mark as active (payment held + KYC done = ready)
-      await supabase
-        .from('matches')
-        .update({
-          status:            'active',
-          payment_status:    'escrowed',
-          payment_completed: true,
-        })
-        .eq('id', matchId);
-
-      const { data: match } = await supabase
-        .from('matches')
-        .select('sender_trip_id, traveler_trip_id')
-        .eq('id', matchId)
-        .single();
-
-      if (match) {
-        await supabase
-          .from('trips')
-          .update({ status: 'matched' })
-          .in('id', [match.sender_trip_id, match.traveler_trip_id]);
-      }
-    } catch (error) {
-      console.error('Finalization error:', error);
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  if (processing) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-16 h-16 text-blue-400 mx-auto mb-4 animate-spin" />
-          <p className="text-white/70">Confirming your payment…</p>
-        </div>
-      </div>
-    );
-  }
+  // Activation is handled server-side by the Stripe webhook.
 
   // Pipeline: active = stage index 5 (0-based)
   const activeStage = 5;

@@ -8,6 +8,7 @@ export interface Airport {
   city: string;
   country: string;
   iata: string;
+  terminals?: string[];
 }
 
 interface Props {
@@ -20,10 +21,11 @@ interface Props {
 }
 
 export function AirportInput({ label, value, onSelect, onClear, placeholder = 'City or IATA code…', disabledIata }: Props) {
-  const [query,   setQuery]   = useState(value);
-  const [results, setResults] = useState<Airport[]>([]);
-  const [open,    setOpen]    = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [query,           setQuery]           = useState(value);
+  const [results,         setResults]         = useState<Airport[]>([]);
+  const [open,            setOpen]            = useState(false);
+  const [loading,         setLoading]         = useState(false);
+  const [pendingAirport,  setPendingAirport]  = useState<Airport | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -57,18 +59,32 @@ export function AirportInput({ label, value, onSelect, onClear, placeholder = 'C
     }, 200);
   }, []);
 
-  const select = (airport: Airport) => {
-    const display = `${airport.city} (${airport.iata})`;
+  const applyAirport = (airport: Airport, terminal?: string) => {
+    const display = terminal
+      ? `${airport.city} (${airport.iata}) · ${terminal}`
+      : `${airport.city} (${airport.iata})`;
     setQuery(display);
     setResults([]);
     setOpen(false);
+    setPendingAirport(null);
     onSelect(display, airport);
+  };
+
+  const select = (airport: Airport) => {
+    setResults([]);
+    setOpen(false);
+    if (airport.terminals?.length) {
+      setPendingAirport(airport);
+    } else {
+      applyAirport(airport);
+    }
   };
 
   const clear = () => {
     setQuery('');
     setResults([]);
     setOpen(false);
+    setPendingAirport(null);
     onClear();
   };
 
@@ -115,9 +131,31 @@ export function AirportInput({ label, value, onSelect, onClear, placeholder = 'C
                   <p className="text-xs text-white/35 truncate">{a.name} · {a.country}</p>
                 </div>
                 {disabled && <span className="text-xs text-white/25 ml-auto shrink-0">selected</span>}
+                {!disabled && a.terminals?.length && (
+                  <span className="text-xs text-white/30 ml-auto shrink-0">Select terminal →</span>
+                )}
               </button>
             );
           })}
+        </div>
+      )}
+
+      {/* Terminal picker — shown inline after airport chosen */}
+      {pendingAirport && (
+        <div className="mt-2 p-3 bg-white/5 border border-white/10 rounded-xl">
+          <p className="text-xs text-white/40 uppercase tracking-widest mb-2">Select terminal</p>
+          <div className="flex flex-wrap gap-2">
+            {pendingAirport.terminals!.map(t => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => applyAirport(pendingAirport, t)}
+                className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-blue-500/30 border border-white/10 hover:border-blue-400/50 text-xs text-white/70 hover:text-white transition-all"
+              >
+                {t}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>

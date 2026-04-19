@@ -50,8 +50,8 @@ export default function BusinessPricingPage() {
             </div>
           </div>
 
-          {/* Two service columns */}
-          <div className="grid md:grid-cols-2 gap-0 md:divide-x divide-white/6">
+          {/* Three service columns */}
+          <div className="grid md:grid-cols-3 gap-0 md:divide-x divide-white/6">
 
             {/* UK Local */}
             <div className="pb-6 md:pb-0 md:pr-8 border-b border-white/6 md:border-b-0">
@@ -60,58 +60,84 @@ export default function BusinessPricingPage() {
                   <Truck className="h-3.5 w-3.5 text-emerald-400" />
                 </div>
                 <div>
-                  <p className="text-white font-black text-sm">🇬🇧 Local UK</p>
-                  <p className="text-white/35 text-xs">Distance-based · min £200</p>
+                  <p className="text-white font-black text-sm">🇬🇧 UK → UK</p>
+                  <p className="text-white/35 text-xs">Three service tiers · first 50 miles included</p>
                 </div>
               </div>
               <p className="text-emerald-400 font-black text-2xl mb-4">
-                £200 <span className="text-xs font-semibold text-white/40">per 30km band</span>
+                From £300 <span className="text-xs font-semibold text-white/40">Express</span>
               </p>
               <div className="space-y-2 text-xs">
                 {[
-                  ['Up to 30km',           '£200'],
-                  ['31 – 60km',            '£400'],
-                  ['61 – 90km',            '£600'],
-                  ['91 – 120km',           '£800'],
-                  ['Each extra 30km',      '+£200'],
-                ].map(([range, price]) => (
-                  <div key={range} className="flex justify-between border-b border-white/5 pb-2 last:border-0">
-                    <span className="text-white/45">{range}</span>
+                  ['Express (3–6 hr)',    'From £300'],
+                  ['Priority (1–3 hr)',   'From £700'],
+                  ['Critical (immediate)','From £1,200'],
+                ].map(([tier, price]) => (
+                  <div key={tier} className="flex justify-between border-b border-white/5 pb-2 last:border-0">
+                    <span className="text-white/45">{tier}</span>
                     <span className="text-emerald-400 font-black">{price}</span>
                   </div>
                 ))}
               </div>
+              <p className="text-white/20 text-xs mt-3">Extra mileage: £3–£6.50/mile</p>
             </div>
 
-            {/* International */}
-            <div className="pt-6 md:pt-0 md:pl-8">
+            {/* UK ↔ EU */}
+            <div className="py-6 md:py-0 md:px-8 border-b border-white/6 md:border-b-0">
               <div className="flex items-center gap-2.5 mb-3">
                 <div className="w-7 h-7 rounded-lg bg-blue-500/20 flex items-center justify-center">
                   <Plane className="h-3.5 w-3.5 text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-white font-black text-sm">✈️ International</p>
+                  <p className="text-white font-black text-sm">🇪🇺 UK ↔ EU</p>
                   <p className="text-white/35 text-xs">Airport-to-airport · quote confirmed on assignment</p>
                 </div>
               </div>
               <p className="text-blue-400 font-black text-2xl mb-4">
-                From £1,000 <span className="text-xs font-semibold text-white/40">per consignment</span>
+                From £1,000 <span className="text-xs font-semibold text-white/40">Next-day</span>
               </p>
               <div className="space-y-2 text-xs">
                 {[
-                  ['UK → Lagos (LHR → LOS)',    'From £1,000'],
-                  ['UK → Dubai (LHR → DXB)',    'From £1,000'],
-                  ['Other routes',              'Quote on request'],
-                ].map(([route, price]) => (
-                  <div key={route} className="flex justify-between border-b border-white/5 pb-2 last:border-0">
-                    <span className="text-white/45">{route}</span>
+                  ['Next-day',  'From £1,000'],
+                  ['Same-day',  'From £1,500'],
+                  ['Critical',  'From £2,500'],
+                ].map(([tier, price]) => (
+                  <div key={tier} className="flex justify-between border-b border-white/5 pb-2 last:border-0">
+                    <span className="text-white/45">{tier}</span>
                     <span className="text-blue-400 font-black">{price}</span>
                   </div>
                 ))}
               </div>
-              <p className="text-white/20 text-xs mt-3">
-                UK→Lagos approx. 6 hrs · carrier checks in at departure airport
+              <p className="text-white/20 text-xs mt-3">Extra mileage billed separately</p>
+            </div>
+
+            {/* UK → Global */}
+            <div className="pt-6 md:pt-0 md:pl-8">
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-7 h-7 rounded-lg bg-rose-500/20 flex items-center justify-center">
+                  <Plane className="h-3.5 w-3.5 text-rose-400" />
+                </div>
+                <div>
+                  <p className="text-white font-black text-sm">🌍 UK → Global</p>
+                  <p className="text-white/35 text-xs">Multi-leg air + road · hand-carry</p>
+                </div>
+              </div>
+              <p className="text-rose-400 font-black text-2xl mb-4">
+                From £2,000 <span className="text-xs font-semibold text-white/40">Standard</span>
               </p>
+              <div className="space-y-2 text-xs">
+                {[
+                  ['Standard',  'From £2,000'],
+                  ['Priority',  'From £4,000'],
+                  ['Critical',  'From £7,000'],
+                ].map(([tier, price]) => (
+                  <div key={tier} className="flex justify-between border-b border-white/5 pb-2 last:border-0">
+                    <span className="text-white/45">{tier}</span>
+                    <span className="text-rose-400 font-black">{price}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-white/20 text-xs mt-3">Insurance: 8% of declared value</p>
             </div>
           </div>
         </motion.div>

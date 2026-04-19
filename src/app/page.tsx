@@ -111,6 +111,117 @@ function TestimonialsSection() {
 
 const HERO_VIDEO = '/videos/onecall/plane2.mp4';
 
+// ── Transport carousel ────────────────────────────────────────────────────────
+const TRANSPORT_MODES = [
+  {
+    emoji:    '✈️',
+    label:    'Air',
+    title:    'Flight-Speed Delivery',
+    body:     'Match with verified travellers on commercial flights. Ideal for urgent cross-border deliveries, documents, and high-value items.',
+    accent:   'blue',
+    glow:     'rgba(59,130,246,0.22)',
+    border:   'border-blue-500/30',
+    bg:       'from-blue-900/50 to-blue-700/20',
+    tag:      'text-blue-300/80',
+  },
+  {
+    emoji:    '🚆',
+    label:    'Rail',
+    title:    'Same-Day UK Corridors',
+    body:     'Intercity trains connect London, Manchester, Birmingham, Edinburgh and beyond. Perfect for domestic same-day delivery.',
+    accent:   'cyan',
+    glow:     'rgba(6,182,212,0.22)',
+    border:   'border-cyan-500/30',
+    bg:       'from-cyan-900/50 to-cyan-700/20',
+    tag:      'text-cyan-300/80',
+  },
+  {
+    emoji:    '🚗',
+    label:    'Road',
+    title:    'Door-to-Door Precision',
+    body:     'Drivers and commuters cover the last mile. Fast, flexible, and ideal for local same-day jobs where flexibility matters most.',
+    accent:   'violet',
+    glow:     'rgba(139,92,246,0.22)',
+    border:   'border-violet-500/30',
+    bg:       'from-violet-900/50 to-violet-700/20',
+    tag:      'text-violet-300/80',
+  },
+] as const;
+
+function TransportCarousel() {
+  const [active, setActive]   = useState(0);
+  const [prev,   setPrev]     = useState<number | null>(null);
+  const [dir,    setDir]      = useState<1 | -1>(1);  // 1 = forward, -1 = back
+
+  const go = useCallback((next: number, direction: 1 | -1 = 1) => {
+    setPrev(active);
+    setDir(direction);
+    setActive(next);
+  }, [active]);
+
+  // Auto-advance
+  useEffect(() => {
+    const id = setInterval(() => {
+      go((active + 1) % TRANSPORT_MODES.length, 1);
+    }, 4000);
+    return () => clearInterval(id);
+  }, [active, go]);
+
+  const mode = TRANSPORT_MODES[active];
+
+  return (
+    <div className="w-full max-w-xl mx-auto select-none">
+      {/* Card */}
+      <div
+        key={active}
+        className={`relative backdrop-blur-xl bg-gradient-to-br ${mode.bg} border ${mode.border} rounded-3xl p-10 text-left
+          shadow-[0_0_80px_var(--glow),0_24px_64px_rgba(0,0,0,0.45)]
+          animate-[fadeSlide_0.45s_ease_forwards]`}
+        style={{ '--glow': mode.glow } as React.CSSProperties}
+      >
+        <div className="text-4xl mb-5">{mode.emoji}</div>
+        <p className={`text-xs font-bold uppercase tracking-[0.2em] mb-2 ${mode.tag}`}>{mode.label}</p>
+        <h3 className="text-white text-2xl font-semibold mb-3">{mode.title}</h3>
+        <p className="text-white/60 text-sm leading-relaxed">{mode.body}</p>
+      </div>
+
+      {/* Dot navigation */}
+      <div className="flex items-center justify-center gap-3 mt-7">
+        {TRANSPORT_MODES.map((m, i) => (
+          <button
+            key={m.label}
+            onClick={() => go(i, i > active ? 1 : -1)}
+            aria-label={`Show ${m.label}`}
+            className={`rounded-full transition-all duration-300 ${
+              i === active
+                ? 'w-8 h-2.5 bg-white'
+                : 'w-2.5 h-2.5 bg-white/25 hover:bg-white/50'
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Prev / Next arrows */}
+      <div className="flex items-center justify-center gap-4 mt-5">
+        <button
+          onClick={() => go((active - 1 + TRANSPORT_MODES.length) % TRANSPORT_MODES.length, -1)}
+          className="w-9 h-9 rounded-full border border-white/15 bg-white/5 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all"
+          aria-label="Previous"
+        >
+          ‹
+        </button>
+        <button
+          onClick={() => go((active + 1) % TRANSPORT_MODES.length, 1)}
+          className="w-9 h-9 rounded-full border border-white/15 bg-white/5 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all"
+          aria-label="Next"
+        >
+          ›
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function HomePageContent() {
   useScrollReveal();
   const router = useRouter();
@@ -365,6 +476,14 @@ function HomePageContent() {
                 </Link>
               </div>
 
+              {/* £20 signup credit pill */}
+              <a href="#emotional-hook"
+                onClick={(e) => { e.preventDefault(); document.getElementById('emotional-hook')?.scrollIntoView({ behavior: 'smooth' }); }}
+                className="inline-flex items-center gap-2 rounded-full border border-amber-500/35 bg-amber-500/10 backdrop-blur-sm px-5 py-2.5 text-sm font-semibold text-amber-300 hover:bg-amber-500/15 transition-all mb-5 cursor-pointer">
+                🎁 New members get £20 delivery credit — claim yours
+                <ArrowRight className="h-3.5 w-3.5" />
+              </a>
+
               <p className="text-white/55 text-sm mb-7">⚡ Get matched with a verified traveller in minutes</p>
 
               {/* Micro How It Works */}
@@ -425,6 +544,105 @@ function HomePageContent() {
           </div>
         </div>
 
+      </section>
+
+      {/* ── EMOTIONAL STORY — "Sending home" + £20 credit ── */}
+      <section id="emotional-hook" className="relative overflow-hidden" style={{ minHeight: '92vh' }}>
+
+        {/* dont_worry.mp4 — the emotional hook video */}
+        <video
+          autoPlay muted loop playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/videos/onecall/test_v/dont_worry.mp4" type="video/mp4" />
+        </video>
+
+        {/* Layered overlays — heavy on left for text, fades to transparent on right so video shows */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07111f] via-[#07111f]/85 to-[#07111f]/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#07111f]/70 via-transparent to-[#07111f]/85" />
+
+        {/* Soft warm ambient — gives the section a gentle glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_60%,rgba(245,158,11,0.07),transparent_60%)]" />
+
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-28 flex items-center min-h-[92vh] w-full">
+          <div className="max-w-xl w-full">
+
+            {/* Eyebrow label */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/8 backdrop-blur-sm px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-amber-300/90 mb-8">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              Why BootHop exists
+            </div>
+
+            {/* Headline — three-line emotional break */}
+            <h2 className="text-4xl sm:text-5xl md:text-[3.75rem] font-extrabold text-white leading-[1.06] tracking-tight mb-7">
+              Sending home<br />
+              <span className="text-white/38">shouldn&apos;t be</span><br />
+              this hard.
+            </h2>
+
+            {/* Body copy */}
+            <p className="text-white/60 text-lg leading-[1.75] mb-3 max-w-[420px]">
+              A birthday present stuck at a depot. A letter that can&apos;t wait. A gift that means
+              everything — delayed by slow couriers and hidden fees.
+            </p>
+            <p className="text-white/38 text-base leading-[1.75] mb-11 max-w-[400px]">
+              We built BootHop so the miles between you and home feel smaller — by connecting
+              your parcel with a real person already making that journey.
+            </p>
+
+            {/* ── £20 CREDIT CARD ── */}
+            <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-br from-[#1c1300]/90 to-[#0d0900]/70 backdrop-blur-2xl p-7 shadow-[0_0_90px_rgba(245,158,11,0.10),0_32px_80px_rgba(0,0,0,0.55)]">
+              <div className="flex items-start gap-5">
+
+                {/* Gift icon block */}
+                <div className="w-14 h-14 rounded-2xl border border-amber-500/25 bg-amber-500/10 flex items-center justify-center shrink-0 text-2xl shadow-[inset_0_1px_0_rgba(245,158,11,0.12)]">
+                  🎁
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  {/* Title row */}
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <p className="text-amber-200 font-extrabold text-xl">£20 free credit</p>
+                    <span className="rounded-full bg-amber-500/15 border border-amber-500/25 px-2.5 py-0.5 text-[10px] font-bold text-amber-400 uppercase tracking-wide">
+                      New members only
+                    </span>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-white/45 text-sm leading-relaxed mb-6">
+                    Join today and your first delivery is on us — up to £20 off, no minimum spend.
+                    First 500 members only. Credit applied automatically at checkout.
+                  </p>
+
+                  {/* CTA button */}
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold px-7 py-3.5 text-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_44px_rgba(245,158,11,0.45)] active:scale-[0.98] shadow-[0_6px_24px_rgba(245,158,11,0.25)]"
+                  >
+                    Claim £20 &amp; send your first package
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Subtle divider + social proof strip */}
+              <div className="mt-7 pt-5 border-t border-white/[0.06] flex flex-wrap items-center gap-x-6 gap-y-2">
+                {[
+                  { dot: 'bg-green-400', text: 'No subscription required' },
+                  { dot: 'bg-blue-400',  text: 'Auto-applied at checkout' },
+                  { dot: 'bg-amber-400', text: 'First 500 members only' },
+                ].map(({ dot, text }) => (
+                  <span key={text} className="flex items-center gap-1.5 text-[11px] text-white/30 font-medium">
+                    <span className={`w-1.5 h-1.5 rounded-full ${dot} opacity-70`} />
+                    {text}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
       </section>
 
       {/* ── EMAIL MODAL ── */}
@@ -664,39 +882,7 @@ function HomePageContent() {
             We connect packages with people already moving — by air, rail, or road.
           </p>
 
-          <div className="grid md:grid-cols-3 gap-6 items-center">
-
-            {/* AIR */}
-            <div className="reveal d1 backdrop-blur-xl bg-white/[0.04] border border-white/[0.08] rounded-2xl p-7 text-left hover:scale-[1.03] hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(59,130,246,0.12)]">
-              <div className="text-blue-400 text-2xl mb-4">✈️</div>
-              <p className="text-xs font-bold text-blue-400/70 uppercase tracking-widest mb-2">Air</p>
-              <h3 className="text-white text-xl font-semibold mb-3">Flight-Speed Delivery</h3>
-              <p className="text-white/55 text-sm leading-relaxed">
-                Match with verified travellers on commercial flights. Ideal for urgent cross-border deliveries, documents, and high-value items.
-              </p>
-            </div>
-
-            {/* RAIL — focus card, elevated */}
-            <div className="reveal d2 backdrop-blur-xl bg-gradient-to-br from-blue-900/45 to-blue-700/20 border border-blue-500/25 rounded-2xl p-7 text-left scale-[1.06] shadow-[0_0_50px_rgba(59,130,246,0.18),0_20px_60px_rgba(0,0,0,0.4)] hover:scale-[1.10] transition-all duration-500">
-              <div className="text-blue-300 text-2xl mb-4">🚆</div>
-              <p className="text-xs font-bold text-blue-300/70 uppercase tracking-widest mb-2">Rail</p>
-              <h3 className="text-white text-xl font-semibold mb-3">Same-Day UK Corridors</h3>
-              <p className="text-white/65 text-sm leading-relaxed">
-                Intercity trains connect London, Manchester, Birmingham, Edinburgh and beyond. Perfect for domestic same-day delivery.
-              </p>
-            </div>
-
-            {/* ROAD */}
-            <div className="reveal d3 backdrop-blur-xl bg-white/[0.04] border border-white/[0.08] rounded-2xl p-7 text-left hover:scale-[1.03] hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(139,92,246,0.12)]">
-              <div className="text-violet-400 text-2xl mb-4">🚗</div>
-              <p className="text-xs font-bold text-violet-400/70 uppercase tracking-widest mb-2">Road</p>
-              <h3 className="text-white text-xl font-semibold mb-3">Door-to-Door Precision</h3>
-              <p className="text-white/55 text-sm leading-relaxed">
-                Drivers and commuters cover the last mile. Fast, flexible, and ideal for local same-day jobs where flexibility matters most.
-              </p>
-            </div>
-
-          </div>
+          <TransportCarousel />
         </div>
       </section>
 
@@ -869,7 +1055,11 @@ function HomePageContent() {
               Browse Live Routes
             </Link>
           </div>
-          <p className="mt-6 text-xs text-white/25">Free to join · No subscription · Cancel anytime</p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <p className="text-xs text-white/25">Free to join · No subscription · Cancel anytime</p>
+            <span className="text-white/15">·</span>
+            <span className="inline-flex items-center gap-1 text-xs text-amber-400/60 font-medium">🎁 First 500 members get £20 credit</span>
+          </div>
         </div>
       </section>
 

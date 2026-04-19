@@ -54,6 +54,19 @@ export async function POST(request: Request) {
       .update({ used: true, used_at: new Date().toISOString() })
       .eq('id', record.id);
 
+    // Grant £20 signup credit to new users — INSERT with unique email key.
+    // If email already exists (returning user) the insert fails silently — no double grant.
+    let isNewUser = false;
+    try {
+      const { error: creditInsertErr } = await supabase.from('signup_credits').insert({
+        email,
+        amount_pence: 2000,   // £20
+        claimed_at:   new Date().toISOString(),
+        redeemed:     false,
+      });
+      if (!creditInsertErr) isNewUser = true;
+    } catch { /* table may not exist yet — graceful degradation */ }
+
     // Save journey and publish as a live trip if the user came from the register form
     let hasDraft = false;
     if (record.journey_payload) {
@@ -110,7 +123,8 @@ export async function POST(request: Request) {
       ok: true,
       email,
       hasDraft,
-      tripSaved: hasDraft,
+      tripSaved:      hasDraft,
+      isNewUser,
       journeyPayload: record.journey_payload,
       redirectTo,
     });

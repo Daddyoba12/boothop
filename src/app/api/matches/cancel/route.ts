@@ -3,6 +3,7 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getAppSession } from '@/lib/auth/session';
 import { cookies } from 'next/headers';
 import { Resend } from 'resend';
+import { sendMatchCancelledEmail } from '@/lib/email/sendMatchEmail';
 
 // Free cancel — no payment made yet
 const FREE_CANCEL   = ['matched', 'agreed', 'committed', 'kyc_pending', 'kyc_complete'];
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
 
     const { data: match, error: matchErr } = await supabase
       .from('matches')
-      .select('id, status, sender_email, traveler_email, agreed_price, sender_trip:sender_trip_id(from_city, to_city)')
+      .select('id, status, sender_email, traveler_email, agreed_price, sender_trip:sender_trip_id(from_city, to_city, travel_date)')
       .eq('id', matchId)
       .maybeSingle();
 
@@ -54,6 +55,17 @@ export async function POST(request: Request) {
         .from('matches')
         .update({ status: 'cancelled', cancelled_by: email, cancelled_at: new Date().toISOString(), cancellation_reason: reason ?? null })
         .eq('id', matchId);
+
+      const trip      = (match as any).sender_trip;
+      const fromCity  = trip?.from_city   ?? '';
+      const toCity    = trip?.to_city     ?? '';
+      const travelDate = trip?.travel_date ?? '';
+      const otherEmail = match.sender_email === email ? match.traveler_email : match.sender_email;
+
+      await Promise.allSettled([
+        sendMatchCancelledEmail({ toEmail: email,       fromCity, toCity, travelDate, cancelledByYou: true,  reason: reason ?? undefined }),
+        sendMatchCancelledEmail({ toEmail: otherEmail,  fromCity, toCity, travelDate, cancelledByYou: false, reason: reason ?? undefined }),
+      ]);
 
       return NextResponse.json({ ok: true, type: 'free_cancel' });
     }
@@ -95,7 +107,7 @@ export async function POST(request: Request) {
           `,
           text: `Refund request: ${fromCity} → ${toCity}\nBy: ${email}\nAmount: £${refundAmount}\nReason: ${reason}`,
         }),
-        // Confirm to user
+        // Confirm to canceller
         resend.emails.send({
           from,
           to: email,
@@ -110,6 +122,23 @@ export async function POST(request: Request) {
             </div>
           `,
           text: `Cancellation received. Refund of £${refundAmount} will be processed within 3-5 business days.`,
+        }),
+        // Notify other party
+        resend.emails.send({
+          from,
+          to: match.sender_email === email ? match.traveler_email : match.sender_email,
+          subject: `Match cancelled — ${fromCity} → ${toCity}`,
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;">
+              <span style="font-size:22px;font-weight:900;color:#1e3a8a;">Boot</span><span style="font-size:22px;font-weight:900;color:#2563eb;">Hop</span>
+              <h2 style="margin:24px 0 8px;">❌ Match cancelled</h2>
+              <p style="color:#475569;">The other party has cancelled the <strong>${fromCity} → ${toCity}</strong> delivery. The match has been closed and you will not be charged.</p>
+              <p style="color:#475569;">Your trip remains active on BootHop and we will continue to look for a new match.</p>
+              <a href="${appUrl}/dashboard" style="display:inline-block;margin-top:16px;background:#2563eb;color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:10px;text-decoration:none;">View Dashboard →</a>
+              <p style="font-size:12px;color:#94a3b8;margin-top:24px;">Reply to this email if you need help.</p>
+            </div>
+          `,
+          text: `The other party cancelled the ${fromCity} → ${toCity} match. You will not be charged. Your trip remains active on BootHop.`,
         }),
       ]);
 

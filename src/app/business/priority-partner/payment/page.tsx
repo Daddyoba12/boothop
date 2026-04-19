@@ -33,8 +33,8 @@ function PaymentContent() {
 
   const bankDetails = [
     { label: 'Account name',  value: 'BootHop Ltd',    key: 'name' },
-    { label: 'Sort code',     value: '20-00-00',        key: 'sort' },
-    { label: 'Account number',value: '12345678',        key: 'acc'  },
+    { label: 'Sort code',     value: '23-08-01',        key: 'sort' },
+    { label: 'Account number',value: '44947453',        key: 'acc'  },
     { label: 'Reference',     value: ref,               key: 'ref'  },
     { label: 'Amount',        value: `£${fee.toLocaleString()}`, key: 'amt' },
   ];

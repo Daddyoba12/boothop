@@ -329,7 +329,7 @@ export default function BusinessPortalPage() {
                     <p>Standard  — from £2,000</p>
                     <p>Priority  — from £4,000</p>
                     <p>Critical  — from £7,000</p>
-                    <p className="text-white/25 mt-2">Multi-leg air + road.<br/>Insurance 5% of declared value.</p>
+                    <p className="text-white/25 mt-2">Multi-leg air + road.<br/>Insurance 8% of declared value.</p>
                   </div>
                 </div>
               </div>

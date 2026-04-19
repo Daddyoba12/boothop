@@ -70,7 +70,8 @@ export default function BusinessContactPage() {
           className="text-white/50 text-xl max-w-xl mx-auto leading-relaxed"
         >
           Questions about business deliveries, pricing, or the Priority Partner programme?
-          We reply within 24 hours.
+          General enquiries replied within 24 hours.
+          Priority Partners receive a <span className="text-amber-400 font-semibold">2-hour guaranteed response</span>.
         </motion.p>
       </div>
 

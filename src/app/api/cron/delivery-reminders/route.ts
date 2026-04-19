@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { sendCarrierDeliveryReminderEmail, sendSenderReceiptReminderEmail } from '@/lib/email/sendDeliveryEmail';
+import { sendCarrierDeliveryReminderEmail, sendSenderReceiptReminderEmail, sendDeliveryEscalationEmail } from '@/lib/email/sendDeliveryEmail';
 
 async function createActionToken(
   supabase: ReturnType<typeof createSupabaseAdminClient>,
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     // Active matches where at least one party hasn't confirmed yet
     const { data: matches } = await supabase
       .from('matches')
-      .select('id, sender_email, traveler_email, agreed_price, booter_confirmed_delivery, hooper_confirmed_receipt, sender_trip:sender_trip_id(from_city, to_city)')
+      .select('id, sender_email, traveler_email, agreed_price, booter_confirmed_delivery, hooper_confirmed_receipt, updated_at, sender_trip:sender_trip_id(from_city, to_city)')
       .eq('status', 'active')
       .or('booter_confirmed_delivery.is.null,booter_confirmed_delivery.eq.false,hooper_confirmed_receipt.is.null,hooper_confirmed_receipt.eq.false');
 
@@ -41,23 +41,25 @@ export async function GET(request: Request) {
 
     let sent = 0;
 
+    const nowMs = Date.now();
+
     for (const match of matches) {
-      const trip      = (match as any).sender_trip;
-      const fromCity  = trip?.from_city ?? '';
-      const toCity    = trip?.to_city   ?? '';
+      const trip        = (match as any).sender_trip;
+      const fromCity    = trip?.from_city ?? '';
+      const toCity      = trip?.to_city   ?? '';
+      const hoursActive = match.updated_at
+        ? (nowMs - new Date(match.updated_at).getTime()) / 3_600_000
+        : 0;
+      const isEscalation = hoursActive >= 72;
       const reminders: Promise<any>[] = [];
 
       // Carrier hasn't confirmed delivery
       if (!match.booter_confirmed_delivery && match.traveler_email) {
         const token = await createActionToken(supabase, match.traveler_email, 'confirm_collected', match.id, { role: 'traveler' });
         reminders.push(
-          sendCarrierDeliveryReminderEmail({
-            toEmail:      match.traveler_email,
-            fromCity,
-            toCity,
-            matchId:      match.id,
-            confirmToken: token,
-          })
+          isEscalation
+            ? sendDeliveryEscalationEmail({ toEmail: match.traveler_email, fromCity, toCity, matchId: match.id, role: 'traveler', confirmToken: token })
+            : sendCarrierDeliveryReminderEmail({ toEmail: match.traveler_email, fromCity, toCity, matchId: match.id, confirmToken: token })
         );
       }
 
@@ -65,13 +67,9 @@ export async function GET(request: Request) {
       if (!match.hooper_confirmed_receipt && match.sender_email) {
         const token = await createActionToken(supabase, match.sender_email, 'confirm_delivered', match.id, { role: 'sender' });
         reminders.push(
-          sendSenderReceiptReminderEmail({
-            toEmail:      match.sender_email,
-            fromCity,
-            toCity,
-            matchId:      match.id,
-            confirmToken: token,
-          })
+          isEscalation
+            ? sendDeliveryEscalationEmail({ toEmail: match.sender_email, fromCity, toCity, matchId: match.id, role: 'sender', confirmToken: token })
+            : sendSenderReceiptReminderEmail({ toEmail: match.sender_email, fromCity, toCity, matchId: match.id, confirmToken: token })
         );
       }
 

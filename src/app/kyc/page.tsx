@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   Shield, CheckCircle, Clock, UserCheck, CreditCard,
   Package, Plane, AlertCircle, ArrowRight, Loader2,
-  Eye, Lock, RefreshCw, Info, Send,
+  Eye, Lock, RefreshCw,
 } from 'lucide-react';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -81,11 +81,11 @@ function KycContent() {
   const [data,           setData]           = useState<PageData | null>(null);
   const [loading,        setLoading]        = useState(true);
   const [kycLoading,     setKycLoading]     = useState(false);
-  const [payLoading,     setPayLoading]     = useState(false);
-  const [payRequested,   setPayRequested]   = useState(false);
+  const [stripeLoading,  setStripeLoading]  = useState(false);
   const [goodsValue,     setGoodsValue]     = useState('');
-  const [insureGoods,    setInsureGoods]    = useState(true);
+  const [insureGoods,    setInsureGoods]    = useState(false);
   const [error,          setError]          = useState<string | null>(null);
+  const [signupCredit,   setSignupCredit]   = useState<number>(0); // pence
 
   const loadData = async () => {
     if (!matchId) { setError('No match ID provided.'); setLoading(false); return; }
@@ -95,6 +95,10 @@ function KycContent() {
       if (!res.ok) { const j = await res.json(); setError(j.error || 'Failed to load match.'); setLoading(false); return; }
       const json = await res.json();
       setData(json);
+      // Check for unspent signup credit (best-effort)
+      fetch('/api/user/credit').then(r => r.ok ? r.json() : null).then(c => {
+        if (c && !c.redeemed) setSignupCredit(c.amount_pence ?? 0);
+      }).catch(() => {});
     } catch {
       setError('Could not load match details.');
     } finally {
@@ -104,25 +108,25 @@ function KycContent() {
 
   useEffect(() => { loadData(); }, [matchId]);
 
-  const requestPayment = async () => {
+  const payWithStripe = async () => {
     if (!matchId) return;
     const parsed = parseFloat(goodsValue) || 0;
-    if (parsed <= 0) { setError('Please enter the declared goods value.'); return; }
-    setPayLoading(true);
+    if (insureGoods && parsed <= 0) { setError('Enter declared goods value to add insurance.'); return; }
+    setStripeLoading(true);
     setError(null);
     try {
-      const res  = await fetch('/api/payment/request', {
+      const res  = await fetch('/api/payment/create-checkout', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ matchId, goodsValue: parsed, insuranceAccepted: insureGoods }),
       });
       const json = await res.json();
-      if (!res.ok) { setError(json.error || 'Could not submit payment request.'); return; }
-      setPayRequested(true);
+      if (!res.ok) { setError(json.error || 'Could not create checkout.'); return; }
+      window.location.href = json.url;
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setPayLoading(false);
+      setStripeLoading(false);
     }
   };
 
@@ -251,106 +255,106 @@ function KycContent() {
         {/* Action area */}
         <div className="rounded-2xl border border-white/10 bg-white/5 p-8">
 
-          {/* Both done, sender submits payment request */}
-          {canPay && !payRequested && (
+          {/* Both done, sender pays */}
+          {canPay && (
             <div>
               <div className="flex items-start gap-4 mb-6">
                 <div className="w-12 h-12 rounded-2xl bg-green-500/20 flex items-center justify-center shrink-0">
                   <CreditCard className="h-6 w-6 text-green-400" />
                 </div>
                 <div>
-                  <h3 className="text-white font-bold text-lg mb-1">Both identities verified — pay now</h3>
+                  <h3 className="text-white font-bold text-lg mb-1">Both verified — pay to unlock contact details</h3>
                   <p className="text-white/50 text-sm leading-relaxed">
-                    Declare your goods value below. Our team will send you payment instructions by email and confirm receipt manually.
+                    Payment is held in escrow and released to the carrier only after delivery is confirmed by both parties.
                   </p>
                 </div>
               </div>
 
-              {/* Goods value */}
-              <div className="mb-4">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">
-                  Declared goods value (£) <span className="text-red-400">*</span>
-                </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 text-sm font-bold">£</span>
-                  <input
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    placeholder="0.00"
-                    value={goodsValue}
-                    onChange={(e) => setGoodsValue(e.target.value)}
-                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  />
-                </div>
-                <p className="text-xs text-white/30 mt-1.5">Must be accurate — understating voids insurance cover.</p>
-              </div>
-
-              {/* Insurance toggle */}
-              <label className={`flex items-start gap-4 cursor-pointer rounded-2xl border p-5 mb-5 transition-all ${insureGoods ? 'border-amber-500/40 bg-amber-500/10' : 'border-white/10 bg-white/5'}`}>
+              {/* Insurance toggle (optional) */}
+              <label className={`flex items-start gap-4 cursor-pointer rounded-2xl border p-5 mb-4 transition-all ${insureGoods ? 'border-amber-500/40 bg-amber-500/10' : 'border-white/10 bg-white/5'}`}>
                 <div className={`w-5 h-5 mt-0.5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${insureGoods ? 'bg-amber-500 border-amber-500' : 'border-white/30 bg-white/5'}`}>
                   {insureGoods && <CheckCircle className="h-3 w-3 text-white" />}
                 </div>
-                <input type="checkbox" checked={insureGoods} onChange={(e) => setInsureGoods(e.target.checked)} className="sr-only" />
+                <input type="checkbox" checked={insureGoods} onChange={(e) => { setInsureGoods(e.target.checked); if (!e.target.checked) setGoodsValue(''); }} className="sr-only" />
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="text-white font-semibold text-sm">Add delivery protection</p>
-                    <span className={`text-sm font-bold ${insureGoods ? 'text-amber-400' : 'text-white/30'}`}>
-                      {parseFloat(goodsValue) > 0 ? `£${(parseFloat(goodsValue) * 0.075).toFixed(2)}` : '7.5%'}
-                    </span>
+                    <p className="text-white font-semibold text-sm">Add goods insurance (optional)</p>
+                    <span className={`text-sm font-bold ${insureGoods ? 'text-amber-400' : 'text-white/30'}`}>8%</span>
                   </div>
-                  <p className="text-white/40 text-xs">Covers loss or damage in transit.</p>
+                  <p className="text-white/40 text-xs">Covers loss or damage in transit. 8% of declared goods value.</p>
                 </div>
               </label>
 
-              {/* Price summary */}
-              {parseFloat(goodsValue) > 0 && (
-                <div className="rounded-xl border border-white/10 bg-white/5 divide-y divide-white/5 mb-5 text-sm">
-                  <div className="flex justify-between px-5 py-3">
-                    <span className="text-white/50">Delivery fee</span>
-                    <span className="text-white font-medium">£{(data?.match.agreed_price ?? 0).toFixed(2)}</span>
+              {/* Goods value — only shown when insurance selected */}
+              {insureGoods && (
+                <div className="mb-4">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">
+                    Declared goods value (£) <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 text-sm font-bold">£</span>
+                    <input
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={goodsValue}
+                      onChange={(e) => setGoodsValue(e.target.value)}
+                      className="w-full pl-8 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
                   </div>
-                  {insureGoods && (
-                    <div className="flex justify-between px-5 py-3">
-                      <span className="text-white/50">Protection (7.5%)</span>
-                      <span className="text-amber-400 font-medium">£{(parseFloat(goodsValue) * 0.075).toFixed(2)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between px-5 py-3 bg-white/5 rounded-b-xl">
-                    <span className="text-white font-bold">Total due</span>
-                    <span className="text-blue-400 font-bold text-base">
-                      £{((data?.match.agreed_price ?? 0) + (insureGoods ? parseFloat(goodsValue) * 0.075 : 0)).toFixed(2)}
-                    </span>
-                  </div>
+                  <p className="text-xs text-white/30 mt-1.5">Must be accurate — understating voids insurance cover.</p>
                 </div>
               )}
 
-              <div className="flex items-start gap-2 text-xs text-amber-400 mb-5">
-                <Info className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-                Our team will email you with payment instructions. Contact details are released once payment is confirmed.
+              {/* Price summary */}
+              <div className="rounded-xl border border-white/10 bg-white/5 divide-y divide-white/5 mb-5 text-sm">
+                <div className="flex justify-between px-5 py-3">
+                  <span className="text-white/50">Delivery fee</span>
+                  <span className="text-white font-medium">£{(data?.match.agreed_price ?? 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between px-5 py-3">
+                  <span className="text-white/50">Platform fee (5%)</span>
+                  <span className="text-white/70 font-medium">£{((data?.match.agreed_price ?? 0) * 0.05).toFixed(2)}</span>
+                </div>
+                {insureGoods && parseFloat(goodsValue) > 0 && (
+                  <div className="flex justify-between px-5 py-3">
+                    <span className="text-white/50">Goods insurance (8%)</span>
+                    <span className="text-amber-400 font-medium">£{(parseFloat(goodsValue) * 0.08).toFixed(2)}</span>
+                  </div>
+                )}
+                {signupCredit > 0 && (
+                  <div className="flex justify-between px-5 py-3 bg-amber-500/5 border-t border-amber-500/20">
+                    <span className="text-amber-300 font-semibold flex items-center gap-1.5">🎁 Signup credit applied</span>
+                    <span className="text-amber-300 font-bold">−£{(Math.min(signupCredit, Math.round(((data?.match.agreed_price ?? 0) * 1.05 + (insureGoods && parseFloat(goodsValue) > 0 ? parseFloat(goodsValue) * 0.08 : 0)) * 100)) / 100).toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between px-5 py-3 bg-white/5 rounded-b-xl">
+                  <span className="text-white font-bold">Total due</span>
+                  <span className="text-blue-400 font-bold text-base">
+                    £{Math.max(0,
+                      (data?.match.agreed_price ?? 0) * 1.05 +
+                      (insureGoods && parseFloat(goodsValue) > 0 ? parseFloat(goodsValue) * 0.08 : 0) -
+                      signupCredit / 100
+                    ).toFixed(2)}
+                  </span>
+                </div>
               </div>
 
+              <div className="flex items-start gap-2 text-xs text-blue-400 mb-5">
+                <Lock className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                Funds are held in escrow and released only after both parties confirm delivery.
+              </div>
+
+              {/* Payment button */}
               <button
-                onClick={requestPayment}
-                disabled={payLoading || !goodsValue || parseFloat(goodsValue) <= 0}
+                onClick={payWithStripe}
+                disabled={stripeLoading || (insureGoods && (!goodsValue || parseFloat(goodsValue) <= 0))}
                 className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl transition-all"
               >
-                {payLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-                {payLoading ? 'Submitting…' : 'Submit payment request'}
+                {stripeLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <CreditCard className="h-5 w-5" />}
+                {stripeLoading ? 'Redirecting to Stripe…' : 'Pay securely with Stripe'}
               </button>
-            </div>
-          )}
-
-          {/* Payment request submitted */}
-          {canPay && payRequested && (
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-4">
-                <Clock className="h-8 w-8 text-amber-400" />
-              </div>
-              <h3 className="text-white font-bold text-xl mb-2">Payment request submitted!</h3>
-              <p className="text-white/50 text-sm">
-                We&apos;ve emailed you with payment instructions. Once our team confirms receipt, contact details will be released to both parties automatically.
-              </p>
             </div>
           )}
 

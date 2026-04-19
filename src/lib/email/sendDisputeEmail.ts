@@ -83,6 +83,42 @@ export async function sendDisputeAcknowledgedEmail(params: {
   });
 }
 
+export async function sendDisputeNotifiedEmail(params: {
+  toEmail:     string;
+  fromCity:    string;
+  toCity:      string;
+  reason:      string;
+  disputeId:   string;
+}) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  await resend.emails.send({
+    from,
+    to: params.toEmail,
+    replyTo: supportEmail,
+    subject: `A dispute has been raised on your delivery | ${params.fromCity} → ${params.toCity}`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0f172a;background:#ffffff;">
+        <div style="margin-bottom:24px;">
+          <span style="font-size:22px;font-weight:900;color:#1e3a8a;">Boot</span><span style="font-size:22px;font-weight:900;color:#2563eb;">Hop</span>
+        </div>
+        <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;">A dispute has been raised</h2>
+        <p style="font-size:15px;color:#475569;margin:0 0 20px;">
+          The other party has raised a dispute regarding the <strong>${params.fromCity} → ${params.toCity}</strong> delivery.
+        </p>
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:14px 18px;margin:0 0 20px;">
+          <p style="margin:0 0 4px;font-size:12px;color:#991b1b;font-weight:600;text-transform:uppercase;">Reason given</p>
+          <p style="margin:0;font-size:14px;font-weight:600;color:#7f1d1d;">${params.reason}</p>
+        </div>
+        <p style="font-size:14px;color:#475569;margin:0 0 20px;">
+          Payment has been placed on hold while we investigate. Our support team will contact both parties within 24 hours. Please reply to this email with any evidence (photos, messages, etc.) that may help resolve this.
+        </p>
+        <p style="font-size:12px;color:#94a3b8;">Dispute reference: ${params.disputeId}</p>
+      </div>
+    `,
+    text: `A dispute has been raised on your ${params.fromCity} → ${params.toCity} delivery.\nReason: ${params.reason}\n\nPayment is on hold. Our team will contact you within 24 hours.\nDispute reference: ${params.disputeId}`,
+  });
+}
+
 export async function sendDisputeResolvedEmail(params: {
   toEmail:     string;
   fromCity:    string;

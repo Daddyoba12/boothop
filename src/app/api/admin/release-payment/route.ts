@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     const { data: match } = await supabase
       .from('matches')
-      .select('id, status, sender_email, traveler_email, sender_trip:sender_trip_id(from_city, to_city)')
+      .select('id, status, sender_email, traveler_email, agreed_price, sender_trip:sender_trip_id(from_city, to_city)')
       .eq('id', matchId)
       .maybeSingle();
 
@@ -36,14 +36,15 @@ export async function GET(request: NextRequest) {
       .update({ status: 'completed', payment_released_at: new Date().toISOString() })
       .eq('id', matchId);
 
-    const tripRaw   = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
-    const trip      = tripRaw as unknown as { from_city: string; to_city: string } | null | undefined;
-    const fromCity  = trip?.from_city ?? '';
-    const toCity    = trip?.to_city ?? '';
+    const tripRaw    = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
+    const trip       = tripRaw as unknown as { from_city: string; to_city: string } | null | undefined;
+    const fromCity   = trip?.from_city ?? '';
+    const toCity     = trip?.to_city ?? '';
+    const agreedPrice = (match as any).agreed_price ?? 0;
 
     await Promise.allSettled([
-      sendRatingRequestEmail({ toEmail: match.sender_email,   fromCity, toCity, matchId }),
-      sendRatingRequestEmail({ toEmail: match.traveler_email, fromCity, toCity, matchId }),
+      sendRatingRequestEmail({ toEmail: match.sender_email,   fromCity, toCity, matchId, role: 'sender',   agreedPrice }),
+      sendRatingRequestEmail({ toEmail: match.traveler_email, fromCity, toCity, matchId, role: 'traveler', agreedPrice }),
     ]);
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     const { data: match } = await supabase
       .from('matches')
-      .select('sender_email, traveler_email, sender_trip:sender_trip_id(from_city, to_city)')
+      .select('sender_email, traveler_email, agreed_price, sender_trip:sender_trip_id(from_city, to_city)')
       .eq('id', matchId)
       .maybeSingle();
 
@@ -81,13 +82,14 @@ export async function POST(request: NextRequest) {
       .eq('id', matchId);
 
     if (match) {
-      const tripRaw  = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
-      const trip     = tripRaw as unknown as { from_city: string; to_city: string } | null | undefined;
-      const fromCity = trip?.from_city ?? '';
-      const toCity   = trip?.to_city ?? '';
+      const tripRaw    = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
+      const trip       = tripRaw as unknown as { from_city: string; to_city: string } | null | undefined;
+      const fromCity   = trip?.from_city ?? '';
+      const toCity     = trip?.to_city ?? '';
+      const agreedPrice = (match as any).agreed_price ?? 0;
       await Promise.allSettled([
-        sendRatingRequestEmail({ toEmail: match.sender_email,   fromCity, toCity, matchId }),
-        sendRatingRequestEmail({ toEmail: match.traveler_email, fromCity, toCity, matchId }),
+        sendRatingRequestEmail({ toEmail: match.sender_email,   fromCity, toCity, matchId, role: 'sender',   agreedPrice }),
+        sendRatingRequestEmail({ toEmail: match.traveler_email, fromCity, toCity, matchId, role: 'traveler', agreedPrice }),
       ]);
     }
 

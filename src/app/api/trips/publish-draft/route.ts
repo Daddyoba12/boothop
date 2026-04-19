@@ -78,9 +78,44 @@ export async function POST(request: Request) {
     // Notify support of new trip (non-blocking)
     const supportEmail = process.env.SUPPORT_EMAIL || 'support@boothop.com';
     const typeLabel    = draft.type === 'travel' ? 'Booter (traveller)' : 'Hooper (sender)';
+    const appUrl       = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
+    const from         = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
     const resend       = new Resend(process.env.RESEND_API_KEY);
+    const dateStr      = new Date(draft.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    // Confirmation to trip creator (non-blocking)
     resend.emails.send({
-      from:    process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>',
+      from,
+      to:      session.email,
+      subject: `Your trip is live — ${draft.from_city} → ${draft.to_city}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0f172a;background:#ffffff;">
+          <div style="margin-bottom:24px;">
+            <span style="font-size:22px;font-weight:900;color:#1e3a8a;">Boot</span><span style="font-size:22px;font-weight:900;color:#2563eb;">Hop</span>
+          </div>
+          <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;">🚀 Your trip is now live!</h2>
+          <p style="font-size:15px;color:#475569;margin:0 0 20px;">
+            Your <strong>${draft.type === 'travel' ? 'carrier' : 'delivery'}</strong> listing for <strong>${draft.from_city} → ${draft.to_city}</strong> on <strong>${dateStr}</strong> is now active on BootHop.
+          </p>
+          <table style="width:100%;border-collapse:collapse;font-size:14px;margin:0 0 24px;">
+            <tr style="background:#f8fafc;"><td style="padding:10px 14px;color:#64748b;width:40%;">Route</td><td style="padding:10px 14px;font-weight:700;">${draft.from_city} → ${draft.to_city}</td></tr>
+            <tr><td style="padding:10px 14px;color:#64748b;">Date</td><td style="padding:10px 14px;">${dateStr}</td></tr>
+            <tr style="background:#f8fafc;"><td style="padding:10px 14px;color:#64748b;">Price</td><td style="padding:10px 14px;font-weight:700;color:#16a34a;">£${draft.price || '—'}</td></tr>
+            ${draft.weight ? `<tr><td style="padding:10px 14px;color:#64748b;">Weight</td><td style="padding:10px 14px;">${draft.weight} kg</td></tr>` : ''}
+          </table>
+          <p style="font-size:14px;color:#475569;margin:0 0 24px;">
+            We'll notify you by email as soon as we find a match. In the meantime, you can manage your listing from your dashboard.
+          </p>
+          <a href="${appUrl}/dashboard" style="display:inline-block;background:#2563eb;color:#ffffff;font-weight:700;font-size:15px;padding:14px 28px;border-radius:12px;text-decoration:none;">
+            View Dashboard →
+          </a>
+        </div>
+      `,
+      text: `Your trip is live: ${draft.from_city} → ${draft.to_city} on ${dateStr}. Price: £${draft.price}.\n\nWe'll email you when we find a match. Dashboard: ${appUrl}/dashboard`,
+    }).catch(e => console.error('Trip creator confirmation email error:', e));
+
+    resend.emails.send({
+      from,
       to:      supportEmail,
       subject: `🚀 New trip registered — ${draft.from_city} → ${draft.to_city} (${typeLabel})`,
       html: `
@@ -105,7 +140,6 @@ export async function POST(request: Request) {
     }).catch(e => console.error('Trip notification email error:', e));
 
     // Run match engine (non-blocking)
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
     fetch(`${appUrl}/api/match-engine`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },

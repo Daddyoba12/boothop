@@ -11,10 +11,29 @@ import {
 import NavBar from '@/components/NavBar';
 
 // ── Country validation ────────────────────────────────────────────────────────
-interface Airport { name: string; city: string; country: string; iata: string; }
+interface Airport { name: string; city: string; country: string; iata: string; terminals?: string[]; }
 
 const BLOCKED_COUNTRIES       = ['KP', 'IR', 'SY', 'CU', 'SD', 'SS', 'BY', 'RU', 'VE', 'AF'];
 const CONTACT_FIRST_COUNTRIES = ['ZA', 'ZW', 'NG', 'GH', 'CD', 'CG'];
+
+// EU single market + EEA/Schengen — free movement, treated like domestic
+const EU_COUNTRIES = new Set([
+  'Austria','Belgium','Bulgaria','Croatia','Cyprus','Czech Republic',
+  'Denmark','Estonia','Finland','France','Germany','Greece','Hungary',
+  'Ireland','Italy','Latvia','Lithuania','Luxembourg','Malta',
+  'Netherlands','Poland','Portugal','Romania','Slovakia','Slovenia',
+  'Spain','Sweden',
+  // EEA / Schengen
+  'Iceland','Liechtenstein','Norway','Switzerland',
+]);
+
+// Extract country from a Google Places description like "Lagos, Nigeria"
+function extractCountryFromCity(city: string): string | null {
+  const parts = city.split(',').map(p => p.trim());
+  return parts.length >= 2 ? parts[parts.length - 1] : null;
+}
+
+type RouteType = 'domestic' | 'eu_internal' | 'international' | 'unknown';
 
 const weightOptions = [
   { value: 'letter', label: 'Letter (<1kg)' },
@@ -67,6 +86,14 @@ function RegisterForm() {
   const [toAirports,   setToAirports]   = useState<Airport[]>([]);
   const [fromAirportData, setFromAirportData] = useState<Airport | null>(null);
   const [toAirportData,   setToAirportData]   = useState<Airport | null>(null);
+
+  // Terminal selection (shown after airport is chosen)
+  const [fromTerminal, setFromTerminal] = useState<string | null>(null);
+  const [toTerminal,   setToTerminal]   = useState<string | null>(null);
+
+  // Postcode suggestions
+  const [fromPostcode, setFromPostcode] = useState<{ display: string; code: string } | null>(null);
+  const [toPostcode,   setToPostcode]   = useState<{ display: string; code: string } | null>(null);
 
   // Country validation
   const [countryBlocked,   setCountryBlocked]   = useState(false);
@@ -125,16 +152,29 @@ function RegisterForm() {
     }).catch(() => {});
   }, []);
 
-  // From city + airport autocomplete
+  // UK postcode/outcode pattern detector
+  const isUkPostcode = (v: string) => /^[A-Z]{1,2}[0-9]{1,2}[A-Z]?(\s?[0-9][A-Z]{2})?$/i.test(v.trim());
+
+  // From city + airport + postcode autocomplete
   useEffect(() => {
     if (fromOk) return;
+    setFromPostcode(null);
     const t = setTimeout(async () => {
       if (!fromQuery || fromQuery.length < 2) { setFromSugg([]); setFromAirports([]); return; }
-      // Airport search (always — covers IATA codes like LHR as well as city names)
+      // Airport search (always — covers IATA codes like LHR, LON as well as city names)
       try {
         const res = await fetch(`/api/airports/search?q=${encodeURIComponent(fromQuery)}`);
         setFromAirports(await res.json());
       } catch { setFromAirports([]); }
+      // UK postcode resolution (no Google Maps needed)
+      if (isUkPostcode(fromQuery)) {
+        try {
+          const res = await fetch(`/api/location/postcode?q=${encodeURIComponent(fromQuery.trim())}`);
+          const data = await res.json();
+          if (data?.display) setFromPostcode({ display: data.display, code: data.postcode ?? data.outcode ?? fromQuery.toUpperCase() });
+        } catch { /* silent */ }
+        return; // postcode found — skip city search
+      }
       // City search (Google Places — needs 3+ chars)
       if (mapsReady && fromQuery.length >= 3) {
         new google.maps.places.AutocompleteService().getPlacePredictions(
@@ -146,9 +186,10 @@ function RegisterForm() {
     return () => clearTimeout(t);
   }, [fromQuery, fromOk, mapsReady]);
 
-  // To city + airport autocomplete
+  // To city + airport + postcode autocomplete
   useEffect(() => {
     if (toOk) return;
+    setToPostcode(null);
     const t = setTimeout(async () => {
       if (!toQuery || toQuery.length < 2) { setToSugg([]); setToAirports([]); return; }
       // Airport search
@@ -156,6 +197,15 @@ function RegisterForm() {
         const res = await fetch(`/api/airports/search?q=${encodeURIComponent(toQuery)}`);
         setToAirports(await res.json());
       } catch { setToAirports([]); }
+      // UK postcode resolution
+      if (isUkPostcode(toQuery)) {
+        try {
+          const res = await fetch(`/api/location/postcode?q=${encodeURIComponent(toQuery.trim())}`);
+          const data = await res.json();
+          if (data?.display) setToPostcode({ display: data.display, code: data.postcode ?? data.outcode ?? toQuery.toUpperCase() });
+        } catch { /* silent */ }
+        return;
+      }
       // City search
       if (mapsReady && toQuery.length >= 3) {
         new google.maps.places.AutocompleteService().getPlacePredictions(
@@ -176,33 +226,59 @@ function RegisterForm() {
     setFromSugg([]); setToSugg([]);
     setFromAirports([]); setToAirports([]);
     setFromAirportData(null); setToAirportData(null);
+    setFromTerminal(null); setToTerminal(null);
+    setFromPostcode(null); setToPostcode(null);
     setFromOk(false); setToOk(false);
   };
 
-  // Airport selection helpers
-  const selectFromAirport = (a: Airport) => {
-    const display = `${a.city} (${a.iata})`;
+  // Build the display string and store it — called after airport or terminal selection
+  const applyFromAirport = (a: Airport, terminal: string | null) => {
+    const display = terminal ? `${a.city} (${a.iata}) · ${terminal}` : `${a.city} (${a.iata})`;
     setFromQuery(display); setForm(p => ({ ...p, from: display }));
-    setFromAirports([]); setFromSugg([]); setFromOk(true); setFromAirportData(a);
+    setFromOk(!a.terminals?.length || !!terminal); // only ok when terminal chosen (if airport has them)
     if (window.google?.maps?.places)
       sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+  };
+
+  const applyToAirport = (a: Airport, terminal: string | null) => {
+    const display = terminal ? `${a.city} (${a.iata}) · ${terminal}` : `${a.city} (${a.iata})`;
+    setToQuery(display); setForm(p => ({ ...p, to: display }));
+    setToOk(!a.terminals?.length || !!terminal);
+    if (window.google?.maps?.places)
+      sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+  };
+
+  // Airport selection helpers — open terminal picker if needed, else confirm immediately
+  const selectFromAirport = (a: Airport) => {
+    setFromAirportData(a); setFromAirports([]); setFromSugg([]);
+    if (a.terminals?.length) {
+      setFromTerminal(null);
+      applyFromAirport(a, null); // shows the airport name, waits for terminal
+    } else {
+      applyFromAirport(a, null);
+      setFromOk(true);
+    }
   };
 
   const selectToAirport = (a: Airport) => {
-    const display = `${a.city} (${a.iata})`;
-    setToQuery(display); setForm(p => ({ ...p, to: display }));
-    setToAirports([]); setToSugg([]); setToOk(true); setToAirportData(a);
-    if (window.google?.maps?.places)
-      sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+    setToAirportData(a); setToAirports([]); setToSugg([]);
+    if (a.terminals?.length) {
+      setToTerminal(null);
+      applyToAirport(a, null);
+    } else {
+      applyToAirport(a, null);
+      setToOk(true);
+    }
   };
 
-  // Detect international route (used for contact-first check)
-  const isInternationalRoute = () => {
-    if (fromAirportData && toAirportData) return fromAirportData.country !== toAirportData.country;
-    const ukPatterns = ['united kingdom', ', uk', ', england', ', scotland', ', wales', ', northern ireland'];
-    const fromUK = ukPatterns.some(p => form.from.toLowerCase().includes(p));
-    const toUK   = ukPatterns.some(p => form.to.toLowerCase().includes(p));
-    return !(fromUK && toUK);
+  // Classify route based on from/to countries
+  const classifyRoute = (): RouteType => {
+    const fromCountry = fromAirportData?.country ?? extractCountryFromCity(form.from);
+    const toCountry   = toAirportData?.country   ?? extractCountryFromCity(form.to);
+    if (!fromCountry || !toCountry) return 'unknown';
+    if (fromCountry.toLowerCase() === toCountry.toLowerCase()) return 'domestic';
+    if (EU_COUNTRIES.has(fromCountry) && EU_COUNTRIES.has(toCountry)) return 'eu_internal';
+    return 'international';
   };
 
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
@@ -213,7 +289,8 @@ function RegisterForm() {
 
     // Country validation
     if (countryBlocked) { setError('BootHop is not available in your region.'); return; }
-    if (contactFirst && isInternationalRoute()) { setShowContactModal(true); return; }
+    // Only block outbound-international — domestic and EU internal are always fine
+    if (contactFirst && classifyRoute() === 'international') { setShowContactModal(true); return; }
 
     if (!form.from || !form.to || !form.date || !form.weight || !form.price) {
       setError('Please fill in all fields including price.');
@@ -234,7 +311,7 @@ function RegisterForm() {
         const res = await fetch('/api/trips/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ from: form.from, to: form.to, date: form.date, weight: form.weight, price: `${currency}${form.price}`, mode }),
+          body: JSON.stringify({ from: form.from, to: form.to, date: form.date, weight: form.weight, price: `${currency}${form.price}`, mode, route_type: classifyRoute() }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to create listing');
@@ -255,7 +332,7 @@ function RegisterForm() {
     if (!form.email) { setError('Please enter your email address.'); return; }
     setLoading(true);
 
-    const journeyPayload = { from: form.from, to: form.to, date: form.date, weight: form.weight, price: `${currency}${form.price}`, mode, ...(interestedIn ? { interestedIn } : {}) };
+    const journeyPayload = { from: form.from, to: form.to, date: form.date, weight: form.weight, price: `${currency}${form.price}`, mode, route_type: classifyRoute(), ...(interestedIn ? { interestedIn } : {}) };
 
     try {
       const res = await fetch('/api/auth/request-code', {
@@ -595,13 +672,13 @@ function RegisterForm() {
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-cyan-400 pointer-events-none transition-colors z-10" />
                     <input
                       type="text"
-                      placeholder="From city"
+                      placeholder="From city, airport or postcode"
                       required
                       value={fromQuery}
-                      onChange={(e) => { setFromQuery(e.target.value); setForm(p => ({ ...p, from: e.target.value })); setFromOk(false); }}
+                      onChange={(e) => { setFromQuery(e.target.value); setForm(p => ({ ...p, from: e.target.value })); setFromOk(false); setFromAirportData(null); setFromTerminal(null); }}
                       className={`${inputCls} pl-9 ${fromQuery && !fromOk ? 'ring-2 ring-amber-400/40' : ''}`}
                     />
-                    {(fromAirports.length > 0 || fromSugg.length > 0) && (
+                    {(fromAirports.length > 0 || fromSugg.length > 0 || fromPostcode) && (
                       <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-52 overflow-auto rounded-xl border border-white/10 bg-slate-900/95 backdrop-blur-xl shadow-2xl">
                         {fromAirports.map((a) => (
                           <div key={a.iata} onClick={() => selectFromAirport(a)}
@@ -612,8 +689,22 @@ function RegisterForm() {
                               <span className="font-medium">{a.city}</span>
                               <span className="text-slate-500 text-xs ml-1 truncate">· {a.name}</span>
                             </div>
+                            {a.terminals?.length ? <span className="ml-auto text-[10px] text-white/25 shrink-0">Select terminal →</span> : null}
                           </div>
                         ))}
+                        {fromPostcode && (
+                          <div onClick={() => {
+                            const v = `${fromPostcode.display} (${fromPostcode.code})`;
+                            setFromQuery(v); setForm(p => ({ ...p, from: v }));
+                            setFromOk(true); setFromPostcode(null); setFromAirportData(null);
+                          }} className="cursor-pointer px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors flex items-center gap-2">
+                            <MapPin className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
+                            <div className="min-w-0">
+                              <span className="font-medium">{fromPostcode.display}</span>
+                              <span className="text-slate-500 text-xs ml-1">· {fromPostcode.code}</span>
+                            </div>
+                          </div>
+                        )}
                         {fromSugg.map((s, i) => (
                           <div key={`city-${i}`} onClick={() => {
                             setFromQuery(s); setForm(p => ({ ...p, from: s }));
@@ -626,21 +717,36 @@ function RegisterForm() {
                         ))}
                       </div>
                     )}
-                    {fromQuery && !fromOk && <p className="absolute -bottom-5 left-1 text-xs text-amber-400 animate-pulse">Select from list</p>}
+                    {fromQuery && !fromOk && !fromAirportData && <p className="absolute -bottom-5 left-1 text-xs text-amber-400 animate-pulse">Select from list</p>}
                   </div>
+
+                  {/* From terminal picker — shown after airport with terminals selected */}
+                  {fromAirportData?.terminals?.length && !fromOk && (
+                    <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3">
+                      <p className="text-xs text-cyan-400 font-semibold mb-2">Select terminal — {fromAirportData.name}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {fromAirportData.terminals.map(t => (
+                          <button key={t} type="button"
+                            onClick={() => { setFromTerminal(t); applyFromAirport(fromAirportData, t); setFromOk(true); }}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${fromTerminal === t ? 'bg-cyan-500 border-cyan-400 text-white' : 'border-white/15 text-white/60 hover:border-cyan-400/50 hover:text-white'}`}
+                          >{t}</button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* To city */}
                   <div className="group relative mt-6">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-cyan-400 pointer-events-none transition-colors z-10" />
                     <input
                       type="text"
-                      placeholder="To city"
+                      placeholder="To city, airport or postcode"
                       required
                       value={toQuery}
-                      onChange={(e) => { setToQuery(e.target.value); setForm(p => ({ ...p, to: e.target.value })); setToOk(false); }}
+                      onChange={(e) => { setToQuery(e.target.value); setForm(p => ({ ...p, to: e.target.value })); setToOk(false); setToAirportData(null); setToTerminal(null); }}
                       className={`${inputCls} pl-9 ${toQuery && !toOk ? 'ring-2 ring-amber-400/40' : ''}`}
                     />
-                    {(toAirports.length > 0 || toSugg.length > 0) && (
+                    {(toAirports.length > 0 || toSugg.length > 0 || toPostcode) && (
                       <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-52 overflow-auto rounded-xl border border-white/10 bg-slate-900/95 backdrop-blur-xl shadow-2xl">
                         {toAirports.map((a) => (
                           <div key={a.iata} onClick={() => selectToAirport(a)}
@@ -651,8 +757,22 @@ function RegisterForm() {
                               <span className="font-medium">{a.city}</span>
                               <span className="text-slate-500 text-xs ml-1 truncate">· {a.name}</span>
                             </div>
+                            {a.terminals?.length ? <span className="ml-auto text-[10px] text-white/25 shrink-0">Select terminal →</span> : null}
                           </div>
                         ))}
+                        {toPostcode && (
+                          <div onClick={() => {
+                            const v = `${toPostcode.display} (${toPostcode.code})`;
+                            setToQuery(v); setForm(p => ({ ...p, to: v }));
+                            setToOk(true); setToPostcode(null); setToAirportData(null);
+                          }} className="cursor-pointer px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors flex items-center gap-2">
+                            <MapPin className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
+                            <div className="min-w-0">
+                              <span className="font-medium">{toPostcode.display}</span>
+                              <span className="text-slate-500 text-xs ml-1">· {toPostcode.code}</span>
+                            </div>
+                          </div>
+                        )}
                         {toSugg.map((s, i) => (
                           <div key={`city-${i}`} onClick={() => {
                             setToQuery(s); setForm(p => ({ ...p, to: s }));
@@ -665,8 +785,44 @@ function RegisterForm() {
                         ))}
                       </div>
                     )}
-                    {toQuery && !toOk && <p className="absolute -bottom-5 left-1 text-xs text-amber-400 animate-pulse">Select from list</p>}
+                    {toQuery && !toOk && !toAirportData && <p className="absolute -bottom-5 left-1 text-xs text-amber-400 animate-pulse">Select from list</p>}
                   </div>
+
+                  {/* To terminal picker */}
+                  {toAirportData?.terminals?.length && !toOk && (
+                    <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3 mt-6">
+                      <p className="text-xs text-cyan-400 font-semibold mb-2">Select terminal — {toAirportData.name}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {toAirportData.terminals.map(t => (
+                          <button key={t} type="button"
+                            onClick={() => { setToTerminal(t); applyToAirport(toAirportData, t); setToOk(true); }}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${toTerminal === t ? 'bg-cyan-500 border-cyan-400 text-white' : 'border-white/15 text-white/60 hover:border-cyan-400/50 hover:text-white'}`}
+                          >{t}</button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Route type badge — shown once both ends are confirmed */}
+                  {fromOk && toOk && (() => {
+                    const rt = classifyRoute();
+                    if (rt === 'unknown') return null;
+                    const cfg: Record<string, { label: string; cls: string; dot: string }> = {
+                      domestic:      { label: 'Domestic route — no restrictions',      cls: 'text-emerald-300 border-emerald-500/30 bg-emerald-500/10', dot: 'bg-emerald-400' },
+                      eu_internal:   { label: 'EU internal — free movement applies',   cls: 'text-blue-300 border-blue-500/30 bg-blue-500/10',     dot: 'bg-blue-400'    },
+                      international: { label: 'International route',                   cls: 'text-amber-300 border-amber-500/30 bg-amber-500/10',   dot: 'bg-amber-400'   },
+                    };
+                    const c = cfg[rt];
+                    return (
+                      <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-semibold ${c.cls}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${c.dot}`} />
+                        {c.label}
+                        {rt === 'international' && contactFirst && (
+                          <span className="ml-auto text-amber-400/70 text-[10px]">Contact us required →</span>
+                        )}
+                      </div>
+                    );
+                  })()}
 
                   {/* Date */}
                   <div className="group relative mt-2">

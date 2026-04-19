@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const [drafts, setDrafts] = useState<any[]>([]);
   const [publishingDraft, setPublishingDraft] = useState<string | null>(null);
   const [deletingTrip, setDeletingTrip] = useState<string | null>(null);
+  const [credit, setCredit] = useState<{ amount_pence: number; redeemed: boolean } | null>(null);
 
   useEffect(() => {
     loadDashboard();
@@ -42,6 +43,12 @@ export default function DashboardPage() {
       setTrips(dash.trips || []);
       setMatches(dash.matches || []);
       setLoading(false);
+
+      // Load signup credit (best-effort)
+      fetch('/api/user/credit', { credentials: 'include' })
+        .then(r => r.ok ? r.json() : null)
+        .then(d => { if (d && !d.redeemed) setCredit(d); })
+        .catch(() => {});
 
       // Load journey drafts
       fetch('/api/drafts')
@@ -162,6 +169,22 @@ export default function DashboardPage() {
       </nav>
 
       <div className="max-w-4xl mx-auto px-5 py-8 space-y-8">
+
+          {/* £20 signup credit banner — shown until redeemed */}
+          {credit && !credit.redeemed && (
+            <div className="relative overflow-hidden rounded-2xl border border-amber-500/35 bg-gradient-to-r from-amber-950/60 via-amber-900/30 to-transparent backdrop-blur-xl p-5 flex items-center gap-5 shadow-[0_0_60px_rgba(245,158,11,0.08)]">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/20 flex items-center justify-center shrink-0 text-2xl">🎁</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-amber-200 font-bold text-base mb-0.5">
+                  You have £{(credit.amount_pence / 100).toFixed(0)} credit waiting
+                </p>
+                <p className="text-white/40 text-xs">Automatically applied on your first delivery payment. No action needed.</p>
+              </div>
+              <Link href="/register" className="shrink-0 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 text-xs transition-all hover:shadow-[0_8px_24px_rgba(245,158,11,0.35)]">
+                Send now →
+              </Link>
+            </div>
+          )}
 
         {/* PAGE HEADER */}
         <div className="flex items-center justify-between">

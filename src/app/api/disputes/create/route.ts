@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getAppSession } from '@/lib/auth/session';
 import { cookies } from 'next/headers';
-import { sendDisputeRaisedAdminEmail, sendDisputeAcknowledgedEmail } from '@/lib/email/sendDisputeEmail';
+import { sendDisputeRaisedAdminEmail, sendDisputeAcknowledgedEmail, sendDisputeNotifiedEmail } from '@/lib/email/sendDisputeEmail';
 
 const DISPUTE_REASONS = [
   'Item not delivered',
@@ -118,6 +118,13 @@ export async function POST(request: Request) {
         toEmail:   email,
         fromCity,
         toCity,
+        disputeId: dispute.id,
+      }),
+      sendDisputeNotifiedEmail({
+        toEmail:   otherParty,
+        fromCity,
+        toCity,
+        reason,
         disputeId: dispute.id,
       }),
     ]);

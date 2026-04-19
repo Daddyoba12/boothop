@@ -141,60 +141,90 @@ const signature = headersList.get('stripe-signature');
 // ============================================================================
 
 /**
- * Handle successful checkout session completion
- * This occurs when a customer completes payment
+ * Handle successful checkout session completion.
+ * Auto-activates the match and releases contact details to both parties.
  */
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   console.log('💳 Processing checkout completion...');
-  
+
   const matchId = session.metadata?.match_id;
-  const customerEmail = session.customer_details?.email;
 
   if (!matchId) {
     console.error('❌ No match_id in session metadata');
     throw new Error('Missing match_id in session metadata');
   }
 
-  try {
-    // Update match with payment details
-    const { data: match, error: updateError } = await supabase
-      .from('matches')
-      .update({
-        payment_status: 'escrowed',
-        payment_intent_id: session.payment_intent as string,
-        stripe_session_id: session.id,
-        status: 'accepted',
-        payment_escrowed_at: new Date().toISOString()
-      })
-      .eq('id', matchId)
-      .select()
-      .single();
+  // Fetch match using email-based model (BootHop uses custom JWT sessions, not Supabase Auth)
+  const { data: match } = await supabase
+    .from('matches')
+    .select('id, status, sender_email, traveler_email, sender_trip:sender_trip_id(from_city, to_city, travel_date)')
+    .eq('id', matchId)
+    .single();
 
-    if (updateError) {
-      console.error('❌ Database update failed:', updateError);
-      throw updateError;
-    }
-
-    console.log(`✅ Payment escrowed for match ${matchId}`);
-    console.log(`💰 Amount: ${session.amount_total! / 100} ${session.currency?.toUpperCase()}`);
-
-    // Send confirmation emails
-    await sendPaymentConfirmationEmails(matchId, customerEmail);
-
-    // Create notification for both parties
-    await createMatchNotifications(matchId, 'payment_escrowed');
-
-    return {
-      success: true,
-      matchId,
-      amount: session.amount_total! / 100,
-      currency: session.currency
-    };
-
-  } catch (error: any) {
-    console.error('❌ Error in handleCheckoutCompleted:', error);
-    throw error;
+  if (!match) {
+    console.error(`❌ Match ${matchId} not found`);
+    throw new Error('Match not found');
   }
+
+  if (match.status === 'active') {
+    console.log(`ℹ️  Match ${matchId} already active — skipping`);
+    return { success: true, matchId, skipped: true };
+  }
+
+  // Activate match
+  await supabase
+    .from('matches')
+    .update({
+      status:               'active',
+      payment_intent_id:    session.payment_intent as string,
+      stripe_session_id:    session.id,
+      payment_confirmed_at: new Date().toISOString(),
+    })
+    .eq('id', matchId);
+
+  console.log(`✅ Match ${matchId} activated — £${(session.amount_total ?? 0) / 100}`);
+
+  // Mark signup credit as redeemed if one was applied at checkout
+  const creditApplied = session.metadata?.signup_credit_applied;
+  if (creditApplied && parseInt(creditApplied) > 0) {
+    await supabase
+      .from('signup_credits')
+      .update({ redeemed: true, redeemed_at: new Date().toISOString() })
+      .eq('email', match.sender_email)
+      .eq('redeemed', false);
+    console.log(`🎁 £${parseInt(creditApplied) / 100} signup credit redeemed for ${match.sender_email}`);
+  }
+
+  // Release contact details to both parties
+  const { sendContactReleasedEmail } = await import('@/lib/email/sendPaymentEmail');
+  const trip       = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
+  const fromCity   = (trip as any)?.from_city   ?? '';
+  const toCity     = (trip as any)?.to_city     ?? '';
+  const travelDate = (trip as any)?.travel_date ?? '';
+
+  await Promise.allSettled([
+    sendContactReleasedEmail({
+      toEmail:    match.sender_email,
+      fromCity,   toCity,   travelDate,
+      matchId,
+      otherEmail: match.traveler_email,
+      role:       'sender',
+    }),
+    sendContactReleasedEmail({
+      toEmail:    match.traveler_email,
+      fromCity,   toCity,   travelDate,
+      matchId,
+      otherEmail: match.sender_email,
+      role:       'traveler',
+    }),
+  ]);
+
+  return {
+    success: true,
+    matchId,
+    amount:   (session.amount_total ?? 0) / 100,
+    currency: session.currency,
+  };
 }
 
 /**

@@ -39,12 +39,6 @@ export default function BoothopBusiness() {
     return () => clearInterval(id);
   }, []);
 
-  // ── Pre-fill email from last login ────────────────────────────────────────
-  useEffect(() => {
-    const saved = localStorage.getItem('boothop_biz_email');
-    if (saved) setEmailInput(saved);
-  }, []);
-
   // ── Session check ──────────────────────────────────────────────────────────
   useEffect(() => {
     fetch('/api/business/auth/me')
@@ -200,7 +194,8 @@ export default function BoothopBusiness() {
                       <Star className="h-5 w-5 text-amber-400" />
                     </div>
                     <h3 className="text-white font-black mb-1.5 group-hover:text-amber-300 transition-colors">Priority Partner</h3>
-                    <p className="text-white/50 text-xs leading-relaxed mb-4">Existing member? Sign in for your dedicated portal — 2-hour guaranteed response, volume discounts &amp; account manager.</p>
+                    <p className="text-white/50 text-xs leading-relaxed mb-3">Existing member? Sign in for your dedicated portal — 2-hour guaranteed response, volume discounts &amp; account manager.</p>
+                    <p className="text-amber-400/70 text-xs font-bold mb-4">From £10,000/yr retainer · UK &amp; international</p>
                     <span className="inline-flex items-center gap-1.5 text-amber-400 text-xs font-black">Sign in <ArrowRight className="h-3.5 w-3.5" /></span>
                   </button>
 
@@ -213,12 +208,27 @@ export default function BoothopBusiness() {
                       <Zap className="h-5 w-5 text-emerald-400" />
                     </div>
                     <h3 className="text-white font-black mb-1.5 group-hover:text-emerald-300 transition-colors">Book a Delivery</h3>
-                    <p className="text-white/50 text-xs leading-relaxed mb-4">New or one-off customer? Sign in with your business email for an instant quote and same-day booking.</p>
+                    <p className="text-white/50 text-xs leading-relaxed mb-3">New or one-off customer? Sign in with your business email for an instant quote and same-day booking.</p>
+                    <p className="text-emerald-400/70 text-xs font-bold mb-4">From £300 UK · From £1,000 international</p>
                     <span className="inline-flex items-center gap-1.5 text-emerald-400 text-xs font-black">Get started <ArrowRight className="h-3.5 w-3.5" /></span>
                   </button>
 
                 </motion.div>
-                <p className="text-white/25 text-xs">Business email required · Personal accounts not accepted</p>
+                <div className="flex flex-col items-center gap-2 mt-2">
+                  <p className="text-white/20 text-xs uppercase tracking-widest font-semibold">Trusted by teams in</p>
+                  <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-white/35 text-xs font-semibold">
+                    <span>Aerospace &amp; AOG</span>
+                    <span className="text-white/15">·</span>
+                    <span>Engineering &amp; Manufacturing</span>
+                    <span className="text-white/15">·</span>
+                    <span>Legal &amp; Finance</span>
+                    <span className="text-white/15">·</span>
+                    <span>Events &amp; Production</span>
+                    <span className="text-white/15">·</span>
+                    <span>Healthcare &amp; Pharma</span>
+                  </div>
+                  <p className="text-white/20 text-xs mt-1">Business email required · Personal accounts not accepted</p>
+                </div>
               </div>
 
               {/* Scroll cue */}
@@ -311,10 +321,10 @@ export default function BoothopBusiness() {
 
                     {/* Metrics strip */}
                     <div className="flex flex-wrap items-center justify-between gap-5 border-t border-white/10 pt-8 text-sm">
-                      <span className="text-white/60"><strong className="text-white font-black">£200+</strong> local from</span>
-                      <span className="text-white/60"><strong className="text-white font-black">Same-day</strong> delivery</span>
-                      <span className="text-white/60"><strong className="text-white font-black">Fully</strong> insured</span>
-                      <span className="text-white/60"><strong className="text-white font-black">Business-only</strong> verified</span>
+                      <span className="text-white/60"><strong className="text-white font-black">Instant</strong> quotes</span>
+                      <span className="text-white/60"><strong className="text-white font-black">Same-day</strong> UK-wide</span>
+                      <span className="text-white/60"><strong className="text-white font-black">Insured</strong> as standard</span>
+                      <span className="text-white/60"><strong className="text-white font-black">ID-verified</strong> carriers</span>
                       <a href="/business/pricing"
                         className="inline-flex items-center gap-1.5 text-emerald-400 font-black hover:text-emerald-300 transition-colors group">
                         View pricing <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />

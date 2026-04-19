@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 // Built-in fallback — works before the airports table is populated in Supabase
+// terminals field: shown as a sub-picker after airport is selected
 const AIRPORTS = [
-  { name: 'Heathrow Airport',                        city: 'London',        country: 'United Kingdom', iata: 'LHR' },
-  { name: 'Gatwick Airport',                         city: 'London',        country: 'United Kingdom', iata: 'LGW' },
+  { name: 'Heathrow Airport',                        city: 'London',        country: 'United Kingdom', iata: 'LHR', terminals: ['T1','T2','T3','T4','T5'] },
+  { name: 'Gatwick Airport',                         city: 'London',        country: 'United Kingdom', iata: 'LGW', terminals: ['South Terminal','North Terminal'] },
   { name: 'Stansted Airport',                        city: 'London',        country: 'United Kingdom', iata: 'STN' },
   { name: 'Luton Airport',                           city: 'London',        country: 'United Kingdom', iata: 'LTN' },
   { name: 'City Airport',                            city: 'London',        country: 'United Kingdom', iata: 'LCY' },
-  { name: 'Manchester Airport',                      city: 'Manchester',    country: 'United Kingdom', iata: 'MAN' },
-  { name: 'Birmingham Airport',                      city: 'Birmingham',    country: 'United Kingdom', iata: 'BHX' },
+  { name: 'Manchester Airport',                      city: 'Manchester',    country: 'United Kingdom', iata: 'MAN', terminals: ['T1','T2','T3'] },
+  { name: 'Birmingham Airport',                      city: 'Birmingham',    country: 'United Kingdom', iata: 'BHX', terminals: ['T1','T2'] },
   { name: 'Edinburgh Airport',                       city: 'Edinburgh',     country: 'United Kingdom', iata: 'EDI' },
   { name: 'Glasgow Airport',                         city: 'Glasgow',       country: 'United Kingdom', iata: 'GLA' },
   { name: 'Bristol Airport',                         city: 'Bristol',       country: 'United Kingdom', iata: 'BRS' },
@@ -69,11 +70,22 @@ const AIRPORTS = [
   { name: 'Incheon International Airport',           city: 'Seoul',         country: 'South Korea',    iata: 'ICN' },
 ];
 
+// LON is the IATA metropolitan area code for all London airports
+const LON_IATAS = new Set(['LHR', 'LGW', 'STN', 'LTN', 'LCY']);
+
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get('q')?.trim() ?? '';
   if (q.length < 2) return NextResponse.json([]);
 
+  const lower = q.toLowerCase();
+
+  // "LON" → return all London airports
+  if (lower === 'lon') {
+    return NextResponse.json(AIRPORTS.filter(a => LON_IATAS.has(a.iata)));
+  }
+
   // Try Supabase airports table first (populated after migration)
+  // Supabase won't have terminals yet so we merge from built-in list
   try {
     const supabase = createSupabaseAdminClient();
     const { data, error } = await supabase
@@ -81,10 +93,16 @@ export async function GET(req: NextRequest) {
       .select('name, city, country, iata')
       .or(`name.ilike.%${q}%,city.ilike.%${q}%,iata.ilike.%${q}%`)
       .limit(8);
-    if (!error && data && data.length > 0) return NextResponse.json(data);
+    if (!error && data && data.length > 0) {
+      // Merge terminals from built-in list
+      const enriched = data.map((row: any) => {
+        const local = AIRPORTS.find(a => a.iata === row.iata);
+        return local ? { ...row, terminals: local.terminals } : row;
+      });
+      return NextResponse.json(enriched);
+    }
   } catch { /* table not yet created — fall through to built-in list */ }
 
-  const lower = q.toLowerCase();
   const results = AIRPORTS.filter(a =>
     a.iata.toLowerCase().startsWith(lower) ||
     a.city.toLowerCase().includes(lower) ||

@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { from, to, date, weight, price, mode } = body;
+    const { from, to, date, weight, price, mode, route_type } = body;
 
     if (!from || !to || !date || !weight || !mode) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
     const supabase = createSupabaseAdminClient();
 
-    // Try inserting with translation columns; fall back to core fields if columns don't exist yet
+    // Try inserting with all columns; fall back to core fields if columns don't exist yet
     const coreInsert = {
       email:       session.email,
       user_id:     null,
@@ -47,6 +47,7 @@ export async function POST(request: Request) {
       to_city_en:   translation.toEn,
       language:     translation.language,
       translated:   translation.translated,
+      route_type:   route_type ?? null,
     });
 
     // If columns don't exist yet, retry with core fields only
