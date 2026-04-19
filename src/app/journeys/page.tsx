@@ -90,6 +90,8 @@ function LiveJourneysContent() {
   // Pre-populate from ?from= and ?to= query params (e.g. from Active Corridors)
   const [fromCity, setFromCity]   = useState(() => searchParams.get('from') ?? '');
   const [toCity, setToCity]       = useState(() => searchParams.get('to')   ?? '');
+  // Remember if filters were set from URL so we can fall back gracefully
+  const [filtersFromUrl]          = useState(() => !!(searchParams.get('from') || searchParams.get('to')));
   const [dateFilter, setDateFilter] = useState('');
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
@@ -160,6 +162,9 @@ function LiveJourneysContent() {
 
   const clearFilters = () => { setSearchTerm(''); setFromCity(''); setToCity(''); setDateFilter(''); };
   const hasFilters = !!(searchTerm || fromCity || toCity || dateFilter);
+
+  // Route came from Active Corridor click but has no live trips
+  const routeEmpty = !loading && filtersFromUrl && filtered.length === 0;
 
   /* ── Compute offered price from listing price ── */
   function computePrice(trip: Trip): string {
@@ -358,10 +363,33 @@ function LiveJourneysContent() {
             <button onClick={fetchTrips} className="mt-4 text-sm text-cyan-400 hover:text-cyan-300 transition-colors">Try again</button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-24">
+          <div className="text-center py-20">
             <Plane className="h-10 w-10 text-slate-600 mx-auto mb-4" />
-            <p className="text-white font-bold text-lg mb-1">No journeys match your filters</p>
-            {hasFilters && <button onClick={clearFilters} className="mt-4 text-sm text-cyan-400">Clear all filters</button>}
+            {routeEmpty ? (
+              <>
+                <p className="text-white font-bold text-lg mb-2">
+                  All slots on {fromCity}{toCity ? ` → ${toCity}` : ''} are taken
+                </p>
+                <p className="text-white/45 text-sm mb-7 max-w-sm mx-auto">
+                  No travellers are currently available on this route. Post your trip and we&apos;ll match you the moment one becomes available.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <a href={`/register?type=send&from=${encodeURIComponent(fromCity)}&to=${encodeURIComponent(toCity)}`}
+                    className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-semibold text-sm px-7 py-3 rounded-full transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)]">
+                    Book my trip to match <ArrowRight className="h-4 w-4" />
+                  </a>
+                  <button onClick={clearFilters}
+                    className="text-sm text-white/45 hover:text-white/80 transition-colors">
+                    Browse all routes →
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-white font-bold text-lg mb-1">No journeys match your filters</p>
+                {hasFilters && <button onClick={clearFilters} className="mt-4 text-sm text-cyan-400">Clear all filters</button>}
+              </>
+            )}
           </div>
         ) : (
           <>
