@@ -20,11 +20,12 @@ export async function GET() {
     const supabase = createSupabaseAdminClient();
     const today = new Date().toISOString().split('T')[0];
 
-    // Fetch user trips
+    // Fetch user trips — exclude auto-created mirror trips (created by express-interest)
     const { data: trips } = await supabase
       .from('trips')
       .select('id, type, from_city, to_city, travel_date, price, weight, status, created_at')
       .eq('email', email)
+      .or('auto_created.is.null,auto_created.eq.false')
       .order('created_at', { ascending: false });
 
     // Active trips = future-dated, status active

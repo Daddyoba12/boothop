@@ -94,6 +94,12 @@ export async function POST(
         .update({ status: 'declined' })
         .eq('id', matchId);
 
+      // Delete any auto-created mirror trips tied to this match
+      const mirrorTripId = email === senderEmail ? match.traveler_trip_id : match.sender_trip_id;
+      if (mirrorTripId) {
+        await supabase.from('trips').delete().eq('id', mirrorTripId).eq('auto_created', true);
+      }
+
       if (otherEmail) {
         sendMatchDeclinedEmail({
           toEmail:    otherEmail,

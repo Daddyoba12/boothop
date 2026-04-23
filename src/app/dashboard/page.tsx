@@ -321,15 +321,27 @@ export default function DashboardPage() {
                 const st = getMatchStatus(match);
                 const StatusIcon = st.icon;
                 const senderTrip = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
+                const travelerTrip = Array.isArray(match.traveler_trip) ? match.traveler_trip[0] : match.traveler_trip;
+                const displayTrip = senderTrip || travelerTrip;
+
+                // Don't show matches where both trips are gone
+                if (!displayTrip) return null;
+
+                const tripDate = displayTrip?.travel_date ? displayTrip.travel_date.split('T')[0] : null;
+                const isExpired = tripDate && tripDate < today;
+
+                // Hide expired matched-only matches — nothing actionable for the user
+                if (isExpired && match.status === 'matched') return null;
+
                 return (
                   <div key={match.id} className="bg-white/6 border border-white/10 rounded-2xl p-4 hover:bg-white/8 transition-all">
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div>
                         <p className="text-white font-medium text-sm">
-                          {senderTrip ? `${senderTrip.from_city} → ${senderTrip.to_city}` : '—'}
+                          {displayTrip.from_city} → {displayTrip.to_city}
                         </p>
                         <p className="text-slate-500 text-xs mt-0.5">
-                          {senderTrip?.travel_date ? new Date(senderTrip.travel_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                          {tripDate ? new Date(tripDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
                           {match.agreed_price ? ` · £${Number(match.agreed_price).toFixed(2)}` : ''}
                         </p>
                       </div>
@@ -345,8 +357,8 @@ export default function DashboardPage() {
                         {st.label}
                       </div>
                     </div>
-                    {/* Accept / Decline for incoming interests */}
-                    {match.status === 'matched' && (
+                    {/* Accept / Decline — only if trip date hasn't passed */}
+                    {match.status === 'matched' && !isExpired && (
                       match.sender_email !== user?.email
                         ? (
                           // Mr A — listing owner sees Accept/Decline
