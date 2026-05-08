@@ -26,7 +26,7 @@ export async function POST(
 
     const { data: match, error: matchErr } = await supabase
       .from('matches')
-      .select('id, status, sender_email, traveler_email, offered_price, agreed_price, sender_trip:sender_trip_id(from_city, to_city, travel_date), traveler_trip:traveler_trip_id(from_city, to_city, travel_date)')
+      .select('id, status, sender_email, traveler_email, offered_price, agreed_price, sender_trip_id, traveler_trip_id, sender_trip:sender_trip_id(from_city, to_city, travel_date), traveler_trip:traveler_trip_id(from_city, to_city, travel_date)')
       .eq('id', matchId)
       .maybeSingle();
 
@@ -93,6 +93,12 @@ export async function POST(
         .from('matches')
         .update({ status: 'declined' })
         .eq('id', matchId);
+
+      // Delete any auto-created mirror trips tied to this match
+      const mirrorTripId = email === senderEmail ? match.traveler_trip_id : match.sender_trip_id;
+      if (mirrorTripId) {
+        await supabase.from('trips').delete().eq('id', mirrorTripId).eq('auto_created', true);
+      }
 
       if (otherEmail) {
         sendMatchDeclinedEmail({

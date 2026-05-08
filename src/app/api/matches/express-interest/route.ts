@@ -59,11 +59,33 @@ export async function POST(request: Request) {
       );
     }
 
-    // Assign trip ID to the correct side based on trip type
-    // If the listed trip is a 'travel' trip → it's the traveler's trip
-    // If the listed trip is a 'send' trip   → it's the sender's trip
-    const sender_trip_id   = trip.type === 'send'   ? tripId : null;
-    const traveler_trip_id = trip.type === 'travel' ? tripId : null;
+    // Auto-create a mirror trip for the expressing party so both sides always have a trip ID.
+    // If the listed trip is 'travel' → the expressing party is the sender → auto-create a 'send' trip.
+    // If the listed trip is 'send'   → the expressing party is the traveler → auto-create a 'travel' trip.
+    const mirrorType = trip.type === 'travel' ? 'send' : 'travel';
+    const { data: mirrorTrip, error: mirrorErr } = await supabase
+      .from('trips')
+      .insert({
+        email:        email,
+        type:         mirrorType,
+        from_city:    trip.from_city,
+        to_city:      trip.to_city,
+        travel_date:  trip.travel_date,
+        price:        finalOfferedPrice,
+        weight:       null,
+        status:       'matched',
+        auto_created: true,
+      })
+      .select('id')
+      .single();
+
+    if (mirrorErr || !mirrorTrip) {
+      console.error('mirror trip insert error', mirrorErr);
+      return NextResponse.json({ error: 'Could not create your trip record.' }, { status: 500 });
+    }
+
+    const sender_trip_id   = trip.type === 'send'   ? tripId : mirrorTrip.id;
+    const traveler_trip_id = trip.type === 'travel' ? tripId : mirrorTrip.id;
 
     // Block duplicate interest from the same email on the same trip
     const { data: existing } = await supabase
@@ -115,7 +137,11 @@ export async function POST(request: Request) {
         interestType,
         matchId,
         loginToken:   tokenData?.token,
-      }).catch((e) => console.error('sendInterestEmail failed', e));
+      })
+        .then(() => console.log(`sendInterestEmail sent to ${trip.email} for match ${matchId}`))
+        .catch((e) => console.error(`sendInterestEmail failed for match ${matchId} to ${trip.email}:`, e));
+    } else {
+      console.error(`express-interest: trip ${tripId} has no email — notification skipped for match ${matchId}`);
     }
 
     return NextResponse.json({ ok: true });

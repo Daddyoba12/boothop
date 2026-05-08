@@ -562,6 +562,12 @@ export default function CustomsPage() {
             >
               How It Works
             </Link>
+            <Link
+              href="/customs/duties"
+              className="border border-white/40 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition"
+            >
+              Estimate Duties &amp; VAT
+            </Link>
           </div>
         </section>
 
