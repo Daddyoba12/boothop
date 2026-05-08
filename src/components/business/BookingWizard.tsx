@@ -77,6 +77,9 @@ interface Form {
   receiverAddress:       string;
   receiverInstructions:  string;
   // Step 7 — Customs
+  personalEffectsConfirmed: boolean;
+  valueLimitConfirmed:      boolean;
+  noProhibitedGoods:        boolean;
   customsAccepted:       boolean;
   taxesAccepted:         boolean;
   legalityAccepted:      boolean;
@@ -111,6 +114,7 @@ const EMPTY_FORM: Form = {
   senderAddress: '', senderInstructions: '',
   receiverCompany: '', receiverName: '', receiverPhone: '',
   receiverEmail: '', receiverAddress: '', receiverInstructions: '',
+  personalEffectsConfirmed: false, valueLimitConfirmed: false, noProhibitedGoods: false,
   customsAccepted: false, taxesAccepted: false, legalityAccepted: false,
   paperworkAccepted: false, delaysAccepted: false,
   customsHandledBy: '', brokerName: '', brokerPhone: '',
@@ -425,6 +429,9 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
         if (!form.receiverPhone.trim()) return 'Receiver phone is required.';
         break;
       case 7:
+        if (!form.personalEffectsConfirmed) return 'Please confirm goods are personal effects only (not commercial cargo).';
+        if (!form.valueLimitConfirmed) return 'Please confirm total value is under £1,000 and no single item exceeds £2,000.';
+        if (!form.noProhibitedGoods) return 'Please confirm the shipment contains no prohibited items.';
         if (!form.customsAccepted || !form.taxesAccepted || !form.legalityAccepted || !form.paperworkAccepted || !form.delaysAccepted)
           return 'All customs declarations must be confirmed to proceed.';
         if (!form.customsHandledBy) return 'Please confirm who handles customs clearance.';
@@ -863,6 +870,22 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
         <div>
           <SectionHead icon={Shield} title="Customs & border responsibility" sub="Required for all cross-border shipments. Hard stop." />
           <div className="space-y-3">
+            {/* International goods policy */}
+            <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+              <p className="text-sm font-semibold text-amber-400 mb-2">International Goods Policy</p>
+              <ul className="text-xs text-white/50 space-y-1">
+                <li>• Personal effects only — clothing, gifts, documents (no commercial cargo without prior approval)</li>
+                <li>• Total declared value must be under £1,000 per traveller shipment</li>
+                <li>• No single item may exceed £2,000 in declared value</li>
+                <li>• No prohibited items under any circumstances</li>
+              </ul>
+            </div>
+            <Toggle checked={form.personalEffectsConfirmed} onChange={v => up('personalEffectsConfirmed', v)}
+              label="All goods are personal effects — clothing, gifts, documents, or household items for personal use (not commercial goods for resale)" />
+            <Toggle checked={form.valueLimitConfirmed} onChange={v => up('valueLimitConfirmed', v)}
+              label="Total declared value is under £1,000 and no single item in this shipment exceeds £2,000" />
+            <Toggle checked={form.noProhibitedGoods} onChange={v => up('noProhibitedGoods', v)}
+              label="Shipment contains no prohibited items — no drugs, weapons, counterfeit goods, live animals, or hazardous materials" />
             {[
               { key: 'customsAccepted',   label: 'Customs clearance is the responsibility of the customer or receiver' },
               { key: 'taxesAccepted',     label: 'All duties, taxes, import fees, and brokerage charges are payable by sender/receiver' },

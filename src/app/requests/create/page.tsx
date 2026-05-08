@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Package, Calendar, MapPin, FileText, AlertCircle, Plane } from 'lucide-react';
+import { Package, Calendar, MapPin, FileText, AlertCircle, Plane, Globe, ShieldCheck } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
 export default function CreateRequestPage() {
   const router   = useRouter();
@@ -11,7 +11,11 @@ export default function CreateRequestPage() {
 
   const [loading, setLoading]               = useState(false);
   const [error, setError]                   = useState<string | null>(null);
-  const [customsAccepted, setCustomsAccepted] = useState(false);
+  const [customsAccepted,    setCustomsAccepted]    = useState(false);
+  const [personalEffects,    setPersonalEffects]    = useState(false);
+  const [underValueLimit,    setUnderValueLimit]    = useState(false);
+  const [noHighValue,        setNoHighValue]        = useState(false);
+  const [noProhibited,       setNoProhibited]       = useState(false);
 
   const [formData, setFormData] = useState({
     itemName: '', itemDescription: '', itemCategory: 'personal_effects',
@@ -60,8 +64,21 @@ export default function CreateRequestPage() {
         throw new Error('Please enter a price.');
 
       const isIntl = formData.pickupCountry !== formData.deliveryCountry;
-      if (isIntl && !customsAccepted)
-        throw new Error('You must acknowledge customs responsibilities for international deliveries.');
+      if (isIntl) {
+        if (!personalEffects)
+          throw new Error('International shipments via BootHop must be personal effects only.');
+        const val = Number(formData.itemValue);
+        if (val > 1000)
+          throw new Error('International personal effects must have a total declared value under £1,000. For higher-value shipments use our Business service.');
+        if (!underValueLimit)
+          throw new Error('Please confirm the total declared value is under £1,000.');
+        if (!noHighValue)
+          throw new Error('Please confirm no single item in this shipment exceeds £2,000.');
+        if (!noProhibited)
+          throw new Error('Please confirm the shipment contains no prohibited items.');
+        if (!customsAccepted)
+          throw new Error('Please accept your customs responsibilities for this international delivery.');
+      }
 
       const { data: request, error: reqErr } = await supabase
         .from('delivery_requests')
@@ -270,17 +287,56 @@ export default function CreateRequestPage() {
               rows={3} placeholder="Any special handling instructions…" className={inputCls} />
           </div>
 
-          {/* Customs checkbox (international only) */}
+          {/* International goods declaration (international routes only) */}
           {isInternational && (
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input type="checkbox" checked={customsAccepted}
-                onChange={(e) => setCustomsAccepted(e.target.checked)}
-                className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
-              <span className="text-sm text-slate-600">
-                I acknowledge my customs responsibilities for this international delivery and confirm
-                the item is legal to transport.
-              </span>
-            </label>
+            <div className="bg-white rounded-2xl border border-blue-100 shadow-sm p-6 space-y-4">
+              <h2 className="font-bold text-slate-900 flex items-center gap-2">
+                <Globe className="h-5 w-5 text-blue-600" /> International Goods Declaration
+              </h2>
+              <p className="text-sm text-slate-500">
+                BootHop carries <strong>personal effects only</strong> on international routes.
+                All items must comply with UK and destination country import rules.
+              </p>
+
+              {/* Value over-limit warning */}
+              {formData.itemValue && Number(formData.itemValue) > 1000 && (
+                <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl p-4">
+                  <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700 font-medium">
+                    Declared value exceeds £1,000. BootHop international routes are for personal effects under £1,000.
+                    For higher-value shipments please use our <a href="/business" className="underline">Business service</a>.
+                  </p>
+                </div>
+              )}
+
+              {/* Declarations */}
+              <div className="space-y-3">
+                {[
+                  { checked: personalEffects,  set: setPersonalEffects,  label: 'These are personal effects — clothing, gifts, documents, or household items for personal use (not commercial goods for resale)' },
+                  { checked: underValueLimit,  set: setUnderValueLimit,  label: 'The total declared value of all items combined is under £1,000' },
+                  { checked: noHighValue,      set: setNoHighValue,      label: 'No single item in this shipment has a value exceeding £2,000' },
+                  { checked: noProhibited,     set: setNoProhibited,     label: 'This shipment contains no prohibited items — no drugs, weapons, counterfeit goods, live animals, hazardous or flammable materials' },
+                  { checked: customsAccepted,  set: setCustomsAccepted,  label: 'I accept customs responsibility for this international delivery and confirm all declared details are accurate and truthful' },
+                ].map(({ checked, set, label }, i) => (
+                  <label key={i} className="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" checked={checked} onChange={(e) => set(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                    <span className="text-sm text-slate-600">{label}</span>
+                  </label>
+                ))}
+              </div>
+
+              {/* Duties estimator link */}
+              <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
+                <ShieldCheck className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                <p className="text-xs text-slate-400">
+                  Import duties and VAT may apply at destination.{' '}
+                  <a href="/customs/duties" className="text-blue-600 hover:underline font-medium">
+                    Estimate your landed cost →
+                  </a>
+                </p>
+              </div>
+            </div>
           )}
 
           <button
