@@ -49,7 +49,7 @@ export async function estimateDutyFromRules(
   const estimatedDuty = (valueGBP * dutyRate) / 100;
   const estimatedVAT = ((valueGBP + estimatedDuty) * vatRate) / 100;
   const handlingFee =
-    valueGBP > 10000
+    valueGBP > 2000
       ? Math.max(HANDLING_FEE_BASE, valueGBP * HANDLING_FEE_PERCENT)
       : HANDLING_FEE_BASE;
   const estimatedTotal = estimatedVAT + estimatedDuty + handlingFee;
@@ -81,10 +81,15 @@ export function assessRisk(
   const flags: string[] = [...(aiResult.flags ?? [])];
   const actions: string[] = [];
 
-  if (valueGBP > 50000)      riskScore += 40;
-  else if (valueGBP > 10000) riskScore += 30;
-  else if (valueGBP > 5000)  riskScore += 20;
-  else if (valueGBP > 1000)  riskScore += 10;
+  // BootHop platform limits: personal effects total <£1,000, no single item >£2,000
+  // AML review triggers only when declared value exceeds the platform's own item cap
+  const AML_THRESHOLD       = 2000;   // flags anything above platform single-item limit
+  const HIGH_VALUE_THRESHOLD = 1000;  // above personal effects total limit
+
+  if (valueGBP > 10000)                riskScore += 40;
+  else if (valueGBP > AML_THRESHOLD)   riskScore += 30;
+  else if (valueGBP > HIGH_VALUE_THRESHOLD) riskScore += 20;
+  else if (valueGBP > 500)             riskScore += 10;
 
   const highRisk   = ['jewellery_gold', 'watches_luxury', 'artwork'];
   const mediumRisk = ['luxury_bag', 'jewellery_silver', 'electronics'];
@@ -96,23 +101,23 @@ export function assessRisk(
     if (!flags.includes('UNCLASSIFIED_ITEM')) flags.push('UNCLASSIFIED_ITEM');
   }
 
-  const requiresAMLReview = valueGBP >= 10000;
+  const requiresAMLReview = valueGBP >= AML_THRESHOLD;
   if (requiresAMLReview) {
     riskScore += 20;
     if (!flags.includes('AML_THRESHOLD')) flags.push('AML_THRESHOLD');
-    actions.push('AML review required — admin must approve before shipment proceeds');
+    actions.push('Value exceeds platform limit — admin review required before shipment proceeds');
   }
 
   const invoiceCategories = ['luxury_bag', 'jewellery_gold', 'jewellery_silver', 'watches_luxury', 'artwork'];
   const requiresInvoice =
-    invoiceCategories.includes(aiResult.detectedCategory) || valueGBP > 5000;
+    invoiceCategories.includes(aiResult.detectedCategory) || valueGBP > HIGH_VALUE_THRESHOLD;
   if (requiresInvoice) {
     if (!flags.includes('NO_INVOICE')) flags.push('NO_INVOICE');
     actions.push('Invoice upload required before shipment proceeds');
   }
 
   const requiresEnhancedID =
-    valueGBP > 10000 ||
+    valueGBP > AML_THRESHOLD ||
     ['jewellery_gold', 'watches_luxury', 'artwork'].includes(aiResult.detectedCategory);
   if (requiresEnhancedID) {
     actions.push('Enhanced ID verification required');
