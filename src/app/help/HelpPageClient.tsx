@@ -15,7 +15,7 @@ const faqs = [
     items: [
       {
         q: 'What is BootHop?',
-        a: 'BootHop is a peer-to-peer delivery platform that connects verified travellers (Booters) with people who need items sent internationally (Hoopers). Instead of expensive couriers, your item travels with a real person going the same route.',
+        a: 'BootHop is a compliance-first logistics network that connects verified travellers and carriers (Booters) with people who need items delivered same-day or cross-border (Hoopers). Instead of expensive couriers, your item travels with a verified person going the same route — with AI customs screening and Stripe escrow protecting every movement.',
       },
       {
         q: 'What is a Booter?',

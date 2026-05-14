@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
 
   description:
-    'BootHop is the peer-to-peer international delivery platform that connects verified travellers with senders worldwide. Send parcels to Nigeria, Ghana, Kenya, Dubai and beyond — cheaper than couriers, faster than freight.',
+    'BootHop is a compliance-first logistics network connecting verified travellers, couriers, businesses, and consumers for same-day and cross-border delivery. Powered by AI-assisted customs screening, airport-enabled movement, and Stripe escrow on every transaction.',
 
   keywords: [
     // Core concept
@@ -56,8 +56,8 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title:       'BootHop – Peer-to-Peer International Delivery',
-    description: 'Connect with verified travellers to send items worldwide — London to Lagos, UK to Dubai and beyond — at a fraction of courier costs.',
+    title:       'BootHop | Same-Day & Cross-Border Logistics Network',
+    description: 'BootHop is a compliance-first logistics network connecting verified travellers, couriers, businesses, and consumers for same-day and cross-border delivery. Powered by AI-assisted customs screening, airport-enabled movement, and Stripe escrow on every transaction.',
     type:        'website',
     siteName:    'BootHop',
     url:         APP_URL,
@@ -83,7 +83,7 @@ export const metadata: Metadata = {
     site:        '@boothop',
     creator:     '@boothop',
     title:       'BootHop – Ship Anything. Anywhere.',
-    description: 'The peer-to-peer logistics platform connecting travellers with senders worldwide.',
+    description: 'BootHop is a compliance-first logistics network connecting verified travellers, couriers, businesses, and consumers for same-day and cross-border delivery. AI customs screening and Stripe escrow on every transaction.',
     images:      ['/images/og-image.png'],
   },
 
@@ -122,7 +122,7 @@ const jsonLd = {
         height:       512,
       },
       description:
-        'BootHop connects verified travellers with people who need parcels delivered internationally, at a fraction of courier costs.',
+        'BootHop is a compliance-first logistics network delivering same-day, cross-border, and business logistics through verified travellers and couriers — with AI customs screening, Stripe escrow, and KYC on every movement.',
       foundingDate: '2024',
       areaServed:   'Worldwide',
       sameAs: [
@@ -154,9 +154,9 @@ const jsonLd = {
     {
       '@type':       'Service',
       '@id':         `${APP_URL}/#service`,
-      name:          'Peer-to-Peer International Parcel Delivery',
+      name:          'Compliance-First Same-Day & Cross-Border Delivery Network',
       provider:      { '@id': `${APP_URL}/#org` },
-      serviceType:   'Delivery Service',
+      serviceType:   'Logistics Network',
       category:      'Logistics',
       areaServed:    { '@type': 'Country', name: 'Worldwide' },
       hasOfferCatalog: {
