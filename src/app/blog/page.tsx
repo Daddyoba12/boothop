@@ -9,36 +9,42 @@ export const metadata: Metadata = {
   description: 'Insights on same-day delivery, cross-border logistics, diaspora shipping, customs compliance, and the future of community-powered delivery from the BootHop team.',
 };
 
-const BLOGGER_BLOG_ID  = process.env.BLOGGER_BLOG_ID  ?? '';
-const BLOGGER_API_KEY  = process.env.BLOGGER_API_KEY  ?? '';
+const BLOG_ID = process.env.BLOGGER_BLOG_ID ?? '8031835400295900689';
 
-interface BlogPost {
-  id: string;
-  title: string;
-  published: string;
-  url: string;
-  labels?: string[];
-  content: string;
+interface Entry {
+  id: { $t: string };
+  title: { $t: string };
+  published: { $t: string };
+  content: { $t: string };
+  category?: { term: string }[];
+  link: { rel: string; href: string }[];
 }
 
-async function getPosts(): Promise<BlogPost[]> {
-  if (!BLOGGER_BLOG_ID || !BLOGGER_API_KEY) return [];
+async function getPosts(): Promise<Entry[]> {
   try {
     const res = await fetch(
-      `https://www.googleapis.com/blogger/v3/blogs/${BLOGGER_BLOG_ID}/posts?key=${BLOGGER_API_KEY}&maxResults=20&fetchBodies=true&status=live`,
+      `https://www.blogger.com/feeds/${BLOG_ID}/posts/default?alt=json&max-results=20`,
       { next: { revalidate: 3600 } }
     );
     if (!res.ok) return [];
     const data = await res.json();
-    return data.items ?? [];
+    return data?.feed?.entry ?? [];
   } catch {
     return [];
   }
 }
 
+function postId(entry: Entry): string {
+  return entry.id.$t.split('post-')[1] ?? entry.id.$t;
+}
+
+function postUrl(entry: Entry): string {
+  const alt = entry.link.find(l => l.rel === 'alternate');
+  return alt?.href ?? '#';
+}
+
 function excerpt(html: string, maxChars = 180): string {
-  const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-  return text.length > maxChars ? text.slice(0, maxChars).trimEnd() + '…' : text;
+  return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, maxChars).trimEnd() + '…';
 }
 
 function firstImage(html: string): string | null {
@@ -78,28 +84,25 @@ export default async function BlogPage() {
         {posts.length === 0 ? (
           <div className="text-center py-24 text-slate-500">
             <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-30" />
-            <p className="text-lg">Posts coming soon.</p>
+            <p className="text-lg font-semibold text-slate-400">First post coming soon.</p>
+            <p className="text-sm mt-2">Check back shortly.</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.map((post, i) => {
-              const img = firstImage(post.content);
-              const slug = encodeURIComponent(post.id);
+            {posts.map((entry) => {
+              const img = firstImage(entry.content.$t);
+              const labels = entry.category?.map(c => c.term) ?? [];
+              const slug = postId(entry);
               return (
                 <Link
-                  key={post.id}
+                  key={slug}
                   href={`/blog/${slug}`}
                   className="group relative overflow-hidden rounded-2xl border border-white/8 bg-white/3 hover:border-blue-500/30 hover:bg-white/5 hover:-translate-y-1 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 flex flex-col"
                 >
-                  {/* Cover image */}
                   {img ? (
                     <div className="relative h-48 overflow-hidden">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={img}
-                        alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+                      <img src={img} alt={entry.title.$t} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent" />
                     </div>
                   ) : (
@@ -109,10 +112,9 @@ export default async function BlogPage() {
                   )}
 
                   <div className="p-6 flex flex-col flex-1">
-                    {/* Labels */}
-                    {post.labels && post.labels.length > 0 && (
+                    {labels.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mb-3">
-                        {post.labels.slice(0, 3).map(label => (
+                        {labels.slice(0, 3).map(label => (
                           <span key={label} className="inline-flex items-center gap-1 text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full">
                             <Tag className="h-2.5 w-2.5" />{label}
                           </span>
@@ -120,20 +122,20 @@ export default async function BlogPage() {
                       </div>
                     )}
 
-                    <h2 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors duration-300 mb-2 leading-snug flex-1">
-                      {post.title}
+                    <h2 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors mb-2 leading-snug flex-1">
+                      {entry.title.$t}
                     </h2>
 
                     <p className="text-sm text-slate-400 leading-relaxed mb-4">
-                      {excerpt(post.content)}
+                      {excerpt(entry.content.$t)}
                     </p>
 
                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
                       <div className="flex items-center gap-1.5 text-xs text-slate-500">
                         <Calendar className="h-3.5 w-3.5" />
-                        {formatDate(post.published)}
+                        {formatDate(entry.published.$t)}
                       </div>
-                      <span className="text-xs font-semibold text-blue-400 flex items-center gap-1 group-hover:gap-2 transition-all duration-300">
+                      <span className="text-xs font-semibold text-blue-400 flex items-center gap-1 group-hover:gap-2 transition-all">
                         Read <ArrowRight className="h-3 w-3" />
                       </span>
                     </div>
