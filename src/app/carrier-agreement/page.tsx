@@ -33,11 +33,11 @@ export default function CarrierAgreementPage() {
         {/* Download button */}
         <div className="flex flex-wrap gap-4 mb-12">
           <a
-            href="/docs/carrier-agreement.docx"
+            href="/docs/carrier-agreement.pdf"
             download
             className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold px-6 py-3 rounded-xl hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 transition-all duration-300"
           >
-            <Download className="h-4 w-4" /> Download Full Agreement (.docx)
+            <Download className="h-4 w-4" /> Download Full Agreement (.pdf)
           </a>
           <a
             href="/docs/general-terms-of-service.pdf"
