@@ -134,8 +134,8 @@ export default function ContactPage() {
             <p className="relative text-sm text-slate-400 leading-relaxed mb-2">
               Speak directly with the BootHop team.
             </p>
-            <a href="tel:+44115661282" className="text-green-400 font-bold text-base hover:text-green-300 transition-colors hover:underline">
-              +44 115 661 282
+            <a href="tel:+447506553755" className="text-green-400 font-bold text-base hover:text-green-300 transition-colors hover:underline">
+              +44 7506 553 755
             </a>
             <p className="text-xs text-slate-500 mt-1">Mon – Fri, 9am – 6pm GMT</p>
           </div>

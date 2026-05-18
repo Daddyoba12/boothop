@@ -119,10 +119,10 @@ export default function BusinessContactPage() {
                 Speak directly with the BootHop business team. Mon – Fri, 9am – 6pm GMT.
               </p>
               <a
-                href="tel:+44115661282"
+                href="tel:+447506553755"
                 className="inline-flex items-center gap-2 text-green-400 font-bold text-base hover:text-green-300 transition-colors hover:underline"
               >
-                <Phone className="h-4 w-4" /> +44 115 661 282
+                <Phone className="h-4 w-4" /> +44 7506 553 755
               </a>
             </div>
 
