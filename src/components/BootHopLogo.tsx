@@ -37,13 +37,17 @@ export default function BootHopLogo({
       onTouchEnd={() => setPressed(false)}
     >
       <Image
-        src="/images/logoMainBoothop-transparent.png"
+        src="/images/logoMainBoothop-light.png"
         alt="BootHop"
         width={w}
         height={h}
         priority
-        className="object-contain drop-shadow-md"
-        style={{ maxHeight: h, width: 'auto' }}
+        className="object-contain"
+        style={{
+          maxHeight: h,
+          width: 'auto',
+          filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.15)) drop-shadow(0 1px 3px rgba(0,0,0,0.4))',
+        }}
       />
     </span>
   );
