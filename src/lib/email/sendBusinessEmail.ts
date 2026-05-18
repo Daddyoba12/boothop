@@ -11,7 +11,7 @@ function header() {
 
 function footer(extra = '') {
   return `<p style="font-size:13px;color:#94a3b8;border-top:1px solid #f1f5f9;padding-top:16px;margin:24px 0 0;">
-    ${extra}Questions? Reply to this email or contact <a href="mailto:support@boothop.com" style="color:#059669;">support@boothop.com</a>
+    ${extra}Questions? Reply to this email or contact <a href="mailto:info@boothop.com" style="color:#059669;">info@boothop.com</a>
   </p>`;
 }
 

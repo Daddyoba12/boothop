@@ -109,7 +109,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
 
     ${bodyText('Your account is verified and ready to go. Complete your profile to build trust with the community.')}
     ${button('Get Started →', `${APP_URL}/dashboard`)}
-    ${bodyText('Need help? Our support team is always here for you at <a href="mailto:support@boothop.com" style="color:#00b4d8;">support@boothop.com</a>')}
+    ${bodyText('Need help? Our support team is always here for you at <a href="mailto:info@boothop.com" style="color:#00b4d8;">info@boothop.com</a>')}
   `);
 
   return getResend().emails.send({
@@ -286,7 +286,7 @@ export async function sendPasswordResetEmail(to: string, name: string, resetUrl:
 
     <div style="background:#0d2a3d;border-radius:12px;padding:16px;margin-top:24px;border-left:4px solid #f59e0b;">
       <p style="color:#f59e0b;font-size:13px;margin:0;font-weight:600;">⚠️ Security Notice</p>
-      <p style="color:#b8d4e3;font-size:13px;margin:8px 0 0;">BootHop will never ask for your password via email or phone. If you\'re concerned about your account security, contact us at <a href="mailto:support@boothop.com" style="color:#00b4d8;">support@boothop.com</a></p>
+      <p style="color:#b8d4e3;font-size:13px;margin:8px 0 0;">BootHop will never ask for your password via email or phone. If you\'re concerned about your account security, contact us at <a href="mailto:info@boothop.com" style="color:#00b4d8;">info@boothop.com</a></p>
     </div>
   `);
 

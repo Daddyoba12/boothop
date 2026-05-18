@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       console.error('upload-document storage error:', uploadError);
       // If bucket doesn't exist, give a clear message
       if (uploadError.message?.includes('Bucket not found') || uploadError.message?.includes('not found')) {
-        return NextResponse.json({ error: 'Document storage not yet configured. Please email documents to support@boothop.com.' }, { status: 503 });
+        return NextResponse.json({ error: 'Document storage not yet configured. Please email documents to info@boothop.com.' }, { status: 503 });
       }
       throw uploadError;
     }

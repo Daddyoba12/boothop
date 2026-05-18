@@ -2,7 +2,7 @@ import { Resend } from 'resend';
 
 const from       = process.env.AUTH_FROM_EMAIL  || 'BootHop <noreply@boothop.com>';
 const appUrl     = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
-const supportEmail = process.env.SUPPORT_EMAIL  || 'support@boothop.com';
+const supportEmail = process.env.SUPPORT_EMAIL  || 'info@boothop.com';
 const whatsappNo   = process.env.WHATSAPP_NUMBER || '';
 
 export async function sendFollowUpUnmatchedEmail(params: {

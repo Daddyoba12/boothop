@@ -76,7 +76,7 @@ export async function POST(request: Request) {
     await supabase.from('journey_drafts').update({ status: 'published' }).eq('id', draftId);
 
     // Notify support of new trip (non-blocking)
-    const supportEmail = process.env.SUPPORT_EMAIL || 'support@boothop.com';
+    const supportEmail = process.env.SUPPORT_EMAIL || 'info@boothop.com';
     const typeLabel    = draft.type === 'travel' ? 'Booter (traveller)' : 'Hooper (sender)';
     const appUrl       = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
     const from         = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';

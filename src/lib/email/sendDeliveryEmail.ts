@@ -127,7 +127,7 @@ export async function sendDeliveryEscalationEmail(params: {
 }) {
   const resend     = new Resend(process.env.RESEND_API_KEY);
   const confirmUrl = `${appUrl}/confirm?token=${params.confirmToken}`;
-  const supportEmail = process.env.SUPPORT_EMAIL || 'support@boothop.com';
+  const supportEmail = process.env.SUPPORT_EMAIL || 'info@boothop.com';
   const isSender   = params.role === 'sender';
   await resend.emails.send({
     from,

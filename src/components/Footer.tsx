@@ -71,8 +71,14 @@ export default function Footer() {
         <div className="mt-6 flex flex-col gap-3 border-t border-white/5 pt-6 md:flex-row md:items-center md:justify-between">
           <p className="text-xs text-white/25">© {new Date().getFullYear()} BootHop Ltd. All rights reserved.</p>
           <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-white/30">
-            {[['Terms', '/terms'], ['Privacy', '/privacy'], ['Cookies', '/cookie-policy']].map(([label, href]) => (
-              <Link key={href} href={href} className="hover:text-white/60 transition-colors">{label}</Link>
+            {[
+              ['Terms', '/terms'],
+              ['Privacy', '/privacy'],
+              ['Cookies', '/cookie-policy'],
+              ['Trust & Safety', '/trust-safety'],
+              ['Carrier Agreement', '/carrier-agreement'],
+            ].map(([label, href]) => (
+              <Link key={href} href={href} scroll={true} className="hover:text-white/60 transition-colors">{label}</Link>
             ))}
           </div>
           <div className="flex items-center gap-1.5">

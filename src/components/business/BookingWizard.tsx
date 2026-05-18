@@ -346,8 +346,8 @@ function DangerousGoodsModal({ onClose }: { onClose: () => void }) {
           We cannot accept dangerous goods through the standard booking portal. Your consignment requires manual assessment before we can accept it.
         </p>
         <div className="space-y-3">
-          <a href="mailto:support@boothop.com" className="flex items-center justify-center gap-2 w-full bg-red-500/10 border border-red-500/25 text-red-400 font-bold text-sm px-4 py-3 rounded-xl hover:bg-red-500/20 transition-all">
-            <Mail className="h-4 w-4" /> support@boothop.com
+          <a href="mailto:info@boothop.com" className="flex items-center justify-center gap-2 w-full bg-red-500/10 border border-red-500/25 text-red-400 font-bold text-sm px-4 py-3 rounded-xl hover:bg-red-500/20 transition-all">
+            <Mail className="h-4 w-4" /> info@boothop.com
           </a>
           <a href="/api/whatsapp" className="flex items-center justify-center gap-2 w-full bg-[#25D366]/10 border border-[#25D366]/25 text-[#25D366] font-bold text-sm px-4 py-3 rounded-xl hover:bg-[#25D366]/20 transition-all">
             <Phone className="h-4 w-4" /> Contact via WhatsApp
@@ -897,7 +897,7 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
           <div className="p-4 bg-red-500/10 border border-red-500/25 rounded-xl">
             <p className="text-sm font-bold text-red-400 mb-2">Dangerous goods — contact us before submitting</p>
             <div className="space-y-2">
-              <a href="mailto:support@boothop.com" className="flex items-center gap-2 text-xs text-red-400/80 hover:text-red-400 transition-colors"><Mail className="h-3.5 w-3.5" /> support@boothop.com</a>
+              <a href="mailto:info@boothop.com" className="flex items-center gap-2 text-xs text-red-400/80 hover:text-red-400 transition-colors"><Mail className="h-3.5 w-3.5" /> info@boothop.com</a>
               <a href="/api/whatsapp" className="flex items-center gap-2 text-xs text-[#25D366]/80 hover:text-[#25D366] transition-colors"><Phone className="h-3.5 w-3.5" /> WhatsApp</a>
             </div>
           </div>

@@ -134,7 +134,7 @@ const jsonLd = {
       contactPoint: {
         '@type':            'ContactPoint',
         contactType:        'customer support',
-        email:              'support@boothop.com',
+        email:              'info@boothop.com',
         availableLanguage:  'English',
       },
     },

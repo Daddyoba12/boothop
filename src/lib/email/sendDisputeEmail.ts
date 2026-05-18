@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 const from         = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 const appUrl       = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
 const adminEmail   = process.env.ADMIN_EMAIL   || 'admin@boothop.com';
-const supportEmail = process.env.SUPPORT_EMAIL || 'support@boothop.com';
+const supportEmail = process.env.SUPPORT_EMAIL || 'info@boothop.com';
 
 export async function sendDisputeRaisedAdminEmail(params: {
   disputeId:     string;

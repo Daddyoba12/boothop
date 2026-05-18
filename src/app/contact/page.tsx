@@ -116,8 +116,8 @@ export default function ContactPage() {
             </div>
             <p className="relative text-sm text-slate-400 leading-relaxed">
               Reach us directly at{' '}
-              <a href="mailto:support@boothop.com" className="text-cyan-400 font-medium hover:underline">
-                support@boothop.com
+              <a href="mailto:info@boothop.com" className="text-cyan-400 font-medium hover:underline">
+                info@boothop.com
               </a>
             </p>
           </div>
@@ -134,8 +134,8 @@ export default function ContactPage() {
             <p className="relative text-sm text-slate-400 leading-relaxed mb-2">
               Speak directly with the BootHop team.
             </p>
-            <a href="tel:+447506553755" className="text-green-400 font-bold text-base hover:text-green-300 transition-colors hover:underline">
-              +44 7506 553 755
+            <a href="tel:+441156612820" className="text-green-400 font-bold text-base hover:text-green-300 transition-colors hover:underline">
+              +44 115 661 282
             </a>
             <p className="text-xs text-slate-500 mt-1">Mon – Fri, 9am – 6pm GMT</p>
           </div>
@@ -223,7 +223,7 @@ export default function ContactPage() {
               {status === 'error' && (
                 <div className="flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
                   <AlertCircle className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-red-300">Something went wrong. Please email us directly at support@boothop.com</p>
+                  <p className="text-sm text-red-300">Something went wrong. Please email us directly at info@boothop.com</p>
                 </div>
               )}
 
