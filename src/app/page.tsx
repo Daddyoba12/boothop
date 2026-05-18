@@ -31,6 +31,7 @@ const navLinks = [
   { href: '/about', label: 'About' },
   { href: '/trust-safety', label: 'Trust & Safety' },
   { href: '/journeys', label: 'Live Journeys' },
+  { href: '/blog', label: 'Blog' },
   { href: '/business', label: 'For Business' },
 ];
 
