@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Mail, MessageCircle, Clock, CheckCircle, AlertCircle, ArrowRight, Sparkles, Shield } from 'lucide-react';
+import { Mail, MessageCircle, Clock, CheckCircle, AlertCircle, ArrowRight, Sparkles, Shield, Phone } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
@@ -120,6 +120,24 @@ export default function ContactPage() {
                 support@boothop.com
               </a>
             </p>
+          </div>
+
+          <div className="reveal d1b group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:border-green-500/50 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-green-500/15 active:scale-[0.98] cursor-pointer">
+            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-green-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-green-500/50 transition-transform duration-300 group-hover:scale-110">
+                <Phone className="h-4 w-4 text-white" />
+              </div>
+              <h3 className="font-bold text-white group-hover:text-green-400 transition-colors duration-300">Call Us</h3>
+            </div>
+            <p className="relative text-sm text-slate-400 leading-relaxed mb-2">
+              Speak directly with the BootHop team.
+            </p>
+            <a href="tel:+44115661282" className="text-green-400 font-bold text-base hover:text-green-300 transition-colors hover:underline">
+              +44 115 661 282
+            </a>
+            <p className="text-xs text-slate-500 mt-1">Mon – Fri, 9am – 6pm GMT</p>
           </div>
 
           <div className="reveal d2 group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:border-emerald-500/50 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/15 active:scale-[0.98] cursor-pointer touch-emerald">

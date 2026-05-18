@@ -104,6 +104,28 @@ export default function BusinessContactPage() {
               </a>
             </div>
 
+            {/* Phone card */}
+            <div className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 transition-all duration-300 hover:border-green-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-green-500/10 active:scale-[0.98]">
+              <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-green-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                  <Phone className="h-4 w-4 text-green-400" />
+                </div>
+                <p className="text-white font-bold group-hover:text-green-300 transition-colors duration-300">
+                  Call Us
+                </p>
+              </div>
+              <p className="text-white/40 text-sm leading-relaxed mb-3">
+                Speak directly with the BootHop business team. Mon – Fri, 9am – 6pm GMT.
+              </p>
+              <a
+                href="tel:+44115661282"
+                className="inline-flex items-center gap-2 text-green-400 font-bold text-base hover:text-green-300 transition-colors hover:underline"
+              >
+                <Phone className="h-4 w-4" /> +44 115 661 282
+              </a>
+            </div>
+
             {/* WhatsApp card */}
             <div className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98]">
               <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
