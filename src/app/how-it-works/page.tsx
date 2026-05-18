@@ -387,6 +387,34 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
+      {/* ── HOW IT WORKS VIDEO ── */}
+      <section className="px-6 py-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
+              See It In{' '}
+              <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                Action
+              </span>
+            </h2>
+            <p className="text-slate-400 text-lg">Watch the full walkthrough — from posting a trip to delivery confirmed</p>
+          </div>
+          <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-blue-500/20"
+               style={{ paddingBottom: '56.25%', height: 0 }}>
+            <iframe
+              src="https://www.youtube.com/embed/cAngo9irSSs?rel=0&modestbranding=1&color=white"
+              title="How BootHop Works — Step by Step"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute top-0 left-0 w-full h-full"
+            />
+          </div>
+          <p className="text-center text-sm text-slate-500 mt-4">
+            How BootHop Works — Step by Step · 2m 48s
+          </p>
+        </div>
+      </section>
+
       {/* ── TRUST LINK CARD ── */}
       <section className="px-6 py-8">
         <div className="max-w-5xl mx-auto">
