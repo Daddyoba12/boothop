@@ -70,9 +70,9 @@ export const metadata: Metadata = {
         alt:    'BootHop – Ship Anything. Anywhere.',
       },
       {
-        url:    '/images/boothop1.png',
-        width:  512,
-        height: 512,
+        url:    '/images/logoMainBoothop.png',
+        width:  1536,
+        height: 1024,
         alt:    'BootHop logo',
       },
     ],
@@ -117,7 +117,7 @@ const jsonLd = {
       url:     APP_URL,
       logo: {
         '@type':      'ImageObject',
-        url:          `${APP_URL}/images/boothop1.png`,
+        url:          `${APP_URL}/images/logoMainBoothop.png`,
         width:        512,
         height:       512,
       },
@@ -218,7 +218,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="apple-touch-icon" href="/images/boothop1.png" />
+        <link rel="apple-touch-icon" href="/images/logoMainBoothop.png" />
         <link rel="canonical" href={APP_URL} />
 
         {/* Preconnect to critical origins */}
