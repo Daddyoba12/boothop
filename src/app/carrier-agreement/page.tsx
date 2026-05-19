@@ -79,7 +79,7 @@ export default function CarrierAgreementPage() {
             },
             {
               title: 'Liability',
-              body: 'You accept liability for loss, damage, or delay caused by your negligence or breach of this agreement. BootHop's liability is limited to the platform technology and does not extend to the goods being transported. Shipment insurance is available at point of booking and is strongly recommended.'
+              body: "You accept liability for loss, damage, or delay caused by your negligence or breach of this agreement. BootHop's liability is limited to the platform technology and does not extend to the goods being transported. Shipment insurance is available at point of booking and is strongly recommended."
             },
             {
               title: 'Platform Rules',
