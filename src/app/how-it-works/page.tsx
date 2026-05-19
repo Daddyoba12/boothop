@@ -114,7 +114,7 @@ export default function HowItWorksPage() {
     { num: '02', title: 'Browse Requests',   desc: 'See curated delivery requests along your exact route from verified senders.', icon: '🔍', image: '/images/GoingonHols.jpg' },
     { num: '03', title: 'Agree on Terms',    desc: 'Confirm price and compliance through secure messaging.', icon: '🤝', image: '/images/meetup1.jpg' },
     { num: '04', title: 'Collect & Deliver', desc: 'Meet sender, carry item, deliver safely.', icon: '📦', image: '/images/Handover.jpg' },
-    { num: '05', title: 'Get Paid',          desc: 'Payment released instantly after confirmation.', icon: '💰', image: '/images/TrustedComm.jpg' },
+    { num: '05', title: 'Get Paid',          desc: 'Payment released 4 hours after confirmed delivery — only if no dispute is raised.', icon: '💰', image: '/images/TrustedComm.jpg' },
   ];
 
   const hooperSteps = [
