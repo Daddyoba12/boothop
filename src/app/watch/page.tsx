@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 // When video ends, redirect to homepage
 // QR code on business card points here: www.boothop.com/watch
-const VIDEO_ID = 'cAngo9irSSs';
+const VIDEO_ID = 'WrBap-JjCH4';
 
 export default function WatchPage() {
   useEffect(() => {

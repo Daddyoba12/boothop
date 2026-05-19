@@ -402,7 +402,7 @@ export default function HowItWorksPage() {
           <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-blue-500/20"
                style={{ paddingBottom: '56.25%', height: 0 }}>
             <iframe
-              src="https://www.youtube.com/embed/cAngo9irSSs?rel=0&modestbranding=1&color=white"
+              src="https://www.youtube.com/embed/WrBap-JjCH4?rel=0&modestbranding=1&color=white"
               title="How BootHop Works — Step by Step"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
