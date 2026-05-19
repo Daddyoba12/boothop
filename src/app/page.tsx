@@ -301,7 +301,7 @@ function HomePageContent() {
     return () => clearInterval(id);
   }, []);
 
-  const trustItems = useMemo(() => ['Identity verified', 'Secure escrow', '95% satisfaction', 'Free to join'], []);
+  const trustItems = useMemo(() => ['Identity verified', 'Secure escrow', 'GDPR compliant', 'Customs screened', 'Cross-border ready', 'Free to join'], []);
 
   const resetForm = () => {
     setTrip({ from: '', to: '', date: '', price: '', email: '', weight: '' });
@@ -457,19 +457,26 @@ function HomePageContent() {
                 Free to join · No subscription · No hidden fees
               </div>
 
-              <p className="text-white/80 text-lg mb-3 max-w-xl leading-relaxed">
+              <p className="text-white/80 text-lg mb-1 max-w-xl leading-relaxed">
                 Your fastest delivery option is already moving.
               </p>
+              <p className="text-white/55 text-sm mb-3 max-w-xl">
+                Powered by verified travellers, couriers, and logistics partners across the UK &amp; Europe.
+              </p>
               <p className="text-white/55 text-sm mb-7">
-                UK &amp; Europe · Hand-carried by verified travellers · <Link href="/trust-safety" className="underline underline-offset-2 hover:text-white/80 transition-colors">What can I send?</Link>
+                Compliance-first logistics for same-day and cross-border delivery. · <Link href="/trust-safety" className="underline underline-offset-2 hover:text-white/80 transition-colors">What can I send?</Link>
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-wrap gap-4 mb-4">
+              <div className="flex flex-wrap gap-3 mb-4">
                 <Link href="#booking-form"
                   onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
                   className="px-7 py-3 rounded-full bg-white text-black font-semibold text-sm hover:scale-105 hover:shadow-[0_12px_32px_rgba(255,255,255,0.2)] transition-all">
                   Send a Package
+                </Link>
+                <Link href="/register?type=booter"
+                  className="px-7 py-3 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-sm font-medium hover:bg-emerald-500/30 transition-all">
+                  Earn as a Traveller
                 </Link>
                 <Link href="/business"
                   className="px-7 py-3 rounded-full border border-white/30 text-white text-sm font-medium hover:bg-white/10 transition-all">
@@ -489,7 +496,7 @@ function HomePageContent() {
 
               {/* Micro How It Works */}
               <div className="flex flex-wrap items-center gap-2 text-white/45 text-sm mb-6">
-                {['Post', 'Match', 'Meet', 'Deliver'].map((step, i, arr) => (
+                {['Post', 'Match', 'Handoff', 'Deliver'].map((step, i, arr) => (
                   <span key={step} className="flex items-center gap-2">
                     <span className="text-white/70 font-medium">{step}</span>
                     {i < arr.length - 1 && <ArrowRight className="h-3 w-3 text-white/25" />}
@@ -501,7 +508,8 @@ function HomePageContent() {
               <div className="flex flex-wrap gap-5 text-white/55 text-xs">
                 <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Identity verified</span>
                 <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Secure escrow</span>
-                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />95% satisfaction rate</span>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />GDPR &amp; customs compliant</span>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Cross-border ready</span>
               </div>
             </div>
 

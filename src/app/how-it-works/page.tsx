@@ -397,21 +397,27 @@ export default function HowItWorksPage() {
                 Action
               </span>
             </h2>
-            <p className="text-slate-400 text-lg">Watch the full walkthrough — from posting a trip to delivery confirmed</p>
+            <p className="text-slate-400 text-lg">Watch the full walkthrough — 2m 50s</p>
           </div>
-          <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-blue-500/20"
-               style={{ paddingBottom: '56.25%', height: 0 }}>
-            <iframe
-              src="https://www.youtube.com/embed/WrBap-JjCH4?rel=0&modestbranding=1&color=white"
-              title="How BootHop Works — Step by Step"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute top-0 left-0 w-full h-full"
-            />
-          </div>
-          <p className="text-center text-sm text-slate-500 mt-4">
-            How BootHop Works — Step by Step · 2m 48s
-          </p>
+
+          {/* Clickable card — links to /watch, plays video then returns to boothop.com */}
+          <Link href="/watch"
+            className="group relative block rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-blue-500/20 hover:border-blue-500/40 hover:shadow-blue-500/30 transition-all duration-300 cursor-pointer">
+            <div className="relative bg-gradient-to-br from-slate-900 via-blue-950/30 to-slate-900"
+                 style={{ paddingBottom: '56.25%' }}>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/10 border border-white/20 backdrop-blur-sm group-hover:bg-blue-500/30 group-hover:border-blue-400/50 group-hover:scale-110 transition-all duration-300">
+                  <svg viewBox="0 0 24 24" fill="white" className="h-9 w-9 ml-1">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </div>
+                <div className="text-center px-4">
+                  <p className="text-white font-bold text-xl mb-1">How BootHop Works</p>
+                  <p className="text-slate-400 text-sm">Step by Step · 2m 50s · After watching, you&apos;ll return to BootHop</p>
+                </div>
+              </div>
+            </div>
+          </Link>
         </div>
       </section>
 
