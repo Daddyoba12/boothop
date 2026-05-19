@@ -775,7 +775,7 @@ function HomePageContent() {
               </div>
               <div className="relative pb-4">
                 <label className="block text-xs text-white/40 mb-1.5 pl-1">Travel / send date</label>
-                <input type="date" value={trip.date} min={new Date().toISOString().split('T')[0]}
+                <input type="date" value={trip.date} min={(() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; })()}
                   onChange={(e) => { setTrip({ ...trip, date: e.target.value }); setFormErrors(p => ({ ...p, date: '' })); }}
                   className={`${inputClass} [color-scheme:dark] ${formErrors.date ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
                 {formErrors.date && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.date}</p>}

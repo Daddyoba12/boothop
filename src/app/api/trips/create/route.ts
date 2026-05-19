@@ -19,6 +19,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Enforce minimum tomorrow — no same-day or past bookings
+    const tripDate = new Date(date);
+    const tomorrow = new Date();
+    tomorrow.setHours(0, 0, 0, 0);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    if (tripDate < tomorrow) {
+      return NextResponse.json(
+        { error: 'Trip date must be at least tomorrow. Same-day bookings are not accepted.' },
+        { status: 400 }
+      );
+    }
+
     const priceNum = parseFloat(String(price || '0').replace(/[^0-9.]/g, '')) || null;
 
     // Auto-translate from/to if non-English (best-effort — never blocks trip creation)

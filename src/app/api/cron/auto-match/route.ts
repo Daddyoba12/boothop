@@ -105,13 +105,17 @@ export async function GET(request: Request) {
 async function runAutoMatch() {
 
   const supabase = createSupabaseAdminClient();
-  const today    = new Date().toISOString().split('T')[0];
+
+  // Only match trips from tomorrow onwards — same-day bookings give zero time to coordinate
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
   /* Fetch all future trips — active or NULL status (old trips before status field existed).
      .not('in') silently drops NULLs in PostgreSQL so we use .or() instead. */
   const [{ data: senders, error: sendErr }, { data: travellers, error: travErr }] = await Promise.all([
-    supabase.from('trips').select('*').eq('type', 'send').or('status.eq.active,status.is.null').gte('travel_date', today),
-    supabase.from('trips').select('*').eq('type', 'travel').or('status.eq.active,status.is.null').gte('travel_date', today),
+    supabase.from('trips').select('*').eq('type', 'send').or('status.eq.active,status.is.null').gte('travel_date', tomorrowStr),
+    supabase.from('trips').select('*').eq('type', 'travel').or('status.eq.active,status.is.null').gte('travel_date', tomorrowStr),
   ]);
 
   if (sendErr || travErr) {

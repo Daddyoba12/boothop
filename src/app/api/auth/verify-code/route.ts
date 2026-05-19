@@ -82,6 +82,18 @@ export async function POST(request: Request) {
         payload: { ...p, user_id: userId, priceNum },
       }).then();
 
+      // Reject same-day and past bookings before inserting
+      const tripDate = new Date(p.date);
+      const tomorrow = new Date();
+      tomorrow.setHours(0, 0, 0, 0);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      if (p.date && tripDate < tomorrow) {
+        return NextResponse.json(
+          { error: 'Trip date must be at least tomorrow. Same-day bookings are not accepted.' },
+          { status: 400 }
+        );
+      }
+
       // Publish as a live trip
       const { error: tripErr } = await supabase.from('trips').insert({
         email,
