@@ -812,6 +812,54 @@ function HomePageContent() {
         </div>
       </section>
 
+      {/* ── BUSINESS SECTION — "Built for teams that move fast" ── */}
+      <section className="py-24 md:py-32 bg-[#030A15] border-t border-white/[0.05]">
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">Enterprise Logistics</p>
+              <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight mb-5">
+                Built for teams<br />that move fast
+              </h2>
+              <p className="text-white/55 text-base leading-relaxed mb-8">
+                When your business needs something moved today — not in three days — BootHop connects you with verified carriers already heading in the right direction.
+              </p>
+              <ul className="space-y-4 mb-8">
+                {[
+                  { icon: '📋', text: 'Compliance-screened carriers — customs declarations, GDPR, chain of custody' },
+                  { icon: '⚡', text: 'Same-day and next-flight delivery for critical items' },
+                  { icon: '🔒', text: 'Escrow-secured payments — funds held until confirmed delivery' },
+                  { icon: '🌍', text: 'UK domestic and cross-border EU corridors' },
+                  { icon: '📊', text: 'Audit trail and delivery confirmation for every shipment' },
+                ].map(({ icon, text }) => (
+                  <li key={text} className="flex items-start gap-3 text-sm text-white/65 list-none">
+                    <span className="text-lg shrink-0 mt-0.5">{icon}</span>
+                    <span>{text}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/business" className="inline-flex items-center gap-2 bg-blue-500 text-white px-7 py-3.5 rounded-full text-sm font-semibold hover:bg-blue-400 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.35)]">
+                Explore Business Portal <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { icon: '✈️', title: 'Aerospace & Aviation', body: 'Aircraft parts, AOGs, critical spares' },
+                { icon: '⚖️', title: 'Legal & Finance', body: 'Signed documents, contracts, evidence bundles' },
+                { icon: '💊', title: 'Medical & Pharma', body: 'Clinical samples, temperature-sensitive cargo' },
+                { icon: '💎', title: 'Luxury Retail', body: 'High-value goods with verified chain of custody' },
+              ].map(({ icon, title, body }) => (
+                <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 hover:border-white/20 hover:bg-white/[0.06] transition-all">
+                  <span className="text-2xl mb-3 block">{icon}</span>
+                  <p className="text-white font-semibold text-sm mb-1">{title}</p>
+                  <p className="text-white/40 text-xs leading-relaxed">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── HOW BOOTHOP WORKS ── */}
       <section className="py-24 md:py-32 bg-[#050D1A]">
         <div className="px-6 max-w-5xl mx-auto w-full">
@@ -1033,6 +1081,41 @@ function HomePageContent() {
 
 
 
+      {/* ── USE CASES — "What people use BootHop for" ── */}
+      <section className="py-24 md:py-32 bg-[#07111f]">
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+          <div className="text-center mb-14">
+            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">Use Cases</p>
+            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">What people use BootHop for</h2>
+            <p className="mt-4 text-white/45 text-base max-w-xl mx-auto">From urgent business deliveries to sending love home — BootHop moves what matters.</p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { icon: '⚙️', title: 'Business-Critical Parts', body: 'Aerospace components, AOG spares, engineering parts — same-day with full compliance documentation.', tag: 'B2B', tagColor: 'bg-blue-500/15 text-blue-300' },
+              { icon: '📄', title: 'Legal Documents', body: 'Signed contracts, court bundles, mortgage deeds — time-sensitive paperwork that cannot wait for a depot.', tag: 'B2B & Personal', tagColor: 'bg-violet-500/15 text-violet-300' },
+              { icon: '🧬', title: 'Medical & Pharmaceutical', body: 'Clinical samples, patient medication, medical devices — tracked and compliance-aware delivery.', tag: 'B2B', tagColor: 'bg-blue-500/15 text-blue-300' },
+              { icon: '🌍', title: 'Diaspora & Home Goods', body: 'Birthday gifts, food parcels, personal items — from family in the UK to loved ones across Africa and Europe.', tag: 'Consumer', tagColor: 'bg-emerald-500/15 text-emerald-300' },
+              { icon: '🛍️', title: 'Retail & E-Commerce', body: 'Overflow fulfilment, marketplace orders, boutique deliveries — where standard couriers are too slow or too costly.', tag: 'B2B', tagColor: 'bg-amber-500/15 text-amber-300' },
+              { icon: '🛫', title: 'Airport Hand-Carry', body: 'High-value or fragile items that need a human escort — carried personally, door to door.', tag: 'Premium', tagColor: 'bg-rose-500/15 text-rose-300' },
+            ].map(({ icon, title, body, tag, tagColor }) => (
+              <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 hover:border-white/20 hover:bg-white/[0.05] transition-all duration-300 hover:-translate-y-1">
+                <span className="text-3xl mb-4 block">{icon}</span>
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <p className="text-white font-semibold text-base">{title}</p>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${tagColor}`}>{tag}</span>
+                </div>
+                <p className="text-white/45 text-sm leading-relaxed">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Link href="/trust-safety" className="inline-flex items-center gap-2 text-sm text-white/35 hover:text-white/65 transition-colors">
+              See full permitted items list <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ── TESTIMONIALS ── */}
       <TestimonialsSection />
 
@@ -1050,6 +1133,9 @@ function HomePageContent() {
             Your package should<br />
             <span className="text-white/60">already be moving.</span>
           </h2>
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/40 mb-6">
+            🌍 Expanding: UK → Europe → Africa
+          </div>
           <p className="text-white/50 text-base mb-10 max-w-sm mx-auto leading-relaxed">
             Post in 30 seconds. Match with a verified traveller on their way now.
           </p>
