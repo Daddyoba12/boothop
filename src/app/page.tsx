@@ -223,6 +223,17 @@ function TransportCarousel() {
   );
 }
 
+function RegisteredRedirect({ loadTrips }: { loadTrips: () => void }) {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    if (searchParams.get('registered') === 'true') {
+      window.history.replaceState({}, '', '/');
+      loadTrips();
+    }
+  }, [searchParams, loadTrips]);
+  return null;
+}
+
 function HomePageContent() {
   useScrollReveal();
   const router = useRouter();
@@ -323,13 +334,7 @@ function HomePageContent() {
 
   useEffect(() => { loadTrips(); }, [loadTrips]);
 
-  const searchParams = useSearchParams();
-  useEffect(() => {
-    if (searchParams.get('registered') === 'true') {
-      window.history.replaceState({}, '', '/');
-      loadTrips();
-    }
-  }, [searchParams, loadTrips]);
+  // searchParams handled by RegisteredRedirect child (keeps this component out of Suspense)
 
   const handleSubmit = () => {
     const errors: Record<string, string> = {};
@@ -1166,22 +1171,14 @@ function HomePageContent() {
         <MessageCircle className="h-5 w-5 md:h-6 md:w-6" />
       </a>
 
+      <Suspense fallback={null}>
+        <RegisteredRedirect loadTrips={loadTrips} />
+      </Suspense>
       <Footer />
     </div>
   );
 }
 
 export default function HomePage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#07111f] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500/50 mx-auto mb-4" />
-          <p className="text-sm text-white/40">Loading BootHop...</p>
-        </div>
-      </div>
-    }>
-      <HomePageContent />
-    </Suspense>
-  );
+  return <HomePageContent />;
 }

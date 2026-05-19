@@ -41,6 +41,15 @@ export const metadata: Metadata = {
     'BootHop', 'boothop delivery', 'boothop shipping',
     // Trust / safety
     'verified traveller delivery', 'safe peer delivery', 'escrow parcel delivery',
+    // Compliance & customs
+    'customs clearance services', 'UK customs clearance', 'cross-border compliance', 'pre-departure customs screening',
+    // Business / enterprise
+    'on-board courier UK', 'time-critical logistics', 'OBC delivery service',
+    'small business international shipping', 'cross-border shipping UK',
+    'same day courier service UK', 'verified courier service',
+    // B2B
+    'business logistics UK', 'enterprise delivery network', 'critical parts delivery UK',
+    'AOG parts delivery', 'pharmaceutical courier UK', 'legal document courier UK',
   ],
 
   manifest: '/manifest.json',

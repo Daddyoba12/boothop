@@ -69,6 +69,68 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency:  'monthly',
       priority:         0.5,
     },
+    // ── Business ──────────────────────────────────────────────
+    {
+      url:              `${APP_URL}/business`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.9,
+    },
+    {
+      url:              `${APP_URL}/business/how-it-works`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.7,
+    },
+    {
+      url:              `${APP_URL}/business/pricing`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.7,
+    },
+    // ── Content ───────────────────────────────────────────────
+    {
+      url:              `${APP_URL}/about`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.7,
+    },
+    {
+      url:              `${APP_URL}/blog`,
+      lastModified:     now,
+      changeFrequency:  'weekly',
+      priority:         0.85,
+    },
+    {
+      url:              `${APP_URL}/blog/customs-clearance-services`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.8,
+    },
+    {
+      url:              `${APP_URL}/blog/small-business-cross-border-shipping`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.8,
+    },
+    {
+      url:              `${APP_URL}/blog/on-board-courier-time-critical-logistics`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.8,
+    },
+    {
+      url:              `${APP_URL}/watch`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.6,
+    },
+    {
+      url:              `${APP_URL}/carrier-agreement`,
+      lastModified:     now,
+      changeFrequency:  'yearly',
+      priority:         0.5,
+    },
     // ── Legal ─────────────────────────────────────────────────
     {
       url:              `${APP_URL}/terms`,
