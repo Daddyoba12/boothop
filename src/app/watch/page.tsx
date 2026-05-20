@@ -20,17 +20,11 @@ export default function WatchPage() {
         videoId: VIDEO_ID,
         playerVars: {
           autoplay: 1,
+          mute: 1,
           rel: 0,
           modestbranding: 1,
           color: 'white',
-        },
-        events: {
-          onStateChange: (event: any) => {
-            // State 0 = ended
-            if (event.data === 0) {
-              window.location.href = 'https://www.boothop.com';
-            }
-          },
+          playsinline: 1,
         },
       });
     };
@@ -65,11 +59,10 @@ export default function WatchPage() {
         </div>
 
         <p className="text-slate-500 text-xs mt-6 text-center">
-          Video will redirect to{' '}
+          Get started at{' '}
           <a href="https://www.boothop.com" className="text-blue-400 hover:underline">
             www.boothop.com
           </a>
-          {' '}when it ends
         </p>
       </div>
 

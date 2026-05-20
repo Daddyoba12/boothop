@@ -901,7 +901,17 @@ function HomePageContent() {
               </div>
             ))}
           </div>
-          <div className="mt-10 text-center">
+          {/* QR — scan to watch */}
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
+            <Link href="/watch"
+              className="group flex items-center gap-5 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-blue-500/30 hover:bg-blue-500/5 transition-all duration-300 px-6 py-4 cursor-pointer">
+              <Image src="/images/watch-qr.png" alt="Scan to watch" width={72} height={72} className="rounded-lg opacity-90 group-hover:opacity-100 transition-opacity" />
+              <div className="text-left">
+                <p className="text-white font-semibold text-sm mb-0.5">Watch how it works</p>
+                <p className="text-white/40 text-xs">Scan with your phone or click to play</p>
+                <p className="text-blue-400 text-xs mt-1.5 font-medium group-hover:text-blue-300 transition-colors">▶ Play video →</p>
+              </div>
+            </Link>
             <Link href="/how-it-works" className="inline-flex items-center gap-2 text-sm text-white/35 hover:text-white/65 transition-colors">
               Full process details <ArrowRight className="h-3.5 w-3.5" />
             </Link>
