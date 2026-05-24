@@ -42,7 +42,7 @@ async function runAutoPayout() {
     .from('matches')
     .select(`
       id, status, agreed_price, sender_email, traveler_email,
-      delivery_confirmed_at, updated_at,
+      updated_at,
       sender_trip:sender_trip_id(from_city, to_city)
     `)
     .eq('status', 'delivery_confirmed')
@@ -62,11 +62,19 @@ async function runAutoPayout() {
 
   for (const match of matches) {
     try {
-      // Mark as completed
-      const { error: updateErr } = await supabase
+      // Mark as completed (try with payment_released_at, fall back without)
+      let updateErr = (await supabase
         .from('matches')
         .update({ status: 'completed', payment_released_at: new Date().toISOString() })
-        .eq('id', match.id);
+        .eq('id', match.id)).error;
+
+      if (updateErr?.message?.includes('column') || updateErr?.code === 'PGRST204') {
+        const fallback = await supabase
+          .from('matches')
+          .update({ status: 'completed' })
+          .eq('id', match.id);
+        updateErr = fallback.error;
+      }
 
       if (updateErr) {
         console.error(`auto-payout update failed for match ${match.id}`, updateErr);
