@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Mail, MessageCircle, Clock, CheckCircle, AlertCircle, ArrowRight, Sparkles, Shield, Phone } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
@@ -20,7 +20,13 @@ const topics = [
 export default function ContactPage() {
   useScrollReveal();
   const [form, setForm] = useState({ name: '', email: '', topic: '', message: '' });
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'awaiting_verification' | 'sent' | 'error'>('idle');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('verified') === '1') setStatus('sent');
+    else if (params.get('error')) setStatus('error');
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +38,9 @@ export default function ContactPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
-      setStatus(res.ok ? 'sent' : 'error');
+      if (!res.ok) { setStatus('error'); return; }
+      const data = await res.json();
+      setStatus(data.pending === 'verify' ? 'awaiting_verification' : 'sent');
     } catch {
       setStatus('error');
     }
@@ -190,7 +198,27 @@ export default function ContactPage() {
 
         {/* CONTACT FORM */}
         <div className="md:col-span-3">
-          {status === 'sent' ? (
+          {status === 'awaiting_verification' ? (
+            <div className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-sm p-12 text-center">
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl" />
+              <div className="relative">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 shadow-lg shadow-blue-500/50">
+                  <Mail className="h-8 w-8 text-white" />
+                </div>
+                <h2 className="text-3xl font-black text-white mb-2">Check your inbox</h2>
+                <p className="text-slate-300 text-sm mb-2">
+                  We&apos;ve sent a verification link to <span className="text-cyan-400 font-semibold">{form.email}</span>.
+                </p>
+                <p className="text-slate-400 text-sm mb-8">Click the link in that email to submit your message to our support team.</p>
+                <button
+                  onClick={() => { setForm({ name: '', email: '', topic: '', message: '' }); setStatus('idle'); }}
+                  className="rounded-xl border border-white/20 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-all duration-300 hover:scale-105"
+                >
+                  Use a different email
+                </button>
+              </div>
+            </div>
+          ) : status === 'sent' ? (
             <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-sm p-12 text-center">
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-full blur-3xl" />
               <div className="relative">

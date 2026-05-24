@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
-const ACTIONABLE = ['payment_processing', 'delivery_confirmed', 'cancellation_requested', 'disputed'];
+const ACTIONABLE = ['awaiting_authorisation', 'payment_processing', 'delivery_confirmed', 'cancellation_requested', 'disputed'];
 
 export async function GET(request: NextRequest) {
   const url      = new URL(request.url);

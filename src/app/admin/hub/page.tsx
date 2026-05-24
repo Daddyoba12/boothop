@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   CheckCircle, XCircle, AlertTriangle, Clock,
-  Loader2, RefreshCw, DollarSign, Truck, Scale,
+  Loader2, RefreshCw, DollarSign, Truck, Scale, Globe,
 } from 'lucide-react';
 
 type Match = {
@@ -50,7 +50,7 @@ function AdminHubContent() {
   const searchParams = useSearchParams();
   const adminKey     = searchParams.get('adminKey');
 
-  const [tab,           setTab]           = useState<'payments' | 'disputes' | 'refunds'>('payments');
+  const [tab,           setTab]           = useState<'africa_auth' | 'payments' | 'disputes' | 'refunds'>('africa_auth');
   const [matches,       setMatches]       = useState<Match[]>([]);
   const [disputes,      setDisputes]      = useState<Dispute[]>([]);
   const [loading,       setLoading]       = useState(true);
@@ -116,6 +116,7 @@ function AdminHubContent() {
     load();
   };
 
+  const africaPending  = matches.filter(m => m.status === 'awaiting_authorisation');
   const paymentPending = matches.filter(m => m.status === 'payment_processing');
   const deliveryDone   = matches.filter(m => m.status === 'delivery_confirmed');
   const refundReqs     = matches.filter(m => m.status === 'cancellation_requested');
@@ -143,12 +144,13 @@ function AdminHubContent() {
         )}
 
         {/* Summary cards */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-5 gap-4 mb-8">
           {[
-            { label: 'Awaiting payment', count: paymentPending.length, icon: DollarSign, color: 'text-amber-400' },
-            { label: 'Release to carrier', count: deliveryDone.length, icon: Truck,      color: 'text-blue-400'  },
-            { label: 'Open disputes',     count: openDisputes.length,  icon: Scale,      color: 'text-red-400'   },
-            { label: 'Refund requests',   count: refundReqs.length,    icon: AlertTriangle, color: 'text-orange-400' },
+            { label: 'Africa auth',       count: africaPending.length, icon: Globe,         color: 'text-emerald-400' },
+            { label: 'Awaiting payment',  count: paymentPending.length,icon: DollarSign,    color: 'text-amber-400'   },
+            { label: 'Release to carrier',count: deliveryDone.length,  icon: Truck,         color: 'text-blue-400'    },
+            { label: 'Open disputes',     count: openDisputes.length,  icon: Scale,         color: 'text-red-400'     },
+            { label: 'Refund requests',   count: refundReqs.length,    icon: AlertTriangle, color: 'text-orange-400'  },
           ].map(({ label, count, icon: Icon, color }) => (
             <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <Icon className={`h-5 w-5 ${color} mb-2`} />
@@ -160,11 +162,20 @@ function AdminHubContent() {
 
         {/* Tabs */}
         <div className="flex gap-1 mb-6 bg-white/5 rounded-xl p-1">
-          {([['payments', 'Payments'], ['disputes', 'Disputes'], ['refunds', 'Refunds']] as const).map(([key, label]) => (
+          {([
+            ['africa_auth', `Africa Auth${africaPending.length ? ` (${africaPending.length})` : ''}`],
+            ['payments',    'Payments'],
+            ['disputes',    'Disputes'],
+            ['refunds',     'Refunds'],
+          ] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setTab(key)}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${tab === key ? 'bg-blue-600 text-white' : 'text-white/40 hover:text-white/70'}`}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                tab === key
+                  ? key === 'africa_auth' ? 'bg-emerald-600 text-white' : 'bg-blue-600 text-white'
+                  : 'text-white/40 hover:text-white/70'
+              }`}
             >
               {label}
             </button>
@@ -177,6 +188,75 @@ function AdminHubContent() {
           </div>
         ) : (
           <>
+            {/* ── AFRICA AUTH TAB ── */}
+            {tab === 'africa_auth' && (
+              <div className="space-y-4">
+                <h2 className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Globe className="h-3.5 w-3.5 text-emerald-400" /> Africa-outbound matches awaiting authorisation
+                </h2>
+                <p className="text-white/40 text-xs mb-4">These matches were auto-detected as originating in Africa. Neither party has been notified. Approve to send match emails and continue the normal flow, or reject to silently cancel.</p>
+                {africaPending.length === 0 && <p className="text-white/30 text-sm text-center py-10">No matches pending authorisation.</p>}
+                {africaPending.map(m => {
+                  const trip = m.sender_trip;
+                  return (
+                    <div key={m.id} className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full font-semibold mr-2">Africa outbound</span>
+                          <p className="text-white font-semibold mt-1">{trip ? `${trip.from_city} → ${trip.to_city}` : 'Unknown route'}</p>
+                          <p className="text-white/40 text-xs mt-0.5">{trip?.travel_date}</p>
+                        </div>
+                        <span className="text-emerald-400 font-bold text-lg">£{(m.agreed_price ?? 0).toFixed(2)}</span>
+                      </div>
+                      <div className="text-xs text-white/50 space-y-1 mb-4">
+                        <p>Sender: <span className="text-white/70">{m.sender_email}</span></p>
+                        <p>Carrier: <span className="text-white/70">{m.traveler_email}</span></p>
+                        <p className="text-white/30 text-xs mt-1">Match ID: {m.id}</p>
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={async () => {
+                            setActionLoading(m.id);
+                            const res = await fetch('/api/admin/authorise-match', {
+                              method:  'POST',
+                              headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey ?? '' },
+                              body:    JSON.stringify({ matchId: m.id, action: 'approve' }),
+                            });
+                            setFeedback(res.ok ? `Match approved — both parties notified.` : 'Error approving match.');
+                            setActionLoading(null);
+                            load();
+                          }}
+                          disabled={actionLoading === m.id}
+                          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all"
+                        >
+                          {actionLoading === m.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                          Approve &amp; notify parties
+                        </button>
+                        <button
+                          onClick={async () => {
+                            setActionLoading(m.id + '_reject');
+                            const res = await fetch('/api/admin/authorise-match', {
+                              method:  'POST',
+                              headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey ?? '' },
+                              body:    JSON.stringify({ matchId: m.id, action: 'reject' }),
+                            });
+                            setFeedback(res.ok ? 'Match rejected and cancelled.' : 'Error rejecting match.');
+                            setActionLoading(null);
+                            load();
+                          }}
+                          disabled={actionLoading === m.id + '_reject'}
+                          className="flex items-center gap-2 bg-red-600/80 hover:bg-red-500 disabled:opacity-60 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all"
+                        >
+                          {actionLoading === m.id + '_reject' ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4" />}
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
             {/* ── PAYMENTS TAB ── */}
             {tab === 'payments' && (
               <div className="space-y-4">

@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { getAppSession } from '@/lib/auth/session';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { translateTripCities } from '@/lib/translation';
+import { Resend } from 'resend';
 
 export async function POST(request: Request) {
   try {
@@ -71,6 +72,23 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: tripErr.message }, { status: 500 });
       }
     }
+
+    // Notify admin of new trip (best-effort, non-blocking)
+    new Resend(process.env.RESEND_API_KEY).emails.send({
+      from: 'BootHop Notifications <noreply@boothop.com>',
+      to: ['info@boothop.com'],
+      subject: `New trip posted: ${from} → ${to} (${mode})`,
+      text: [
+        'A new trip has been posted on BootHop.',
+        '',
+        `Type:    ${mode === 'sender' ? 'Sending goods' : 'Travelling (carry goods)'}`,
+        `Route:   ${from} → ${to}`,
+        `Date:    ${date}`,
+        `Weight:  ${weight} kg`,
+        priceNum != null ? `Price:   £${priceNum}` : 'Price:   Not specified',
+        `Posted by: ${session.email}`,
+      ].join('\n'),
+    }).catch(() => {});
 
     // Fire auto-match (best-effort, non-blocking)
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
