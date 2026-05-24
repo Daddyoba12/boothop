@@ -195,7 +195,7 @@ async function runAutoMatch() {
       for (const [email, role] of [[send.email, 'sender'], [travel.email, 'traveler']] as [string, string][]) {
         if (!email) continue;
         const [acceptToken, declineToken] = await Promise.all([
-          createActionToken(supabase, email, 'accept_match', matchRecord.id, { role }),
+          createActionToken(supabase, email, 'confirm_match', matchRecord.id, { role }),
           createActionToken(supabase, email, 'decline_match', matchRecord.id, { role }),
         ]);
         emailPromises.push(
@@ -246,7 +246,7 @@ async function runAutoMatch() {
     for (const [email, role] of [[orphan.sender_email, 'sender'], [orphan.traveler_email, 'traveler']] as [string, string][]) {
       if (!email) continue;
       const [acceptToken, declineToken] = await Promise.all([
-        createActionToken(supabase, email, 'accept_match', orphan.id, { role }),
+        createActionToken(supabase, email, 'confirm_match', orphan.id, { role }),
         createActionToken(supabase, email, 'decline_match', orphan.id, { role }),
       ]);
       emailPromises.push(

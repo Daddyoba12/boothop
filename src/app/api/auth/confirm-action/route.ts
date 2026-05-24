@@ -59,11 +59,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, redirectTo, message, action_type });
     }
 
-    if (action_type === 'confirm_match' || action_type === 'decline_match') {
+    if (action_type === 'confirm_match' || action_type === 'accept_match' || action_type === 'decline_match') {
       const matchId = entity_id;
       redirectTo = `/matches/${matchId}`;
 
-      if (action_type === 'confirm_match') {
+      if (action_type === 'confirm_match' || action_type === 'accept_match') {
         const role = payload?.role as 'sender' | 'traveler';
         const updateField = role === 'sender' ? 'sender_accepted' : 'traveler_accepted';
 
