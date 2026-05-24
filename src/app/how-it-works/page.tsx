@@ -421,6 +421,27 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
+      {/* ── DOWNLOAD GUIDE ── */}
+      <section className="px-6 py-4">
+        <div className="max-w-5xl mx-auto">
+          <Link
+            href="/guide"
+            className="reveal group relative overflow-hidden flex items-center justify-between rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm px-6 py-5 transition-all duration-300 hover:border-cyan-500/50 hover:shadow-xl hover:shadow-cyan-500/15 hover:-translate-y-0.5 hover:scale-[1.015] active:scale-[0.98] mb-4"
+          >
+            <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-blue-400 text-white shadow-lg shadow-cyan-500/40 group-hover:scale-110 transition-transform duration-300 text-lg">
+                📄
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white group-hover:text-cyan-400 transition-colors duration-300">Full Guide — How BootHop Works</p>
+                <p className="mt-0.5 text-xs text-white/40">Download or print the complete user guide as a PDF →</p>
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 shrink-0 text-white/25 transition-transform group-hover:translate-x-1 group-hover:text-cyan-400" />
+          </Link>
+        </div>
+      </section>
+
       {/* ── TRUST LINK CARD ── */}
       <section className="px-6 py-8">
         <div className="max-w-5xl mx-auto">
