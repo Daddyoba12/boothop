@@ -24,7 +24,7 @@ export function BusinessNav({ rightSlot, transparent = false }: BusinessNavProps
     >
       {/* Logo → /business */}
       <Link href="/business" className="flex items-center gap-2 shrink-0">
-        <BootHopLogo size="sm" iconClass="text-white" textClass="text-white" />
+        <BootHopLogo size="sm" />
         <span className="text-xs font-semibold bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-2.5 py-1 rounded-full uppercase tracking-widest backdrop-blur-sm">
           Business
         </span>

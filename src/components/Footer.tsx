@@ -11,7 +11,7 @@ export default function Footer() {
 
           {/* Logo + tagline */}
           <div className="flex items-center gap-4">
-            <BootHopLogo textClass="text-white" iconClass="text-white" size="sm" />
+            <BootHopLogo size="sm" />
             <span className="hidden text-xs text-white/30 md:block">People-powered delivery</span>
           </div>
 

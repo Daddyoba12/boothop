@@ -163,7 +163,7 @@ export default function LoginPage() {
         <div className="absolute bottom-1/3 left-1/4 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '7s', animationDelay: '2s' }} />
 
         <div className="relative z-10">
-          <Link href="/"><BootHopLogo iconClass="text-white" textClass="text-white" /></Link>
+          <Link href="/"><BootHopLogo size="sm" /></Link>
         </div>
 
         <div className="relative z-10 space-y-5">
@@ -205,7 +205,7 @@ export default function LoginPage() {
 
         {/* Mobile logo */}
         <div className="lg:hidden mb-8 relative z-10">
-          <Link href="/"><BootHopLogo iconClass="text-white" textClass="text-white" /></Link>
+          <Link href="/"><BootHopLogo size="sm" /></Link>
         </div>
 
         <div className="w-full max-w-sm relative z-10">

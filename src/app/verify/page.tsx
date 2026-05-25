@@ -122,7 +122,7 @@ function VerifyContent() {
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
           <Link href="/">
-            <BootHopLogo iconClass="text-white" textClass="text-white" />
+            <BootHopLogo size="sm" />
           </Link>
         </div>
 

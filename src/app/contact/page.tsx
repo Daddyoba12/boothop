@@ -62,7 +62,7 @@ export default function ContactPage() {
       <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/">
-            <BootHopLogo iconClass="text-white" textClass="text-white" />
+            <BootHopLogo size="sm" />
           </Link>
           <Link href="/" className="text-sm text-slate-400 hover:text-white flex items-center gap-2 transition-all duration-300 hover:gap-3">
             ← Back
