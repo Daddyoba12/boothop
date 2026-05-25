@@ -36,7 +36,7 @@ export default function WatchPage() {
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4 border-b border-white/8">
         <Link href="/">
-          <BootHopLogo size="sm" />
+          <BootHopLogo size="md" />
         </Link>
         <Link href="/" className="text-sm text-slate-400 hover:text-white transition-colors">
           Visit boothop.com →
