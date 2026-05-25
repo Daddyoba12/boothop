@@ -25,7 +25,7 @@ export default function NavBar() {
 
         {/* Logo */}
         <Link href="/" className="flex-shrink-0">
-          <BootHopLogo size="sm" />
+          <BootHopLogo size="md" />
         </Link>
 
         {/* Desktop links */}
