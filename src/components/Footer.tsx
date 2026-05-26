@@ -77,6 +77,7 @@ export default function Footer() {
               ['Cookies', '/cookie-policy'],
               ['Trust & Safety', '/trust-safety'],
               ['Carrier Agreement', '/carrier-agreement'],
+              ['Equality & Diversity', '/edi-policy'],
             ].map(([label, href]) => (
               <Link key={href} href={href} scroll={true} className="hover:text-white/60 transition-colors">{label}</Link>
             ))}
