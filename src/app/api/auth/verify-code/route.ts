@@ -54,6 +54,22 @@ export async function POST(request: Request) {
       .update({ used: true, used_at: new Date().toISOString() })
       .eq('id', record.id);
 
+    // Deduplicate Supabase Auth entries for this email.
+    // The old auth flow occasionally created multiple auth.users rows for the same email.
+    // On every successful login we find and delete all but the most recent one (best-effort, non-blocking).
+    try {
+      const { data: authUsers } = await (supabase.auth.admin as any).listUsers({ perPage: 1000 });
+      if (authUsers?.users) {
+        const dupes = (authUsers.users as any[])
+          .filter((u: any) => u.email?.toLowerCase() === email)
+          .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        // Keep index 0 (newest), delete the rest
+        for (const dupe of dupes.slice(1)) {
+          await (supabase.auth.admin as any).deleteUser(dupe.id).catch(() => {});
+        }
+      }
+    } catch { /* non-blocking — dedup failure must never break login */ }
+
     // Grant £20 signup credit to new users — INSERT with unique email key.
     // If email already exists (returning user) the insert fails silently — no double grant.
     let isNewUser = false;

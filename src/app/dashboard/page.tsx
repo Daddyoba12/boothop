@@ -22,6 +22,9 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadDashboard();
+    // Poll every 30s so match status updates from the other party appear without a manual refresh
+    const interval = setInterval(loadDashboard, 30_000);
+    return () => clearInterval(interval);
   }, []);
 
   const loadDashboard = async () => {
