@@ -26,7 +26,9 @@ export async function POST(
 
     const { data: match, error: matchErr } = await supabase
       .from('matches')
-      .select('id, status, sender_email, traveler_email, offered_price, agreed_price, sender_trip_id, traveler_trip_id, sender_trip:sender_trip_id(from_city, to_city, travel_date), traveler_trip:traveler_trip_id(from_city, to_city, travel_date)')
+      .select(`id, status, sender_email, traveler_email, offered_price, agreed_price, sender_trip_id, traveler_trip_id,
+        sender_trip:sender_trip_id(from_city, to_city, travel_date, auto_created),
+        traveler_trip:traveler_trip_id(from_city, to_city, travel_date, auto_created)`)
       .eq('id', matchId)
       .maybeSingle();
 
@@ -38,12 +40,16 @@ export async function POST(
       return NextResponse.json({ error: 'This match is no longer pending.' }, { status: 400 });
     }
 
-    // Only the listing owner (the person who did NOT initiate interest) can respond
+    // Only the listing owner (non-auto_created trip side) can respond.
+    // The person who expressed interest has the auto_created mirror trip.
     const senderEmail   = match.sender_email?.toLowerCase().trim();
     const travelerEmail = match.traveler_email?.toLowerCase().trim();
-    const isInvolved    = email === senderEmail || email === travelerEmail;
-    if (!isInvolved) {
-      return NextResponse.json({ error: 'Not authorised.' }, { status: 403 });
+    const senderTrip    = Array.isArray(match.sender_trip)   ? match.sender_trip[0]   : match.sender_trip;
+    const travelerTrip  = Array.isArray(match.traveler_trip) ? match.traveler_trip[0] : match.traveler_trip;
+    const ownerEmail    = senderTrip?.auto_created ? travelerEmail : senderEmail;
+
+    if (email !== ownerEmail) {
+      return NextResponse.json({ error: 'Only the listing owner can accept or decline.' }, { status: 403 });
     }
 
     // Derive the other party (Mr B — who expressed interest)
@@ -68,7 +74,7 @@ export async function POST(
 
       // Create magic login token for Mr B so they land on their dashboard
       if (otherEmail) {
-        const expires_at = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
+        const expires_at = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
         const { data: tokenData } = await supabase
           .from('action_tokens')
           .insert({ email: otherEmail, action_type: 'magic_login', entity_id: matchId, payload: { redirectTo: '/dashboard' }, expires_at })

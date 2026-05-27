@@ -15,18 +15,23 @@ export async function POST(request: Request) {
     const supabase = createSupabaseAdminClient();
     const nowIso = new Date().toISOString();
 
-    // Look up the token
+    // Look up the token — allow expired check but not used check yet
     const { data: record, error: findErr } = await supabase
       .from('action_tokens')
       .select('*')
       .eq('token', token)
-      .eq('used', false)
       .gte('expires_at', nowIso)
       .maybeSingle();
 
     if (findErr) throw findErr;
     if (!record) {
-      return NextResponse.json({ error: 'This link has expired or already been used.' }, { status: 400 });
+      return NextResponse.json({ error: 'This link has expired.' }, { status: 400 });
+    }
+
+    // Magic login links can be clicked more than once (e.g. email client pre-fetch,
+    // clicking from multiple devices). All other action tokens are strictly single-use.
+    if (record.used && record.action_type !== 'magic_login') {
+      return NextResponse.json({ error: 'This link has already been used.' }, { status: 400 });
     }
 
     const { email, action_type, entity_id, payload } = record;

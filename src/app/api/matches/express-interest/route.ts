@@ -120,7 +120,7 @@ export async function POST(request: Request) {
 
     // Create a magic login token for the trip owner so clicking email logs them in and goes to dashboard
     if (trip.email) {
-      const expires_at = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
+      const expires_at = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
       const { data: tokenData } = await supabase.from('action_tokens').insert({
         email: trip.email, action_type: 'magic_login', entity_id: matchId,
         payload: { redirectTo: '/dashboard' }, expires_at,

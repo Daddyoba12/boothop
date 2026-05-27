@@ -39,8 +39,8 @@ export async function GET() {
       .select(`
         id, status, agreed_price, proposed_price, negotiation_status, created_at,
         sender_email, traveler_email,
-        sender_trip:sender_trip_id(from_city, to_city, travel_date, price),
-        traveler_trip:traveler_trip_id(from_city, to_city, travel_date, price)
+        sender_trip:sender_trip_id(from_city, to_city, travel_date, price, auto_created),
+        traveler_trip:traveler_trip_id(from_city, to_city, travel_date, price, auto_created)
       `)
       .or(`sender_email.eq.${email},traveler_email.eq.${email}`)
       .order('created_at', { ascending: false });

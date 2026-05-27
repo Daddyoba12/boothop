@@ -341,8 +341,9 @@ export default function DashboardPage() {
                 const tripDate = displayTrip?.travel_date ? displayTrip.travel_date.split('T')[0] : null;
                 const isExpired = tripDate && tripDate < today;
 
-                // Hide expired matched-only matches — nothing actionable for the user
+                // Hide expired matched-only matches and terminal statuses — nothing actionable
                 if (isExpired && match.status === 'matched') return null;
+                if (['declined', 'cancelled', 'completed'].includes(match.status)) return null;
 
                 return (
                   <div key={match.id} className="bg-white/6 border border-white/10 rounded-2xl p-4 hover:bg-white/8 transition-all">
@@ -369,10 +370,16 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     {/* Accept / Decline — only if trip date hasn't passed */}
-                    {match.status === 'matched' && !isExpired && (
-                      match.sender_email !== user?.email
+                    {match.status === 'matched' && !isExpired && (() => {
+                      // Determine who is the listing owner vs who expressed interest.
+                      // The person who expressed interest has the auto_created mirror trip.
+                      // The listing owner has the original (non-auto_created) trip.
+                      const userIsSender = match.sender_email === user?.email;
+                      const userTrip = userIsSender ? senderTrip : travelerTrip;
+                      const isListingOwner = !userTrip?.auto_created;
+                      return isListingOwner
                         ? (
-                          // Mr A — listing owner sees Accept/Decline
+                          // Listing owner — sees Accept/Decline
                           <div className="flex gap-2 mb-2">
                             <button
                               onClick={() => respondToMatch(match.id, 'accept')}
@@ -390,7 +397,7 @@ export default function DashboardPage() {
                             </button>
                           </div>
                         ) : (
-                          // Mr B — waiting for response
+                          // Expresser of interest — waiting for listing owner to respond
                           <p className="text-xs text-white/30 text-center mb-2">Waiting for listing owner to respond…</p>
                         )
                     )}
