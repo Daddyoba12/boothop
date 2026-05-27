@@ -118,6 +118,9 @@ export async function POST(request: Request) {
 
     const matchId = newMatch.id;
 
+    // Lock the original listing so no other user can express interest while this match is pending
+    await supabase.from('trips').update({ status: 'pending' }).eq('id', tripId);
+
     // Create a magic login token for the trip owner so clicking email logs them in and goes to dashboard
     if (trip.email) {
       const expires_at = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();

@@ -133,11 +133,11 @@ function LiveJourneysContent() {
     setLoading(true); setError(null);
     try {
       const { data, error: e } = await supabase
-        .from('trips').select('*').gte('travel_date', tomorrow).order('travel_date', { ascending: true });
+        .from('trips').select('*').eq('status', 'active').gte('travel_date', tomorrow).order('travel_date', { ascending: true });
       if (!e && data) { setTrips(data as Trip[]); return; }
 
       // fallback: client-side date filter
-      const { data: all } = await supabase.from('trips').select('*').order('created_at', { ascending: false });
+      const { data: all } = await supabase.from('trips').select('*').eq('status', 'active').order('created_at', { ascending: false });
       if (all) {
         setTrips((all as Trip[]).filter(t => !t.travel_date || t.travel_date >= tomorrow));
         return;

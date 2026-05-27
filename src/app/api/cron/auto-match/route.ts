@@ -197,6 +197,12 @@ async function runAutoMatch() {
       created.push(matchRecord.id);
       alreadyMatched.add(pairKey);
 
+      // Lock both trips so no one else can match with them while this is pending
+      await Promise.all([
+        supabase.from('trips').update({ status: 'pending' }).eq('id', send.id),
+        supabase.from('trips').update({ status: 'pending' }).eq('id', travel.id),
+      ]);
+
       if (isAfricaOutbound) {
         // ── Africa-outbound: email admin only, hold match for authorisation ──
         const resend   = new Resend(process.env.RESEND_API_KEY);

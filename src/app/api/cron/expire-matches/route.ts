@@ -4,7 +4,8 @@ import { Resend } from 'resend';
 
 const from = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
-// Auto-cancels matches stuck at agreed/committed if T&C not signed within 12 hours
+// Auto-cancels matches stuck at various stages past their deadline.
+// Also releases locked trips back to 'active' so other users can match with them.
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -14,39 +15,67 @@ export async function GET(request: Request) {
   try {
     const supabase  = createSupabaseAdminClient();
     const resend    = new Resend(process.env.RESEND_API_KEY);
+    const cutoff4h  = new Date(Date.now() -  4 * 3_600_000).toISOString();
     const cutoff12h = new Date(Date.now() - 12 * 3_600_000).toISOString();
     const cutoff72h = new Date(Date.now() - 72 * 3_600_000).toISOString();
+
+    // Matches awaiting owner response for over 4 hours — release the route
+    const { data: stuckMatched } = await supabase
+      .from('matches')
+      .select(`id, status, sender_email, traveler_email, sender_trip_id, traveler_trip_id,
+        sender_trip:sender_trip_id(from_city, to_city, auto_created),
+        traveler_trip:traveler_trip_id(auto_created)`)
+      .eq('status', 'matched')
+      .lt('created_at', cutoff4h);
 
     // Matches stuck at 'agreed' or 'committed' for over 12 hours
     const { data: stuckMatches } = await supabase
       .from('matches')
-      .select('id, status, sender_email, traveler_email, sender_trip:sender_trip_id(from_city, to_city)')
+      .select(`id, status, sender_email, traveler_email, sender_trip_id, traveler_trip_id,
+        sender_trip:sender_trip_id(from_city, to_city, auto_created),
+        traveler_trip:traveler_trip_id(auto_created)`)
       .in('status', ['agreed', 'committed'])
       .lt('created_at', cutoff12h);
 
     // Matches stuck at 'kyc_pending' for over 72 hours
     const { data: stuckKyc } = await supabase
       .from('matches')
-      .select('id, status, sender_email, traveler_email, sender_trip:sender_trip_id(from_city, to_city)')
+      .select(`id, status, sender_email, traveler_email, sender_trip_id, traveler_trip_id,
+        sender_trip:sender_trip_id(from_city, to_city, auto_created),
+        traveler_trip:traveler_trip_id(auto_created)`)
       .eq('status', 'kyc_pending')
       .lt('created_at', cutoff72h);
 
-    const toCancel = [...(stuckMatches ?? []), ...(stuckKyc ?? [])];
+    const toCancel = [...(stuckMatched ?? []), ...(stuckMatches ?? []), ...(stuckKyc ?? [])];
     if (!toCancel.length) return NextResponse.json({ cancelled: 0 });
 
     let cancelled = 0;
+    const nowIso = new Date().toISOString();
+
     for (const match of toCancel) {
       await supabase
         .from('matches')
-        .update({ status: 'cancelled', cancelled_at: new Date().toISOString(), cancellation_reason: 'Expired — not completed within the required time.' })
+        .update({ status: 'cancelled', cancelled_at: nowIso, cancellation_reason: 'Expired — not completed within the required time.' })
         .eq('id', match.id);
 
-      const trip     = (match as any).sender_trip;
-      const route    = trip ? `${trip.from_city} → ${trip.to_city}` : 'your delivery';
-      const appUrl   = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
+      // Release trips: restore original listing to 'active', delete auto-created mirror
+      const senderTrip   = Array.isArray(match.sender_trip)   ? match.sender_trip[0]   : match.sender_trip;
+      const travelerTrip = Array.isArray(match.traveler_trip) ? match.traveler_trip[0] : match.traveler_trip;
+      const originalTripId = (senderTrip as any)?.auto_created ? match.traveler_trip_id : match.sender_trip_id;
+      const mirrorTripId   = (senderTrip as any)?.auto_created ? match.sender_trip_id
+        : (travelerTrip as any)?.auto_created ? match.traveler_trip_id : null;
+
+      await Promise.all([
+        originalTripId && supabase.from('trips').update({ status: 'active' }).eq('id', originalTripId),
+        mirrorTripId   && supabase.from('trips').delete().eq('id', mirrorTripId).eq('auto_created', true),
+      ]);
+
+      const trip   = (match as any).sender_trip;
+      const route  = trip ? `${trip.from_city} → ${trip.to_city}` : 'your delivery';
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
 
       const emails = [match.sender_email, match.traveler_email].filter(Boolean);
-      await Promise.allSettled(emails.map(email =>
+      await Promise.allSettled(emails.map((email: string) =>
         resend.emails.send({
           from,
           to: email,

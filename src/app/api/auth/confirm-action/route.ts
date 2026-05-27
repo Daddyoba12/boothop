@@ -121,10 +121,12 @@ export async function POST(request: Request) {
       }
 
       if (action_type === 'decline_match') {
-        // Fetch match before updating so we can email the other party
+        // Fetch match before updating so we can email the other party and release trips
         const { data: declMatch } = await supabase
           .from('matches')
-          .select('sender_email, traveler_email, sender_trip:sender_trip_id(from_city, to_city, travel_date)')
+          .select(`sender_email, traveler_email, sender_trip_id, traveler_trip_id,
+            sender_trip:sender_trip_id(from_city, to_city, travel_date, auto_created),
+            traveler_trip:traveler_trip_id(auto_created)`)
           .eq('id', matchId)
           .single();
 
@@ -132,6 +134,18 @@ export async function POST(request: Request) {
           .from('matches')
           .update({ status: 'declined' })
           .eq('id', matchId);
+
+        // Release original listing back to active; delete mirror trip (auto_created)
+        if (declMatch) {
+          const declSenderTrip   = Array.isArray(declMatch.sender_trip)   ? declMatch.sender_trip[0]   : declMatch.sender_trip;
+          const declTravelerTrip = Array.isArray(declMatch.traveler_trip) ? declMatch.traveler_trip[0] : declMatch.traveler_trip;
+          const originalTripId   = (declSenderTrip as any)?.auto_created ? declMatch.traveler_trip_id : declMatch.sender_trip_id;
+          const mirrorTripId     = (declSenderTrip as any)?.auto_created ? declMatch.sender_trip_id   : (declTravelerTrip as any)?.auto_created ? declMatch.traveler_trip_id : null;
+          await Promise.all([
+            originalTripId && supabase.from('trips').update({ status: 'active' }).eq('id', originalTripId),
+            mirrorTripId   && supabase.from('trips').delete().eq('id', mirrorTripId).eq('auto_created', true),
+          ]);
+        }
 
         if (declMatch) {
           const trip      = (declMatch as any).sender_trip;

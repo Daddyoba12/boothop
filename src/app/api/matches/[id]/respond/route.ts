@@ -56,9 +56,7 @@ export async function POST(
     const otherEmail = email === senderEmail ? travelerEmail : senderEmail;
 
     // Get route info — prefer sender_trip, fall back to traveler_trip
-    const senderTrip   = Array.isArray(match.sender_trip)   ? match.sender_trip[0]   : match.sender_trip;
-    const travelerTrip = Array.isArray(match.traveler_trip) ? match.traveler_trip[0] : match.traveler_trip;
-    const tripInfo     = senderTrip ?? travelerTrip;
+    const tripInfo = senderTrip ?? travelerTrip;
     const fromCity     = tripInfo?.from_city  ?? '';
     const toCity       = tripInfo?.to_city    ?? '';
     const travelDate   = tripInfo?.travel_date ?? '';
@@ -104,6 +102,12 @@ export async function POST(
       const mirrorTripId = email === senderEmail ? match.traveler_trip_id : match.sender_trip_id;
       if (mirrorTripId) {
         await supabase.from('trips').delete().eq('id', mirrorTripId).eq('auto_created', true);
+      }
+
+      // Release the original listing back to active so other users can match with it
+      const originalTripId = senderTrip?.auto_created ? match.traveler_trip_id : match.sender_trip_id;
+      if (originalTripId) {
+        await supabase.from('trips').update({ status: 'active' }).eq('id', originalTripId);
       }
 
       if (otherEmail) {
