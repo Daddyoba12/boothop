@@ -20,7 +20,6 @@ export default function Footer() {
             {[
               ['How It Works', '/how-it-works'],
               ['Pricing', '/pricing'],
-              ['Trust & Safety', '/trust-safety'],
               ['Live Journeys', '/journeys'],
               ['About', '/about'],
               ['Help', '/help'],
