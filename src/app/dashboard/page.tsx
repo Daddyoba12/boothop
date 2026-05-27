@@ -72,9 +72,17 @@ export default function DashboardPage() {
         body: JSON.stringify({ action }),
         credentials: 'include',
       });
-      if (res.ok) loadDashboard();
-    } catch { /* ignore */ }
-    finally { setRespondingMatch(null); }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || `Failed to ${action} match — please try again`);
+        return;
+      }
+      loadDashboard();
+    } catch {
+      alert('Network error — please check your connection and try again');
+    } finally {
+      setRespondingMatch(null);
+    }
   };
 
   const publishDraft = async (draftId: string) => {
