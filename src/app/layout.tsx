@@ -52,6 +52,17 @@ export const metadata: Metadata = {
     'AOG parts delivery', 'pharmaceutical courier UK', 'legal document courier UK',
   ],
 
+  icons: {
+    icon: [
+      { url: '/favicon.ico',        sizes: 'any' },
+      { url: '/icon-32x32.png',     type: 'image/png', sizes: '32x32'  },
+      { url: '/icon-96x96.png',     type: 'image/png', sizes: '96x96'  },
+      { url: '/icon-192x192.png',   type: 'image/png', sizes: '192x192'},
+      { url: '/icon-512x512.png',   type: 'image/png', sizes: '512x512'},
+    ],
+    apple:    { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    shortcut: '/favicon.ico',
+  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
