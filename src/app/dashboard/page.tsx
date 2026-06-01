@@ -400,7 +400,7 @@ export default function DashboardPage() {
                           // Expresser of interest — waiting for listing owner to respond
                           <p className="text-xs text-white/30 text-center mb-2">Waiting for listing owner to respond…</p>
                         )
-                    )}
+                    })()}
                     <Link
                       href={`/matches/${match.id}`}
                       className="flex items-center justify-center gap-1.5 w-full py-2 bg-white/6 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold rounded-xl transition-all"

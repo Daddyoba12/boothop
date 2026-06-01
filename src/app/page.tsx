@@ -868,36 +868,58 @@ function HomePageContent() {
           <div className="text-center mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">Simple process</p>
             <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">How BootHop Works</h2>
-            <p className="mt-4 text-white/45 text-base">From posting to delivery in four steps.</p>
+            <p className="mt-4 text-white/45 text-base">One platform. Two journeys. Zero hassle.</p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-14">
-            {[
-              { n: '01', title: 'Post Your Request', sub: 'Tell us the route, date, and package size. Takes 30 seconds.', icon: '📦', color: 'border-blue-500/25 hover:border-blue-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(59,130,246,0.18)]' },
-              { n: '02', title: 'Get Matched', sub: 'We connect you with a verified traveller already making that journey.', icon: '🤝', color: 'border-emerald-500/25 hover:border-emerald-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(16,185,129,0.18)]' },
-              { n: '03', title: 'Identity Verified', sub: 'All travellers complete KYC checks before handling any delivery.', icon: '🛡️', color: 'border-violet-500/25 hover:border-violet-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(139,92,246,0.18)]' },
-              { n: '04', title: 'Delivered', sub: 'Both sides confirm. Funds release. Simple, safe, done.', icon: '✅', color: 'border-amber-500/25 hover:border-amber-400/40', glow: 'hover:shadow-[0_16px_48px_rgba(245,158,11,0.18)]' },
-            ].map(({ n, title, sub, icon, color, glow }) => (
-              <div key={n} className={`rounded-2xl border bg-white/[0.03] backdrop-blur-sm p-6 transition-all duration-300 hover:-translate-y-1 ${color} ${glow}`}>
-                <div className="text-3xl mb-4">{icon}</div>
-                <p className="text-[10px] font-bold text-white/25 uppercase tracking-widest mb-2">{n}</p>
-                <p className="text-white font-semibold text-base leading-tight mb-2">{title}</p>
-                <p className="text-white/45 text-xs leading-relaxed">{sub}</p>
+
+          {/* Two diagram cards side by side */}
+          <div className="grid md:grid-cols-2 gap-6 mb-14">
+
+            {/* Traveller card */}
+            <div className="group cursor-pointer flex flex-col">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-sm shadow-lg shadow-blue-500/40">✈️</span>
+                <div>
+                  <p className="text-white font-bold text-sm">For Travellers</p>
+                  <p className="text-white/40 text-xs">Earn from your spare luggage space</p>
+                </div>
               </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { icon: '🔐', label: 'End-to-end encrypted' },
-              { icon: '✅', label: 'ID verified travellers' },
-              { icon: '💰', label: 'Secure payment escrow' },
-              { icon: '🌍', label: '200+ city corridors' },
-            ].map(({ icon, label }) => (
-              <div key={label} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md px-4 py-3">
-                <span className="text-xl">{icon}</span>
-                <span className="text-xs text-white/60 font-medium">{label}</span>
+              <div className="relative flex-1">
+                <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-blue-500/50 via-cyan-400/30 to-blue-600/50 blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative rounded-2xl overflow-hidden border border-blue-500/25 shadow-2xl shadow-blue-500/20 group-hover:shadow-blue-500/50 group-hover:-translate-y-2 transition-all duration-500">
+                  <img
+                    src="/images/traveller-diagram.png"
+                    alt="How it works for Travellers"
+                    className="w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-blue-950/30 via-transparent to-transparent" />
+                </div>
               </div>
-            ))}
+            </div>
+
+            {/* Sender card */}
+            <div className="group cursor-pointer flex flex-col">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center text-sm shadow-lg shadow-emerald-500/40">📦</span>
+                <div>
+                  <p className="text-white font-bold text-sm">For Senders</p>
+                  <p className="text-white/40 text-xs">Send anything, anywhere, affordably</p>
+                </div>
+              </div>
+              <div className="relative flex-1">
+                <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-emerald-500/50 via-teal-400/30 to-emerald-600/50 blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative rounded-2xl overflow-hidden border border-emerald-500/25 shadow-2xl shadow-emerald-500/20 group-hover:shadow-emerald-500/50 group-hover:-translate-y-2 transition-all duration-500">
+                  <img
+                    src="/images/sender-diagram.png"
+                    alt="How it works for Senders"
+                    className="w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/30 via-transparent to-transparent" />
+                </div>
+              </div>
+            </div>
+
           </div>
+
           {/* QR — scan to watch */}
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
             <Link href="/watch"

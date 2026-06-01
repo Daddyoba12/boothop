@@ -218,32 +218,26 @@ export default function HowItWorksPage() {
             </div>
           </div>
 
-          {/* Steps — collapsed by default, expand on click */}
-          <div className="max-w-2xl" ref={booterStepsRef}>
+          {/* Traveller diagram */}
+          <div className="max-w-2xl">
             <h3 className="text-3xl font-black mb-8 flex items-center gap-3">
               <span className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center">✨</span>
               How it works
             </h3>
-
-            {/* Step 1 — always visible */}
-            <StepCard s={booterSteps[0]} i={0} color="blue" />
-
-            {/* Steps 2–5 — shown only when expanded */}
-            {booterExpanded && booterSteps.slice(1).map((s, i) => (
-              <StepCard key={s.num} s={s} i={i + 1} color="blue" />
-            ))}
-
-            {/* Expand / collapse toggle */}
-            <button
-              onClick={() => setBooterExpanded((p) => !p)}
-              className="group w-full flex items-center justify-center gap-2 mt-2 mb-8 py-3 px-6 rounded-2xl border border-blue-500/25 bg-gradient-to-br from-slate-800/30 to-slate-900/30 text-blue-300 text-sm font-semibold hover:border-blue-500/50 hover:bg-blue-500/10 hover:text-cyan-300 hover:shadow-lg hover:shadow-blue-500/15 transition-all duration-300 active:scale-[0.98]"
-            >
-              {booterExpanded ? (
-                <>Show less <ChevronDown className="w-4 h-4 rotate-180 transition-transform duration-300" /></>
-              ) : (
-                <>Need to know more <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform duration-300" /></>
-              )}
-            </button>
+            <div className="relative group cursor-pointer">
+              {/* Outer glow ring */}
+              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-blue-500/60 via-cyan-400/40 to-blue-600/60 blur-xl opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
+              {/* Push/lift shadow */}
+              <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-br from-blue-500/30 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative rounded-2xl overflow-hidden border border-blue-500/30 shadow-2xl shadow-blue-500/30 group-hover:shadow-blue-500/60 group-hover:-translate-y-2 transition-all duration-500">
+                <img
+                  src="/images/traveller-diagram.png"
+                  alt="How it works for Travellers"
+                  className="w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-950/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -286,32 +280,26 @@ export default function HowItWorksPage() {
             </div>
           </div>
 
-          {/* Steps */}
-          <div className="max-w-2xl" ref={hooperStepsRef}>
+          {/* Sender diagram */}
+          <div className="max-w-2xl">
             <h3 className="text-3xl font-black mb-8 flex items-center gap-3">
               <span className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-xl flex items-center justify-center">🎯</span>
               How it works
             </h3>
-
-            {/* Step 1 — always visible */}
-            <StepCard s={hooperSteps[0]} i={0} color="emerald" />
-
-            {/* Steps 2–5 — shown only when expanded */}
-            {hooperExpanded && hooperSteps.slice(1).map((s, i) => (
-              <StepCard key={s.num} s={s} i={i + 1} color="emerald" />
-            ))}
-
-            {/* Expand / collapse toggle */}
-            <button
-              onClick={() => setHooperExpanded((p) => !p)}
-              className="group w-full flex items-center justify-center gap-2 mt-2 mb-8 py-3 px-6 rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-slate-800/30 to-slate-900/30 text-emerald-300 text-sm font-semibold hover:border-emerald-500/50 hover:bg-emerald-500/10 hover:text-teal-300 hover:shadow-lg hover:shadow-emerald-500/15 transition-all duration-300 active:scale-[0.98]"
-            >
-              {hooperExpanded ? (
-                <>Show less <ChevronDown className="w-4 h-4 rotate-180 transition-transform duration-300" /></>
-              ) : (
-                <>Need to know more <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform duration-300" /></>
-              )}
-            </button>
+            <div className="relative group cursor-pointer">
+              {/* Outer glow ring */}
+              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-emerald-500/60 via-teal-400/40 to-emerald-600/60 blur-xl opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
+              {/* Push/lift shadow */}
+              <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-br from-emerald-500/30 to-teal-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative rounded-2xl overflow-hidden border border-emerald-500/30 shadow-2xl shadow-emerald-500/30 group-hover:shadow-emerald-500/60 group-hover:-translate-y-2 transition-all duration-500">
+                <img
+                  src="/images/sender-diagram.png"
+                  alt="How it works for Senders"
+                  className="w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+            </div>
           </div>
         </div>
       </section>

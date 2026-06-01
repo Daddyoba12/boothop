@@ -574,7 +574,7 @@ export default function GuidePage() {
               <h4>Contact</h4>
               <ul>
                 <li>Email: info@boothop.com</li>
-                <li>Phone: +44 115 661 2820</li>
+                <li>Phone: +44 115 661 2825</li>
                 <li>Hours: Mon–Fri, 9am–6pm GMT</li>
                 <li>Weekend: Limited support</li>
               </ul>
@@ -595,7 +595,7 @@ export default function GuidePage() {
 
       {/* FOOTER */}
       <div className="footer">
-        <strong>BootHop</strong> · boothop.com · info@boothop.com · +44 115 661 2820<br />
+        <strong>BootHop</strong> · boothop.com · info@boothop.com · +44 115 661 2825<br />
         <span style={{ marginTop: 8, display: 'block' }}>
           © {new Date().getFullYear()} BootHop. All rights reserved.
           This document is for informational purposes. Subject to change without notice.
