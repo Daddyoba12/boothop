@@ -253,26 +253,59 @@ export default function BoothopBusiness() {
                   </div>
 
                 </motion.div>
-                {/* Social proof ticker */}
-                <div className="mt-4 w-full max-w-2xl mx-auto rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl px-5 py-4 space-y-3">
-                  <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] text-center">Serving Critical Industries</p>
-                  <div className="flex flex-wrap justify-center gap-2">
+                {/* Social proof ticker — glassmorphism */}
+                <div className="mt-8 w-full max-w-2xl mx-auto rounded-3xl border border-white/20 bg-white/8 backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.15)] px-8 py-7">
+
+                  {/* Header */}
+                  <p className="text-[11px] font-black text-emerald-400 uppercase tracking-[0.25em] text-center mb-5">
+                    Serving Critical Industries
+                  </p>
+
+                  {/* Industry tags */}
+                  <div className="flex flex-wrap justify-center gap-2.5 mb-6">
                     {['⚙️ Engineering & Manufacturing', '✈️ Aerospace & AOG', '⚖️ Legal & Finance', '🎬 Events & Production', '🏥 Healthcare & Pharma'].map(ind => (
-                      <span key={ind} className="text-xs text-white/55 font-semibold bg-white/5 border border-white/10 rounded-full px-3 py-1">{ind}</span>
+                      <span key={ind} className="text-xs text-white/80 font-semibold bg-white/10 border border-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 hover:bg-white/15 transition-colors cursor-default">
+                        {ind}
+                      </span>
                     ))}
                   </div>
-                  {/* Rotating delivery */}
-                  <div className="flex items-center justify-center gap-3 py-1.5 rounded-xl bg-emerald-500/8 border border-emerald-500/15">
-                    <span className="text-base">{DELIVERIES[tickerIdx].icon}</span>
-                    <span className="text-xs font-bold text-white/70">{DELIVERIES[tickerIdx].route}</span>
-                    <span className="text-xs text-emerald-400 font-black">{DELIVERIES[tickerIdx].time}</span>
+
+                  {/* Divider */}
+                  <div className="h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent mb-6" />
+
+                  {/* Rotating live delivery */}
+                  <div className="flex items-center justify-center gap-4 bg-gradient-to-r from-emerald-500/15 via-blue-500/10 to-emerald-500/15 border border-emerald-500/25 rounded-2xl px-6 py-4 mb-6">
+                    <span className="text-2xl drop-shadow-lg">{DELIVERIES[tickerIdx].icon}</span>
+                    <div className="flex flex-col items-start">
+                      <span className="text-[10px] text-emerald-400/70 uppercase tracking-widest font-bold mb-0.5">Live delivery</span>
+                      <span className="text-sm font-bold text-white">{DELIVERIES[tickerIdx].route}</span>
+                    </div>
+                    <span className="ml-auto text-sm font-black text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 rounded-xl px-3 py-1.5">
+                      {DELIVERIES[tickerIdx].time}
+                    </span>
                   </div>
-                  <div className="flex items-center justify-center gap-3 text-xs text-white/35">
-                    <span><strong className="text-white/60">47</strong> urgent deliveries this week</span>
-                    <span className="text-white/15">·</span>
-                    <span><strong className="text-white/60">4.8★</strong> from operations managers</span>
+
+                  {/* Stats */}
+                  <div className="flex items-center justify-center gap-6 mb-5">
+                    <div className="text-center">
+                      <p className="text-2xl font-black text-white">47</p>
+                      <p className="text-xs text-white/45 mt-0.5">urgent deliveries this week</p>
+                    </div>
+                    <div className="w-px h-10 bg-white/10" />
+                    <div className="text-center">
+                      <p className="text-2xl font-black text-white">4.8<span className="text-amber-400">★</span></p>
+                      <p className="text-xs text-white/45 mt-0.5">from operations managers</p>
+                    </div>
                   </div>
-                  <p className="text-[10px] text-white/20 text-center">Business email required · Personal accounts not accepted</p>
+
+                  {/* Divider */}
+                  <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4" />
+
+                  {/* Note */}
+                  <p className="text-xs text-white/35 text-center italic">
+                    Business email required · Personal accounts not accepted
+                  </p>
+
                 </div>
               </div>
 
