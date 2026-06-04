@@ -11,6 +11,71 @@ const DISPOSABLE_DOMAINS = new Set([
 
 const SPAM_KEYWORDS = ['click here', 'buy now', 'limited offer', 'act now', 'viagra', 'cialis'];
 
+// ── Language / script coherence ───────────────────────────────────────────────
+
+type Script = 'latin' | 'cyrillic' | 'arabic' | 'cjk' | 'devanagari' | 'unknown';
+
+function detectScript(text: string): Script {
+  let latin = 0, cyrillic = 0, arabic = 0, cjk = 0, devanagari = 0;
+  for (const ch of text) {
+    const c = ch.charCodeAt(0);
+    if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122) || (c >= 192 && c <= 591)) latin++;
+    else if (c >= 1024 && c <= 1279) cyrillic++;
+    else if (c >= 0x0600 && c <= 0x06FF) arabic++;
+    else if ((c >= 0x4E00 && c <= 0x9FFF) || (c >= 0x3040 && c <= 0x30FF) || (c >= 0xAC00 && c <= 0xD7AF)) cjk++;
+    else if (c >= 0x0900 && c <= 0x097F) devanagari++;
+  }
+  const best = { latin, cyrillic, arabic, cjk, devanagari };
+  const top = (Object.entries(best) as [Script, number][]).sort((a, b) => b[1] - a[1])[0];
+  return top[1] === 0 ? 'unknown' : top[0];
+}
+
+// Countries whose primary written script is NOT Latin
+// Latin is always accepted as a universal fallback (English is global)
+const COUNTRY_SCRIPTS: Record<string, Script[]> = {
+  RU: ['cyrillic'], BY: ['cyrillic'], UA: ['cyrillic'], BG: ['cyrillic'], RS: ['cyrillic'], MK: ['cyrillic'],
+  CN: ['cjk'], JP: ['cjk'], KR: ['cjk'], TW: ['cjk'],
+  SA: ['arabic'], AE: ['arabic'], EG: ['arabic'], IQ: ['arabic'], JO: ['arabic'], KW: ['arabic'],
+  MA: ['arabic'], DZ: ['arabic'], TN: ['arabic'], LY: ['arabic'], YE: ['arabic'], OM: ['arabic'],
+  IN: ['latin', 'devanagari'], NP: ['devanagari'],
+  IR: ['arabic'], PK: ['arabic'],
+};
+
+function checkLinguisticCoherence(text: string, country: string): { score: number; flag?: string } {
+  const words = text.trim().split(/\s+/).filter(w => w.length > 0);
+  if (words.length < 2) return { score: 0 };
+
+  // Abnormally long "words" — likely encoded spam or random strings
+  const avgLen = words.reduce((s, w) => s + w.length, 0) / words.length;
+  if (avgLen > 18) return { score: 30, flag: 'Incoherent word structure (avg word too long)' };
+
+  // Very high ratio of unique characters to length — random-string indicator
+  const charSet = new Set(text.toLowerCase().replace(/\s/g, ''));
+  const entropy = charSet.size / Math.max(text.replace(/\s/g, '').length, 1);
+  if (entropy > 0.85 && text.length > 20) return { score: 25, flag: 'High character entropy (likely random)' };
+
+  // Excessive word repetition — bots often repeat the same word/phrase
+  const unique = new Set(words.map(w => w.toLowerCase()));
+  if (words.length >= 6 && unique.size / words.length < 0.4) {
+    return { score: 20, flag: 'Excessive word repetition' };
+  }
+
+  // Script vs IP country mismatch
+  const script = detectScript(text);
+  const expected = COUNTRY_SCRIPTS[country?.toUpperCase() ?? ''];
+  if (expected && script !== 'latin' && !expected.includes(script)) {
+    return { score: 20, flag: `Script mismatch for IP country ${country} (detected: ${script})` };
+  }
+  // Inverse: if IP is Cyrillic/CJK/Arabic country but message is pure gibberish unknown script
+  if (expected && script === 'unknown') {
+    return { score: 20, flag: `Unrecognised script from ${country}` };
+  }
+
+  return { score: 0 };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function calculateGibberish(text: string): number {
   const clean = text.replace(/[^A-Za-z]/g, '');
   if (clean.length < 5) return 0;
@@ -22,7 +87,7 @@ function calculateGibberish(text: string): number {
   return 20;
 }
 
-function calculateSpamScore(name: string, email: string, message: string): { score: number; flags: string[] } {
+function calculateSpamScore(name: string, email: string, message: string, country = ''): { score: number; flags: string[] } {
   let score = 0;
   const flags: string[] = [];
 
@@ -45,6 +110,10 @@ function calculateSpamScore(name: string, email: string, message: string): { sco
   if (SPAM_KEYWORDS.some(kw => message.toLowerCase().includes(kw))) { score += 30; flags.push('Spam keywords detected'); }
   if (message === message.toUpperCase() && message.length > 10) { score += 15; flags.push('All caps message'); }
 
+  // Language / script coherence vs IP country
+  const lang = checkLinguisticCoherence(message, country);
+  if (lang.score > 0 && lang.flag) { score += lang.score; flags.push(lang.flag); }
+
   return { score: Math.min(score, 100), flags };
 }
 
@@ -54,21 +123,24 @@ function getStatus(score: number): 'APPROVED' | 'REVIEW' | 'REJECTED' {
   return 'APPROVED';
 }
 
-function generateSubject(status: string, spamScore: number, topic: string): string {
-  const emoji = { REJECTED: '🚨', REVIEW: '⚠️', APPROVED: '✅' } as Record<string, string>;
-  const label = { REJECTED: 'HIGH RISK', REVIEW: 'NEEDS REVIEW', APPROVED: 'VERIFIED' } as Record<string, string>;
-  return `${emoji[status]} BootHop Contact | ${label[status]} | ${topic} (Score: ${spamScore})`;
-}
 
 export async function POST(request: Request) {
   try {
-    const { name, email, topic, message } = await request.json();
+    const { name, email, topic, message, _hp } = await request.json();
+
+    // Honeypot — bots fill hidden fields, humans don't
+    if (_hp) {
+      return NextResponse.json({ ok: true, pending: 'verify' });
+    }
 
     if (!name || !email || !topic || !message) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const { score: spamScore, flags } = calculateSpamScore(name, email, message);
+    // Vercel injects visitor country automatically — free, no API needed
+    const country = request.headers.get('x-vercel-ip-country') || '';
+
+    const { score: spamScore, flags } = calculateSpamScore(name, email, message, country);
     const status = getStatus(spamScore);
 
     if (status === 'REJECTED') {
@@ -91,7 +163,7 @@ export async function POST(request: Request) {
         email,
         action_type: 'verify_contact',
         entity_id: crypto.randomUUID(),
-        payload: { name, email, topic, message, spamScore, flags, status },
+        payload: { name, email, topic, message, spamScore, flags, status, country },
         expires_at,
       })
       .select('token')
@@ -103,12 +175,6 @@ export async function POST(request: Request) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
     const verifyLink = `${appUrl}/api/contact/verify?token=${data.token}`;
-    const scoreClass = spamScore >= 60 ? 'high' : spamScore >= 30 ? 'medium' : 'low';
-    const riskClass = status === 'REVIEW' ? 'review' : 'approved';
-    const riskIcon = status === 'REVIEW' ? '⚠️' : '✅';
-    const flagsHtml = flags.length
-      ? flags.map(f => `<span style="color:#d32f2f;font-weight:bold;">⚠ ${f}</span>`).join('<br>')
-      : '✅ All checks passed';
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
@@ -129,54 +195,7 @@ export async function POST(request: Request) {
       ].join('\n'),
     });
 
-    if (process.env.ADMIN_EMAIL) {
-      const headerBg = status === 'REVIEW' ? '#f57c00' : '#388e3c';
-      await resend.emails.send({
-        from: 'BootHop Contact <noreply@boothop.com>',
-        to: [process.env.ADMIN_EMAIL],
-        subject: generateSubject(status, spamScore, topic),
-        html: `<!DOCTYPE html><html><head><style>
-          body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f4f4;padding:20px}
-          .container{max-width:700px;margin:0 auto;background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-          .header{padding:20px;color:white;font-weight:bold;font-size:18px;background:${headerBg}}
-          .content{padding:25px}
-          .field{margin-bottom:15px}
-          .label{font-weight:600;color:#555;font-size:12px;text-transform:uppercase;margin-bottom:4px}
-          .value{color:#222;font-size:15px;line-height:1.6}
-          .metadata{background:#f9f9f9;padding:15px;border-left:4px solid #ddd;margin-top:20px}
-          .score{display:inline-block;padding:4px 12px;border-radius:4px;font-weight:bold}
-          .score.high{background:#ffcdd2;color:#c62828}
-          .score.medium{background:#ffe0b2;color:#e65100}
-          .score.low{background:#c8e6c9;color:#2e7d32}
-        </style></head><body>
-          <div class="container">
-            <div class="header">${riskIcon} BootHop Contact Form | ${status}</div>
-            <div class="content">
-              <div class="field"><div class="label">Name</div><div class="value">${name}</div></div>
-              <div class="field"><div class="label">Email</div><div class="value">${email}</div></div>
-              <div class="field"><div class="label">Topic</div><div class="value">${topic}</div></div>
-              <div class="field"><div class="label">Message</div><div class="value">${message}</div></div>
-              <div class="metadata">
-                <div class="field">
-                  <div class="label">Spam Score</div>
-                  <div class="value"><span class="score ${scoreClass}">${spamScore}/100</span></div>
-                </div>
-                <div class="field">
-                  <div class="label">Validation Flags</div>
-                  <div class="value">${flagsHtml}</div>
-                </div>
-                <div class="field">
-                  <div class="label">Verify Link</div>
-                  <div class="value"><a href="${verifyLink}">${verifyLink}</a></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </body></html>`,
-        text: `${riskIcon} BootHop Contact | ${status}\n\nName: ${name}\nEmail: ${email}\nTopic: ${topic}\nMessage: ${message}\n\nSpam Score: ${spamScore}/100\nFlags: ${flags.join(', ') || 'None'}\n\nVerify: ${verifyLink}`,
-      });
-    }
-
+    // Admin is only notified after the user clicks the verify link (see verify/route.ts)
     return NextResponse.json({ ok: true, pending: 'verify' });
   } catch (err) {
     console.error('Contact form error:', err);

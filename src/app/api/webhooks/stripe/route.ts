@@ -3,6 +3,12 @@ import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { sendPaymentConfirmationEmail } from '@/lib/email';
+import { sendDeliveryCompleteEmail } from '@/lib/email/sendDeliveryEmail';
+import {
+  getWebhookEventStatus,
+  setWebhookEventStatus,
+  pushFailedEvent,
+} from '@/lib/redis';
 
 // ============================================================================
 // ELITE STRIPE WEBHOOK HANDLER
@@ -40,6 +46,7 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
   const stripe = getStripeClient();
+  let capturedEventId: string | undefined;
 
   try {
     const body = await request.text();
@@ -48,26 +55,42 @@ export async function POST(request: NextRequest) {
 const signature = headersList.get('stripe-signature');
     
 
-    if (!signature) {
-      console.error('❌ Missing Stripe signature');
-      return NextResponse.json(
-        { error: 'Missing signature' }, 
-        { status: 400 }
-      );
+    // ── Internal retry bypass (from process-webhook-queue cron) ─────────────
+    const bypassHeader = headersList.get('x-internal-bypass');
+    const cronSecret   = process.env.CRON_SECRET;
+    const isInternalRetry = bypassHeader && cronSecret && bypassHeader === cronSecret;
+
+    // Verify webhook signature (skip for internal retries)
+    let event: Stripe.Event;
+    if (isInternalRetry) {
+      try {
+        event = JSON.parse(body) as Stripe.Event;
+      } catch (err: any) {
+        return NextResponse.json({ error: 'Invalid event body' }, { status: 400 });
+      }
+    } else {
+      if (!signature) {
+        console.error('❌ Missing Stripe signature');
+        return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
+      }
+      try {
+        event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      } catch (err: any) {
+        console.error('❌ Webhook signature verification failed:', err.message);
+        await logWebhookError('signature_verification_failed', err.message);
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+      }
     }
 
-    // Verify webhook signature
-    let event: Stripe.Event;
-    try {
-      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-    } catch (err: any) {
-      console.error('❌ Webhook signature verification failed:', err.message);
-      await logWebhookError('signature_verification_failed', err.message);
-      return NextResponse.json(
-        { error: 'Invalid signature' }, 
-        { status: 400 }
-      );
+    // ── Redis idempotency check ──────────────────────────────────────────────
+    capturedEventId = event.id;
+    const existingStatus = await getWebhookEventStatus(event.id);
+    if (existingStatus === 'processed') {
+      console.log(`⏭️  Skipping duplicate event ${event.id}`);
+      return NextResponse.json({ received: true, duplicate: true });
     }
+    // Mark as processing (prevents concurrent duplicates via 5-min lock)
+    await setWebhookEventStatus(event.id, 'processing');
 
     console.log(`\n${'='.repeat(80)}`);
     console.log(`🎯 Webhook Event Received: ${event.type}`);
@@ -102,6 +125,10 @@ const signature = headersList.get('stripe-signature');
         result = await handlePaymentCanceled(event.data.object as Stripe.PaymentIntent);
         break;
 
+      case 'transfer.created':
+        result = await handleTransferCreated(event.data.object as Stripe.Transfer);
+        break;
+
       default:
         console.log(`⚠️  Unhandled event type: ${event.type}`);
         result = { handled: false, message: 'Event type not handled' };
@@ -111,11 +138,14 @@ const signature = headersList.get('stripe-signature');
     console.log(`\n✅ Webhook processed successfully in ${duration}ms`);
     console.log(`${'='.repeat(80)}\n`);
 
+    // Mark event as fully processed in Redis (7-day dedup window)
+    await setWebhookEventStatus(event.id, 'processed');
+
     // Log successful webhook
     await logWebhookEvent(event.type, event.id, 'success', result);
 
-    return NextResponse.json({ 
-      received: true, 
+    return NextResponse.json({
+      received: true,
       processed: true,
       eventType: event.type,
       duration: `${duration}ms`
@@ -124,13 +154,20 @@ const signature = headersList.get('stripe-signature');
   } catch (error: any) {
     const duration = Date.now() - startTime;
     console.error(`\n❌ Webhook processing failed after ${duration}ms:`, error);
+
+    // Track in Redis for retry
+    if (capturedEventId) {
+      await setWebhookEventStatus(capturedEventId, 'failed');
+      await pushFailedEvent(capturedEventId);
+    }
+
     await logWebhookError('processing_failed', error.message);
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Webhook handler failed',
-        message: error.message 
-      }, 
+        message: error.message
+      },
       { status: 500 }
     );
   }
@@ -166,23 +203,39 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     throw new Error('Match not found');
   }
 
-  if (match.status === 'active') {
-    console.log(`ℹ️  Match ${matchId} already active — skipping`);
+  if (match.status === 'active' || match.status === 'escrowed') {
+    console.log(`ℹ️  Match ${matchId} already escrowed — skipping`);
     return { success: true, matchId, skipped: true };
   }
 
-  // Activate match
+  // Set premium_tracking flag before activating
+  const premiumTracking = session.metadata?.premium_tracking === 'true';
+
+  // Hold match in escrowed state — funds are secured but not yet captured
   await supabase
     .from('matches')
     .update({
-      status:               'active',
+      status:               'escrowed',
       payment_intent_id:    session.payment_intent as string,
       stripe_session_id:    session.id,
       payment_confirmed_at: new Date().toISOString(),
+      premium_tracking:     premiumTracking,
     })
     .eq('id', matchId);
 
-  console.log(`✅ Match ${matchId} activated — £${(session.amount_total ?? 0) / 100}`);
+  // Record in transactions ledger
+  await supabase.from('transactions').insert({
+    match_id:                 matchId,
+    stripe_session_id:        session.id,
+    stripe_payment_intent_id: session.payment_intent as string,
+    amount_total:             session.amount_total,
+    currency:                 session.currency,
+    status:                   'escrowed',
+    sender_email:             match.sender_email,
+    traveller_email:          match.traveler_email,
+  }).catch(() => {});
+
+  console.log(`✅ Match ${matchId} escrowed — £${(session.amount_total ?? 0) / 100}${premiumTracking ? ' [Premium Tracking]' : ''}`);
 
   // Mark signup credit as redeemed if one was applied at checkout
   const creditApplied = session.metadata?.signup_credit_applied;
@@ -219,11 +272,19 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }),
   ]);
 
+  // Generate tracking barcodes asynchronously — does not block checkout confirmation
+  fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/tracking/generate-barcodes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ matchId }),
+  }).catch(err => console.error('Barcode generation failed:', err));
+
   return {
     success: true,
     matchId,
     amount:   (session.amount_total ?? 0) / 100,
     currency: session.currency,
+    premiumTracking,
   };
 }
 
@@ -313,13 +374,12 @@ async function handleChargeCaptured(charge: Stripe.Charge) {
       throw new Error('Match not found');
     }
 
-    // Update match to completed
+    // Mark escrow as released — status moves to completed only after transfer.created fires
     const { error: updateError } = await supabase
       .from('matches')
       .update({
-        payment_status: 'released',
+        payment_status:      'released',
         payment_released_at: new Date().toISOString(),
-        status: 'completed'
       })
       .eq('id', match.id);
 
@@ -328,14 +388,31 @@ async function handleChargeCaptured(charge: Stripe.Charge) {
       throw updateError;
     }
 
+    // Initiate Stripe Connect transfer to traveller's payout account
+    const { data: travellerUser } = await supabase
+      .from('users')
+      .select('stripe_connect_id')
+      .eq('email', match.traveler_email)
+      .maybeSingle();
+
+    if (travellerUser?.stripe_connect_id) {
+      const transferAmount   = Math.round((match.carrier_payout ?? 0) * 100);
+      const transferCurrency = match.currency ?? 'gbp';
+      if (transferAmount > 0) {
+        const stripe = getStripeClient();
+        await stripe.transfers.create({
+          amount:      transferAmount,
+          currency:    transferCurrency,
+          destination: travellerUser.stripe_connect_id,
+          metadata:    { match_id: match.id },
+        });
+        console.log(`💸 Transfer of ${transferCurrency.toUpperCase()} ${transferAmount / 100} initiated to ${travellerUser.stripe_connect_id}`);
+      }
+    } else {
+      console.warn(`⚠️  No stripe_connect_id for traveller ${match.traveler_email} — transfer skipped`);
+    }
+
     console.log(`✅ Escrow released for match ${match.id}`);
-    console.log(`💵 Traveler receives: £${match.booter_receives}`);
-
-    // Send completion emails
-    await sendDeliveryCompletionEmails(match.id);
-
-    // Create completion notifications
-    await createMatchNotifications(match.id, 'delivery_completed');
 
     return {
       success: true,
@@ -412,6 +489,34 @@ async function handlePaymentCanceled(paymentIntent: Stripe.PaymentIntent) {
   };
 }
 
+/**
+ * Handle Stripe Connect transfer confirmation.
+ * Fires after stripe.transfers.create succeeds — money is now on its way to the traveller.
+ */
+async function handleTransferCreated(transfer: Stripe.Transfer) {
+  console.log('✅ Transfer created — completing match...');
+  const matchId = transfer.metadata?.match_id;
+  if (!matchId) return { success: true, transferId: transfer.id, matchId: null };
+
+  await supabase
+    .from('matches')
+    .update({ status: 'completed' })
+    .eq('id', matchId);
+
+  // Update transactions ledger
+  await supabase
+    .from('transactions')
+    .update({ status: 'transferred', stripe_transfer_id: transfer.id, updated_at: new Date().toISOString() })
+    .eq('match_id', matchId)
+    .catch(() => {});
+
+  await sendDeliveryCompletionEmails(matchId);
+  await createMatchNotifications(matchId, 'delivery_completed');
+
+  console.log(`✅ Match ${matchId} completed — transfer ${transfer.id}`);
+  return { success: true, transferId: transfer.id, matchId };
+}
+
 // ============================================================================
 // NOTIFICATION HELPERS
 // ============================================================================
@@ -461,7 +566,7 @@ async function sendPaymentConfirmationEmails(matchId: string, customerEmail?: st
     travelerData?.user?.email && sendPaymentConfirmationEmail({
       to:           travelerData.user.email,
       name:         travelerData.user.user_metadata?.full_name || 'there',
-      amount:       `£${match.booter_receives || 0}`,
+      amount:       `£${match.carrier_payout || 0}`,
       role:         'traveler',
       from:         match.traveler_trip?.from_city,
       to_location:  match.traveler_trip?.to_city,
@@ -472,18 +577,59 @@ async function sendPaymentConfirmationEmails(matchId: string, customerEmail?: st
 }
 
 async function sendPaymentFailureNotification(matchId: string) {
-  console.log(`📧 Sending payment failure notification for match ${matchId}`);
-  // TODO: Implement email notification
+  const { data: match } = await supabase
+    .from('matches')
+    .select('sender_email, traveler_email, sender_trip:sender_trip_id(from_city, to_city)')
+    .eq('id', matchId)
+    .single();
+  if (!match) return;
+  const trip = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
+  const resend = new (await import('resend')).Resend(process.env.RESEND_API_KEY);
+  const from = 'BootHop <noreply@boothop.com>';
+  await Promise.allSettled([
+    match.sender_email && resend.emails.send({
+      from, to: match.sender_email,
+      subject: 'Payment failed — action required',
+      html: `<p>Your payment for the <strong>${trip?.from_city} → ${trip?.to_city}</strong> delivery could not be processed. Please retry via the BootHop dashboard.</p>`,
+      text: `Your payment for ${trip?.from_city} → ${trip?.to_city} failed. Please retry via https://www.boothop.com/dashboard`,
+    }),
+  ]);
 }
 
 async function sendDeliveryCompletionEmails(matchId: string) {
-  console.log(`📧 Sending delivery completion emails for match ${matchId}`);
-  // TODO: Implement email notification
+  const { data: match } = await supabase
+    .from('matches')
+    .select('sender_email, traveler_email, sender_trip:sender_trip_id(from_city, to_city)')
+    .eq('id', matchId)
+    .single();
+  if (!match) return;
+  const trip = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
+  const fromCity = trip?.from_city ?? '';
+  const toCity   = trip?.to_city   ?? '';
+  await Promise.allSettled([
+    match.sender_email && sendDeliveryCompleteEmail({ toEmail: match.sender_email, fromCity, toCity, matchId, role: 'sender' }),
+    match.traveler_email && sendDeliveryCompleteEmail({ toEmail: match.traveler_email, fromCity, toCity, matchId, role: 'traveler' }),
+  ]);
 }
 
 async function sendRefundNotifications(matchId: string) {
-  console.log(`📧 Sending refund notifications for match ${matchId}`);
-  // TODO: Implement email notification
+  const { data: match } = await supabase
+    .from('matches')
+    .select('sender_email, sender_trip:sender_trip_id(from_city, to_city)')
+    .eq('id', matchId)
+    .single();
+  if (!match) return;
+  const trip = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
+  const resend = new (await import('resend')).Resend(process.env.RESEND_API_KEY);
+  await Promise.allSettled([
+    match.sender_email && resend.emails.send({
+      from: 'BootHop <noreply@boothop.com>',
+      to: match.sender_email,
+      subject: 'Your refund is on its way',
+      html: `<p>Your payment for the <strong>${trip?.from_city} → ${trip?.to_city}</strong> delivery has been refunded. It should appear within 5–10 business days.</p>`,
+      text: `Your payment for ${trip?.from_city} → ${trip?.to_city} has been refunded.`,
+    }),
+  ]);
 }
 
 async function createMatchNotifications(matchId: string, type: string) {

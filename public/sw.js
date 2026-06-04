@@ -1,4 +1,4 @@
-const CACHE_NAME = 'boothop-v1779196454898';
+const CACHE_NAME = 'boothop-v1780341439298';
 
 // Pre-cache these on install so key pages and branding assets work offline
 const STATIC_ASSETS = [

@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Not authenticated.' }, { status: 401 });
     }
 
-    const { matchId, goodsValue, insuranceAccepted } = await request.json();
+    const { matchId, goodsValue, insuranceAccepted, premiumTracking } = await request.json();
     if (!matchId) {
       return NextResponse.json({ error: 'matchId is required.' }, { status: 400 });
     }
@@ -46,6 +46,64 @@ export async function POST(request: Request) {
     if (!['kyc_complete', 'payment_pending'].includes(match.status)) {
       return NextResponse.json({ error: 'Match is not ready for payment.' }, { status: 400 });
     }
+
+    // ── Guard 1: Traveller must be Connect-verified ─────────────────────────
+    // Final hard check — if the traveller can't receive a payout, block payment
+    // entirely. Contact details must never be released if payout isn't possible.
+    const { data: travellerUser } = await supabase
+      .from('users')
+      .select('can_receive_payments, stripe_connect_id, stripe_onboarding_completed')
+      .eq('email', match.traveler_email)
+      .maybeSingle();
+
+    if (!travellerUser?.can_receive_payments) {
+      const needsAccount = !travellerUser?.stripe_connect_id;
+      return NextResponse.json({
+        error: needsAccount
+          ? 'Your traveller has not set up their payout account. Payment cannot proceed until they complete Stripe onboarding.'
+          : 'Your traveller\'s payout account is still under review (usually 24–48 hours). Please try again once Stripe has verified them.',
+        travellerNotVerified: true,
+        travellerNeedsAccount: needsAccount,
+      }, { status: 402 });
+    }
+    // ── End Guard 1 ─────────────────────────────────────────────────────────
+
+    // ── Guard 2: Check sender's stored card hasn't expired ──────────────────
+    // Only applies if they saved a card previously. If no card saved, Stripe
+    // checkout will collect one — no block needed.
+    try {
+      const { data: senderUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (senderUser?.id) {
+        const { data: savedCard } = await supabase
+          .from('user_payment_methods')
+          .select('type, card_exp_month, card_exp_year')
+          .eq('user_id', senderUser.id)
+          .eq('is_default', true)
+          .eq('is_active', true)
+          .maybeSingle();
+
+        if (savedCard?.type === 'card') {
+          const now = new Date();
+          const expired =
+            savedCard.card_exp_year < now.getFullYear() ||
+            (savedCard.card_exp_year === now.getFullYear() &&
+              savedCard.card_exp_month < now.getMonth() + 1);
+
+          if (expired) {
+            return NextResponse.json({
+              error: `Your saved card expired ${savedCard.card_exp_month}/${savedCard.card_exp_year}. Please use a new card at checkout.`,
+              cardExpired: true,
+            }, { status: 400 });
+          }
+        }
+      }
+    } catch { /* non-fatal — proceed if payment methods table not queried */ }
+    // ── End Guard 2 ─────────────────────────────────────────────────────────
 
     const agreedPrice   = match.agreed_price ?? 0;
     const parsedGoods   = parseFloat(goodsValue) || 0;
@@ -114,6 +172,20 @@ export async function POST(request: Request) {
       });
     }
 
+    if (premiumTracking) {
+      lineItems.push({
+        price_data: {
+          currency:     'gbp',
+          product_data: {
+            name:        'Premium Tracking',
+            description: 'Unlimited location pings · Photo proof · SMS alerts · Priority support',
+          },
+          unit_amount: 200, // £2.00
+        },
+        quantity: 1,
+      });
+    }
+
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items:  lineItems,
@@ -121,10 +193,15 @@ export async function POST(request: Request) {
       success_url: `${appUrl}/payment/succes?match_id=${matchId}`,
       cancel_url:  `${appUrl}/kyc?matchId=${matchId}`,
       customer_email: email,
+      // Hold funds in escrow until both parties confirm delivery
+      payment_intent_data: { capture_method: 'manual' },
       metadata: {
         match_id:              matchId,
         sender_email:          email,
         signup_credit_applied: signupCreditApplied > 0 ? String(signupCreditApplied) : '',
+        premium_tracking:      premiumTracking ? 'true' : '',
+        carrier_payout:        String(Math.round(carrierPayout * 100)),
+        currency:              'gbp',
       },
     });
 

@@ -19,7 +19,7 @@ const topics = [
 
 export default function ContactPage() {
   useScrollReveal();
-  const [form, setForm] = useState({ name: '', email: '', topic: '', message: '' });
+  const [form, setForm] = useState({ name: '', email: '', topic: '', message: '', _hp: '' });
   const [status, setStatus] = useState<'idle' | 'sending' | 'awaiting_verification' | 'sent' | 'error'>('idle');
 
   useEffect(() => {
@@ -211,7 +211,7 @@ export default function ContactPage() {
                 </p>
                 <p className="text-slate-400 text-sm mb-8">Click the link in that email to submit your message to our support team.</p>
                 <button
-                  onClick={() => { setForm({ name: '', email: '', topic: '', message: '' }); setStatus('idle'); }}
+                  onClick={() => { setForm({ name: '', email: '', topic: '', message: '', _hp: '' }); setStatus('idle'); }}
                   className="rounded-xl border border-white/20 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-all duration-300 hover:scale-105"
                 >
                   Use a different email
@@ -228,7 +228,7 @@ export default function ContactPage() {
                 <h2 className="text-3xl font-black text-white mb-2">Message sent!</h2>
                 <p className="text-slate-400 text-sm mb-8">We'll be in touch within 24 hours on business days.</p>
                 <button
-                  onClick={() => { setForm({ name: '', email: '', topic: '', message: '' }); setStatus('idle'); }}
+                  onClick={() => { setForm({ name: '', email: '', topic: '', message: '', _hp: '' }); setStatus('idle'); }}
                   className="rounded-xl border border-white/20 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-all duration-300 hover:scale-105"
                 >
                   Send another message
@@ -254,6 +254,12 @@ export default function ContactPage() {
                   <p className="text-sm text-red-300">Something went wrong. Please email us directly at info@boothop.com</p>
                 </div>
               )}
+
+              {/* Honeypot — hidden from humans, bots fill it and get silently dropped */}
+              <div style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }} aria-hidden="true">
+                <input tabIndex={-1} type="text" name="website" autoComplete="off"
+                  value={form._hp} onChange={(e) => setForm({ ...form, _hp: e.target.value })} />
+              </div>
 
               <div className="grid sm:grid-cols-2 gap-4 relative">
                 <div>

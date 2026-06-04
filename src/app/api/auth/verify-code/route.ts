@@ -150,6 +150,7 @@ export async function POST(request: Request) {
     const response = NextResponse.json({
       ok: true,
       email,
+      token,          // returned for mobile clients that store in SecureStore
       hasDraft,
       tripSaved:      hasDraft,
       isNewUser,

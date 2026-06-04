@@ -1,15 +1,38 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const protectedPaths = ['/dashboard', '/journeys/create', '/profile'];
+const protectedPagePaths = ['/dashboard', '/journeys/create', '/profile'];
 
 export function middleware(request: NextRequest) {
-  const isProtected = protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path));
+  const { pathname } = request.nextUrl;
+
+  // ── Mobile Bearer token → cookie injection ─────────────────────────────────
+  // Mobile clients send "Authorization: Bearer <jwt>" instead of a cookie.
+  // Middleware runs on Edge Runtime (no jsonwebtoken), so we can't verify here.
+  // We forward the token as the boothop_session cookie so every API route
+  // handler picks it up via `cookies()` without any changes.
+  if (pathname.startsWith('/api/')) {
+    const authHeader = request.headers.get('authorization');
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+    if (bearerToken && !request.cookies.get('boothop_session')) {
+      // Inject the token as a cookie into the request so route handlers
+      // that call `cookies()` see it without any changes.
+      const requestHeaders = new Headers(request.headers);
+      const existing = requestHeaders.get('cookie') ?? '';
+      requestHeaders.set(
+        'cookie',
+        existing ? `${existing}; boothop_session=${bearerToken}` : `boothop_session=${bearerToken}`
+      );
+      return NextResponse.next({ request: { headers: requestHeaders } });
+    }
+    return NextResponse.next();
+  }
+
+  // ── Page route protection ──────────────────────────────────────────────────
+  const isProtected = protectedPagePaths.some((p) => pathname.startsWith(p));
   if (!isProtected) return NextResponse.next();
 
-  // Middleware runs on Edge Runtime — jsonwebtoken (Node.js crypto) is not
-  // available here. We just check the cookie exists; full JWT verification
-  // happens in /api/auth/me (Node.js runtime) which the dashboard calls on load.
   const token = request.cookies.get('boothop_session')?.value;
   if (!token) {
     return NextResponse.redirect(new URL('/login', request.url));
@@ -19,5 +42,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/journeys/create/:path*', '/profile/:path*'],
+  matcher: ['/api/:path*', '/dashboard/:path*', '/journeys/create/:path*', '/profile/:path*'],
 };
