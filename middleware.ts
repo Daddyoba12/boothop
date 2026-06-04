@@ -12,6 +12,12 @@ export function middleware(request: NextRequest) {
   // We forward the token as the boothop_session cookie so every API route
   // handler picks it up via `cookies()` without any changes.
   if (pathname.startsWith('/api/')) {
+    // Cron routes use their own Bearer-secret auth — skip cookie injection so
+    // the Authorization header reaches the route handler untouched.
+    if (pathname.startsWith('/api/cron/')) {
+      return NextResponse.next();
+    }
+
     const authHeader = request.headers.get('authorization');
     const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
