@@ -119,6 +119,14 @@ export default function TermsPage() {
 
       {/* HERO */}
       <section className="relative pt-36 pb-16 px-6 text-center z-10">
+        {/* BootHop logo — visible brand identity for this page */}
+        <div className="flex justify-center mb-8">
+          <img
+            src="/images/boothopimage-gradient.png"
+            alt="BootHop"
+            className="h-16 w-auto"
+          />
+        </div>
         <div className="inline-flex items-center gap-2 mb-6 px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/30 backdrop-blur-xl">
           <Scale className="h-4 w-4 text-cyan-400" />
           <span className="text-xs font-semibold tracking-widest uppercase text-cyan-300">Legal</span>
