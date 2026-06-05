@@ -22,7 +22,19 @@
     },
     {
       "path": "/api/cron/process-webhook-queue",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/instagram-post",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/instagram-publish",
       "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/instagram-analytics",
+      "schedule": "0 10 * * 1"
     }
   ]
 }
