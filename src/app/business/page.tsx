@@ -3,11 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import {
   Loader2, Mail, ShieldCheck, CheckCircle, ArrowRight,
-  Zap, Lock, Clock, Star, Building2, Truck,
-  MessageCircle,
+  Zap, Star, MessageCircle, Truck, Users, Building2, ChevronDown,
 } from 'lucide-react';
 import { BusinessNav } from '@/components/business/BusinessNav';
 import BusinessFooter from '@/components/business/BusinessFooter';
@@ -22,7 +20,6 @@ const BIZ_VIDEOS = [
   '/videos/onecall/test2/compressed/Planeoff2.mp4',
 ];
 
-
 export default function BoothopBusiness() {
   const router = useRouter();
 
@@ -36,25 +33,22 @@ export default function BoothopBusiness() {
   const [tickerIdx,   setTickerIdx]   = useState(0);
 
   const DELIVERIES = [
-    { icon: '🚀', route: 'Manchester → London',    time: '3.2 hours' },
-    { icon: '✈️', route: 'Bristol → Edinburgh',    time: '4.5 hours' },
-    { icon: '⚙️', route: 'Birmingham → Leeds',     time: '2.8 hours' },
-    { icon: '🏥', route: 'Glasgow → Newcastle',    time: '3.1 hours' },
+    { icon: '🚀', route: 'Manchester → London',  time: '3.2 hours' },
+    { icon: '✈️', route: 'Bristol → Edinburgh',  time: '4.5 hours' },
+    { icon: '⚙️', route: 'Birmingham → Leeds',   time: '2.8 hours' },
+    { icon: '🏥', route: 'Glasgow → Newcastle',  time: '3.1 hours' },
   ];
 
-  // Apple-style slow video crossfade — 7s interval
   useEffect(() => {
     const id = setInterval(() => setBizVid(v => (v + 1) % BIZ_VIDEOS.length), 7000);
     return () => clearInterval(id);
   }, []);
 
-  // Live delivery ticker — rotate every 4s
   useEffect(() => {
     const id = setInterval(() => setTickerIdx(v => (v + 1) % 4), 4000);
     return () => clearInterval(id);
   }, []);
 
-  // ── Session check ──────────────────────────────────────────────────────────
   useEffect(() => {
     fetch('/api/business/auth/me')
       .then(r => r.json())
@@ -68,7 +62,6 @@ export default function BoothopBusiness() {
       .catch(() => setStage('landing'));
   }, [router]);
 
-  // ── Auth ───────────────────────────────────────────────────────────────────
   const sendOtp = async () => {
     setAuthError(null); setAuthLoading(true);
     try {
@@ -78,7 +71,6 @@ export default function BoothopBusiness() {
       });
       const j = await res.json();
       if (!res.ok) { setAuthError(j.error); return; }
-      // Trusted returning user — server re-issued session, skip OTP
       if (j.skipOtp) {
         const me = await fetch('/api/business/auth/me').then(r => r.json());
         router.push(me.partner_status === 'active' ? '/business/portal/priority' : loginIntent === 'priority' ? '/business/priority-partner' : '/business/portal');
@@ -98,12 +90,11 @@ export default function BoothopBusiness() {
       });
       const j = await res.json();
       if (!res.ok) { setAuthError(j.error); return; }
-      // Check partner status to route to the right portal
       const me = await fetch('/api/business/auth/me').then(r => r.json());
       if (me.partner_status === 'active') {
         router.push('/business/portal/priority');
       } else if (loginIntent === 'priority') {
-        router.push('/business/priority-partner'); // not yet a partner — take them to apply & pay
+        router.push('/business/priority-partner');
       } else {
         router.push('/business/portal');
       }
@@ -111,7 +102,6 @@ export default function BoothopBusiness() {
     finally { setAuthLoading(false); }
   };
 
-  // ── Loading ────────────────────────────────────────────────────────────────
   if (stage === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: BG }}>
@@ -130,257 +120,311 @@ export default function BoothopBusiness() {
         {stage === 'landing' && (
           <motion.div key="landing" {...FADE} transition={{ duration: 0.4 }}>
 
-            {/* Sticky nav — sits above the hero so sticky positioning works */}
+            {/* ── NAV ───────────────────────────────────────────────── */}
             <BusinessNav
               rightSlot={
                 <>
-                  <a href="/" className="text-sm font-semibold text-white/35 hover:text-white/70 transition-colors hidden sm:flex items-center gap-1.5">
-                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+                  <a href="/" className="text-sm font-semibold text-white/30 hover:text-white/70 transition-colors hidden sm:flex items-center gap-1.5">
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
                     BootHop
                   </a>
-                  <span className="text-white/15 hidden sm:block">|</span>
-                  <a href="/business/how-it-works" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">How It Works</a>
-                  <button onClick={() => { setLoginIntent('priority'); setStage('email'); }} className="text-sm font-semibold text-amber-400/70 hover:text-amber-400 transition-colors hidden sm:block">Priority Partner</button>
-                  <a href="/business/contact" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">Contact</a>
-                  <button onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
-                    className="inline-flex items-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-black font-black text-sm px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-400/40 hover:scale-105 active:scale-95">
+                  <span className="text-white/10 hidden sm:block">|</span>
+                  <a href="/business/how-it-works" className="text-sm font-semibold text-white/45 hover:text-white transition-colors hidden sm:block">How It Works</a>
+                  <a href="/business/carrier-network" className="text-sm font-semibold text-blue-400/70 hover:text-blue-300 transition-colors hidden sm:block">Carrier Network</a>
+                  <a href="/business/contact" className="text-sm font-semibold text-white/45 hover:text-white transition-colors hidden sm:block">Contact</a>
+                  <button
+                    onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
+                    className="inline-flex items-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-black font-black text-sm px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/30 hover:scale-105 active:scale-95">
                     Book a Delivery
                   </button>
                 </>
               }
             />
 
-            {/* ── FULL-SCREEN VIDEO HERO ───────────────────────────── */}
-            <div className="relative min-h-screen w-full" style={{ background: BG }}>
-
-              {/* Background video */}
+            {/* ── HERO ──────────────────────────────────────────────── */}
+            <div className="relative min-h-screen w-full overflow-hidden" style={{ background: BG }}>
               <video
                 autoPlay muted loop playsInline preload="auto"
-                className="absolute inset-0 w-full h-full object-cover brightness-[0.65]"
+                className="absolute inset-0 w-full h-full object-cover brightness-[0.55]"
                 src="/videos/onecall/test2/compressed/Planeeoff1.mp4"
               />
-
-              {/* Layer 1 — solid dark base */}
-              <div className="absolute inset-0 bg-black/60" />
-
-              {/* Layer 2 — directional gradient */}
+              <div className="absolute inset-0 bg-black/50" />
               <div className="absolute inset-0" style={{
-                background: `
-                  linear-gradient(to bottom,
-                    rgba(2,6,35,0.75) 0%,
-                    rgba(2,6,35,0.20) 28%,
-                    rgba(2,6,35,0.20) 58%,
-                    rgba(2,6,35,0.90) 88%,
-                    #020617 100%
-                  )`
+                background: `linear-gradient(to bottom,
+                  rgba(2,6,35,0.70) 0%,
+                  rgba(2,6,35,0.10) 30%,
+                  rgba(2,6,35,0.10) 60%,
+                  rgba(2,6,35,0.95) 100%)`
               }} />
 
-              {/* Centred hero content */}
-              <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-6 py-24">
+              <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-6 pt-20 pb-32">
 
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold px-4 py-2 rounded-full mb-8 uppercase tracking-widest backdrop-blur-sm">
-                  <Zap className="h-3.5 w-3.5" /> Premium business logistics
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                  className="inline-flex items-center gap-2 bg-white/8 border border-white/15 backdrop-blur-xl text-white/70 text-xs font-semibold px-4 py-2 rounded-full mb-8 uppercase tracking-widest">
+                  Business Logistics · UK &amp; International
                 </motion.div>
 
-                <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                  className="text-5xl md:text-7xl font-black tracking-tight leading-tight mb-6 drop-shadow-2xl">
-                  Same-day delivery<br /><span className="text-emerald-400">across the UK.</span>
+                <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+                  className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tight leading-[1.05] mb-8 drop-shadow-2xl max-w-5xl">
+                  Keep production<br />
+                  <span className="text-emerald-400">running.</span>
                 </motion.h1>
 
+                <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+                  className="text-white/55 text-lg md:text-xl max-w-2xl mx-auto mb-4 leading-relaxed">
+                  Keep aircraft flying. Keep deals closing. Keep lines moving.
+                </motion.p>
                 <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-                  className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
-                  Keep production running. Get aircraft flying.<br />
-                  <span className="text-white/80">Emergency parts delivered when downtime = £10K/hour.</span>
+                  className="text-white/80 text-base md:text-lg max-w-xl mx-auto mb-12 leading-relaxed font-medium">
+                  When downtime costs thousands per hour, BootHop moves what matters — verified carriers, fully insured, same-day.
                 </motion.p>
 
-                {/* Dual login cards */}
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-                  className="grid sm:grid-cols-2 gap-4 w-full max-w-2xl mb-4">
+                {/* Stat chips */}
+                <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+                  className="flex flex-wrap items-center justify-center gap-3 mb-16">
+                  {[
+                    { icon: '⚡', label: 'Same-day UK' },
+                    { icon: '🛡️', label: 'Insured as standard' },
+                    { icon: '✅', label: 'ID-verified carriers' },
+                    { icon: '🌍', label: 'International' },
+                  ].map(({ icon, label }) => (
+                    <span key={label} className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/70 bg-white/8 border border-white/12 backdrop-blur-xl rounded-full px-4 py-2">
+                      {icon} {label}
+                    </span>
+                  ))}
+                </motion.div>
 
-                  {/* Priority Partner card */}
-                  <div className="group relative overflow-hidden bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-6 text-left transition-all duration-300 hover:border-amber-400/50 hover:bg-white/15 hover:-translate-y-1 hover:shadow-amber-500/20">
-                    <div className="pointer-events-none absolute -top-6 right-0 w-24 h-24 bg-amber-500/25 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent" />
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/25 border border-amber-400/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                      <Star className="h-5 w-5 text-amber-400" />
+                {/* Scroll cue */}
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
+                  className="flex flex-col items-center gap-2 text-white/30">
+                  <p className="text-xs font-semibold uppercase tracking-widest">Explore your options</p>
+                  <ChevronDown className="h-5 w-5 animate-bounce" />
+                </motion.div>
+              </div>
+            </div>
+
+            {/* ── THREE PATHS ───────────────────────────────────────── */}
+            <section className="relative z-10 py-24 px-6" style={{ background: BG }}>
+              <div className="max-w-6xl mx-auto">
+
+                <div className="text-center mb-16">
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
+                    className="text-xs font-black text-emerald-400 uppercase tracking-[0.25em] mb-4">
+                    Three paths. One network.
+                  </motion.p>
+                  <motion.h2 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                    className="text-3xl md:text-5xl font-black text-white mb-4">
+                    Choose how you work<br />with BootHop
+                  </motion.h2>
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
+                    className="text-white/40 text-base max-w-xl mx-auto">
+                    Whether you're shipping, carrying, or managing critical logistics at scale — there's a route built for you.
+                  </motion.p>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-6 items-stretch">
+
+                  {/* ── CARD 1: Express ──────────────────────────────── */}
+                  <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                    className="group relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-white/3 backdrop-blur-sm p-8 flex flex-col transition-all duration-300 hover:border-emerald-500/50 hover:bg-white/5 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/10">
+                    <div className="pointer-events-none absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                    <div className="mb-6">
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center mb-5">
+                        <Truck className="h-6 w-6 text-emerald-400" />
+                      </div>
+                      <span className="text-[10px] font-black text-emerald-400/70 uppercase tracking-widest">One-off &amp; Urgent</span>
+                      <h3 className="text-2xl font-black text-white mt-1 mb-3">BootHop Express</h3>
+                      <p className="text-white/45 text-sm leading-relaxed">
+                        For businesses that need something moved now. No contracts. No minimum commitment. Just fast, reliable same-day delivery.
+                      </p>
                     </div>
-                    <h3 className="text-white font-black mb-1.5 group-hover:text-amber-300 transition-colors">Priority Partner</h3>
-                    <p className="text-white/50 text-xs leading-relaxed mb-3">For teams with 5+ urgent deliveries per month.</p>
-                    <ul className="space-y-1.5 mb-4">
-                      {['Dedicated account manager', '2-hour response guarantee', 'Volume discounts up to 40%', 'API integration & Slack alerts'].map(b => (
-                        <li key={b} className="flex items-center gap-2 text-xs text-white/60">
-                          <CheckCircle className="h-3 w-3 text-amber-400 shrink-0" />{b}
+
+                    <ul className="space-y-2.5 mb-6 flex-1">
+                      {[
+                        'Instant quote in under 30 seconds',
+                        'Same-day UK, airport-to-airport options',
+                        'Fully insured up to £10,000',
+                        'Pay per delivery — no account required',
+                      ].map(b => (
+                        <li key={b} className="flex items-start gap-2.5 text-sm text-white/60">
+                          <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                          {b}
                         </li>
                       ))}
                     </ul>
-                    <p className="text-amber-400/70 text-xs font-bold mb-4">From £10,000/yr · UK &amp; International</p>
-                    <div className="flex gap-2">
-                      <button onClick={() => { setLoginIntent('priority'); setStage('email'); }}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 bg-amber-400 hover:bg-amber-300 text-black text-xs font-black px-3 py-2.5 rounded-xl transition-all hover:scale-105 active:scale-95">
-                        Sign In <ArrowRight className="h-3 w-3" />
+
+                    <div className="mt-auto">
+                      <p className="text-emerald-400/70 text-xs font-bold mb-4">From £300 UK · From £1,000 International</p>
+                      <button
+                        onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
+                        className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-sm px-5 py-3.5 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-emerald-500/20">
+                        Get Instant Quote <ArrowRight className="h-4 w-4" />
                       </button>
+                    </div>
+                  </motion.div>
+
+                  {/* ── CARD 2: Carrier Network ───────────────────────── (most prominent) */}
+                  <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                    className="group relative overflow-hidden rounded-3xl border-2 border-blue-400/40 bg-blue-500/6 backdrop-blur-sm p-8 flex flex-col transition-all duration-300 hover:border-blue-400/70 hover:bg-blue-500/10 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/20 md:scale-[1.03]">
+                    <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 w-56 h-56 bg-blue-500/15 rounded-full blur-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+
+                    {/* Most popular badge */}
+                    <div className="absolute top-6 right-6">
+                      <span className="text-[10px] font-black bg-blue-400/20 border border-blue-400/30 text-blue-300 px-3 py-1 rounded-full uppercase tracking-widest">
+                        Join the Network
+                      </span>
+                    </div>
+
+                    <div className="mb-6">
+                      <div className="w-12 h-12 rounded-2xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center mb-5">
+                        <Users className="h-6 w-6 text-blue-300" />
+                      </div>
+                      <span className="text-[10px] font-black text-blue-400/70 uppercase tracking-widest">Couriers &amp; Operators</span>
+                      <h3 className="text-2xl font-black text-white mt-1 mb-3">Carrier Network</h3>
+                      <p className="text-white/45 text-sm leading-relaxed">
+                        For courier companies, transport operators and logistics providers. Receive urgent delivery requests from businesses across the UK. You choose which jobs to accept.
+                      </p>
+                    </div>
+
+                    <ul className="space-y-2.5 mb-6 flex-1">
+                      {[
+                        'Receive job alerts in your service area',
+                        'Airport, AOG and same-day opportunities',
+                        'No lead generation required',
+                        'ADR, aviation and specialist roles available',
+                        'Build your verified delivery profile',
+                      ].map(b => (
+                        <li key={b} className="flex items-start gap-2.5 text-sm text-white/60">
+                          <CheckCircle className="h-4 w-4 text-blue-400 shrink-0 mt-0.5" />
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="mt-auto">
+                      <p className="text-blue-300/60 text-xs font-semibold mb-4">Free to register · Earn per job accepted</p>
+                      <a href="/business/carrier-network"
+                        className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-black text-sm px-5 py-3.5 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-blue-500/25">
+                        Register as Carrier Partner <ArrowRight className="h-4 w-4" />
+                      </a>
+                      <p className="text-white/20 text-xs text-center mt-3">
+                        Capability profile required · Certifications verified
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* ── CARD 3: Priority Client ───────────────────────── */}
+                  <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                    className="group relative overflow-hidden rounded-3xl border border-amber-500/20 bg-white/3 backdrop-blur-sm p-8 flex flex-col transition-all duration-300 hover:border-amber-500/50 hover:bg-amber-500/5 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/10">
+                    <div className="pointer-events-none absolute -top-10 -right-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                    <div className="mb-6">
+                      <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center mb-5">
+                        <Building2 className="h-6 w-6 text-amber-400" />
+                      </div>
+                      <span className="text-[10px] font-black text-amber-400/70 uppercase tracking-widest">Enterprise &amp; Critical</span>
+                      <h3 className="text-2xl font-black text-white mt-1 mb-3">Priority Client</h3>
+                      <p className="text-white/45 text-sm leading-relaxed">
+                        For organisations where delivery failure is not an option. Dedicated account management, priority carrier assignment, and enterprise-grade service.
+                      </p>
+                    </div>
+
+                    <ul className="space-y-2.5 mb-6 flex-1">
+                      {[
+                        'Dedicated account manager',
+                        '2-hour guaranteed response',
+                        'Engineering, aerospace, healthcare & legal',
+                        'UK and international coverage',
+                        'API & Slack integration available',
+                      ].map(b => (
+                        <li key={b} className="flex items-start gap-2.5 text-sm text-white/60">
+                          <CheckCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="mt-auto">
+                      <p className="text-amber-400/70 text-xs font-bold mb-4">From £10,000/year · UK &amp; International</p>
                       <a href="/business/priority-partner"
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 border border-amber-400/40 text-amber-400 hover:border-amber-400/70 hover:bg-amber-500/10 text-xs font-black px-3 py-2.5 rounded-xl transition-all">
-                        Apply Now <ArrowRight className="h-3 w-3" />
+                        className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-orange-400 text-black font-black text-sm px-5 py-3.5 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-amber-500/20">
+                        Apply Now <ArrowRight className="h-4 w-4" />
                       </a>
                     </div>
-                  </div>
-
-                  {/* Book a Delivery card */}
-                  <div className="group relative overflow-hidden bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-6 text-left transition-all duration-300 hover:border-emerald-400/50 hover:bg-white/15 hover:-translate-y-1 hover:shadow-emerald-500/20">
-                    <div className="pointer-events-none absolute -top-6 right-0 w-24 h-24 bg-emerald-500/25 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent" />
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/25 border border-emerald-400/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                      <Zap className="h-5 w-5 text-emerald-400" />
-                    </div>
-                    <h3 className="text-white font-black mb-1.5 group-hover:text-emerald-300 transition-colors">Book a Delivery</h3>
-                    <p className="text-white/50 text-xs leading-relaxed mb-3">Urgent, one-off deliveries. No contracts or minimums.</p>
-                    <ul className="space-y-1.5 mb-4">
-                      {['Instant online quote', 'Same-day UK delivery', 'Fully insured up to £10K', 'No account required to quote'].map(b => (
-                        <li key={b} className="flex items-center gap-2 text-xs text-white/60">
-                          <CheckCircle className="h-3 w-3 text-emerald-400 shrink-0" />{b}
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="text-emerald-400/70 text-xs font-bold mb-4">From £300 UK · From £1,000 International</p>
-                    <button onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
-                      className="w-full inline-flex items-center justify-center gap-1.5 bg-emerald-400 hover:bg-emerald-300 text-black text-xs font-black px-3 py-2.5 rounded-xl transition-all hover:scale-105 active:scale-95">
-                      Get Instant Quote <ArrowRight className="h-3 w-3" />
-                    </button>
-                  </div>
-
-                </motion.div>
-                {/* Social proof ticker — glassmorphism */}
-                <div className="mt-8 w-full max-w-2xl mx-auto rounded-3xl border border-white/20 bg-white/8 backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.15)] px-8 py-7">
-
-                  {/* Header */}
-                  <p className="text-[11px] font-black text-emerald-400 uppercase tracking-[0.25em] text-center mb-5">
-                    Serving Critical Industries
-                  </p>
-
-                  {/* Industry tags */}
-                  <div className="flex flex-wrap justify-center gap-2.5 mb-6">
-                    {['⚙️ Engineering & Manufacturing', '✈️ Aerospace & AOG', '⚖️ Legal & Finance', '🎬 Events & Production', '🏥 Healthcare & Pharma'].map(ind => (
-                      <span key={ind} className="text-xs text-white/80 font-semibold bg-white/10 border border-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 hover:bg-white/15 transition-colors cursor-default">
-                        {ind}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Divider */}
-                  <div className="h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent mb-6" />
-
-                  {/* Rotating live delivery */}
-                  <div className="flex items-center justify-center gap-4 bg-gradient-to-r from-emerald-500/15 via-blue-500/10 to-emerald-500/15 border border-emerald-500/25 rounded-2xl px-6 py-4 mb-6">
-                    <span className="text-2xl drop-shadow-lg">{DELIVERIES[tickerIdx].icon}</span>
-                    <div className="flex flex-col items-start">
-                      <span className="text-[10px] text-emerald-400/70 uppercase tracking-widest font-bold mb-0.5">Live delivery</span>
-                      <span className="text-sm font-bold text-white">{DELIVERIES[tickerIdx].route}</span>
-                    </div>
-                    <span className="ml-auto text-sm font-black text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 rounded-xl px-3 py-1.5">
-                      {DELIVERIES[tickerIdx].time}
-                    </span>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="flex items-center justify-center gap-6 mb-5">
-                    <div className="text-center">
-                      <p className="text-2xl font-black text-white">47</p>
-                      <p className="text-xs text-white/45 mt-0.5">urgent deliveries this week</p>
-                    </div>
-                    <div className="w-px h-10 bg-white/10" />
-                    <div className="text-center">
-                      <p className="text-2xl font-black text-white">4.8<span className="text-amber-400">★</span></p>
-                      <p className="text-xs text-white/45 mt-0.5">from operations managers</p>
-                    </div>
-                  </div>
-
-                  {/* Divider */}
-                  <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4" />
-
-                  {/* Note */}
-                  <p className="text-xs text-white/35 text-center italic">
-                    Business email required · Personal accounts not accepted
-                  </p>
+                  </motion.div>
 
                 </div>
+
+                {/* Already a client sign-in prompt */}
+                <div className="text-center mt-12">
+                  <p className="text-white/25 text-sm">
+                    Already a client or carrier partner?{' '}
+                    <button
+                      onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
+                      className="text-white/50 hover:text-white underline underline-offset-2 transition-colors font-semibold">
+                      Sign in here
+                    </button>
+                  </p>
+                </div>
               </div>
+            </section>
 
-              {/* Scroll cue */}
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
-                className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30 z-10">
-                <p className="text-xs font-semibold uppercase tracking-widest">Scroll</p>
-                <div className="w-px h-10 bg-gradient-to-b from-white/30 to-transparent" />
-              </motion.div>
+            {/* ── INDUSTRY STRIP ────────────────────────────────────── */}
+            <div className="relative z-10 border-y border-white/5 bg-white/2 py-10 px-6">
+              <div className="max-w-5xl mx-auto">
+                <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.25em] text-center mb-6">Serving critical industries</p>
+                <div className="flex flex-wrap justify-center gap-3">
+                  {['⚙️ Engineering & Manufacturing', '✈️ Aerospace & AOG', '⚖️ Legal & Finance', '🎬 Events & Production', '🏥 Healthcare & Pharma'].map(ind => (
+                    <span key={ind} className="text-xs text-white/60 font-semibold bg-white/5 border border-white/10 rounded-full px-4 py-2">
+                      {ind}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Live delivery ticker */}
+                <div className="mt-8 max-w-md mx-auto flex items-center justify-center gap-4 bg-emerald-500/8 border border-emerald-500/20 rounded-2xl px-6 py-4">
+                  <span className="text-2xl">{DELIVERIES[tickerIdx].icon}</span>
+                  <div>
+                    <p className="text-[10px] text-emerald-400/60 uppercase tracking-widest font-bold">Live delivery</p>
+                    <p className="text-sm font-bold text-white">{DELIVERIES[tickerIdx].route}</p>
+                  </div>
+                  <span className="ml-auto text-sm font-black text-emerald-400 bg-emerald-500/15 border border-emerald-500/20 rounded-xl px-3 py-1.5 shrink-0">
+                    {DELIVERIES[tickerIdx].time}
+                  </span>
+                </div>
+              </div>
             </div>
 
-            {/* ── Premium ambient glow layer — fixed so it never adds scroll height ── */}
-            <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
-              {/* Emerald glow — top left */}
-              <div className="absolute top-[5%]  left-[2%]  w-[560px] h-[560px] bg-emerald-500/10 rounded-full blur-[160px]" />
-              {/* Blue glow — top right */}
-              <div className="absolute top-[12%] right-[3%] w-[440px] h-[440px] bg-blue-600/10  rounded-full blur-[140px]" />
-              {/* Violet glow — mid */}
-              <div className="absolute top-[38%] left-[40%] w-[380px] h-[380px] bg-violet-500/7  rounded-full blur-[130px]" />
-              {/* Teal glow — lower left */}
-              <div className="absolute top-[62%] left-[8%]  w-[320px] h-[320px] bg-teal-500/8   rounded-full blur-[120px]" />
-              {/* Rose glow — lower right */}
-              <div className="absolute top-[75%] right-[8%] w-[300px] h-[300px] bg-rose-500/5    rounded-full blur-[110px]" />
-            </div>
-
-            {/* ── BOTTOM SECTION — Crossfading plane videos + premium glass panel ── */}
+            {/* ── WHY BOOTHOP — glass panel over crossfading video ──── */}
             <section className="relative z-10 py-28 px-8 overflow-hidden">
-
-              {/* Two plane videos — slow opacity crossfade */}
               <div className="absolute inset-0">
                 {BIZ_VIDEOS.map((src, i) => (
-                  <video
-                    key={src}
-                    autoPlay muted loop playsInline
-                    preload={i === 0 ? 'auto' : 'none'}
+                  <video key={src} autoPlay muted loop playsInline preload={i === 0 ? 'auto' : 'none'}
                     className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[3000ms] ease-in-out"
-                    style={{ opacity: i === bizVid ? 1 : 0 }}
-                  >
+                    style={{ opacity: i === bizVid ? 1 : 0 }}>
                     <source src={src} type="video/mp4" />
                   </video>
                 ))}
-                {/* Dark scrim — enough to read text without killing the planes */}
-                <div className="absolute inset-0 bg-black/55" />
-                {/* Fade into adjacent sections */}
+                <div className="absolute inset-0 bg-black/60" />
                 <div className="absolute inset-0 bg-gradient-to-b from-[#020617] via-transparent to-[#020617]" />
-                {/* Edge vignette */}
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_50%,rgba(2,6,23,0.50)_100%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_50%,rgba(2,6,23,0.55)_100%)]" />
               </div>
 
-              {/* ── GLASS PANEL — premium frosted card over the video ── */}
               <div className="relative max-w-5xl mx-auto">
                 <div className="rounded-3xl border border-white/[0.12] bg-white/[0.05] backdrop-blur-2xl shadow-[0_40px_120px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.1)] overflow-hidden">
-
-                  {/* Top accent line */}
                   <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent" />
-
                   <div className="p-10 md:p-14">
-
-                    {/* Label */}
-                    <p className="text-xs font-black text-emerald-400 uppercase tracking-[0.2em] mb-6">
-                      Why BootHop Business
-                    </p>
-
-                    {/* Headline */}
+                    <p className="text-xs font-black text-emerald-400 uppercase tracking-[0.2em] mb-6">Why BootHop Business</p>
                     <h2 className="text-4xl md:text-5xl font-black text-white leading-[1.08] mb-6">
                       We don&apos;t deliver parcels.<br />
                       <span className="text-emerald-400">We eliminate downtime.</span>
                     </h2>
-
-                    {/* Sub-copy */}
                     <p className="text-white/65 text-lg max-w-2xl leading-relaxed mb-12">
-                      Downtime costs £10,000+ per hour. Delays cost more.
-                      BootHop moves critical items the moment they matter —
-                      verified carriers, fully insured, same-day.
+                      Downtime costs £10,000+ per hour. Delays cost contracts. BootHop moves critical items the moment they matter — verified carriers, fully insured, same-day.
                     </p>
-
-                    {/* Use cases — frosted inner grid */}
                     <div className="grid md:grid-cols-3 gap-px bg-white/[0.07] rounded-2xl overflow-hidden mb-12">
                       {[
                         { icon: '⚙️', title: 'Engineering &\nManufacturing', body: 'Spare parts, production line recovery, maintenance components.' },
@@ -394,8 +438,6 @@ export default function BoothopBusiness() {
                         </div>
                       ))}
                     </div>
-
-                    {/* Metrics strip */}
                     <div className="flex flex-wrap items-center justify-between gap-5 border-t border-white/10 pt-8 text-sm">
                       <span className="text-white/60"><strong className="text-white font-black">Instant</strong> quotes</span>
                       <span className="text-white/60"><strong className="text-white font-black">Same-day</strong> UK-wide</span>
@@ -406,16 +448,13 @@ export default function BoothopBusiness() {
                         View pricing <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </a>
                     </div>
-
                   </div>
-
-                  {/* Bottom accent line */}
                   <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 </div>
               </div>
             </section>
 
-            {/* ── HOW IT WORKS ── */}
+            {/* ── HOW IT WORKS ──────────────────────────────────────── */}
             <section className="relative z-10 py-20 px-8">
               <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-12">
@@ -424,10 +463,10 @@ export default function BoothopBusiness() {
                 </div>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
-                    { n: '01', title: 'REQUEST', desc: 'Call, SMS, or instant online quote in 30 seconds', icon: '📋' },
-                    { n: '02', title: 'DISPATCH', desc: 'Verified carrier assigned within 15 minutes', icon: '🚗' },
-                    { n: '03', title: 'TRACK', desc: 'Live GPS tracking + photo proof of pickup & delivery', icon: '📍' },
-                    { n: '04', title: 'CONFIRM', desc: 'Automated billing + delivery confirmation email/SMS', icon: '✅' },
+                    { n: '01', title: 'REQUEST',  desc: 'Call, SMS, or instant online quote in 30 seconds',                    icon: '📋' },
+                    { n: '02', title: 'DISPATCH', desc: 'Verified carrier assigned within 15 minutes',                         icon: '🚗' },
+                    { n: '03', title: 'TRACK',    desc: 'Live GPS tracking + photo proof of pickup & delivery',                icon: '📍' },
+                    { n: '04', title: 'CONFIRM',  desc: 'Automated billing + delivery confirmation email/SMS',                 icon: '✅' },
                   ].map(({ n, title, desc, icon }) => (
                     <div key={n} className="relative rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-6 hover:border-emerald-500/30 hover:bg-white/[0.07] transition-all duration-300 hover:-translate-y-1">
                       <div className="text-2xl mb-3">{icon}</div>
@@ -438,16 +477,10 @@ export default function BoothopBusiness() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-8 rounded-2xl border border-emerald-500/15 bg-emerald-500/5 px-6 py-4 text-center">
-                  <p className="text-sm text-white/60">
-                    <strong className="text-white">Need integration with your systems?</strong><br />
-                    <span className="text-xs">We support Slack alerts, Teams notifications, email webhooks, and REST API for ERP/WMS integration.</span>
-                  </p>
-                </div>
               </div>
             </section>
 
-            {/* ── COMPARISON TABLE ── */}
+            {/* ── COMPARISON TABLE ──────────────────────────────────── */}
             <section className="relative z-10 py-12 px-8">
               <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-10">
@@ -455,7 +488,6 @@ export default function BoothopBusiness() {
                   <h2 className="text-3xl font-black text-white">How we compare</h2>
                 </div>
                 <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-sm overflow-hidden">
-                  {/* Header */}
                   <div className="grid grid-cols-4 border-b border-white/10">
                     <div className="p-4 text-xs font-black text-white/30 uppercase tracking-wider">Feature</div>
                     {['BootHop', 'DHL Same-Day', 'Traditional Courier'].map(h => (
@@ -463,13 +495,13 @@ export default function BoothopBusiness() {
                     ))}
                   </div>
                   {[
-                    { feature: 'UK same-day', boothop: '✓', dhl: '✓', trad: '△' },
-                    { feature: 'Instant quote', boothop: '✓', dhl: '✗', trad: '✗' },
-                    { feature: 'Typical cost', boothop: '£300', dhl: '£450+', trad: '£500+' },
-                    { feature: 'Insurance included', boothop: '£10K std', dhl: 'Extra cost', trad: 'Extra cost' },
-                    { feature: 'ID-verified carrier', boothop: '✓', dhl: '△', trad: '✗' },
-                    { feature: 'API / Slack integration', boothop: '✓', dhl: 'Enterprise only', trad: '✗' },
-                    { feature: 'International hand-carry', boothop: '✓', dhl: '✓', trad: '✗' },
+                    { feature: 'UK same-day',             boothop: '✓',        dhl: '✓',              trad: '△' },
+                    { feature: 'Instant quote',            boothop: '✓',        dhl: '✗',              trad: '✗' },
+                    { feature: 'Typical cost',             boothop: '£300',     dhl: '£450+',          trad: '£500+' },
+                    { feature: 'Insurance included',       boothop: '£10K std', dhl: 'Extra cost',     trad: 'Extra cost' },
+                    { feature: 'ID-verified carrier',      boothop: '✓',        dhl: '△',              trad: '✗' },
+                    { feature: 'API / Slack integration',  boothop: '✓',        dhl: 'Enterprise only', trad: '✗' },
+                    { feature: 'International hand-carry', boothop: '✓',        dhl: '✓',              trad: '✗' },
                   ].map(({ feature, boothop, dhl, trad }, i) => (
                     <div key={feature} className={`grid grid-cols-4 border-b border-white/5 ${i % 2 === 0 ? '' : 'bg-white/[0.02]'}`}>
                       <div className="p-4 text-xs text-white/50 font-medium">{feature}</div>
@@ -482,13 +514,14 @@ export default function BoothopBusiness() {
               </div>
             </section>
 
-            {/* Footer links */}
+            {/* ── FOOTER LINKS ──────────────────────────────────────── */}
             <div className="relative z-10 max-w-5xl mx-auto px-8 pb-16 flex flex-wrap items-center justify-center gap-6 text-sm text-white/25">
-              <a href="/business/how-it-works" className="hover:text-white/60 transition-colors">How It Works</a>
-              <a href="/business/pricing" className="hover:text-emerald-400 transition-colors text-emerald-400/40">Pricing</a>
-              <a href="/business/priority-partner" className="hover:text-amber-400 transition-colors text-amber-400/40">Priority Partner</a>
-              <a href="/business/contact" className="hover:text-white/60 transition-colors">Contact Us</a>
-              <a href="/" className="hover:text-white/70 transition-colors text-white/40">← Back to BootHop</a>
+              <a href="/business/how-it-works"    className="hover:text-white/60 transition-colors">How It Works</a>
+              <a href="/business/carrier-network" className="hover:text-blue-400 transition-colors text-blue-400/40">Carrier Network</a>
+              <a href="/business/pricing"         className="hover:text-emerald-400 transition-colors text-emerald-400/40">Pricing</a>
+              <a href="/business/priority-partner" className="hover:text-amber-400 transition-colors text-amber-400/40">Priority Client</a>
+              <a href="/business/contact"         className="hover:text-white/60 transition-colors">Contact</a>
+              <a href="/"                         className="hover:text-white/70 transition-colors text-white/40">← BootHop P2P</a>
             </div>
 
           </motion.div>
@@ -506,11 +539,11 @@ export default function BoothopBusiness() {
                 </div>
                 <p className="text-xl font-black mb-1">Boot<span className="text-emerald-400">Hop</span> <span className="text-white/40 font-normal">Business</span></p>
                 <h2 className="text-3xl font-black mt-4 mb-2">
-                  {loginIntent === 'priority' ? 'Priority Partner sign-in' : 'Book a delivery'}
+                  {loginIntent === 'priority' ? 'Priority Client sign-in' : 'Book a delivery'}
                 </h2>
                 <p className="text-white/40 text-sm">
                   {loginIntent === 'priority'
-                    ? 'Enter your registered Priority Partner email'
+                    ? 'Enter your registered Priority Client email'
                     : 'Enter your business email — personal addresses not accepted'}
                 </p>
               </div>
