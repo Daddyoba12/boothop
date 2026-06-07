@@ -71,35 +71,42 @@ function StarRating({ count }: { count: number }) {
 }
 
 function TestimonialsSection() {
-  const [index, setIndex] = useState(0);
-  useEffect(() => {
-    const timer = setInterval(() => setIndex((prev) => (prev + 1) % testimonials.length), 5000);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <section id="testimonials" className="relative py-20 md:py-28 bg-[#07111f]">
-      <div className="mx-auto max-w-7xl px-6 md:px-8">
-        <div className="mb-12 text-center">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400">Community Stories</p>
-          <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Trusted by travellers worldwide</h2>
+      <div className="mx-auto max-w-5xl px-6 md:px-8">
+
+        {/* Big pull quote — first testimonial */}
+        <div className="mb-14 border-l-2 border-blue-500/40 pl-8">
+          <p className="text-2xl md:text-3xl font-medium text-white/85 leading-snug italic mb-6">
+            &ldquo;{testimonials[0].text}&rdquo;
+          </p>
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-500/20 text-sm font-bold text-blue-300">
+              {testimonials[0].name[0]}
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-white">{testimonials[0].name}</p>
+              <p className="text-xs text-white/40">{testimonials[0].role} · {testimonials[0].route}</p>
+            </div>
+            <div className="ml-4">
+              <StarRating count={testimonials[0].rating} />
+            </div>
+          </div>
         </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          {testimonials.map((t, i) => (
-            <div
-              key={t.name}
-              onClick={() => setIndex(i)}
-              className={`cursor-pointer rounded-3xl border p-6 transition-all duration-500 ${i === index ? 'border-blue-500/30 bg-blue-500/8 shadow-[0_20px_60px_rgba(59,130,246,0.15)]' : 'border-white/8 bg-white/3 hover:border-white/15 hover:bg-white/5'}`}
-            >
+
+        {/* Two smaller cards */}
+        <div className="grid gap-5 md:grid-cols-2">
+          {testimonials.slice(1).map((t) => (
+            <div key={t.name} className="rounded-2xl border border-white/8 bg-white/3 p-6">
               <StarRating count={t.rating} />
-              <p className="mt-4 text-sm leading-relaxed text-white/75 italic">&quot;{t.text}&quot;</p>
-              <div className="mt-5 flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/20 text-xs font-bold text-blue-300">
+              <p className="mt-3 text-sm leading-relaxed text-white/65 italic">&quot;{t.text}&quot;</p>
+              <div className="mt-4 flex items-center gap-3">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white/60">
                   {t.name[0]}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">{t.name}</p>
-                  <p className="text-xs text-white/45">{t.role} · {t.route}</p>
+                  <p className="text-sm font-medium text-white/80">{t.name}</p>
+                  <p className="text-xs text-white/35">{t.role} · {t.route}</p>
                 </div>
               </div>
             </div>
@@ -579,12 +586,6 @@ function HomePageContent() {
         <div className="relative z-10 max-w-7xl mx-auto px-6 py-28 flex items-center min-h-[92vh] w-full">
           <div className="max-w-xl w-full">
 
-            {/* Eyebrow label */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/8 backdrop-blur-sm px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-amber-300/90 mb-8">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-              Why BootHop exists
-            </div>
-
             {/* Headline — three-line emotional break */}
             <h2 className="text-4xl sm:text-5xl md:text-[3.75rem] font-extrabold text-white leading-[1.06] tracking-tight mb-7">
               Sending home<br />
@@ -718,9 +719,9 @@ function HomePageContent() {
       {/* ── BOOKING FORM — right below hero for instant action ── */}
       <section id="booking-form" className="py-20 px-6 bg-[#07111f] border-t border-white/[0.05]">
         <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-semibold text-white mb-2">Ready to move something?</h2>
-            <p className="text-white/40 text-sm">Post in under 30 seconds. We&apos;ll match you with a verified traveller.</p>
+          <div className="mb-8">
+            <h2 className="text-2xl md:text-3xl font-semibold text-white mb-1">Post in 30 seconds.</h2>
+            <p className="text-white/40 text-sm">We&apos;ll match you with a verified traveller heading that way.</p>
           </div>
 
           {/* Mode toggle */}
@@ -819,7 +820,10 @@ function HomePageContent() {
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">Enterprise Logistics</p>
+              <div className="mb-6">
+                <span className="text-6xl md:text-7xl font-black text-white/10 leading-none select-none">2h</span>
+                <p className="text-white/40 text-xs -mt-2 ml-1">average domestic delivery</p>
+              </div>
               <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight mb-5">
                 Built for teams<br />that move fast
               </h2>
@@ -865,10 +869,16 @@ function HomePageContent() {
       {/* ── HOW BOOTHOP WORKS ── */}
       <section className="py-24 md:py-32 bg-[#050D1A]">
         <div className="px-6 max-w-5xl mx-auto w-full">
-          <div className="text-center mb-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">Simple process</p>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-14">
             <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">How BootHop Works</h2>
-            <p className="mt-4 text-white/45 text-base">One platform. Two journeys. Zero hassle.</p>
+            <div className="flex items-center gap-5 text-sm text-white/30 pb-1">
+              {['01 Post', '02 Match', '03 Handoff', '04 Deliver'].map((s, i) => (
+                <span key={s} className="flex items-center gap-2">
+                  <span className="text-white/60 font-mono text-xs">{s}</span>
+                  {i < 3 && <span className="text-white/15">›</span>}
+                </span>
+              ))}
+            </div>
           </div>
 
           {/* Two diagram cards side by side */}
@@ -967,12 +977,7 @@ function HomePageContent() {
 
         {/* Content */}
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
-          <p className="text-blue-400 text-sm font-semibold tracking-[0.2em] uppercase mb-3 reveal">HOW WE MOVE</p>
-          <h2 className="text-4xl md:text-5xl text-white font-semibold mb-4 reveal d1">Powered by Movement</h2>
-          <p className="text-white/55 max-w-2xl mx-auto mb-16 reveal d2">
-            We connect packages with people already moving — by air, rail, or road.
-          </p>
-
+          <h2 className="text-4xl md:text-5xl text-white font-semibold mb-16 reveal">Powered by Movement</h2>
           <TransportCarousel />
         </div>
       </section>
@@ -1004,12 +1009,6 @@ function HomePageContent() {
 
         {/* Content */}
         <div className="relative z-10 max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">The Difference</p>
-            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">Why BootHop Wins</h2>
-            <p className="mt-4 text-white/55 text-base max-w-lg mx-auto">Traditional couriers were built for a different world. BootHop was built for speed, precision, and last-mile execution.</p>
-          </div>
-
           <div className="grid md:grid-cols-2 gap-6 mb-12">
 
             {/* Traditional — glass with red tint */}
@@ -1070,13 +1069,14 @@ function HomePageContent() {
       {/* ── FEATURED ROUTES ── */}
       <section className="relative py-20 md:py-28 bg-[#050D1A]">
         <div className="mx-auto max-w-7xl px-6 md:px-8">
-          <div className="mb-12 text-center">
-            <div className="inline-flex items-center gap-2 text-green-400 text-sm mb-4">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-ping inline-block" />
-              Live
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-ping" />
+              <span className="text-white font-semibold text-lg">Active Corridors</span>
             </div>
-            <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Active Corridors</h2>
-            <p className="mx-auto mt-4 max-w-xl text-base text-white/50">Real-time routes with travellers already in motion.</p>
+            <Link href="/journeys" className="text-sm text-white/35 hover:text-white/65 transition-colors">
+              View all →
+            </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {featuredRoutes.map((route) => (
@@ -1104,12 +1104,6 @@ function HomePageContent() {
               </div>
             ))}
           </div>
-          <div className="mt-8 text-center">
-            <Link href="/journeys"
-              className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-6 py-3 text-sm font-medium text-white/70 transition-all duration-200 hover:border-white/20 hover:bg-white/8 hover:text-white">
-              View all live journeys <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -1118,10 +1112,9 @@ function HomePageContent() {
       {/* ── USE CASES — "What people use BootHop for" ── */}
       <section className="py-24 md:py-32 bg-[#07111f]">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
-          <div className="text-center mb-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">Use Cases</p>
-            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">What people use BootHop for</h2>
-            <p className="mt-4 text-white/45 text-base max-w-xl mx-auto">From urgent business deliveries to sending love home — BootHop moves what matters.</p>
+          <div className="mb-14">
+            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight mb-2">What people use BootHop for</h2>
+            <p className="text-white/40 text-base">From urgent business deliveries to sending love home.</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
