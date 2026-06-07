@@ -9,6 +9,7 @@ const DECISION_MAP: Record<string, string> = {
   '2': 'all_v2',   'ig': 'all_v2',   'instagram': 'all_v2',
   '3': 'tt_ig',    'both': 'tt_ig',   'post both': 'tt_ig',
   '4': 'ignore',   'skip': 'ignore',  'no': 'ignore',
+  '5': 'ig_story', 'story': 'ig_story', 'reel': 'ig_story',
   // V1/V2 specifics
   'v1': 'all_v1',  'v2': 'all_v2',
   'tt v1': 'tt_v1', 'tt v2': 'tt_v2',
