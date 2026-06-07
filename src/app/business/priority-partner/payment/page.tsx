@@ -8,6 +8,8 @@ import {
   Clock, ShieldCheck,
 } from 'lucide-react';
 import { useState } from 'react';
+import { BusinessNav } from '@/components/business/BusinessNav';
+import Footer from '@/components/Footer';
 
 const FEES: Record<string, number> = {
   uk:            10000,
@@ -44,16 +46,18 @@ function PaymentContent() {
       className="min-h-screen text-white"
       style={{ background: 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)', backgroundAttachment: 'fixed' }}
     >
-      {/* Nav */}
-      <nav className="px-6 py-5 flex items-center justify-between border-b border-white/5 max-w-3xl mx-auto">
-        <a href="/business/priority-partner" className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-semibold transition-colors">
-          <ChevronLeft className="h-4 w-4" /> Back
-        </a>
-        <div className="text-xl font-black tracking-tight">
-          Boot<span className="text-emerald-400">Hop</span>
-          <span className="ml-2 text-xs font-semibold bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-full uppercase tracking-widest">Priority Partner</span>
-        </div>
-      </nav>
+      <BusinessNav
+        rightSlot={
+          <>
+            <a href="/business/priority-partner" className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-semibold transition-colors">
+              <ChevronLeft className="h-4 w-4" /> Back
+            </a>
+            <span className="text-xs font-semibold bg-amber-500/20 border border-amber-500/30 text-amber-400 px-2.5 py-1 rounded-full uppercase tracking-widest">
+              Priority Partner
+            </span>
+          </>
+        }
+      />
 
       <div className="max-w-3xl mx-auto px-6 py-16">
 
@@ -144,6 +148,8 @@ function PaymentContent() {
         </motion.div>
 
       </div>
+
+      <Footer />
     </div>
   );
 }

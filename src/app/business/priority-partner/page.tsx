@@ -9,6 +9,7 @@ import {
   Truck, Plane,
 } from 'lucide-react';
 import { BusinessNav } from '@/components/business/BusinessNav';
+import Footer from '@/components/Footer';
 
 // Annual membership fee — update here to change pricing
 const FEES: Record<'uk' | 'international', number> = {
@@ -310,6 +311,8 @@ export default function PriorityPartnerPage() {
           Volume discounts are applied automatically at invoice stage and are not visible during booking. Membership renews annually. Cancel any time before renewal to stop the next charge.
         </p>
       </div>
+
+      <Footer />
     </div>
   );
 }

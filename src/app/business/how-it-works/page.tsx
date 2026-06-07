@@ -8,6 +8,7 @@ import {
   Star, ShieldCheck, Plane, Zap, ArrowRight,
 } from 'lucide-react';
 import { BusinessNav } from '@/components/business/BusinessNav';
+import Footer from '@/components/Footer';
 
 const FADE = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 } };
 
@@ -260,7 +261,7 @@ export default function HowItWorksPage() {
       </div>
 
       {/* ── Bottom CTA ── */}
-      <div className="max-w-2xl mx-auto px-8 pb-24 text-center">
+      <div className="max-w-2xl mx-auto px-8 pb-16 text-center">
         <motion.div {...FADE} transition={{ delay: 0.3 }}
           className="bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border border-emerald-500/20 rounded-3xl p-10">
           <h2 className="text-3xl font-black mb-3">Ready to ship?</h2>
@@ -279,6 +280,8 @@ export default function HowItWorksPage() {
           </div>
         </motion.div>
       </div>
+
+      <Footer />
     </div>
   );
 }
