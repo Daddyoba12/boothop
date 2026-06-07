@@ -159,7 +159,7 @@ export default function PriorityPortalPage() {
     <div className="min-h-screen bg-[#080c10] text-white">
 
       {/* Nav bar */}
-      <nav className="border-b border-amber-500/15 px-6 py-4 flex items-center justify-between">
+      <nav className="fixed top-0 left-0 right-0 z-50 h-20 border-b border-amber-500/15 px-6 flex items-center justify-between bg-[#080c10]/95 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           <span className="text-amber-400 font-black text-xl tracking-tight">BootHop</span>
           <span className="inline-flex items-center gap-1.5 text-xs font-black text-amber-400 bg-amber-500/10 border border-amber-500/25 px-2.5 py-1 rounded-full uppercase tracking-widest">
@@ -178,7 +178,7 @@ export default function PriorityPortalPage() {
 
         {/* ══ HUB ══ */}
         {stage === 'hub' && (
-          <motion.div key="hub" {...FADE} className="max-w-5xl mx-auto px-6 py-12">
+          <motion.div key="hub" {...FADE} className="max-w-5xl mx-auto px-6 pt-24 pb-12">
 
             {/* Welcome */}
             <div className="mb-10">
@@ -270,7 +270,7 @@ export default function PriorityPortalPage() {
 
         {/* ══ JOBS ══ */}
         {stage === 'jobs' && (
-          <motion.div key="jobs" {...FADE} className="max-w-3xl mx-auto px-6 py-12">
+          <motion.div key="jobs" {...FADE} className="max-w-3xl mx-auto px-6 pt-24 pb-12">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <button onClick={() => setStage('hub')} className="flex items-center gap-1.5 text-white/30 hover:text-white text-sm font-semibold transition-colors mb-2">

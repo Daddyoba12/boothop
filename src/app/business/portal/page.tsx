@@ -191,8 +191,7 @@ export default function BusinessPortalPage() {
       </div>
 
       {/* Nav bar */}
-      <div className="relative z-10">
-        <BusinessNav
+      <BusinessNav
           rightSlot={
             <>
               <span className="text-white/30 text-sm hidden sm:block">{bizEmail}</span>
@@ -202,13 +201,12 @@ export default function BusinessPortalPage() {
             </>
           }
         />
-      </div>
 
       <AnimatePresence mode="wait">
 
         {/* ══ HUB ══ */}
         {stage === 'hub' && (
-          <motion.div key="hub" {...FADE} className="relative z-10 max-w-5xl mx-auto px-6 py-12">
+          <motion.div key="hub" {...FADE} className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-12">
 
             {/* Payment cancelled banner */}
             {paymentCancelled && (
@@ -342,7 +340,7 @@ export default function BusinessPortalPage() {
 
         {/* ══ JOBS ══ */}
         {stage === 'jobs' && (
-          <motion.div key="jobs" {...FADE} className="max-w-3xl mx-auto px-6 py-12">
+          <motion.div key="jobs" {...FADE} className="max-w-3xl mx-auto px-6 pt-24 pb-12">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <button onClick={() => setStage('hub')} className="flex items-center gap-1.5 text-white/30 hover:text-white text-sm font-semibold transition-colors mb-2">
@@ -437,7 +435,7 @@ export default function BusinessPortalPage() {
 
         {/* ══ SUCCESS ══ */}
         {stage === 'success' && (
-          <motion.div key="success" {...FADE} className="max-w-lg mx-auto px-6 py-12">
+          <motion.div key="success" {...FADE} className="max-w-lg mx-auto px-6 pt-24 pb-12">
             <div className="text-center mb-8">
               <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="h-10 w-10 text-emerald-400" />
