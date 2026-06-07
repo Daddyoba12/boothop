@@ -10,7 +10,7 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { BusinessNav } from '@/components/business/BusinessNav';
-import Footer from '@/components/Footer';
+import BusinessFooter from '@/components/business/BusinessFooter';
 
 type Stage = 'loading' | 'landing' | 'email' | 'otp';
 
@@ -577,7 +577,7 @@ export default function BoothopBusiness() {
 
       </AnimatePresence>
 
-      <Footer />
+      <BusinessFooter />
 
       {/* WhatsApp FAB */}
       <a href="/api/whatsapp"

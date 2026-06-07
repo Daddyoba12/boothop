@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { BusinessNav } from '@/components/business/BusinessNav';
-import Footer from '@/components/Footer';
+import BusinessFooter from '@/components/business/BusinessFooter';
 
 const FEES: Record<string, number> = {
   uk:            10000,
@@ -149,7 +149,7 @@ function PaymentContent() {
 
       </div>
 
-      <Footer />
+      <BusinessFooter />
     </div>
   );
 }

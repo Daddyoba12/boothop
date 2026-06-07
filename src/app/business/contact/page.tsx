@@ -7,7 +7,7 @@ import {
   Building2, Star, Phone,
 } from 'lucide-react';
 import { BusinessNav } from '@/components/business/BusinessNav';
-import Footer from '@/components/Footer';
+import BusinessFooter from '@/components/business/BusinessFooter';
 
 const FADE = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 } };
 
@@ -260,7 +260,7 @@ export default function BusinessContactPage() {
         </div>
       </div>
 
-      <Footer />
+      <BusinessFooter />
     </div>
   );
 }

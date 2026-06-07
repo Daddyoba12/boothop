@@ -9,7 +9,7 @@ import {
   Truck, Plane,
 } from 'lucide-react';
 import { BusinessNav } from '@/components/business/BusinessNav';
-import Footer from '@/components/Footer';
+import BusinessFooter from '@/components/business/BusinessFooter';
 
 // Annual membership fee — update here to change pricing
 const FEES: Record<'uk' | 'international', number> = {
@@ -312,7 +312,7 @@ export default function PriorityPartnerPage() {
         </p>
       </div>
 
-      <Footer />
+      <BusinessFooter />
     </div>
   );
 }
