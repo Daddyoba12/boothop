@@ -10,6 +10,7 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { BusinessNav } from '@/components/business/BusinessNav';
+import Footer from '@/components/Footer';
 
 type Stage = 'loading' | 'landing' | 'email' | 'otp';
 
@@ -129,20 +130,40 @@ export default function BoothopBusiness() {
         {stage === 'landing' && (
           <motion.div key="landing" {...FADE} transition={{ duration: 0.4 }}>
 
+            {/* Sticky nav — sits above the hero so sticky positioning works */}
+            <BusinessNav
+              rightSlot={
+                <>
+                  <a href="/" className="text-sm font-semibold text-white/35 hover:text-white/70 transition-colors hidden sm:flex items-center gap-1.5">
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+                    BootHop
+                  </a>
+                  <span className="text-white/15 hidden sm:block">|</span>
+                  <a href="/business/how-it-works" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">How It Works</a>
+                  <button onClick={() => { setLoginIntent('priority'); setStage('email'); }} className="text-sm font-semibold text-amber-400/70 hover:text-amber-400 transition-colors hidden sm:block">Priority Partner</button>
+                  <a href="/business/contact" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">Contact</a>
+                  <button onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
+                    className="inline-flex items-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-black font-black text-sm px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-400/40 hover:scale-105 active:scale-95">
+                    Book a Delivery
+                  </button>
+                </>
+              }
+            />
+
             {/* ── FULL-SCREEN VIDEO HERO ───────────────────────────── */}
             <div className="relative min-h-screen w-full" style={{ background: BG }}>
 
               {/* Background video */}
               <video
                 autoPlay muted loop playsInline preload="auto"
-                className="absolute inset-0 w-full h-full object-cover brightness-[0.65] overflow-hidden"
+                className="absolute inset-0 w-full h-full object-cover brightness-[0.65]"
                 src="/videos/onecall/test2/compressed/Planeeoff1.mp4"
               />
 
-              {/* Layer 1 — solid dark base (matches HeroV2 bg-black/60) */}
+              {/* Layer 1 — solid dark base */}
               <div className="absolute inset-0 bg-black/60" />
 
-              {/* Layer 2 — directional gradient: readable centre, pitch black at edges */}
+              {/* Layer 2 — directional gradient */}
               <div className="absolute inset-0" style={{
                 background: `
                   linear-gradient(to bottom,
@@ -153,29 +174,6 @@ export default function BoothopBusiness() {
                     #020617 100%
                   )`
               }} />
-
-              {/* Nav — float over video */}
-              <div className="absolute top-0 left-0 right-0 z-20">
-                <BusinessNav
-                  transparent
-                  rightSlot={
-                    <>
-                      <a href="/" className="text-sm font-semibold text-white/35 hover:text-white/70 transition-colors hidden sm:flex items-center gap-1.5">
-                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
-                        BootHop
-                      </a>
-                      <span className="text-white/15 hidden sm:block">|</span>
-                      <a href="/business/how-it-works" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">How It Works</a>
-                      <button onClick={() => { setLoginIntent('priority'); setStage('email'); }} className="text-sm font-semibold text-amber-400/70 hover:text-amber-400 transition-colors hidden sm:block">Priority Partner</button>
-                      <a href="/business/contact" className="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">Contact</a>
-                      <button onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
-                        className="inline-flex items-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-black font-black text-sm px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-400/40 hover:scale-105 active:scale-95">
-                        Book a Delivery
-                      </button>
-                    </>
-                  }
-                />
-              </div>
 
               {/* Centred hero content */}
               <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-6 py-24">
@@ -578,6 +576,8 @@ export default function BoothopBusiness() {
         )}
 
       </AnimatePresence>
+
+      <Footer />
 
       {/* WhatsApp FAB */}
       <a href="/api/whatsapp"
