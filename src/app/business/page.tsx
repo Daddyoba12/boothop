@@ -121,27 +121,7 @@ export default function BoothopBusiness() {
           <motion.div key="landing" {...FADE} transition={{ duration: 0.4 }}>
 
             {/* ── NAV ───────────────────────────────────────────────── */}
-            <BusinessNav
-              rightSlot={
-                <>
-                  <a href="/" className="text-sm font-semibold text-white/30 hover:text-white/70 transition-colors hidden sm:flex items-center gap-1.5">
-                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                    </svg>
-                    BootHop
-                  </a>
-                  <span className="text-white/10 hidden sm:block">|</span>
-                  <a href="/business/how-it-works" className="text-sm font-semibold text-white/45 hover:text-white transition-colors hidden sm:block">How It Works</a>
-                  <a href="/business/carrier-network" className="text-sm font-semibold text-blue-400/70 hover:text-blue-300 transition-colors hidden sm:block">Carrier Network</a>
-                  <a href="/business/contact" className="text-sm font-semibold text-white/45 hover:text-white transition-colors hidden sm:block">Contact</a>
-                  <button
-                    onClick={() => { setLoginIntent('oneoff'); setStage('email'); }}
-                    className="inline-flex items-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-black font-black text-sm px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/30 hover:scale-105 active:scale-95">
-                    Book a Delivery
-                  </button>
-                </>
-              }
-            />
+            <BusinessNav showDefaultNav />
 
             {/* ── HERO ──────────────────────────────────────────────── */}
             <div className="relative min-h-screen w-full overflow-hidden" style={{ background: BG }}>
@@ -159,7 +139,7 @@ export default function BoothopBusiness() {
                   rgba(2,6,35,0.95) 100%)`
               }} />
 
-              <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-6 pt-20 pb-32">
+              <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-6 pt-28 pb-32">
 
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
                   className="inline-flex items-center gap-2 bg-white/8 border border-white/15 backdrop-blur-xl text-white/70 text-xs font-semibold px-4 py-2 rounded-full mb-8 uppercase tracking-widest">

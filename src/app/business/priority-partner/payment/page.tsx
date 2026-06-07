@@ -125,7 +125,7 @@ function PaymentContent() {
             {[
               { icon: Star,        text: 'Your application has been received and is pending payment confirmation.' },
               { icon: CheckCircle, text: 'Once your bank transfer clears (usually same day), our team will activate your Priority Partner status.' },
-              { icon: Clock,       text: 'Account activation within 24 hours of payment clearing. You\'ll receive a confirmation email.' },
+              { icon: Clock,       text: 'Account activation within 1 week of payment clearing. You\'ll receive a confirmation email.' },
               { icon: ShieldCheck, text: 'From your first booking after activation, all jobs will be flagged as Priority.' },
             ].map(({ icon: Icon, text }, i) => (
               <div key={i} className="flex items-start gap-3">

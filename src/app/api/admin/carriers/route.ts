@@ -23,15 +23,18 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const { id, status } = await request.json();
-  if (!id || !status) {
-    return NextResponse.json({ error: 'id and status required' }, { status: 400 });
-  }
+  const body = await request.json();
+  const { id, status, registration_fee_paid } = body;
+  if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
+
+  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  if (status !== undefined) updates.status = status;
+  if (registration_fee_paid !== undefined) updates.registration_fee_paid = registration_fee_paid;
 
   const supabase = createSupabaseAdminClient();
   const { error } = await supabase
     .from('carrier_profiles')
-    .update({ status, updated_at: new Date().toISOString() })
+    .update(updates)
     .eq('id', id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

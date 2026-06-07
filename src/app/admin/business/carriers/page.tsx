@@ -9,11 +9,17 @@ import {
 type Carrier = {
   id: string;
   company_name: string;
+  company_reg_number: string | null;
+  vat_number: string | null;
   contact_name: string | null;
+  your_role: string | null;
   email: string;
   phone: string | null;
   base_location: string | null;
   fleet_size: string | null;
+  vehicle_types: string[] | null;
+  operating_hours: string | null;
+  coverage_area: string | null;
   cert_adr: boolean;
   cert_iata_dg: boolean;
   cert_gdp: boolean;
@@ -33,15 +39,23 @@ type Carrier = {
   svc_ooh: boolean;
   svc_refrigerated: boolean;
   svc_hazmat: boolean;
+  bank_account_name: string | null;
+  sort_code: string | null;
+  account_number: string | null;
+  how_did_you_hear: string | null;
+  agreed_to_terms: boolean;
+  insurance_filename: string | null;
+  registration_fee_paid: boolean;
   notes: string | null;
   status: string;
   created_at: string;
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  pending:  'text-amber-400  bg-amber-500/10  border-amber-500/25',
-  active:   'text-emerald-400 bg-emerald-500/10 border-emerald-500/25',
-  rejected: 'text-red-400    bg-red-500/10    border-red-500/25',
+  payment_pending: 'text-orange-400 bg-orange-500/10 border-orange-500/25',
+  pending:         'text-amber-400  bg-amber-500/10  border-amber-500/25',
+  active:          'text-emerald-400 bg-emerald-500/10 border-emerald-500/25',
+  rejected:        'text-red-400    bg-red-500/10    border-red-500/25',
 };
 
 const CERT_LABELS: (keyof Carrier)[] = [
@@ -115,7 +129,7 @@ export default function CarriersAdminPage() {
 
         {/* Filter tabs */}
         <div className="flex gap-2 mb-6">
-          {['all', 'pending', 'active', 'rejected'].map(s => (
+          {['all', 'payment_pending', 'pending', 'active', 'rejected'].map(s => (
             <button
               key={s}
               onClick={() => setFilter(s)}
@@ -192,13 +206,27 @@ export default function CarriersAdminPage() {
 
                       {/* Contact */}
                       <div>
-                        <h4 className="text-xs text-white/30 uppercase tracking-widest font-bold mb-3">Contact</h4>
+                        <h4 className="text-xs text-white/30 uppercase tracking-widest font-bold mb-3">Company & Contact</h4>
                         <div className="space-y-1.5 text-sm">
-                          <p><span className="text-white/40">Name:</span> <span className="text-white font-semibold">{c.contact_name || '—'}</span></p>
+                          <p><span className="text-white/40">Co. Reg:</span> <span className="text-white font-mono font-semibold">{c.company_reg_number || '—'}</span></p>
+                          <p><span className="text-white/40">VAT:</span> <span className="text-white/80">{c.vat_number || '—'}</span></p>
+                          <p><span className="text-white/40">Name:</span> <span className="text-white font-semibold">{c.contact_name || '—'}</span> <span className="text-white/40 text-xs">{c.your_role || ''}</span></p>
                           <p><span className="text-white/40">Email:</span> <a href={`mailto:${c.email}`} className="text-blue-300 hover:underline">{c.email}</a></p>
                           <p><span className="text-white/40">Phone:</span> <a href={`tel:${c.phone}`} className="text-white/80">{c.phone || '—'}</a></p>
                           <p><span className="text-white/40">Base:</span> <span className="text-white/80">{c.base_location || '—'}</span></p>
                           <p><span className="text-white/40">Fleet:</span> <span className="text-white/80">{c.fleet_size || '—'}</span></p>
+                          <p><span className="text-white/40">Coverage:</span> <span className="text-white/80">{c.coverage_area || '—'}</span></p>
+                          <p><span className="text-white/40">Hours:</span> <span className="text-white/80">{c.operating_hours || '—'}</span></p>
+                          {c.vehicle_types && c.vehicle_types.length > 0 && (
+                            <p><span className="text-white/40">Vehicles:</span> <span className="text-white/80">{c.vehicle_types.join(', ')}</span></p>
+                          )}
+                          {c.insurance_filename && (
+                            <p><span className="text-white/40">Insurance cert:</span> <span className="text-white/80">{c.insurance_filename}</span></p>
+                          )}
+                          <p><span className="text-white/40">How found us:</span> <span className="text-white/80">{c.how_did_you_hear || '—'}</span></p>
+                          <p><span className="text-white/40">Banking:</span> <span className="text-white/80">{c.bank_account_name || '—'} · SC {c.sort_code || '—'} · AC {c.account_number || '—'}</span></p>
+                          <p><span className="text-white/40">Reg fee paid:</span> <span className={c.registration_fee_paid ? 'text-emerald-400 font-bold' : 'text-amber-400'}>{c.registration_fee_paid ? 'Yes — £250 ✓' : 'No — awaiting payment'}</span></p>
+                          <p><span className="text-white/40">Agreed to terms:</span> <span className={c.agreed_to_terms ? 'text-emerald-400' : 'text-red-400'}>{c.agreed_to_terms ? 'Yes ✓' : 'No ✗'}</span></p>
                         </div>
                       </div>
 
@@ -236,6 +264,24 @@ export default function CarriersAdminPage() {
 
                     {/* Action buttons */}
                     <div className="flex flex-wrap gap-3">
+                      {!c.registration_fee_paid && (
+                        <button
+                          onClick={async () => {
+                            setUpdating(c.id);
+                            await fetch('/api/admin/carriers', {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ id: c.id, registration_fee_paid: true }),
+                            });
+                            await load(filter);
+                            setUpdating(null);
+                          }}
+                          disabled={updating === c.id}
+                          className="inline-flex items-center gap-2 bg-orange-500/15 border border-orange-400/30 text-orange-300 font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-orange-500/25 transition-all disabled:opacity-40">
+                          {updating === c.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
+                          Mark £250 paid
+                        </button>
+                      )}
                       {c.status !== 'active' && (
                         <button
                           onClick={() => updateStatus(c.id, 'active')}
