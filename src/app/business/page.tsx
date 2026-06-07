@@ -130,12 +130,12 @@ export default function BoothopBusiness() {
           <motion.div key="landing" {...FADE} transition={{ duration: 0.4 }}>
 
             {/* ── FULL-SCREEN VIDEO HERO ───────────────────────────── */}
-            <div className="relative h-screen w-full overflow-hidden" style={{ background: BG }}>
+            <div className="relative min-h-screen w-full" style={{ background: BG }}>
 
               {/* Background video */}
               <video
                 autoPlay muted loop playsInline preload="auto"
-                className="absolute inset-0 w-full h-full object-cover brightness-[0.65]"
+                className="absolute inset-0 w-full h-full object-cover brightness-[0.65] overflow-hidden"
                 src="/videos/onecall/test2/compressed/Planeeoff1.mp4"
               />
 
@@ -178,7 +178,7 @@ export default function BoothopBusiness() {
               </div>
 
               {/* Centred hero content */}
-              <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6 pb-20">
+              <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-6 py-24">
 
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                   className="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold px-4 py-2 rounded-full mb-8 uppercase tracking-widest backdrop-blur-sm">
@@ -186,7 +186,7 @@ export default function BoothopBusiness() {
                 </motion.div>
 
                 <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                  className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-6 drop-shadow-2xl">
+                  className="text-5xl md:text-7xl font-black tracking-tight leading-tight mb-6 drop-shadow-2xl">
                   Same-day delivery<br /><span className="text-emerald-400">across the UK.</span>
                 </motion.h1>
 

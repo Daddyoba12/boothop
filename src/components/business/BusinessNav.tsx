@@ -18,8 +18,10 @@ interface BusinessNavProps {
 export function BusinessNav({ rightSlot, transparent = false }: BusinessNavProps) {
   return (
     <nav
-      className={`px-6 py-4 flex items-center justify-between ${
-        transparent ? '' : 'border-b border-white/6'
+      className={`px-6 py-4 flex items-center justify-between sticky top-0 z-50 ${
+        transparent
+          ? ''
+          : 'border-b border-white/6 bg-[#020617]/90 backdrop-blur-xl'
       }`}
     >
       {/* Logo → /business */}
