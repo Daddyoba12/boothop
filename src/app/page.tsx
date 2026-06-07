@@ -319,7 +319,7 @@ function HomePageContent() {
     return () => clearInterval(id);
   }, []);
 
-  const trustItems = useMemo(() => ['Identity verified', 'Secure escrow', 'GDPR compliant', 'Customs screened', 'Cross-border ready', 'Free to join'], []);
+  const [routeCounts, setRouteCounts] = useState<Record<string, number>>({});
 
   const resetForm = () => {
     setTrip({ from: '', to: '', date: '', price: '', email: '', weight: '' });
@@ -330,13 +330,26 @@ function HomePageContent() {
   };
 
   const loadTrips = useCallback(async () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0];
     const { data, error } = await supabase
       .from('trips').select('id, from_city, to_city, travel_date, type, weight')
-      .gte('travel_date', tomorrowStr).order('travel_date', { ascending: true }).limit(50);
-    if (!error) setTrips((data as RecentTrip[]) || []);
+      .gte('travel_date', today).order('travel_date', { ascending: true }).limit(200);
+    if (!error) {
+      setTrips((data as RecentTrip[]) || []);
+      // Count real travellers per featured route
+      const counts: Record<string, number> = {};
+      for (const t of (data as RecentTrip[]) ?? []) {
+        const match = featuredRoutes.find(r =>
+          t.from_city?.toLowerCase().includes(r.from.toLowerCase()) &&
+          t.to_city?.toLowerCase().includes(r.to.toLowerCase())
+        );
+        if (match) {
+          const key = `${match.from}→${match.to}`;
+          counts[key] = (counts[key] ?? 0) + 1;
+        }
+      }
+      setRouteCounts(counts);
+    }
   }, []);
 
   useEffect(() => { loadTrips(); }, [loadTrips]);
@@ -460,12 +473,6 @@ function HomePageContent() {
                 Move Almost Anything.<br />Anywhere. Same Day.
               </h1>
 
-              {/* Trust tag below headline */}
-              <div className="mb-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white/80 text-sm backdrop-blur-md">
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                Free to join · No subscription · No hidden fees
-              </div>
-
               <p className="text-white/80 text-lg mb-1 max-w-xl leading-relaxed">
                 Your fastest delivery option is already moving.
               </p>
@@ -473,7 +480,7 @@ function HomePageContent() {
                 Powered by verified travellers, couriers, and logistics partners across the UK &amp; Europe.
               </p>
               <p className="text-white/55 text-sm mb-7">
-                Compliance-first logistics for same-day and cross-border delivery. · <Link href="/trust-safety" className="underline underline-offset-2 hover:text-white/80 transition-colors">What can I send?</Link>
+                <Link href="/trust-safety" className="underline underline-offset-2 hover:text-white/80 transition-colors">What can I send? →</Link>
               </p>
 
               {/* CTAs */}
@@ -513,12 +520,10 @@ function HomePageContent() {
                 ))}
               </div>
 
-              {/* Trust strip */}
-              <div className="flex flex-wrap gap-5 text-white/55 text-xs">
-                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Identity verified</span>
-                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Secure escrow</span>
-                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />GDPR &amp; customs compliant</span>
-                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Cross-border ready</span>
+              {/* Trust strip — two specific, human facts. Not four corporate claims. */}
+              <div className="flex flex-wrap gap-5 text-white/50 text-xs">
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Every traveller ID-verified before matching</span>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Payment held in escrow until you confirm delivery</span>
               </div>
             </div>
 
@@ -1079,30 +1084,39 @@ function HomePageContent() {
             </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredRoutes.map((route) => (
-              <div key={`${route.from}-${route.to}`}
-                onClick={() => router.push(`/journeys?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`)}
-                className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${route.color} ${route.border} p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer`}>
-                <div className="mb-3 flex items-center justify-between">
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${route.badge}`}>{route.tag}</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-[10px] text-green-400 font-semibold">{route.departs}</span>
+            {featuredRoutes.map((route) => {
+              const liveCount = routeCounts[`${route.from}→${route.to}`] ?? 0;
+              return (
+                <div key={`${route.from}-${route.to}`}
+                  onClick={() => router.push(`/journeys?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`)}
+                  className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${route.color} ${route.border} p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer`}>
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${route.badge}`}>{route.tag}</span>
+                    {liveCount > 0 && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+                        <span className="text-[10px] text-green-400 font-semibold">Live</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-base font-semibold text-white">{route.from}</span>
+                    <ArrowRight className="h-4 w-4 text-white/30" />
+                    <span className="text-base font-semibold text-white">{route.to}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className="flex items-center gap-1 text-xs text-white/40">
+                      <Users className="h-3 w-3" />
+                      {liveCount > 0
+                        ? `${liveCount} traveller${liveCount !== 1 ? 's' : ''} available`
+                        : 'No travellers yet — be first'
+                      }
+                    </p>
+                    <span className="text-xs text-white/25 group-hover:text-white/60 transition-colors">Book →</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-base font-semibold text-white">{route.from}</span>
-                  <ArrowRight className="h-4 w-4 text-white/30" />
-                  <span className="text-base font-semibold text-white">{route.to}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="flex items-center gap-1 text-xs text-white/40">
-                    <Users className="h-3 w-3" />{route.travellers} traveller{route.travellers !== 1 ? 's' : ''} available
-                  </p>
-                  <span className="text-xs text-white/25 group-hover:text-white/60 transition-colors">Book →</span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
