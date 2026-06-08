@@ -142,23 +142,22 @@ export default function ExpressPage() {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
-          from_location: quote.from,
-          to_location: quote.to,
-          cargo_type: SIZE_LABELS[quote.size],
-          urgency: quote.type === 'uk' ? 'same_day' : 'international',
-          estimated_price: price,
-          pickup_address: booking.pickup_address,
-          pickup_contact: booking.pickup_contact,
-          delivery_address: booking.delivery_address,
-          delivery_contact: booking.delivery_contact,
-          delivery_phone: booking.delivery_phone,
-          special_requirements: booking.special_instructions,
+          from_location:        quote.from,
+          to_location:          quote.to,
+          package_size:         quote.size,
+          delivery_type:        quote.type,
+          estimated_price:      price,
+          pickup_address:       booking.pickup_address,
+          pickup_contact:       booking.pickup_contact,
+          delivery_address:     booking.delivery_address,
+          delivery_contact:     booking.delivery_contact,
+          delivery_phone:       booking.delivery_phone,
+          special_instructions: booking.special_instructions,
         }),
       });
       const j = await res.json();
       if (!res.ok) { setError(j.error || 'Something went wrong.'); return; }
-      const ref = `BH-EXP-${Math.floor(1000 + Math.random() * 9000)}`;
-      setRefNumber(ref);
+      setRefNumber(j.reference || `BH-EXP-${Math.floor(1000 + Math.random() * 9000)}`);
       setStep(6);
     } catch { setError('Could not submit booking. Please try again.'); }
     finally { setLoading(false); }

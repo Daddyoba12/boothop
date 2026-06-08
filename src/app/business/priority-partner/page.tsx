@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Star, Clock, ShieldCheck, Zap, User, CheckCircle,
-  ArrowRight, Loader2, Send, Lock,
+  ArrowRight, Loader2, Send, Lock, Mail,
   Truck, Plane, Briefcase,
 } from 'lucide-react';
 import { BusinessNav } from '@/components/business/BusinessNav';
@@ -98,7 +98,11 @@ const inputCls = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 
 
 export default function PriorityPartnerPage() {
   const router = useRouter();
-  const [authChecked, setAuthChecked] = useState(false);
+  const [gate, setGate]           = useState<'check' | 'email' | 'otp' | 'form'>('check');
+  const [gateEmail, setGateEmail] = useState('');
+  const [gateOtp, setGateOtp]     = useState('');
+  const [gateError, setGateError] = useState<string | null>(null);
+  const [gateLoading, setGateLoading] = useState(false);
   const [form, setForm]   = useState<FormState>(INITIAL);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
@@ -107,11 +111,62 @@ export default function PriorityPartnerPage() {
     fetch('/api/business/auth/me')
       .then(r => r.json())
       .then(d => {
-        if (!d.authenticated) router.replace('/business');
-        else setAuthChecked(true);
+        if (d.authenticated && d.partner_status === 'active') {
+          router.replace('/business/portal/priority');
+        } else if (d.authenticated) {
+          setGate('form');
+        } else {
+          setGate('email');
+        }
       })
-      .catch(() => router.replace('/business'));
+      .catch(() => setGate('email'));
   }, [router]);
+
+  const routeAfterAuth = async (email: string) => {
+    const me = await fetch('/api/business/auth/me').then(r => r.json());
+    if (me.partner_status === 'active') {
+      router.replace('/business/portal/priority');
+    } else {
+      setForm(f => ({ ...f, email: email.trim() }));
+      setGate('form');
+    }
+  };
+
+  const sendGateOtp = async () => {
+    if (PERSONAL_DOMAINS.some(d => gateEmail.toLowerCase().includes(d))) {
+      setGateError('Personal email not accepted. Please use your company email.');
+      return;
+    }
+    setGateError(null); setGateLoading(true);
+    try {
+      const res = await fetch('/api/business/auth/send-otp', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: gateEmail.trim() }),
+      });
+      const j = await res.json();
+      if (!res.ok) { setGateError(j.error || 'Could not send code.'); return; }
+      if (j.skipOtp) {
+        await routeAfterAuth(gateEmail);
+        return;
+      }
+      setGate('otp');
+    } catch { setGateError('Could not send code. Please try again.'); }
+    finally { setGateLoading(false); }
+  };
+
+  const verifyGateOtp = async () => {
+    setGateError(null); setGateLoading(true);
+    try {
+      const res = await fetch('/api/business/auth/verify-otp', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: gateOtp.trim() }),
+      });
+      const j = await res.json();
+      if (!res.ok) { setGateError(j.error || 'Invalid code.'); return; }
+      await routeAfterAuth(gateEmail);
+    } catch { setGateError('Verification failed. Try again.'); }
+    finally { setGateLoading(false); }
+  };
 
   const fee = form.delivery_type ? FEES[form.delivery_type] : null;
 
@@ -152,10 +207,122 @@ export default function PriorityPartnerPage() {
     }
   };
 
-  if (!authChecked) return (
+  if (gate === 'check') return (
     <div className="min-h-screen flex items-center justify-center"
       style={{ background: 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)' }}>
       <Star className="h-8 w-8 text-amber-400 animate-pulse" />
+    </div>
+  );
+
+  if (gate === 'email' || gate === 'otp') return (
+    <div className="min-h-screen text-white"
+      style={{ background: 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)' }}>
+      <BusinessNav />
+      <div className="min-h-screen flex items-center justify-center px-6 py-24">
+        <div className="w-full max-w-4xl grid md:grid-cols-2 gap-8 items-center">
+
+          {/* Left — perks panel */}
+          <div className="hidden md:block">
+            <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 uppercase tracking-widest">
+              <Star className="h-3 w-3" /> Exclusive membership
+            </div>
+            <h2 className="text-3xl font-black mb-2">
+              BootHop <span className="text-amber-400">Priority</span>
+            </h2>
+            <p className="text-white/45 text-sm leading-relaxed mb-8">
+              Dedicated account management, guaranteed 2-hour responses, and automatic volume discounts — from day one of your membership.
+            </p>
+            <ul className="space-y-4">
+              {PERKS.map(({ icon: Icon, label, sub }) => (
+                <li key={label} className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <Icon className="h-4 w-4 text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-white">{label}</p>
+                    <p className="text-xs text-white/35 mt-0.5">{sub}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex gap-4 text-center">
+              <div className="flex-1 bg-white/4 border border-white/8 rounded-xl p-3">
+                <p className="text-xl font-black text-amber-400">£10k</p>
+                <p className="text-xs text-white/35">UK annual</p>
+              </div>
+              <div className="flex-1 bg-white/4 border border-white/8 rounded-xl p-3">
+                <p className="text-xl font-black text-amber-400">£15k</p>
+                <p className="text-xs text-white/35">International</p>
+              </div>
+              <div className="flex-1 bg-white/4 border border-white/8 rounded-xl p-3">
+                <p className="text-xl font-black text-amber-400">2hr</p>
+                <p className="text-xs text-white/35">Response SLA</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right — auth form */}
+          <div>
+            <div className="text-center mb-8">
+              <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center mx-auto mb-5">
+                <Star className="h-7 w-7 text-amber-400" />
+              </div>
+              <h2 className="text-2xl font-black mb-2">
+                {gate === 'otp' ? 'Check your inbox' : 'Sign in or apply'}
+              </h2>
+              <p className="text-white/40 text-sm max-w-xs mx-auto">
+                {gate === 'otp'
+                  ? `We sent a 6-digit code to ${gateEmail}`
+                  : 'Existing Priority Clients will be taken straight to your portal. New applications take 2 minutes.'}
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-8 space-y-4">
+              {gateError && <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">{gateError}</div>}
+              {gate === 'email' ? (
+                <>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+                    <input type="email" value={gateEmail}
+                      onChange={e => { setGateEmail(e.target.value); setGateError(null); }}
+                      onKeyDown={e => e.key === 'Enter' && sendGateOtp()}
+                      placeholder="you@yourcompany.com" autoFocus
+                      className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/20 border border-white/20 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm" />
+                  </div>
+                  <p className="text-white/25 text-xs text-center">Business email only — personal addresses not accepted.</p>
+                  <button onClick={sendGateOtp} disabled={gateLoading || !gateEmail.trim()}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-black bg-gradient-to-r from-amber-400 to-orange-400 text-black disabled:opacity-40 hover:scale-[1.02] transition-all">
+                    {gateLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+                    {gateLoading ? 'Checking…' : 'Continue →'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <input type="text" inputMode="numeric" value={gateOtp}
+                    onChange={e => { setGateOtp(e.target.value.replace(/\D/g, '').slice(0, 6)); setGateError(null); }}
+                    onKeyDown={e => e.key === 'Enter' && verifyGateOtp()}
+                    placeholder="_ _ _ _ _ _" autoFocus maxLength={6}
+                    className="w-full text-center text-3xl font-mono tracking-[0.4em] py-4 rounded-xl bg-white/20 border border-white/20 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-amber-400" />
+                  <button onClick={verifyGateOtp} disabled={gateLoading || gateOtp.length < 6}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-black bg-gradient-to-r from-amber-400 to-orange-400 text-black disabled:opacity-40 hover:scale-[1.02] transition-all">
+                    {gateLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+                    {gateLoading ? 'Verifying…' : 'Verify & Continue'}
+                  </button>
+                  <button onClick={() => { setGate('email'); setGateOtp(''); setGateError(null); }}
+                    className="w-full text-center text-white/25 hover:text-white/50 text-sm transition-colors">
+                    ← Use a different email
+                  </button>
+                  <button onClick={sendGateOtp}
+                    className="w-full text-center text-white/20 text-xs hover:text-white/40 transition-colors">
+                    Didn't get it? Resend code
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <BusinessFooter />
     </div>
   );
 

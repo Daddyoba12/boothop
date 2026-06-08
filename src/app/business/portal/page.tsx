@@ -10,6 +10,7 @@ import {
   Zap, Globe, Truck, Shield, Clock, Package,
 } from 'lucide-react';
 import { BusinessNav } from '@/components/business/BusinessNav';
+import BusinessFooter from '@/components/business/BusinessFooter';
 import { BusinessBookingWizard } from '@/components/business/BookingWizard';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -562,6 +563,8 @@ export default function BusinessPortalPage() {
           </motion.div>
         </div>
       )}
+
+      <BusinessFooter />
     </div>
   );
 }

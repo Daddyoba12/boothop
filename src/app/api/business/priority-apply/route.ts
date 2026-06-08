@@ -23,7 +23,25 @@ export async function POST(request: NextRequest) {
     if (!delivery_type) return NextResponse.json({ error: 'Delivery type (UK or International) required.' }, { status: 400 });
 
     const supabase = createSupabaseAdminClient();
-    const fee      = FEES[delivery_type] ?? FEES.uk;
+
+    // One-role-per-domain: check if this domain is already registered as a carrier
+    const domain = email.split('@')[1]?.toLowerCase();
+    if (domain) {
+      const sixMonthsAgo = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: existingCarrier } = await supabase
+        .from('carrier_profiles')
+        .select('email')
+        .ilike('email', `%@${domain}`)
+        .gte('created_at', sixMonthsAgo)
+        .limit(1);
+      if (existingCarrier && existingCarrier.length > 0) {
+        return NextResponse.json({
+          error: `A company from ${domain} is already registered as a Carrier Partner. One organisation can only hold one BootHop role within a 6-month period.`,
+        }, { status: 409 });
+      }
+    }
+
+    const fee = FEES[delivery_type] ?? FEES.uk;
 
     const { error } = await supabase.from('priority_partners').upsert({
       email,

@@ -8,6 +8,8 @@ import {
   XCircle, User, AlertCircle, X, MessageCircle,
   Zap, Globe, Truck, Shield, Star, Package,
 } from 'lucide-react';
+import { BusinessNav } from '@/components/business/BusinessNav';
+import BusinessFooter from '@/components/business/BusinessFooter';
 import { BusinessBookingWizard } from '@/components/business/BookingWizard';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -158,21 +160,19 @@ export default function PriorityPortalPage() {
   return (
     <div className="min-h-screen bg-[#080c10] text-white">
 
-      {/* Nav bar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 h-20 border-b border-amber-500/15 px-6 flex items-center justify-between bg-[#080c10]/95 backdrop-blur-xl">
-        <div className="flex items-center gap-3">
-          <span className="text-amber-400 font-black text-xl tracking-tight">BootHop</span>
-          <span className="inline-flex items-center gap-1.5 text-xs font-black text-amber-400 bg-amber-500/10 border border-amber-500/25 px-2.5 py-1 rounded-full uppercase tracking-widest">
-            <Star className="h-3 w-3" /> Priority Partner
-          </span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-white/30 text-sm hidden sm:block">{bizEmail}</span>
-          <button onClick={logout} className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white transition-colors">
-            <LogOut className="h-3.5 w-3.5" /> Sign out
-          </button>
-        </div>
-      </nav>
+      <BusinessNav
+        rightSlot={
+          <>
+            <span className="text-xs font-semibold bg-amber-500/20 border border-amber-500/30 text-amber-400 px-2.5 py-1 rounded-full uppercase tracking-widest hidden sm:inline-flex items-center gap-1.5">
+              <Star className="h-3 w-3" /> Priority Partner
+            </span>
+            <span className="text-white/30 text-sm hidden md:block">{bizEmail}</span>
+            <button onClick={logout} className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white transition-colors">
+              <LogOut className="h-3.5 w-3.5" /> Sign out
+            </button>
+          </>
+        }
+      />
 
       <AnimatePresence mode="wait">
 
@@ -439,6 +439,8 @@ export default function PriorityPortalPage() {
           </motion.div>
         </div>
       )}
+
+      <BusinessFooter />
     </div>
   );
 }

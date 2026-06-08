@@ -38,6 +38,23 @@ export async function POST(request: NextRequest) {
 
     const supabase = createSupabaseAdminClient();
 
+    // One-role-per-domain: check if this domain is already registered under a different role
+    const domain = email.split('@')[1]?.toLowerCase();
+    if (domain) {
+      const sixMonthsAgo = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: existingPriority } = await supabase
+        .from('priority_partners')
+        .select('email')
+        .ilike('email', `%@${domain}`)
+        .gte('created_at', sixMonthsAgo)
+        .limit(1);
+      if (existingPriority && existingPriority.length > 0) {
+        return NextResponse.json({
+          error: `A company from ${domain} is already registered as a Priority Partner. One organisation can only hold one BootHop role within a 6-month period.`,
+        }, { status: 409 });
+      }
+    }
+
     const { error: dbError } = await supabase.from('carrier_profiles').upsert({
       company_name,
       company_reg_number:     company_reg_number     || null,

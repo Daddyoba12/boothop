@@ -13,9 +13,9 @@ interface BusinessNavProps {
 }
 
 const SIGN_IN_OPTIONS = [
-  { label: "I'm a Business Client",  sub: 'Book express deliveries',     href: '/business',                emoji: '⚡' },
-  { label: "I'm a Carrier Partner",  sub: 'Manage your profile & alerts', href: '/business/carrier-network', emoji: '🚚' },
-  { label: "I'm a Priority Client",  sub: 'Access my account',            href: '/business',                emoji: '🏆' },
+  { label: "I'm an Express Client",  sub: 'Book & track deliveries',      href: '/business/sign-in',          emoji: '⚡' },
+  { label: "I'm a Carrier Partner",  sub: 'View your job dashboard',      href: '/business/carrier-sign-in',  emoji: '🚚' },
+  { label: "I'm a Priority Client",  sub: 'Access my account',            href: '/business/priority-partner', emoji: '🏆' },
 ];
 
 export function BusinessNav({ rightSlot, transparent = false, showDefaultNav = false }: BusinessNavProps) {
@@ -55,7 +55,6 @@ export function BusinessNav({ rightSlot, transparent = false, showDefaultNav = f
             <a href="/" className="text-sm font-semibold text-white/30 hover:text-white/70 transition-colors hidden md:block">← BootHop</a>
             <span className="text-white/10 hidden md:block">|</span>
             <a href="/business/how-it-works" className="text-sm text-white/45 hover:text-white transition-colors hidden lg:block">How It Works</a>
-            <a href="/business/carrier-network" className="text-sm text-blue-400/70 hover:text-blue-300 transition-colors hidden lg:block">Carrier Network</a>
             <a href="/business/contact" className="text-sm text-white/45 hover:text-white transition-colors hidden md:block">Contact</a>
 
             {/* Sign In dropdown */}
@@ -89,7 +88,7 @@ export function BusinessNav({ rightSlot, transparent = false, showDefaultNav = f
 
             {/* Get Started */}
             <a
-              href="/business/express"
+              href="/business/get-started"
               className="inline-flex items-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-black font-black text-sm px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/30 hover:scale-105 active:scale-95"
             >
               Get Started →
@@ -100,13 +99,22 @@ export function BusinessNav({ rightSlot, transparent = false, showDefaultNav = f
 
       {/* Returning user banner — only shown when showDefaultNav is true */}
       {showDefaultNav && (
-        <div className="fixed top-20 left-0 right-0 z-40 border-b border-white/4 bg-[#0d1f35]/80 backdrop-blur-sm px-6 py-2 flex items-center justify-center gap-2 text-xs text-white/40">
-          <span>👋 Returning?</span>
-          <a href="/business" className="hover:text-white/70 transition-colors font-semibold">Sign in as Business Client</a>
-          <span>·</span>
-          <a href="/business/carrier-network" className="hover:text-white/70 transition-colors font-semibold">Sign in as Carrier Partner</a>
-          <span>·</span>
-          <a href="/business" className="hover:text-white/70 transition-colors font-semibold">Sign in as Priority Client</a>
+        <div className="fixed top-20 left-0 right-0 z-40 border-b border-white/8 bg-[#0b1929]/90 backdrop-blur-md px-6 py-2.5 flex items-center justify-center gap-3 flex-wrap">
+          <span className="text-xs text-white/50 font-medium shrink-0">Returning?</span>
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            <a href="/business/sign-in"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/75 hover:text-white bg-white/8 hover:bg-white/14 border border-white/12 hover:border-white/25 px-3 py-1.5 rounded-full transition-all">
+              ⚡ Express Client
+            </a>
+            <a href="/business/carrier-sign-in"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/75 hover:text-white bg-white/8 hover:bg-white/14 border border-white/12 hover:border-white/25 px-3 py-1.5 rounded-full transition-all">
+              🚚 Carrier Partner
+            </a>
+            <a href="/business/priority-partner"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/75 hover:text-white bg-white/8 hover:bg-white/14 border border-white/12 hover:border-white/25 px-3 py-1.5 rounded-full transition-all">
+              🏆 Priority Client
+            </a>
+          </div>
         </div>
       )}
     </>
