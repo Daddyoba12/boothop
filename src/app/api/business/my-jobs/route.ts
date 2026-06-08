@@ -1,15 +1,10 @@
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { getBizSession } from '@/lib/auth/session';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireBizAuth } from '@/lib/auth/bizAuth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
-export async function GET() {
-  const cookieStore = await cookies();
-  const session     = getBizSession(cookieStore);
-
-  if (!session?.email) {
-    return NextResponse.json({ error: 'Not authenticated.' }, { status: 401 });
-  }
+export async function GET(request: NextRequest) {
+  const session = await requireBizAuth(request);
+  if (session instanceof NextResponse) return session;
 
   const supabase = createSupabaseAdminClient();
   const { data } = await supabase

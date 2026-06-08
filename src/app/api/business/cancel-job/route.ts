@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { getBizSession } from '@/lib/auth/session';
+import { requireBizAuth } from '@/lib/auth/bizAuth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function POST(request: NextRequest) {
-  const cookieStore = await cookies();
-  const session     = getBizSession(cookieStore);
-
-  if (!session?.email) {
-    return NextResponse.json({ error: 'Not authenticated.' }, { status: 401 });
-  }
+  const session = await requireBizAuth(request);
+  if (session instanceof NextResponse) return session;
 
   const { id } = await request.json();
   if (!id) return NextResponse.json({ error: 'Job ID required.' }, { status: 400 });

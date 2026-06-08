@@ -147,3 +147,21 @@ export function getBizOtp(
     }) as { email: string; code_hash: string; attempts: number; iat?: number };
   } catch { return null; }
 }
+
+// ── Mobile Bearer token support ───────────────────────────────────────────────
+// Accepts both a biz-specific JWT (audience: boothop-business) and a P2P JWT
+// (audience: boothop-users) so the mobile app can use its existing session.
+export function getBizSessionFromBearer(authHeader: string | null): { email: string } | null {
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  const token  = authHeader.slice(7);
+  const secret = process.env.APP_SESSION_SECRET;
+  if (!secret) return null;
+  try {
+    const p = jwt.verify(token, secret, { issuer: 'boothop', audience: 'boothop-business' }) as BizSessionPayload;
+    return { email: p.email };
+  } catch { /* fall through */ }
+  try {
+    const p = jwt.verify(token, secret, { issuer: 'boothop', audience: 'boothop-users' }) as AppSessionPayload;
+    return { email: p.email };
+  } catch { return null; }
+}
