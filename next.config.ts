@@ -10,6 +10,16 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'blogger.googleusercontent.com' },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'boothop.com' }],
+        destination: 'https://www.boothop.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -131,6 +131,37 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency:  'yearly',
       priority:         0.5,
     },
+    // ── Send landing pages ────────────────────────────────────
+    {
+      url:              `${APP_URL}/send/uk-same-day`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.9,
+    },
+    {
+      url:              `${APP_URL}/send/student-delivery`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.85,
+    },
+    {
+      url:              `${APP_URL}/send/working-away`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.85,
+    },
+    {
+      url:              `${APP_URL}/send/business-urgent`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.9,
+    },
+    {
+      url:              `${APP_URL}/send/uk-to-europe`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.9,
+    },
     // ── Legal ─────────────────────────────────────────────────
     {
       url:              `${APP_URL}/terms`,

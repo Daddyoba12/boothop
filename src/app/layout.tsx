@@ -51,6 +51,21 @@ export const metadata: Metadata = {
     // B2B
     'business logistics UK', 'enterprise delivery network', 'critical parts delivery UK',
     'AOG parts delivery', 'pharmaceutical courier UK', 'legal document courier UK',
+    // UK domestic
+    'same day delivery UK', 'same day courier UK', 'urgent delivery UK',
+    'UK domestic same day delivery', 'send parcel same day UK',
+    // Student
+    'student delivery UK', 'send stuff to university UK', 'goods left at home delivery',
+    'student package delivery UK', 'send belongings to uni',
+    // Working away
+    'working away from home delivery UK', 'send package to temporary address UK',
+    'delivery for contractors UK', 'urgent delivery while working away',
+    // B2B urgent verticals
+    'urgent business delivery UK', 'legal document courier UK', 'AOG parts delivery UK',
+    'same day courier law firm', 'premiership football courier', 'financial document courier UK',
+    // UK-Europe
+    'UK to Europe delivery', 'send parcel to Europe from UK', 'post-Brexit UK delivery Europe',
+    'UK to France delivery', 'UK to Germany parcel', 'UK to Spain delivery',
   ],
 
   icons: {
