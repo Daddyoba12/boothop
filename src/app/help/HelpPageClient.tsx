@@ -246,6 +246,48 @@ export default function HelpPageClient() {
           );
         })}
 
+        {/* Data Deletion Section — required for Google Play / App Store */}
+        <div id="delete-data" className="relative overflow-hidden rounded-3xl border border-red-500/30 bg-gradient-to-br from-red-500/10 to-orange-500/10 backdrop-blur-sm p-10">
+          <div className="relative">
+            <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-orange-400 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-red-500/30">
+              <Shield className="h-7 w-7 text-white" />
+            </div>
+            <h3 className="text-2xl font-black text-white mb-2">Data Deletion Request</h3>
+            <p className="text-slate-400 text-sm mb-6 max-w-2xl">
+              You can request deletion of your personal data at any time — without deleting your account — or request full account and data deletion.
+            </p>
+            <div className="grid md:grid-cols-2 gap-6 text-left mb-8">
+              <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+                <h4 className="text-white font-bold mb-2">What gets deleted</h4>
+                <ul className="text-slate-400 text-sm space-y-1 list-disc list-inside">
+                  <li>Your name, email, and profile information</li>
+                  <li>Your delivery and trip history</li>
+                  <li>Messages and chat history</li>
+                  <li>Payment method details (handled by Stripe)</li>
+                  <li>KYC verification data</li>
+                </ul>
+              </div>
+              <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+                <h4 className="text-white font-bold mb-2">What we retain</h4>
+                <ul className="text-slate-400 text-sm space-y-1 list-disc list-inside">
+                  <li>Transaction records (required by financial regulations, up to 7 years)</li>
+                  <li>Anonymised usage analytics</li>
+                  <li>Any data required by law or to resolve disputes</li>
+                </ul>
+              </div>
+            </div>
+            <h4 className="text-white font-semibold mb-3">How to request data deletion</h4>
+            <ol className="text-slate-400 text-sm space-y-2 mb-6 list-decimal list-inside">
+              <li>Email <a href="mailto:privacy@boothop.com" className="text-blue-400 underline">privacy@boothop.com</a> with subject line <strong className="text-white">"Data Deletion Request"</strong></li>
+              <li>Include your registered email address and what you'd like deleted (specific data or full account)</li>
+              <li>We will confirm receipt within 48 hours and complete the deletion within 30 days</li>
+            </ol>
+            <Link href="/contact" className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-red-500/30 transition-all duration-300 hover:scale-105">
+              <MessageCircle className="h-4 w-4" /> Contact us to delete data
+            </Link>
+          </div>
+        </div>
+
         <div className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-sm p-10 text-center">
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl" />
           <div className="relative">
