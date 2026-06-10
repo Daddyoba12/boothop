@@ -54,7 +54,7 @@ export default function BDLoginPage({ redirectTo }: { redirectTo: string }) {
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🌍</div>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: '#F9FAFB', margin: '0 0 6px' }}>
-            BootHop BD Pipeline
+            BootHop Promo
           </h1>
           <p style={{ color: '#6B7280', fontSize: 13, margin: 0 }}>
             "How things move around the world"
