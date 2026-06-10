@@ -16,9 +16,9 @@ export default function BootHopLogo({
   const [pressed, setPressed] = useState(false);
 
   const heightMap = {
-    sm:  'h-9',
-    md:  'h-14',
-    lg:  'h-20',
+    sm:  'h-12',
+    md:  'h-16',
+    lg:  'h-24',
   };
 
   return (
