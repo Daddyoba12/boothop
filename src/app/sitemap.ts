@@ -162,6 +162,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency:  'monthly',
       priority:         0.9,
     },
+    // ── City-pair delivery pages ──────────────────────────────
+    ...([
+      'london-to-manchester', 'london-to-birmingham', 'london-to-edinburgh',
+      'london-to-glasgow', 'london-to-leeds', 'london-to-liverpool',
+      'london-to-bristol', 'london-to-sheffield', 'london-to-newcastle',
+      'london-to-nottingham', 'manchester-to-london', 'manchester-to-birmingham',
+      'manchester-to-edinburgh', 'birmingham-to-london', 'birmingham-to-manchester',
+      'edinburgh-to-london', 'glasgow-to-london', 'bristol-to-london',
+      'leeds-to-london', 'liverpool-to-london',
+    ].map(slug => ({
+      url:             `${APP_URL}/send/${slug}`,
+      lastModified:    now,
+      changeFrequency: 'monthly' as const,
+      priority:        0.85,
+    }))),
     // ── Legal ─────────────────────────────────────────────────
     {
       url:              `${APP_URL}/terms`,
