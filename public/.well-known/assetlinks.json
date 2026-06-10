@@ -1,12 +1,8 @@
-[
-  {
-    "relation": ["delegate_permission/common.handle_all_urls"],
-    "target": {
-      "namespace": "android_app",
-      "package_name": "com.boothop.app",
-      "sha256_cert_fingerprints": [
-        "PLACEHOLDER_REPLACE_WITH_SHA256_FROM_PLAY_CONSOLE"
-      ]
-    }
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.boothop.www.twa",
+    "sha256_cert_fingerprints": ["42:2A:24:40:27:87:C0:99:72:9B:23:DB:31:C3:AE:67:53:DA:E1:48:90:FA:4A:7E:E4:B5:B3:CE:86:60:F0:9F"]
   }
-]
+}]
