@@ -122,7 +122,7 @@ export default function TermsPage() {
         {/* BootHop logo — visible brand identity for this page */}
         <div className="flex justify-center mb-8">
           <img
-            src="/images/boothopimage-gradient.png"
+            src="/images/boothop-logo-new.png"
             alt="BootHop"
             className="h-16 w-auto"
           />

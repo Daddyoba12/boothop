@@ -36,7 +36,7 @@ export default function BootHopLogo({
       onTouchEnd={() => setPressed(false)}
     >
       <img
-        src="/images/boothopimage-gradient.png"
+        src="/images/boothop-logo-new.png"
         alt="BootHop"
         className={`${heightMap[size]} w-auto object-contain
           transition-all duration-300 ease-out
