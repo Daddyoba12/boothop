@@ -45,6 +45,18 @@ Generate 2 variant hooks (B=money angle, C=urgency angle).
 Return ONLY valid JSON: {"variantB":{"hook":"...","caption_opener":"..."},"variantC":{"hook":"...","caption_opener":"..."}}`;
 }
 
+async function sendTelegram(message: string) {
+  const token  = process.env.TELEGRAM_BOT_TOKEN  || '8717698733:AAF7GI9Yw1DhdYVv_TK35fYQcwaGdk4caeA';
+  const chatId = process.env.TELEGRAM_CHAT_ID    || '8641867751';
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method:  'POST',
+      headers: { 'content-type': 'application/json' },
+      body:    JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' }),
+    });
+  } catch { /* non-fatal */ }
+}
+
 async function callClaude(prompt: string) {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method:  'POST',
@@ -101,6 +113,42 @@ export async function POST(request: Request) {
     }
 
     await supabase.from('bd_notifications').insert({ message: `Generated: "${content.hook.slice(0, 60)}..."`, type: 'success' });
+
+    // Send full content to Telegram
+    const tgMsg = [
+      `🎯 <b>New BootHop Promo Content</b>`,
+      `📌 Pillar: ${pillar.replace(/_/g, ' ')} | ${templateKey}`,
+      ``,
+      `🪝 <b>HOOK</b>`,
+      content.hook,
+      ``,
+      `📜 <b>SCRIPT</b>`,
+      content.script,
+      ``,
+      `📝 <b>CAPTION</b>`,
+      content.caption,
+      ``,
+      `#️⃣ <b>HASHTAGS</b>`,
+      content.hashtags,
+      ``,
+      `🎬 <b>VISUAL</b>`,
+      content.visual_desc,
+      ``,
+      `🔗 Approve: https://www.boothop.com/promo/library`,
+    ].join('\n');
+    await sendTelegram(tgMsg.slice(0, 4096));
+
+    // Send variant hooks as a separate message
+    if (variants) {
+      const varMsg = [
+        `🔀 <b>Hook Variants</b> (A/B/C)`,
+        ``,
+        `<b>A:</b> ${content.hook}`,
+        `<b>B (money):</b> ${variants.variantB?.hook ?? '—'}`,
+        `<b>C (urgency):</b> ${variants.variantC?.hook ?? '—'}`,
+      ].join('\n');
+      await sendTelegram(varMsg);
+    }
 
     const { data: full } = await supabase.from('bd_content').select('*, bd_variants(*)').eq('id', item!.id).single();
     return NextResponse.json({ ok: true, item: full });
