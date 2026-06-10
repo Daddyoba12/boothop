@@ -82,7 +82,7 @@ export default function PublishPage() {
 
       {items.length === 0 && (
         <div style={{ background: '#111827', borderRadius: 14, padding: 40, textAlign: 'center', color: '#6B7280' }}>
-          No content in the publish pipeline. Approve content in the <a href="/boothop-promo/library" style={{ color: '#7C3AED' }}>Library</a> first.
+          No content in the publish pipeline. Approve content in the <a href="/promo/library" style={{ color: '#7C3AED' }}>Library</a> first.
         </div>
       )}
 

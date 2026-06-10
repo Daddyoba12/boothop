@@ -8,7 +8,7 @@ export default function ManualPage() {
 
       {/* Access */}
       <Section title="1. Accessing the Dashboard" icon="🔐">
-        <Step n="1" text="Go to boothop.com/boothop-promo/login" />
+        <Step n="1" text="Go to boothop.com/promo/login" />
         <Step n="2" text="Click 'Send Code →' — a 6-digit code is emailed to oluwatoyinb@yahoo.com" />
         <Step n="3" text="Enter the code within 15 minutes and click 'Access Dashboard →'" />
         <Step n="4" text="You are now logged in. Session is cookie-based — you stay logged in until you sign out." />
@@ -115,7 +115,7 @@ export default function ManualPage() {
         <ul style={list}>
           <li>Check oluwatoyinb@yahoo.com for the code — check spam folder</li>
           <li>Code expires in 15 minutes — click 'Resend code' if needed</li>
-          <li>Make sure you are at /boothop-promo/login (not the old /bdpipe_admin URL)</li>
+          <li>Make sure you are at /promo/login (not the old /bdpipe_admin URL)</li>
         </ul>
         <SubHeading>Generate fails with an error</SubHeading>
         <ul style={list}>

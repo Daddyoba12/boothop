@@ -158,7 +158,7 @@ export default function GeneratePage() {
         <div style={{ background: '#111827', borderRadius: 14, padding: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ fontWeight: 800, fontSize: 16, color: '#F9FAFB' }}>Generated ✅</div>
-            <a href="/boothop-promo/library" style={{ color: '#7C3AED', fontSize: 12, textDecoration: 'none' }}>View in library →</a>
+            <a href="/promo/library" style={{ color: '#7C3AED', fontSize: 12, textDecoration: 'none' }}>View in library →</a>
           </div>
 
           {/* Variants */}

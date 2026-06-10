@@ -100,11 +100,11 @@ export default function PromoOverview() {
       {/* Quick links */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         {[
-          { href: '/boothop-promo/generate', label: '✨ Generate content', color: '#7C3AED' },
-          { href: '/boothop-promo/library',  label: '📚 Review library',   color: '#0EA5E9' },
-          { href: '/boothop-promo/publish',  label: '🚀 Publish queue',    color: '#10B981' },
-          { href: '/boothop-promo/analytics',label: '📊 Analytics',        color: '#F59E0B' },
-          { href: '/boothop-promo/manual',   label: '📖 User Manual',      color: '#6B7280' },
+          { href: '/promo/generate', label: '✨ Generate content', color: '#7C3AED' },
+          { href: '/promo/library',  label: '📚 Review library',   color: '#0EA5E9' },
+          { href: '/promo/publish',  label: '🚀 Publish queue',    color: '#10B981' },
+          { href: '/promo/analytics',label: '📊 Analytics',        color: '#F59E0B' },
+          { href: '/promo/manual',   label: '📖 User Manual',      color: '#6B7280' },
         ].map(l => (
           <a key={l.href} href={l.href} style={{ background: `${l.color}18`, border: `1px solid ${l.color}44`, borderRadius: 10, color: l.color, fontSize: 13, fontWeight: 600, padding: '10px 18px', textDecoration: 'none' }}>{l.label}</a>
         ))}
