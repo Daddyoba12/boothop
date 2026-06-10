@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { CheckCircle, ArrowRight, Clock, Shield, Star } from 'lucide-react';
+import { CheckCircle, ArrowRight } from 'lucide-react';
 
 const CITY_PAIRS: Record<string, { from: string; to: string; time: string; price: string; region: string }> = {
   'london-to-manchester':   { from: 'London',     to: 'Manchester',  time: '3–4 hours',  price: '£15', region: 'UK' },
