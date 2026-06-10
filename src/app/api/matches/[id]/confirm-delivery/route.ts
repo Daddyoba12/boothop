@@ -61,11 +61,20 @@ export async function POST(
 
     const bothConfirmed = !!(updated?.sender_confirmed_delivery && updated?.traveller_confirmed_delivery);
 
-    if (bothConfirmed && updated?.payment_intent_id) {
-      // Both parties confirmed — release escrow by capturing the payment
-      // charge.captured webhook fires → stripe.transfers.create → traveller paid → transfer.created → completed
-      const stripe = getStripe();
-      await stripe.paymentIntents.capture(updated.payment_intent_id);
+    if (bothConfirmed) {
+      // Start 7-day dispute window — sets locked_at on the match.
+      // After 7 days, the messaging API rejects new messages automatically.
+      await supabase.from('matches').update({
+        status:    'delivery_confirmed',
+        locked_at: new Date().toISOString(),
+      }).eq('id', matchId);
+
+      if (updated?.payment_intent_id) {
+        // Release escrow by capturing the payment.
+        // charge.captured webhook → stripe.transfers.create → traveller paid.
+        const stripe = getStripe();
+        await stripe.paymentIntents.capture(updated.payment_intent_id);
+      }
     }
 
     return NextResponse.json({
@@ -74,7 +83,7 @@ export async function POST(
       travellerConfirmed: updated?.traveller_confirmed_delivery ?? false,
       bothConfirmed,
       message: bothConfirmed
-        ? 'Both parties confirmed — payment is being released to the traveller.'
+        ? 'Both parties confirmed — payment is being released to the traveller. A 7-day dispute window is now open.'
         : 'Confirmation recorded. Waiting for the other party.',
     });
 

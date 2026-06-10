@@ -25,6 +25,10 @@
     { "path": "/api/cron/carrier-summaries",      "schedule": "0 8 * * 1"     },
     { "path": "/api/cron/payment-reconciliation", "schedule": "0 9 * * 1"     },
     { "path": "/api/cron/instagram-analytics",    "schedule": "0 10 * * 1"    },
-    { "path": "/api/cron/priority-summaries",     "schedule": "0 8 1 * *"     }
+    { "path": "/api/cron/priority-summaries",     "schedule": "0 8 1 * *"     },
+    { "path": "/api/cron/bd-generate?slot=1",    "schedule": "0 6 * * *"     },
+    { "path": "/api/cron/bd-generate?slot=2",    "schedule": "0 11 * * *"    },
+    { "path": "/api/cron/bd-generate?slot=3",    "schedule": "0 17 * * *"    },
+    { "path": "/api/cron/bd-generate?slot=4",    "schedule": "0 20 * * *"    }
   ]
 }

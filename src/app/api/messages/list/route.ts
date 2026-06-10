@@ -20,10 +20,9 @@ export async function GET(request: Request) {
     const supabase = createSupabaseAdminClient();
     const email    = session.email;
 
-    // Verify participation
     const { data: match } = await supabase
       .from('matches')
-      .select('sender_email, traveler_email')
+      .select('sender_email, traveler_email, status, locked_at')
       .eq('id', matchId)
       .maybeSingle();
 
@@ -36,13 +35,30 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Access denied.' }, { status: 403 });
     }
 
+    // Determine thread lock state
+    let isLocked = false;
+    let lockedSince: string | null = null;
+    if (match.locked_at) {
+      lockedSince = match.locked_at;
+      const ms = Date.now() - new Date(match.locked_at).getTime();
+      if (ms >= 7 * 24 * 60 * 60 * 1000) isLocked = true;
+    }
+
+    const shipmentId = `BH-${matchId.replace(/-/g, '').slice(0, 8).toUpperCase()}`;
+
     const { data: messages } = await supabase
       .from('match_messages')
-      .select('id, sender_email, content, is_flagged, created_at')
+      .select('id, sender_email, content, is_flagged, is_blocked, created_at')
       .eq('match_id', matchId)
       .order('created_at', { ascending: true });
 
-    return NextResponse.json({ messages: messages ?? [] });
+    return NextResponse.json({
+      messages:    messages ?? [],
+      shipmentId,
+      isLocked,
+      lockedSince,
+      matchStatus: match.status,
+    });
 
   } catch (error) {
     console.error('messages/list error:', error);

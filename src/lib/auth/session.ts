@@ -148,6 +148,34 @@ export function getBizOtp(
   } catch { return null; }
 }
 
+// ── BD Pipeline session ───────────────────────────────────────────────────────
+const BD_COOKIE = 'boothop_bd_session';
+export const BD_ALLOWED_EMAIL = 'oluwatoyinb@yahoo.com';
+
+export function getBdCookieName() { return BD_COOKIE; }
+
+export function signBdSession(email: string) {
+  const secret = process.env.APP_SESSION_SECRET;
+  if (!secret) throw new Error('APP_SESSION_SECRET is missing');
+  return jwt.sign({ email, bd: true }, secret, {
+    expiresIn: '30d', issuer: 'boothop', audience: 'boothop-bd',
+  });
+}
+
+export function getBdSession(
+  cookieStore: { get: (name: string) => { value: string } | undefined }
+): { email: string } | null {
+  try {
+    const cookie = cookieStore.get(BD_COOKIE);
+    if (!cookie?.value) return null;
+    const p = jwt.verify(cookie.value, process.env.APP_SESSION_SECRET!, {
+      issuer: 'boothop', audience: 'boothop-bd',
+    }) as { email: string; bd: boolean };
+    if (!p.bd) return null;
+    return { email: p.email };
+  } catch { return null; }
+}
+
 // ── Mobile Bearer token support ───────────────────────────────────────────────
 // Accepts both a biz-specific JWT (audience: boothop-business) and a P2P JWT
 // (audience: boothop-users) so the mobile app can use its existing session.
