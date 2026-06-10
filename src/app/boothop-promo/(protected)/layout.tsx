@@ -27,7 +27,7 @@ export default async function PromoLayout({ children }: { children: React.ReactN
           </Link>
         ))}
         <div style={{ marginLeft: 'auto' }}>
-          <a href="/boothop-promo/login" onClick={async e => { e.preventDefault(); await fetch('/api/bd/auth', { method: 'DELETE' }); window.location.href = '/boothop-promo/login'; }} style={{ color: '#6B7280', fontSize: 12, cursor: 'pointer', textDecoration: 'none' }}>Sign out</a>
+          <a href="/api/bd/signout" style={{ color: '#6B7280', fontSize: 12, textDecoration: 'none' }}>Sign out</a>
         </div>
       </nav>
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px' }}>
