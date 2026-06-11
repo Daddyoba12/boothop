@@ -33,6 +33,8 @@ export default function LibraryPage() {
   const [editData, setEditData] = useState<Partial<ContentItem>>({});
   const [saving,   setSaving]   = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [tgSending, setTgSending] = useState<string | null>(null);
+  const [tgMsg,     setTgMsg]     = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -64,6 +66,19 @@ export default function LibraryPage() {
   async function setStatus2(id: string, s: string) {
     await fetch('/api/bd/content', { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id, status: s }) });
     setItems(prev => prev.map(x => x.id === id ? { ...x, status: s } : x));
+  }
+
+  async function sendToTelegram(id: string) {
+    setTgSending(id);
+    try {
+      const res = await fetch('/api/bd/telegram-send', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id }) });
+      const ok  = res.ok;
+      setTgMsg(prev => ({ ...prev, [id]: ok ? '✅ Sent to Telegram' : '❌ Failed' }));
+      setTimeout(() => setTgMsg(prev => { const n = { ...prev }; delete n[id]; return n; }), 4000);
+    } catch {
+      setTgMsg(prev => ({ ...prev, [id]: '❌ Error' }));
+    }
+    setTgSending(null);
   }
 
   if (loading) return <div style={{ color: '#6B7280', padding: 60, textAlign: 'center' }}>Loading...</div>;
@@ -104,7 +119,11 @@ export default function LibraryPage() {
                   <span style={{ color: '#374151', fontSize: 11 }}>{new Date(it.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+              <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
+                {tgMsg[it.id] && <span style={{ fontSize: 11, color: tgMsg[it.id].startsWith('✅') ? '#86EFAC' : '#FCA5A5' }}>{tgMsg[it.id]}</span>}
+                <button onClick={() => sendToTelegram(it.id)} disabled={tgSending === it.id} title="Send to Telegram" style={{ ...iconBtn, color: '#38BDF8' }}>
+                  {tgSending === it.id ? '⏳' : '📨'}
+                </button>
                 <button onClick={() => { setExpanded(expanded === it.id ? null : it.id); }} style={iconBtn}>
                   {expanded === it.id ? '▲' : '▼'}
                 </button>

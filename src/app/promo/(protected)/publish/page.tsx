@@ -20,6 +20,7 @@ export default function PublishPage() {
   const [saving,    setSaving]    = useState<string | null>(null);
   const [videoUrls, setVideoUrls] = useState<Record<string, string>>({});
   const [msg,       setMsg]       = useState<Record<string, string>>({});
+  const [tgSending, setTgSending] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -59,6 +60,15 @@ export default function PublishPage() {
       load();
     } catch { flash(id, '❌ Failed to save URL'); }
     finally { setSaving(null); }
+  }
+
+  async function sendToTelegram(id: string) {
+    setTgSending(id);
+    try {
+      const res = await fetch('/api/bd/telegram-send', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id }) });
+      flash(id, res.ok ? '✅ Sent to Telegram' : '❌ Telegram send failed');
+    } catch { flash(id, '❌ Telegram error'); }
+    setTgSending(null);
   }
 
   async function post(id: string, platform: 'tiktok' | 'instagram') {
@@ -209,6 +219,13 @@ export default function PublishPage() {
                 ) : (
                   <span style={{ color: '#6B7280', fontSize: 13 }}>Paste a video URL above to unlock the post buttons</span>
                 )}
+                <button
+                  onClick={() => sendToTelegram(it.id)}
+                  disabled={tgSending === it.id}
+                  style={{ background: tgSending === it.id ? '#374151' : '#1F2937', border: '1px solid #38BDF8', borderRadius: 8, color: '#38BDF8', cursor: 'pointer', fontSize: 13, fontWeight: 700, padding: '10px 18px' }}
+                >
+                  {tgSending === it.id ? '⏳' : '📨 Telegram'}
+                </button>
                 {msg[it.id] && (
                   <span style={{ color: msg[it.id].startsWith('✅') ? '#86EFAC' : '#FCA5A5', fontSize: 13, fontWeight: 600 }}>{msg[it.id]}</span>
                 )}

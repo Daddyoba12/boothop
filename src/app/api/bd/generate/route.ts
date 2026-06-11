@@ -114,42 +114,6 @@ export async function POST(request: Request) {
 
     await supabase.from('bd_notifications').insert({ message: `Generated: "${content.hook.slice(0, 60)}..."`, type: 'success' });
 
-    // Send full content to Telegram
-    const tgMsg = [
-      `🎯 <b>New BootHop Promo Content</b>`,
-      `📌 Pillar: ${pillar.replace(/_/g, ' ')} | ${templateKey}`,
-      ``,
-      `🪝 <b>HOOK</b>`,
-      content.hook,
-      ``,
-      `📜 <b>SCRIPT</b>`,
-      content.script,
-      ``,
-      `📝 <b>CAPTION</b>`,
-      content.caption,
-      ``,
-      `#️⃣ <b>HASHTAGS</b>`,
-      content.hashtags,
-      ``,
-      `🎬 <b>VISUAL</b>`,
-      content.visual_desc,
-      ``,
-      `🔗 Approve: https://www.boothop.com/promo/library`,
-    ].join('\n');
-    await sendTelegram(tgMsg.slice(0, 4096));
-
-    // Send variant hooks as a separate message
-    if (variants) {
-      const varMsg = [
-        `🔀 <b>Hook Variants</b> (A/B/C)`,
-        ``,
-        `<b>A:</b> ${content.hook}`,
-        `<b>B (money):</b> ${variants.variantB?.hook ?? '—'}`,
-        `<b>C (urgency):</b> ${variants.variantC?.hook ?? '—'}`,
-      ].join('\n');
-      await sendTelegram(varMsg);
-    }
-
     const { data: full } = await supabase.from('bd_content').select('*, bd_variants(*)').eq('id', item!.id).single();
     return NextResponse.json({ ok: true, item: full });
 
