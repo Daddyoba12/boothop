@@ -48,20 +48,29 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   const checkAdmin = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         router.push('/login');
         return;
       }
 
-      // Check if user is admin
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
+      const ADMIN_EMAILS = ['titobalo12@gmail.com', 'info@boothop.com'];
+      const isAdminEmail = ADMIN_EMAILS.includes(user.email ?? '');
 
-      if (profile?.role !== 'admin') {
+      // Also check profiles.role if the column exists
+      let roleAdmin = false;
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        roleAdmin = profile?.role === 'admin';
+      } catch {
+        // role column may not exist yet
+      }
+
+      if (!isAdminEmail && !roleAdmin) {
         alert('Access denied. Admin privileges required.');
         router.push('/dashboard');
         return;
