@@ -202,7 +202,7 @@ export async function POST(request: Request) {
       payment_method_types: ['card'],
       line_items:  lineItems,
       mode:        'payment',
-      success_url: `${appUrl}/payment/succes?match_id=${matchId}`,
+      success_url: `${appUrl}/payment/success?match_id=${matchId}`,
       cancel_url:  `${appUrl}/kyc?matchId=${matchId}`,
       customer_email: email,
       // Hold funds in escrow until both parties confirm delivery

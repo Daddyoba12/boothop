@@ -45,7 +45,7 @@ function CheckoutForm({ matchId, amount }: { matchId: string; amount: number }) 
       const { error: confirmError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/checkout/success?match=${matchId}`,
+          return_url: `${window.location.origin}/payment/success?match_id=${matchId}`,
         },
       });
 
