@@ -1,8 +1,11 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import AdminDashboard from './AdminDashboard';
 
 export const dynamic = 'force-dynamic';
+
+const ADMIN_EMAILS = ['daddyoba12@gmail.com', 'info@boothop.com'];
 
 export default async function AdminPage() {
   const cookieStore = await cookies();
@@ -28,8 +31,17 @@ export default async function AdminPage() {
     }
   );
 
-  // Verify session server-side
   const { data: { session } } = await supabase.auth.getSession();
+
+  // Not logged in — send to login
+  if (!session) {
+    redirect('/login?next=/admin');
+  }
+
+  // Logged in but not an admin email — send to dashboard
+  if (!ADMIN_EMAILS.includes(session.user.email ?? '')) {
+    redirect('/dashboard');
+  }
 
   return <AdminDashboard serverSession={session} />;
 }

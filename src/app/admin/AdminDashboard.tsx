@@ -46,54 +46,14 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   }, []);
 
   const checkAdmin = async () => {
-    try {
-      const ADMIN_EMAILS = ['daddyoba12@gmail.com', 'info@boothop.com'];
-
-      // Use serverSession first (passed from server component — always reliable)
-      // Fall back to client getUser() for local dev
-      let userEmail: string | undefined;
-      let userId: string | undefined;
-
-      if (serverSession?.user) {
-        userEmail = serverSession.user.email;
-        userId = serverSession.user.id;
-      } else {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          router.push('/login');
-          return;
-        }
-        userEmail = user.email;
-        userId = user.id;
-      }
-
-      const isAdminEmail = ADMIN_EMAILS.includes(userEmail ?? '');
-
-      // Also check profiles.role if the column exists
-      let roleAdmin = false;
-      try {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', userId)
-          .single();
-        roleAdmin = profile?.role === 'admin';
-      } catch {
-        // role column may not exist yet
-      }
-
-      if (!isAdminEmail && !roleAdmin) {
-        alert('Access denied. Admin privileges required.');
-        router.push('/dashboard');
-        return;
-      }
-
-      setIsAdmin(true);
-      loadDashboardData();
-    } catch (error) {
-      console.error('Error checking admin:', error);
-      router.push('/login');
+    // Server component already verified admin access before rendering this page.
+    // serverSession is guaranteed to exist and belong to an admin email.
+    if (!serverSession?.user) {
+      router.push('/login?next=/admin');
+      return;
     }
+    setIsAdmin(true);
+    loadDashboardData();
   };
 
   const loadDashboardData = async () => {
