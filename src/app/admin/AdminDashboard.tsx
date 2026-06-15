@@ -47,7 +47,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
 
   const checkAdmin = async () => {
     try {
-      const ADMIN_EMAILS = ['titobalo12@gmail.com', 'info@boothop.com'];
+      const ADMIN_EMAILS = ['daddyoba12@gmail.com', 'info@boothop.com'];
 
       // Use serverSession first (passed from server component — always reliable)
       // Fall back to client getUser() for local dev
