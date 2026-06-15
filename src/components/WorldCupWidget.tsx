@@ -1,18 +1,37 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-const EXPIRY   = new Date('2026-07-15T00:00:00Z');
-const STORAGE  = 'bh_wc_dismissed';
+const EXPIRY  = new Date('2026-07-15T00:00:00Z');
+const STORAGE = 'bh_wc_dismissed';
+const VIDEOS  = [
+  '/videos/wc_logo_1.mp4',
+  '/videos/wc_logo_2.mp4',
+  '/videos/wc_logo_3.mp4',
+];
 
 export default function WorldCupWidget() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible]   = useState(false);
+  const [index, setIndex]       = useState(0);
+  const videoRef                = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     if (Date.now() >= EXPIRY.getTime()) return;
     if (typeof window !== 'undefined' && localStorage.getItem(STORAGE)) return;
     setVisible(true);
   }, []);
+
+  function onEnded() {
+    setIndex(i => (i + 1) % VIDEOS.length);
+  }
+
+  // When index changes, reload the video
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.load();
+      videoRef.current.play().catch(() => {});
+    }
+  }, [index]);
 
   if (!visible) return null;
 
@@ -41,40 +60,40 @@ export default function WorldCupWidget() {
         onClick={dismiss}
         aria-label="Close"
         style={{
-          position:        'absolute',
-          top:             '4px',
-          right:           '4px',
-          zIndex:          1,
-          width:           '20px',
-          height:          '20px',
-          borderRadius:    '50%',
-          background:      'rgba(0,0,0,0.65)',
-          border:          'none',
-          color:           '#fff',
-          fontSize:        '11px',
-          lineHeight:      '20px',
-          textAlign:       'center',
-          cursor:          'pointer',
-          display:         'flex',
-          alignItems:      'center',
-          justifyContent:  'center',
-          padding:         0,
+          position:       'absolute',
+          top:            '4px',
+          right:          '4px',
+          zIndex:         1,
+          width:          '20px',
+          height:         '20px',
+          borderRadius:   '50%',
+          background:     'rgba(0,0,0,0.65)',
+          border:         'none',
+          color:          '#fff',
+          fontSize:       '11px',
+          cursor:         'pointer',
+          display:        'flex',
+          alignItems:     'center',
+          justifyContent: 'center',
+          padding:        0,
         }}
       >
         ✕
       </button>
 
-      {/* Video */}
+      {/* Rotating video */}
       <video
-        src="/videos/aboutuspart1.mp4"
+        ref={videoRef}
+        key={index}
+        src={VIDEOS[index]}
         autoPlay
         muted
-        loop
         playsInline
+        onEnded={onEnded}
         style={{ width: '100%', display: 'block', aspectRatio: '9/16', objectFit: 'cover' }}
       />
 
-      {/* World Cup badge overlay */}
+      {/* World Cup badge */}
       <div
         style={{
           position:   'absolute',
