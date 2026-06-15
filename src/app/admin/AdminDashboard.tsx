@@ -90,7 +90,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
       setDisputes(disputesData || []);
 
       // Calculate advanced stats
-      const verifiedCount = usersData?.filter((u: any) => u.verified).length || 0;
+      const verifiedCount = usersData?.filter((u: any) => u.id_verified).length || 0;
       const activeCount = matchesData?.filter((m: any) => m.status === 'accepted' || m.status === 'in_transit').length || 0;
       const completedCount = matchesData?.filter((m: any) => m.status === 'completed').length || 0;
       const escrowSum = escrowData?.reduce((sum: number, m: any) => sum + Number(m.agreed_price || 0), 0) || 0;
@@ -131,9 +131,9 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ 
-          verified: true, 
-          verified_at: new Date().toISOString() 
+        .update({
+          id_verified: true,
+          id_verified_at: new Date().toISOString()
         })
         .eq('id', userId);
 
@@ -148,14 +148,14 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   };
 
   const suspendUser = async (userId: string) => {
-    if (!confirm('⚠️ Are you sure you want to suspend this user?')) return;
+    if (!confirm('Are you sure you want to suspend this user?')) return;
 
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ 
-          suspended: true, 
-          suspended_at: new Date().toISOString() 
+        .update({
+          suspended: true,
+          suspended_at: new Date().toISOString()
         })
         .eq('id', userId);
 
@@ -196,9 +196,9 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          user.email?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || 
-                         (filterStatus === 'verified' && user.verified) ||
-                         (filterStatus === 'pending' && !user.verified);
+    const matchesFilter = filterStatus === 'all' ||
+                         (filterStatus === 'verified' && user.id_verified) ||
+                         (filterStatus === 'pending' && !user.id_verified);
     return matchesSearch && matchesFilter;
   });
 
@@ -276,7 +276,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
             <p className="text-white/60 text-sm mb-1">Total Users</p>
             <p className="text-3xl font-bold text-white mb-2">{stats.totalUsers}</p>
             <p className="text-xs text-green-400">
-              {stats.verifiedUsers} verified ({((stats.verifiedUsers / stats.totalUsers) * 100).toFixed(0)}%)
+              {stats.verifiedUsers} KYC verified ({stats.totalUsers > 0 ? ((stats.verifiedUsers / stats.totalUsers) * 100).toFixed(0) : 0}%)
             </p>
           </div>
 
@@ -446,10 +446,10 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          {user.verified ? (
+                          {user.id_verified ? (
                             <span className="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
                               <CheckCircle className="w-4 h-4" />
-                              Verified
+                              KYC Verified
                             </span>
                           ) : user.suspended ? (
                             <span className="px-3 py-1 bg-red-500/20 text-red-300 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
@@ -465,7 +465,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex gap-2">
-                            {!user.verified && (
+                            {!user.id_verified && (
                               <button
                                 onClick={() => verifyUser(user.id)}
                                 className="px-4 py-2 bg-green-600 text-white rounded-lg text-xs font-semibold hover:bg-green-700 transition-all flex items-center gap-1"
@@ -538,6 +538,23 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                     </div>
                   </div>
 
+                  <div className="grid md:grid-cols-2 gap-3 text-sm mb-4 bg-white/5 rounded-xl p-4">
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-blue-400 shrink-0" />
+                      <div>
+                        <p className="text-white/50 text-xs">Sender (Hooper)</p>
+                        <p className="text-white font-medium">{match.hooper_email || match.sender_email || 'N/A'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-green-400 shrink-0" />
+                      <div>
+                        <p className="text-white/50 text-xs">Traveller (Booter)</p>
+                        <p className="text-white font-medium">{match.booter_email || match.traveler_email || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="grid md:grid-cols-5 gap-4 text-sm mb-4">
                     <div>
                       <p className="text-white/60 mb-1">Payment Status</p>
@@ -550,7 +567,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                     <div>
                       <p className="text-white/60 mb-1">Travel Date</p>
                       <p className="text-white font-medium">
-                        {new Date(match.sender_trip?.travel_date).toLocaleDateString()}
+                        {match.sender_trip?.travel_date ? new Date(match.sender_trip.travel_date).toLocaleDateString() : 'N/A'}
                       </p>
                     </div>
                     <div>
