@@ -30,18 +30,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Trip not found or not yours' }, { status: 404 });
     }
 
-    // Block deletion if trip is in an active match
-    const LOCKED_STATUSES = ['committed', 'kyc_pending', 'kyc_complete', 'payment_processing', 'active'];
-    const { data: activeMatch } = await supabase
+    // Block deletion if the trip has any match that is not in a terminal state.
+    // Terminal = cancelled, declined, blocked, completed (match is fully dead).
+    // Everything else (agreed, committed, kyc_pending, kyc_complete,
+    // payment_processing, active, delivery_confirmed, disputed,
+    // cancellation_requested, matched) keeps the trip locked.
+    const TERMINAL_STATUSES = ['cancelled', 'declined', 'blocked', 'completed'];
+    const { data: liveMatch } = await supabase
       .from('matches')
       .select('id, status')
       .or(`sender_trip_id.eq.${tripId},traveler_trip_id.eq.${tripId}`)
-      .in('status', LOCKED_STATUSES)
+      .not('status', 'in', `(${TERMINAL_STATUSES.join(',')})`)
       .maybeSingle();
 
-    if (activeMatch) {
+    if (liveMatch) {
       return NextResponse.json(
-        { error: 'Cannot delete a trip that is part of an active match.' },
+        { error: 'This trip cannot be deleted while a match is in progress. Cancel the match first.' },
         { status: 409 },
       );
     }
