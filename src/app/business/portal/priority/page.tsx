@@ -64,6 +64,7 @@ export default function PriorityPortalPage() {
   const [companyName,  setCompanyName]  = useState('');
   const [discount,     setDiscount]     = useState<number | null>(null);
   const [jobRef,       setJobRef]       = useState('');
+  const [isPaid,       setIsPaid]       = useState(false);
 
   const [myJobs,       setMyJobs]       = useState<MyJob[]>([]);
   const [jobsLoading,  setJobsLoading]  = useState(false);
@@ -82,9 +83,19 @@ export default function PriorityPortalPage() {
         if (!d.authenticated) { router.replace('/business'); return; }
         if (d.partner_status !== 'active') { router.replace('/business/portal'); return; }
         setBizEmail(d.email ?? '');
-        if (d.company_name) setCompanyName(d.company_name);
-        if (d.discount)     setDiscount(d.discount);
-        setStage('hub');
+        if (d.company_name)      setCompanyName(d.company_name);
+        if (d.partner_discount)  setDiscount(d.partner_discount);
+        // Handle Stripe redirect after payment (priority portal receives params passed through from standard portal)
+        const params    = new URLSearchParams(window.location.search);
+        const payResult = params.get('payment');
+        const payRef    = params.get('jobRef');
+        if (payResult === 'success' && payRef) {
+          setJobRef(payRef); setIsPaid(true); setStage('success');
+        } else if (payResult === 'cancelled') {
+          setStage('hub');
+        } else {
+          setStage('hub');
+        }
       })
       .catch(() => router.replace('/business'));
   }, [router]);
@@ -298,7 +309,27 @@ export default function PriorityPortalPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {myJobs.map(job => {
+                {/* Incomplete bookings — payment was never completed */}
+                {myJobs.filter(j => j.status === 'pending_payment').length > 0 && (
+                  <div className="bg-yellow-500/8 border border-yellow-500/20 rounded-2xl p-5 mb-2">
+                    <p className="text-yellow-400 font-bold text-sm mb-1">Incomplete bookings</p>
+                    <p className="text-white/35 text-xs mb-4">These bookings were not paid. Start a new booking to proceed — your previous reference will not be charged.</p>
+                    <div className="space-y-2">
+                      {myJobs.filter(j => j.status === 'pending_payment').map(job => (
+                        <div key={job.id} className="flex items-center justify-between gap-4 bg-white/3 border border-white/8 rounded-xl px-4 py-3">
+                          <div>
+                            <span className="font-mono text-xs text-yellow-400 font-bold">{job.job_ref}</span>
+                            <p className="text-white/40 text-xs mt-0.5">{job.pickup} → {job.dropoff}</p>
+                          </div>
+                          <button onClick={() => setStage('wizard')} className="text-xs text-amber-400 hover:text-amber-300 font-bold whitespace-nowrap transition-colors">
+                            New booking →
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {myJobs.filter(j => j.status !== 'pending_payment').map(job => {
                   const canAct = ['pending', 'assigned', 'review'].includes(job.status);
                   return (
                     <div
@@ -372,8 +403,10 @@ export default function PriorityPortalPage() {
               <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-black px-4 py-2 rounded-full mb-4 uppercase tracking-widest">
                 <Star className="h-3.5 w-3.5" /> Priority Job Submitted
               </div>
-              <h2 className="text-4xl font-black mb-3">Booking received</h2>
-              <p className="text-white/40 mb-3 leading-relaxed">Your priority delivery request has been received.</p>
+              <h2 className="text-4xl font-black mb-3">{isPaid ? 'Payment received' : 'Booking received'}</h2>
+              <p className="text-white/40 mb-3 leading-relaxed">
+                {isPaid ? 'Your payment has been received. Your priority job is now under review.' : 'Your priority delivery request has been received.'}
+              </p>
               <p className="text-amber-400/80 text-sm mb-8">Operator assignment within 2 hours — flagged as Priority.</p>
               <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl px-8 py-5 inline-block mb-6">
                 <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-1">Reference</p>

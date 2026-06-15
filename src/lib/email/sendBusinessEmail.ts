@@ -15,6 +15,38 @@ function footer(extra = '') {
   </p>`;
 }
 
+export async function sendBusinessJobPaymentConfirmedEmail(params: {
+  to: string; jobRef: string; pickup: string; dropoff: string; price: number; isPriority?: boolean;
+}) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const tag    = params.isPriority ? '⭐ Priority' : '✅ Payment confirmed';
+  await resend.emails.send({
+    from,
+    to: params.to,
+    subject: `${tag} — Ref: ${params.jobRef}`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0f172a;background:#ffffff;">
+        ${header()}
+        <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;">💳 Payment received — your job is under review</h2>
+        <p style="font-size:15px;color:#475569;margin:0 0 20px;">
+          We've received your payment for job <strong>${params.jobRef}</strong>. Our team is reviewing your booking and will assign a carrier shortly.
+        </p>
+        <div style="background:#f8fafc;border-radius:16px;padding:20px;margin:0 0 20px;">
+          <p style="margin:0 0 8px;font-size:13px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Job Reference</p>
+          <p style="margin:0 0 16px;font-size:20px;font-weight:900;color:#059669;font-family:monospace;">${params.jobRef}</p>
+          <p style="margin:0 0 6px;font-size:14px;color:#475569;">📍 <strong>${params.pickup}</strong> → <strong>${params.dropoff}</strong></p>
+          <p style="margin:0;font-size:14px;color:#059669;font-weight:700;">Amount paid: £${params.price.toLocaleString()}</p>
+        </div>
+        <p style="font-size:14px;color:#475569;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:12px 16px;margin:0 0 16px;">
+          ${params.isPriority ? '⭐ Your job is flagged as Priority — operator assignment within 2 hours.' : '⚡ Usually confirmed within 2–4 hours during business hours.'}
+        </p>
+        ${footer('Keep this reference number for your records. ')}
+      </div>
+    `,
+    text: `Payment received — ${params.jobRef}\n\n${params.pickup} → ${params.dropoff}\nAmount paid: £${params.price}\n\nYour job is under review. We will be in touch shortly.`,
+  });
+}
+
 export async function sendBusinessOtpEmail(params: { to: string; code: string }) {
   const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({

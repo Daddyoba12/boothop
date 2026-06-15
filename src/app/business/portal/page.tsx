@@ -94,7 +94,12 @@ export default function BusinessPortalPage() {
       .then(r => r.json())
       .then(d => {
         if (!d.authenticated) { router.replace('/business'); return; }
-        if (d.partner_status === 'active') { router.replace('/business/portal/priority'); return; }
+        if (d.partner_status === 'active') {
+          // Preserve payment=success/cancelled query params so priority portal can show the right screen
+          const qs = window.location.search;
+          router.replace(`/business/portal/priority${qs}`);
+          return;
+        }
         setBizEmail(d.email ?? '');
         if (d.company_name) setCompanyName(d.company_name);
         const params    = new URLSearchParams(window.location.search);
@@ -369,7 +374,27 @@ export default function BusinessPortalPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {myJobs.map(job => {
+                {/* Incomplete bookings — payment was never completed */}
+                {myJobs.filter(j => j.status === 'pending_payment').length > 0 && (
+                  <div className="bg-yellow-500/8 border border-yellow-500/20 rounded-2xl p-5 mb-2">
+                    <p className="text-yellow-400 font-bold text-sm mb-1">Incomplete bookings</p>
+                    <p className="text-white/35 text-xs mb-4">These bookings were not paid. Start a new booking to proceed — your previous reference will not be charged.</p>
+                    <div className="space-y-2">
+                      {myJobs.filter(j => j.status === 'pending_payment').map(job => (
+                        <div key={job.id} className="flex items-center justify-between gap-4 bg-white/3 border border-white/8 rounded-xl px-4 py-3">
+                          <div>
+                            <span className="font-mono text-xs text-yellow-400 font-bold">{job.job_ref}</span>
+                            <p className="text-white/40 text-xs mt-0.5">{job.pickup} → {job.dropoff}</p>
+                          </div>
+                          <button onClick={() => setStage('wizard')} className="text-xs text-emerald-400 hover:text-emerald-300 font-bold whitespace-nowrap transition-colors">
+                            New booking →
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {myJobs.filter(j => j.status !== 'pending_payment').map(job => {
                   const canAct = ['pending', 'assigned', 'review'].includes(job.status);
                   return (
                     <div

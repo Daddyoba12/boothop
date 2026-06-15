@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
+import { sendBusinessJobPaymentConfirmedEmail } from '@/lib/email/sendBusinessEmail';
+import { Resend } from 'resend';
 
 export const runtime = 'nodejs';
 
@@ -44,8 +46,17 @@ export async function POST(req: NextRequest) {
     const supabase = createSupabaseAdminClient();
 
     // Move job to "review" — payment received, now under BootHop review
-    // This gives buffer time while Stripe goes from test → live
     const updatePayload: Record<string, unknown> = { status: 'review' };
+
+    let jobRow: { email: string; pickup: string; dropoff: string; estimated_price: number | null; metadata: Record<string, unknown> | null } | null = null;
+
+    // Fetch job details for notifications
+    const { data: fetchedJob } = await supabase
+      .from('business_jobs')
+      .select('email, pickup, dropoff, estimated_price, metadata')
+      .eq('job_ref', jobRef)
+      .maybeSingle();
+    jobRow = fetchedJob;
 
     // Store stripe session ID if column exists
     try {
@@ -54,11 +65,33 @@ export async function POST(req: NextRequest) {
         .update({ ...updatePayload, stripe_session_id: session.id })
         .eq('job_ref', jobRef);
     } catch {
-      // Column may not exist yet — update status only
       await supabase
         .from('business_jobs')
         .update(updatePayload)
         .eq('job_ref', jobRef);
+    }
+
+    // Send payment confirmed email to client + admin alert
+    if (jobRow) {
+      const isPriority = session.metadata?.is_priority === 'true';
+      const price      = jobRow.estimated_price ?? 0;
+
+      await Promise.allSettled([
+        sendBusinessJobPaymentConfirmedEmail({
+          to:         jobRow.email,
+          jobRef,
+          pickup:     jobRow.pickup,
+          dropoff:    jobRow.dropoff,
+          price,
+          isPriority,
+        }),
+        new Resend(process.env.RESEND_API_KEY).emails.send({
+          from:    process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>',
+          to:      process.env.ADMIN_EMAIL     || 'admin@boothop.com',
+          subject: `💳 Payment received — ${jobRef}${isPriority ? ' [PRIORITY]' : ''}`,
+          text:    `Payment confirmed for ${jobRef}.\nClient: ${jobRow.email}\nRoute: ${jobRow.pickup} → ${jobRow.dropoff}\nAmount: £${price}\nStatus: under review — assign a carrier.`,
+        }),
+      ]);
     }
 
     console.log(`business/webhook: payment received → job ${jobRef} set to review`);
