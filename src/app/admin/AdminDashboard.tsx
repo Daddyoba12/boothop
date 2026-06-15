@@ -47,15 +47,27 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
 
   const checkAdmin = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const ADMIN_EMAILS = ['titobalo12@gmail.com', 'info@boothop.com'];
 
-      if (!user) {
-        router.push('/login');
-        return;
+      // Use serverSession first (passed from server component — always reliable)
+      // Fall back to client getUser() for local dev
+      let userEmail: string | undefined;
+      let userId: string | undefined;
+
+      if (serverSession?.user) {
+        userEmail = serverSession.user.email;
+        userId = serverSession.user.id;
+      } else {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          router.push('/login');
+          return;
+        }
+        userEmail = user.email;
+        userId = user.id;
       }
 
-      const ADMIN_EMAILS = ['titobalo12@gmail.com', 'info@boothop.com'];
-      const isAdminEmail = ADMIN_EMAILS.includes(user.email ?? '');
+      const isAdminEmail = ADMIN_EMAILS.includes(userEmail ?? '');
 
       // Also check profiles.role if the column exists
       let roleAdmin = false;
@@ -63,7 +75,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
         const { data: profile } = await supabase
           .from('profiles')
           .select('role')
-          .eq('id', user.id)
+          .eq('id', userId)
           .single();
         roleAdmin = profile?.role === 'admin';
       } catch {
@@ -80,7 +92,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
       loadDashboardData();
     } catch (error) {
       console.error('Error checking admin:', error);
-      router.push('/dashboard');
+      router.push('/login');
     }
   };
 
