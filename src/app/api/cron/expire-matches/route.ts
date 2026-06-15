@@ -15,9 +15,10 @@ export async function GET(request: Request) {
   try {
     const supabase  = createSupabaseAdminClient();
     const resend    = new Resend(process.env.RESEND_API_KEY);
-    const cutoff4h  = new Date(Date.now() -  4 * 3_600_000).toISOString();
-    const cutoff12h = new Date(Date.now() - 12 * 3_600_000).toISOString();
-    const cutoff72h = new Date(Date.now() - 72 * 3_600_000).toISOString();
+    const cutoff4h  = new Date(Date.now() -   4 * 3_600_000).toISOString();
+    const cutoff12h = new Date(Date.now() -  12 * 3_600_000).toISOString();
+    const cutoff72h = new Date(Date.now() -  72 * 3_600_000).toISOString();
+    const cutoff7d  = new Date(Date.now() - 168 * 3_600_000).toISOString();
 
     // Matches awaiting owner response for over 4 hours — release the route
     const { data: stuckMatched } = await supabase
@@ -46,16 +47,29 @@ export async function GET(request: Request) {
       .eq('status', 'kyc_pending')
       .lt('created_at', cutoff72h);
 
-    const toCancel = [...(stuckMatched ?? []), ...(stuckMatches ?? []), ...(stuckKyc ?? [])];
+    // Africa-outbound matches held for admin review but never actioned — release after 7 days
+    const { data: stuckAuth } = await supabase
+      .from('matches')
+      .select(`id, status, sender_email, traveler_email, sender_trip_id, traveler_trip_id,
+        sender_trip:sender_trip_id(from_city, to_city, auto_created),
+        traveler_trip:traveler_trip_id(auto_created)`)
+      .eq('status', 'awaiting_authorisation')
+      .lt('created_at', cutoff7d);
+
+    const toCancel = [...(stuckMatched ?? []), ...(stuckMatches ?? []), ...(stuckKyc ?? []), ...(stuckAuth ?? [])];
     if (!toCancel.length) return NextResponse.json({ cancelled: 0 });
 
     let cancelled = 0;
     const nowIso = new Date().toISOString();
 
     for (const match of toCancel) {
+      const cancelReason = match.status === 'awaiting_authorisation'
+        ? 'Africa-outbound match expired — not authorised within 7 days.'
+        : 'Expired — not completed within the required time.';
+
       await supabase
         .from('matches')
-        .update({ status: 'cancelled', cancelled_at: nowIso, cancellation_reason: 'Expired — not completed within the required time.' })
+        .update({ status: 'cancelled', cancelled_at: nowIso, cancellation_reason: cancelReason })
         .eq('id', match.id);
 
       // Release trips: restore original listing to 'active', delete auto-created mirror

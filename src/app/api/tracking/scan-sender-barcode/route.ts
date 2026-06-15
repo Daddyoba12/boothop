@@ -29,13 +29,25 @@ export async function POST(req: NextRequest) {
 
     const { data: match } = await supabase
       .from('matches')
-      .select('id, delivery_tier, tracking_status, sender_email, traveler_email, traveller_barcode')
+      .select('id, status, delivery_tier, tracking_status, sender_email, traveler_email, traveller_barcode')
       .eq('sender_barcode', senderBarcode)
       .single();
 
     if (!match) return NextResponse.json({ error: 'Barcode not found' }, { status: 404 });
     if (match.tracking_status === 'completed') {
       return NextResponse.json({ status: 'completed', message: 'Delivery already completed' });
+    }
+
+    // Only allow location requests when the delivery is actually underway
+    if (!['active', 'delivery_confirmed'].includes(match.status)) {
+      return NextResponse.json({
+        error: 'Location tracking is only available once your delivery is active.',
+        status: 'not_active',
+      }, { status: 400 });
+    }
+
+    if (!match.traveller_barcode) {
+      return NextResponse.json({ error: 'Traveller barcode not yet assigned for this delivery.' }, { status: 400 });
     }
 
     const tier = getTierConfig(match.delivery_tier || 'p2p');

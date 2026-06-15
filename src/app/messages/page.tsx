@@ -3,188 +3,139 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  Package, 
-  MessageSquare,
-  Search,
-  Clock
-} from 'lucide-react';
-import { createSupabaseClient } from '@/lib/supabase';
+import { MessageSquare, ArrowLeft, Package, Plane, CheckCircle, AlertTriangle } from 'lucide-react';
 
-type Conversation = {
-  match_id: string;
-  other_user: {
-    id: string;
-    full_name: string;
-  };
-  last_message: {
-    message: string;
-    created_at: string;
-    is_read: boolean;
-  };
-  delivery_requests: {
-    item_name: string;
-  };
+type MatchTrip = { from_city?: string; to_city?: string; travel_date?: string; auto_created?: boolean } | null;
+
+type Match = {
+  id: string;
+  status: string;
+  sender_email: string;
+  traveler_email: string;
+  sender_trip: MatchTrip | MatchTrip[];
+  traveler_trip: MatchTrip | MatchTrip[];
+  created_at: string;
 };
 
+const MESSAGING_STATUSES = ['active', 'delivery_confirmed', 'disputed'];
+
+function resolveTrip(t: MatchTrip | MatchTrip[]): MatchTrip {
+  return Array.isArray(t) ? (t[0] ?? null) : t;
+}
+
+function statusBadge(status: string) {
+  if (status === 'active')             return { label: 'Active',     cls: 'bg-green-500/20 text-green-300 border-green-500/30' };
+  if (status === 'delivery_confirmed') return { label: 'Confirming', cls: 'bg-amber-500/20 text-amber-300 border-amber-500/30' };
+  if (status === 'disputed')           return { label: 'Disputed',   cls: 'bg-red-500/20 text-red-300 border-red-500/30' };
+  return { label: status, cls: 'bg-white/10 text-white/50 border-white/10' };
+}
+
 export default function MessagesPage() {
-  const router = useRouter();
-  const supabase = createSupabaseClient();
-  
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const router  = useRouter();
+  const [matches,  setMatches]  = useState<Match[]>([]);
+  const [myEmail,  setMyEmail]  = useState<string | null>(null);
+  const [loading,  setLoading]  = useState(true);
 
   useEffect(() => {
-    fetchConversations();
-  }, []);
+    async function load() {
+      try {
+        const meRes = await fetch('/api/auth/me');
+        if (!meRes.ok) { router.push('/login'); return; }
+        const meData = await meRes.json();
+        const email  = meData?.user?.email;
+        if (!email)  { router.push('/login'); return; }
+        setMyEmail(email);
 
-  const fetchConversations = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
+        const dashRes = await fetch('/api/dashboard');
+        if (!dashRes.ok) { router.push('/login'); return; }
+        const dashData = await dashRes.json();
+
+        const all: Match[] = dashData.matches ?? [];
+        setMatches(all.filter(m => MESSAGING_STATUSES.includes(m.status)));
+      } catch {
         router.push('/login');
-        return;
+      } finally {
+        setLoading(false);
       }
-
-      setCurrentUserId(user.id);
-
-      // Fetch all matches for current user
-      const { data: matches, error: matchesError } = await supabase
-        .from('delivery_matches')
-        .select(`
-          id,
-          booter_id,
-          hooper_id,
-          delivery_requests:request_id (
-            item_name
-          )
-        `)
-        .or(`booter_id.eq.${user.id},hooper_id.eq.${user.id}`)
-        .order('created_at', { ascending: false });
-
-      if (matchesError) throw matchesError;
-
-      // For each match, get the last message and other user info
-      const conversationsData = await Promise.all(
-        matches.map(async (match: any) => {
-          const otherUserId = match.booter_id === user.id ? match.hooper_id : match.booter_id;
-
-          // Get other user profile
-          const { data: otherUser } = await supabase
-            .from('profiles')
-            .select('id, full_name')
-            .eq('id', otherUserId)
-            .single();
-
-          // Get last message
-          const { data: lastMessage } = await supabase
-            .from('messages')
-            .select('message, created_at, is_read, sender_id')
-            .eq('match_id', match.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
-
-          return {
-            match_id: match.id,
-            other_user: otherUser,
-            last_message: lastMessage,
-            delivery_requests: match.delivery_requests,
-          };
-        })
-      );
-
-      setConversations(conversationsData.filter(c => c.last_message) as unknown as Conversation[]);
-    } catch (error) {
-      console.error('Error fetching conversations:', error);
-    } finally {
-      setLoading(false);
     }
-  };
+    load();
+  }, [router]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
       {/* Header */}
-      <nav className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center space-x-2">
-              <Package className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">BootHop</span>
-            </Link>
-            <Link href="/hooper-dashboard" className="text-gray-600 hover:text-gray-900">
-              ← Back to Dashboard
-            </Link>
+      <div className="sticky top-0 z-10 bg-slate-950/90 backdrop-blur border-b border-white/8 px-4 py-3">
+        <div className="max-w-2xl mx-auto flex items-center gap-3">
+          <Link href="/dashboard" className="p-2 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition">
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <div>
+            <h1 className="text-white font-semibold">Messages</h1>
+            <p className="text-xs text-white/40">Your active delivery conversations</p>
           </div>
         </div>
-      </nav>
+      </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Messages</h1>
-          <p className="text-gray-600">Chat with Booters and Hoopers</p>
-        </div>
-
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-3">
         {loading ? (
-          <div className="text-center py-12">
-            <MessageSquare className="h-16 w-16 text-blue-600 animate-bounce mx-auto mb-4" />
-            <p className="text-gray-600">Loading conversations...</p>
+          <div className="text-center py-16">
+            <MessageSquare className="h-10 w-10 text-blue-400 animate-pulse mx-auto mb-3" />
+            <p className="text-white/40 text-sm">Loading conversations…</p>
           </div>
-        ) : conversations.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-            <MessageSquare className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-600 mb-2">No conversations yet</p>
-            <p className="text-sm text-gray-500">Start a conversation when you match with someone</p>
+        ) : matches.length === 0 ? (
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-12 text-center">
+            <MessageSquare className="h-12 w-12 text-white/20 mx-auto mb-3" />
+            <p className="text-white/60 font-semibold mb-1">No active conversations</p>
+            <p className="text-white/30 text-sm">Messaging opens once your delivery match is active.</p>
+            <Link
+              href="/dashboard"
+              className="mt-6 inline-block px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition"
+            >
+              Back to dashboard
+            </Link>
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-gray-200 divide-y">
-            {conversations.map((conversation) => (
+          matches.map((match) => {
+            const sTrip  = resolveTrip(match.sender_trip);
+            const tTrip  = resolveTrip(match.traveler_trip);
+            const isSender = match.sender_email === myEmail;
+            const otherEmail = isSender ? match.traveler_email : match.sender_email;
+            const fromCity = sTrip?.from_city ?? tTrip?.from_city ?? '—';
+            const toCity   = tTrip?.to_city   ?? sTrip?.to_city   ?? '—';
+            const badge    = statusBadge(match.status);
+
+            return (
               <Link
-                key={conversation.match_id}
-                href={`/messages/${conversation.match_id}`}
-                className="block p-4 hover:bg-gray-50 transition"
+                key={match.id}
+                href={`/messages/${match.id}`}
+                className="block bg-white/5 border border-white/10 hover:border-blue-500/40 hover:bg-blue-950/30 rounded-2xl p-4 transition group"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
-                    {conversation.other_user.full_name.charAt(0)}
+                  <div className="w-11 h-11 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0">
+                    {otherEmail.charAt(0).toUpperCase()}
                   </div>
-                  
                   <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start mb-1">
-                      <div>
-                        <h3 className="font-semibold text-gray-900">
-                          {conversation.other_user.full_name}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          {conversation.delivery_requests.item_name}
-                        </p>
-                      </div>
-                      <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
-                        {new Date(conversation.last_message.created_at).toLocaleDateString()}
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <p className="text-white font-semibold text-sm truncate">{otherEmail.split('@')[0]}</p>
+                      <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full border ${badge.cls}`}>
+                        {badge.label}
                       </span>
                     </div>
-                    
-                    <p className={`text-sm truncate ${
-                      !conversation.last_message.is_read && (conversation.last_message as any).sender_id !== currentUserId
-                        ? 'font-semibold text-gray-900'
-                        : 'text-gray-600'
-                    }`}>
-                      {conversation.last_message.message}
+                    <div className="flex items-center gap-1.5 text-white/50 text-xs">
+                      {isSender ? <Package className="h-3 w-3 shrink-0" /> : <Plane className="h-3 w-3 shrink-0" />}
+                      <span className="truncate">{fromCity} → {toCity}</span>
+                    </div>
+                    <p className="text-white/25 text-xs mt-1">
+                      {isSender ? 'You are the sender' : 'You are the traveller'}
                     </p>
                   </div>
-
-                  {!conversation.last_message.is_read && (conversation.last_message as any).sender_id !== currentUserId && (
-                    <div className="w-3 h-3 bg-blue-600 rounded-full flex-shrink-0"></div>
-                  )}
+                  <div className="shrink-0 text-blue-400/50 group-hover:text-blue-400 transition text-lg">›</div>
                 </div>
               </Link>
-            ))}
-          </div>
+            );
+          })
         )}
       </div>
     </div>
   );
 }
-
