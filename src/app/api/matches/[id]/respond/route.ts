@@ -144,11 +144,19 @@ export async function POST(
       }
       // ── End guard ───────────────────────────────────────────────────────────
 
-      // Move match to agreed — both sides have committed
-      await supabase
+      // Move match to agreed — atomic: only succeeds if still in 'matched' status.
+      // Prevents two simultaneous accepts both committing.
+      const { data: acceptedRow } = await supabase
         .from('matches')
         .update({ status: 'agreed', agreed_price: price, sender_accepted: true, traveler_accepted: true })
-        .eq('id', matchId);
+        .eq('id', matchId)
+        .eq('status', 'matched')
+        .select('id')
+        .maybeSingle();
+
+      if (!acceptedRow) {
+        return NextResponse.json({ error: 'Match is no longer available.' }, { status: 409 });
+      }
 
       // Create magic login token for Mr B so they land on their dashboard
       if (otherEmail) {

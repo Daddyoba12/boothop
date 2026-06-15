@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase.admin';
 
 export async function POST(req: NextRequest) {
+  const adminKey = req.headers.get('x-admin-key');
+  if (!adminKey || adminKey !== process.env.ADMIN_SECRET) {
+    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
+  }
+
   try {
     const body = await req.json() as { id: string; decision: 'approve' | 'reject'; note?: string };
     const { id, decision, note } = body;

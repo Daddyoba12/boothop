@@ -35,6 +35,9 @@ export async function POST(
       return NextResponse.json({ error: 'Match not found.' }, { status: 404 });
     }
 
+    if (match.status === 'delivery_confirmed' || match.status === 'completed') {
+      return NextResponse.json({ ok: true, alreadyConfirmed: true, message: 'Delivery already confirmed.' });
+    }
     if (!['active', 'escrowed'].includes(match.status)) {
       return NextResponse.json({ error: 'Match is not in an active delivery state.' }, { status: 400 });
     }
@@ -45,6 +48,10 @@ export async function POST(
     if (!isSender && !isTraveller) {
       return NextResponse.json({ error: 'Not a participant in this match.' }, { status: 403 });
     }
+
+    // Idempotency: if caller already confirmed, don't double-process
+    if (isSender    && match.sender_confirmed_delivery)    return NextResponse.json({ ok: true, alreadyConfirmed: true, message: 'Already confirmed.' });
+    if (isTraveller && match.traveller_confirmed_delivery) return NextResponse.json({ ok: true, alreadyConfirmed: true, message: 'Already confirmed.' });
 
     const update: Record<string, boolean> = {};
     if (isSender)    update.sender_confirmed_delivery    = true;

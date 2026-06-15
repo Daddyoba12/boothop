@@ -6,7 +6,12 @@ import { Resend } from 'resend';
 // Finds delivered jobs where 7 days have elapsed since delivery — marks payment released
 // and notifies the carrier.
 
-export async function GET() {
+export async function GET(request: Request) {
+  const auth = request.headers.get('authorization');
+  if (!auth || auth !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
+  }
+
   const supabase   = createSupabaseAdminClient();
   const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';

@@ -30,15 +30,33 @@ export async function GET(request: NextRequest) {
   const matchId  = url.searchParams.get('matchId');
   const action   = url.searchParams.get('action'); // 'approve' | 'reject'
   const adminKey = url.searchParams.get('adminKey');
+  const token    = url.searchParams.get('token');
 
-  if (!adminKey || adminKey !== process.env.ADMIN_SECRET) {
-    return new NextResponse('Unauthorized.', { status: 401 });
-  }
   if (!matchId || !action || !['approve', 'reject'].includes(action)) {
     return new NextResponse('matchId and action (approve|reject) required.', { status: 400 });
   }
 
   const supabase = createSupabaseAdminClient();
+
+  // Prefer one-time token auth; fall back to legacy adminKey for backwards compat
+  if (token) {
+    const expectedType = action === 'approve' ? 'admin_approve_match' : 'admin_reject_match';
+    const { data: tok } = await supabase
+      .from('action_tokens')
+      .select('id, expires_at, used_at')
+      .eq('token', token)
+      .eq('action_type', expectedType)
+      .eq('entity_id', matchId)
+      .maybeSingle();
+
+    if (!tok || tok.used_at || new Date(tok.expires_at) < new Date()) {
+      return new NextResponse('Link expired or already used.', { status: 401 });
+    }
+    // Consume the token immediately
+    await supabase.from('action_tokens').update({ used_at: new Date().toISOString() }).eq('id', tok.id);
+  } else if (!adminKey || adminKey !== process.env.ADMIN_SECRET) {
+    return new NextResponse('Unauthorized.', { status: 401 });
+  }
 
   const { data: match } = await supabase
     .from('matches')
@@ -54,12 +72,11 @@ export async function GET(request: NextRequest) {
     return new NextResponse('Match not found.', { status: 404 });
   }
 
-  if (match.status !== 'awaiting_authorisation') {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
-    return NextResponse.redirect(`${appUrl}/admin/hub?adminKey=${adminKey}&notice=already_processed`);
-  }
-
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
+
+  if (match.status !== 'awaiting_authorisation') {
+    return NextResponse.redirect(`${appUrl}/admin?notice=already_processed`);
+  }
 
   if (action === 'reject') {
     await supabase
@@ -67,7 +84,7 @@ export async function GET(request: NextRequest) {
       .update({ status: 'cancelled', cancelled_at: new Date().toISOString(), cancellation_reason: 'Rejected during Africa-outbound authorisation review.' })
       .eq('id', matchId);
 
-    return NextResponse.redirect(`${appUrl}/admin/hub?adminKey=${adminKey}&notice=rejected`);
+    return NextResponse.redirect(`${appUrl}/admin?notice=rejected`);
   }
 
   // ── APPROVE ──
@@ -109,7 +126,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  return NextResponse.redirect(`${appUrl}/admin/hub?adminKey=${adminKey}&notice=approved`);
+  return NextResponse.redirect(`${appUrl}/admin?notice=approved`);
 }
 
 export async function POST(request: NextRequest) {

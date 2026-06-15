@@ -21,7 +21,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Not authenticated.' }, { status: 401 });
     }
 
-    const { matchId, goodsValue, insuranceAccepted, premiumTracking } = await request.json();
+    const { matchId, goodsValue, insuranceAccepted: rawInsurance, premiumTracking } = await request.json();
+    const insuranceAccepted = rawInsurance === true;
     if (!matchId) {
       return NextResponse.json({ error: 'matchId is required.' }, { status: 400 });
     }
@@ -134,17 +135,28 @@ export async function POST(request: Request) {
     // Total charge in pence (delivery + platform fee; insurance added separately below)
     const totalChargePence = Math.round((agreedPrice + platformFee) * 100);
 
-    // Check if sender has an unspent signup credit — apply it (max: full charge amount)
+    // Check for unspent signup credit and mark it redeemed atomically before
+    // creating the Stripe session — prevents double-spend on concurrent requests.
     let signupCreditApplied = 0;
     try {
       const { data: creditRow } = await supabase
         .from('signup_credits')
-        .select('amount_pence, redeemed')
+        .select('amount_pence')
         .eq('email', email)
         .eq('redeemed', false)
         .maybeSingle();
+
       if (creditRow) {
-        signupCreditApplied = Math.min(creditRow.amount_pence, totalChargePence);
+        // Atomically mark redeemed — only succeeds if still unredeemed
+        const { error: redeemErr } = await supabase
+          .from('signup_credits')
+          .update({ redeemed: true, redeemed_at: new Date().toISOString() })
+          .eq('email', email)
+          .eq('redeemed', false);
+
+        if (!redeemErr) {
+          signupCreditApplied = Math.min(creditRow.amount_pence, totalChargePence);
+        }
       }
     } catch { /* graceful */ }
 

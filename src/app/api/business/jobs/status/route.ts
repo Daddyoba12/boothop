@@ -24,7 +24,7 @@ const TIMESTAMP_MAP: Record<Action, string> = {
 
 function verifyToken(jobId: string, action: string, token: string) {
   const secret   = process.env.JOB_STATUS_SECRET || 'boothop-jobs-secret-2026';
-  const expected = createHmac('sha256', secret).update(`${jobId}:${action}`).digest('hex').slice(0, 16);
+  const expected = createHmac('sha256', secret).update(`${jobId}:${action}`).digest('hex');
   return expected === token;
 }
 

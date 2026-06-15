@@ -199,7 +199,7 @@ export async function POST(request: Request) {
           : `/api/send-match-email`;
         await fetch(`${appUrl}${emailRoute}`, {
           method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'x-service-key': process.env.CRON_SECRET ?? '' },
           body:    JSON.stringify({ matchId: matchRecord.id }),
         });
       } catch (emailErr) {

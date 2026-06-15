@@ -33,7 +33,8 @@ export async function GET() {
       (t) => t.status === 'active' && t.travel_date >= today
     );
 
-    // Fetch matches where user is sender or traveler
+    // Fetch matches where user is sender or traveler.
+    // Exclude awaiting_authorisation — admin-only status users shouldn't see.
     const { data: matches } = await supabase
       .from('matches')
       .select(`
@@ -43,6 +44,7 @@ export async function GET() {
         traveler_trip:traveler_trip_id(from_city, to_city, travel_date, price, auto_created)
       `)
       .or(`sender_email.eq.${email},traveler_email.eq.${email}`)
+      .neq('status', 'awaiting_authorisation')
       .order('created_at', { ascending: false });
 
     return NextResponse.json({

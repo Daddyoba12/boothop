@@ -50,9 +50,12 @@ export async function POST(request: NextRequest) {
     const role     = isSender ? 'sender' : 'traveler';
     const kycField = isSender ? 'sender_kyc_status' : 'traveler_kyc_status';
 
-    // Don't restart if already verified
+    // Don't restart if already verified or mid-session
     if (match[kycField] === 'verified') {
       return NextResponse.json({ error: 'Your identity is already verified.' }, { status: 400 });
+    }
+    if (match[kycField] === 'pending') {
+      return NextResponse.json({ error: 'A verification session is already in progress. Please complete it before starting a new one.' }, { status: 400 });
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL!;

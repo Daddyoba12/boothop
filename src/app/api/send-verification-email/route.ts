@@ -4,6 +4,11 @@ import { Resend } from 'resend';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://boothop-one.vercel.app';
 
 export async function POST(request: Request) {
+  const serviceKey = request.headers.get('x-service-key');
+  if (!serviceKey || serviceKey !== process.env.CRON_SECRET) {
+    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
+  }
+
   const resend = new Resend(process.env.RESEND_API_KEY);
   try {
     const { email, from, to } = await request.json();

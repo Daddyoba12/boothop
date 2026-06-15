@@ -12,7 +12,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://boothop.com';
 
 function makeStatusToken(jobId: string, action: string) {
   const secret = process.env.JOB_STATUS_SECRET || 'boothop-jobs-secret-2026';
-  return createHmac('sha256', secret).update(`${jobId}:${action}`).digest('hex').slice(0, 16);
+  return createHmac('sha256', secret).update(`${jobId}:${action}`).digest('hex');
 }
 
 export async function GET(request: NextRequest) {

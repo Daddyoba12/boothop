@@ -30,9 +30,10 @@ export async function GET(
 
     if (!match) return NextResponse.json({ error: 'Match not found.' }, { status: 404 });
 
-    // Allow participants and admins
+    // Allow participants and admins (check env var, not just domain)
+    const ADMIN_EMAILS  = (process.env.ADMIN_EMAILS ?? 'daddyoba12@gmail.com,info@boothop.com').split(',').map(e => e.trim());
     const isParticipant = match.sender_email === email || match.traveler_email === email;
-    const isAdmin       = email.endsWith('@boothop.com');
+    const isAdmin       = ADMIN_EMAILS.includes(email);
     if (!isParticipant && !isAdmin) {
       return NextResponse.json({ error: 'Access denied.' }, { status: 403 });
     }

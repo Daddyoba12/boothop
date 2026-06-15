@@ -120,20 +120,35 @@ export async function POST(request: Request) {
       }, { status: 403 });
     }
 
-    // ── Content moderation (flag harmful text, still deliver) ────────────────
+    // ── Content moderation (hold harmful text for admin review) ─────────────
     const moderation  = moderateText(content.trim());
     const isFlagged   = moderation.flagged;
 
     if (isFlagged) {
-      // Alert admin asynchronously — don't block delivery
+      // Store the message as blocked — not delivered to recipient
+      await supabase.from('match_messages').insert({
+        match_id:     matchId,
+        sender_email: email,
+        content:      content.trim(),
+        is_flagged:   true,
+        is_blocked:   true,
+      });
+
+      // Alert admin asynchronously
       const { Resend } = await import('resend');
       new Resend(process.env.RESEND_API_KEY).emails.send({
         from:    process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>',
         to:      process.env.ADMIN_EMAIL     || 'admin@boothop.com',
-        subject: `[FLAGGED:${moderation.category}] Message — Match ${matchId}`,
-        html: `<p><strong>From:</strong> ${email}</p><p><strong>Match:</strong> ${matchId}</p><p><strong>Category:</strong> ${moderation.category}</p><blockquote>${content.trim()}</blockquote><p>Message was <strong>delivered</strong> but flagged for review.</p>`,
-        text: `Flagged message (${moderation.category}) from ${email} on match ${matchId}:\n\n${content.trim()}`,
+        subject: `[HELD:${moderation.category}] Message held for review — Match ${matchId}`,
+        html: `<p><strong>From:</strong> ${email}</p><p><strong>Match:</strong> ${matchId}</p><p><strong>Category:</strong> ${moderation.category}</p><blockquote>${content.trim()}</blockquote><p>Message was <strong>held and not delivered</strong> pending review.</p>`,
+        text: `Held message (${moderation.category}) from ${email} on match ${matchId}:\n\n${content.trim()}`,
       }).catch(console.error);
+
+      return NextResponse.json({
+        error:   'Your message has been held for review. BootHop moderates messages to keep the platform safe.',
+        code:    'MESSAGE_HELD',
+        blocked: true,
+      }, { status: 403 });
     }
 
     const { data: message, error: insertErr } = await supabase
@@ -142,7 +157,7 @@ export async function POST(request: Request) {
         match_id:     matchId,
         sender_email: email,
         content:      content.trim(),
-        is_flagged:   isFlagged,
+        is_flagged:   false,
         is_blocked:   false,
       })
       .select('id, content, sender_email, is_flagged, is_blocked, created_at')

@@ -208,9 +208,15 @@ async function runAutoMatch() {
         const resend   = new Resend(process.env.RESEND_API_KEY);
         const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
         const appUrl     = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
-        const adminSecret = process.env.ADMIN_SECRET ?? '';
-        const approveUrl = `${appUrl}/api/admin/authorise-match?matchId=${matchRecord.id}&action=approve&adminKey=${adminSecret}`;
-        const rejectUrl  = `${appUrl}/api/admin/authorise-match?matchId=${matchRecord.id}&action=reject&adminKey=${adminSecret}`;
+
+        // Use single-use action tokens instead of exposing ADMIN_SECRET in emails
+        const tokenExpiry = new Date(Date.now() + 7 * 24 * 3_600_000).toISOString();
+        const [approveTokenRow, rejectTokenRow] = await Promise.all([
+          supabase.from('action_tokens').insert({ email: adminEmail, action_type: 'admin_approve_match', entity_id: matchRecord.id, payload: { action: 'approve' }, expires_at: tokenExpiry }).select('token').single(),
+          supabase.from('action_tokens').insert({ email: adminEmail, action_type: 'admin_reject_match',  entity_id: matchRecord.id, payload: { action: 'reject'  }, expires_at: tokenExpiry }).select('token').single(),
+        ]);
+        const approveUrl = `${appUrl}/api/admin/authorise-match?matchId=${matchRecord.id}&action=approve&token=${approveTokenRow.data?.token ?? ''}`;
+        const rejectUrl  = `${appUrl}/api/admin/authorise-match?matchId=${matchRecord.id}&action=reject&token=${rejectTokenRow.data?.token ?? ''}`;
 
         await resend.emails.send({
           from:    process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>',

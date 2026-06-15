@@ -17,7 +17,8 @@ export async function GET(request: NextRequest) {
     .from('matches')
     .select('id, status, sender_email, traveler_email, agreed_price, goods_value, insurance_fee, created_at, sender_trip:sender_trip_id(from_city, to_city, travel_date)')
     .in('status', ACTIONABLE)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(200);
 
   return NextResponse.json({ matches: matches ?? [] });
 }
