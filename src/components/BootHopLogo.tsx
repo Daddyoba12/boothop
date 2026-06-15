@@ -36,12 +36,11 @@ export default function BootHopLogo({
       onTouchEnd={() => setPressed(false)}
     >
       <img
-        src="/images/boothop-logo-new.png"
+        src="/images/boothop-icon-512.png"
         alt="BootHop"
         className={`${heightMap[size]} w-auto object-contain
-          transition-all duration-300 ease-out
-          drop-shadow-[0_2px_8px_rgba(30,115,190,0.25)]
-          group-hover:drop-shadow-[0_8px_24px_rgba(30,115,190,0.55)]`}
+          transition-all duration-300 ease-out rounded-xl`}
+        style={{ mixBlendMode: 'screen' }}
         draggable={false}
       />
     </span>

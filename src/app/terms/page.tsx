@@ -122,9 +122,10 @@ export default function TermsPage() {
         {/* BootHop logo — visible brand identity for this page */}
         <div className="flex justify-center mb-8">
           <img
-            src="/images/boothop-logo-new.png"
+            src="/images/boothop-icon-512.png"
             alt="BootHop"
-            className="h-16 w-auto"
+            className="h-16 w-auto rounded-xl"
+            style={{ mixBlendMode: 'screen' }}
           />
         </div>
         <div className="inline-flex items-center gap-2 mb-6 px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/30 backdrop-blur-xl">
