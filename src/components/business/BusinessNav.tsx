@@ -15,7 +15,7 @@ interface BusinessNavProps {
 const SIGN_IN_OPTIONS = [
   { label: "I'm an Express Client",  sub: 'Book & track deliveries',      href: '/business/sign-in',          emoji: '⚡' },
   { label: "I'm a Carrier Partner",  sub: 'View your job dashboard',      href: '/business/carrier-sign-in',  emoji: '🚚' },
-  { label: "I'm a Priority Client",  sub: 'Access my account',            href: '/business/priority-partner', emoji: '🏆' },
+  { label: "I'm a Priority Client",  sub: 'Access my account',            href: '/business/priority-sign-in', emoji: '🏆' },
 ];
 
 export function BusinessNav({ rightSlot, transparent = false, showDefaultNav = false }: BusinessNavProps) {
@@ -110,7 +110,7 @@ export function BusinessNav({ rightSlot, transparent = false, showDefaultNav = f
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/75 hover:text-white bg-white/8 hover:bg-white/14 border border-white/12 hover:border-white/25 px-3 py-1.5 rounded-full transition-all">
               🚚 Carrier Partner
             </a>
-            <a href="/business/priority-partner"
+            <a href="/business/priority-sign-in"
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/75 hover:text-white bg-white/8 hover:bg-white/14 border border-white/12 hover:border-white/25 px-3 py-1.5 rounded-full transition-all">
               🏆 Priority Client
             </a>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Mail, ShieldCheck, ArrowRight, Truck, Clock, AlertCircle, Package, MapPin, BarChart3 } from 'lucide-react';
@@ -10,12 +10,10 @@ import BusinessFooter from '@/components/business/BusinessFooter';
 const BG = 'linear-gradient(135deg, #020617 0%, #0a1628 50%, #020617 100%)';
 const FADE = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -16 } };
 
-const PERSONAL_DOMAINS = ['gmail.', 'hotmail.', 'yahoo.', 'outlook.com', 'icloud.', 'live.', 'aol.', 'proton.', 'me.com'];
-
 const FEATURES = [
-  { icon: Package, label: 'Job alerts in your area',    sub: 'Receive matched jobs within your coverage radius' },
-  { icon: Truck,   label: 'Accept jobs on your terms',  sub: 'Pick up deliveries that fit your schedule' },
-  { icon: MapPin,  label: 'UK & International routes',  sub: 'Operate across domestic and international networks' },
+  { icon: Package,  label: 'Job alerts in your area',   sub: 'Receive matched jobs within your coverage radius' },
+  { icon: Truck,    label: 'Accept jobs on your terms', sub: 'Pick up deliveries that fit your schedule' },
+  { icon: MapPin,   label: 'UK & International routes', sub: 'Operate across domestic and international networks' },
   { icon: BarChart3, label: 'Full job history',         sub: 'Track all active and completed deliveries' },
 ];
 
@@ -23,19 +21,30 @@ type Stage = 'email' | 'otp' | 'pending' | 'not_found';
 
 export default function CarrierSignInPage() {
   const router = useRouter();
-  const [stage, setStage]       = useState<Stage>('email');
-  const [email, setEmail]       = useState('');
-  const [otp, setOtp]           = useState('');
-  const [error, setError]       = useState<string | null>(null);
-  const [loading, setLoading]   = useState(false);
+  const [checking, setChecking]           = useState(true);
+  const [stage, setStage]                 = useState<Stage>('email');
+  const [email, setEmail]                 = useState('');
+  const [otp, setOtp]                     = useState('');
+  const [error, setError]                 = useState<string | null>(null);
+  const [loading, setLoading]             = useState(false);
   const [carrierStatus, setCarrierStatus] = useState<string | null>(null);
   const [companyName, setCompanyName]     = useState<string | null>(null);
 
+  // Redirect immediately if already signed in
+  useEffect(() => {
+    fetch('/api/business/auth/me')
+      .then(r => r.json())
+      .then(async d => {
+        if (d.authenticated) {
+          await routeCarrier();
+        } else {
+          setChecking(false);
+        }
+      })
+      .catch(() => setChecking(false));
+  }, []);
+
   const sendOtp = async () => {
-    if (PERSONAL_DOMAINS.some(d => email.toLowerCase().includes(d))) {
-      setError('Personal email not accepted. Please use your carrier company email.');
-      return;
-    }
     setError(null); setLoading(true);
     try {
       const res = await fetch('/api/business/auth/send-otp', {
@@ -66,6 +75,7 @@ export default function CarrierSignInPage() {
 
   const routeCarrier = async () => {
     const me = await fetch('/api/business/carrier/me').then(r => r.json());
+    setChecking(false);
     if (!me.registered) { setStage('not_found'); return; }
     setCarrierStatus(me.status);
     setCompanyName(me.company_name);
@@ -75,6 +85,15 @@ export default function CarrierSignInPage() {
     }
     setStage('pending');
   };
+
+  // Auth check in progress — show minimal loader
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: BG }}>
+        <Loader2 className="h-8 w-8 text-blue-400 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen text-white" style={{ background: BG }}>
@@ -175,7 +194,7 @@ export default function CarrierSignInPage() {
                       <Mail className="h-8 w-8 text-blue-400" />
                     </div>
                     <h2 className="text-2xl font-black mb-2">Check your inbox</h2>
-                    <p className="text-white/40 text-sm">We sent a 6-digit code to</p>
+                    <p className="text-white/40 text-sm">We sent a 5-character code to</p>
                     <p className="text-blue-400 font-semibold text-sm mt-0.5">{email}</p>
                   </div>
                   <div className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-8 space-y-4">
@@ -183,14 +202,14 @@ export default function CarrierSignInPage() {
                       <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">{error}</div>
                     )}
                     <input
-                      type="text" inputMode="numeric" value={otp}
-                      onChange={e => { setOtp(e.target.value.replace(/\D/g, '').slice(0, 6)); setError(null); }}
+                      type="text" inputMode="text" value={otp}
+                      onChange={e => { setOtp(e.target.value.replace(/[^A-Z0-9]/gi, '').toUpperCase().slice(0, 5)); setError(null); }}
                       onKeyDown={e => e.key === 'Enter' && verifyOtp()}
-                      placeholder="_ _ _ _ _ _" autoFocus maxLength={6}
-                      className="w-full text-center text-3xl font-mono tracking-[0.4em] py-4 rounded-xl bg-white/20 border border-white/20 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      placeholder="_ _ _ _ _" autoFocus maxLength={5}
+                      className="w-full text-center text-3xl font-mono tracking-[0.4em] py-4 rounded-xl bg-white/20 border border-white/20 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 uppercase"
                     />
                     <button
-                      onClick={verifyOtp} disabled={loading || otp.length < 6}
+                      onClick={verifyOtp} disabled={loading || otp.length < 5}
                       className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-black bg-gradient-to-r from-blue-500 to-blue-400 text-white disabled:opacity-40 hover:scale-[1.02] transition-all">
                       {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
                       {loading ? 'Verifying…' : 'Verify & sign in'}
