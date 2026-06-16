@@ -4,6 +4,11 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { normalizeEmail } from '@/lib/auth/code';
 import { getAppSession } from '@/lib/auth/session';
 
+const ADMIN_EMAILS = [
+  'daddyoba12@gmail.com',
+  ...(process.env.ADMIN_EMAILS ?? 'info@boothop.com').split(',').map(e => e.trim()).filter(Boolean),
+];
+
 export async function POST(req: Request) {
   try {
     const cookieStore = await cookies();
@@ -22,6 +27,11 @@ export async function POST(req: Request) {
 
     if (!email || !email.includes('@')) {
       return NextResponse.json({ trips: [] });
+    }
+
+    // Admin emails bypass the listing check — return a placeholder so OTP flow proceeds
+    if (ADMIN_EMAILS.includes(email)) {
+      return NextResponse.json({ trips: [{ id: 'admin', type: 'admin', from_city: '', to_city: '', travel_date: null, weight: null, status: 'active' }] });
     }
 
     const supabase = createSupabaseAdminClient();
