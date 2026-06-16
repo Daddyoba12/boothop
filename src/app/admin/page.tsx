@@ -5,8 +5,10 @@ import AdminDashboard from './AdminDashboard';
 
 export const dynamic = 'force-dynamic';
 
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? 'daddyoba12@gmail.com,info@boothop.com')
-  .split(',').map(e => e.trim());
+const ADMIN_EMAILS = [
+  'daddyoba12@gmail.com',
+  ...(process.env.ADMIN_EMAILS ?? 'info@boothop.com').split(',').map(e => e.trim()).filter(Boolean),
+];
 
 export default async function AdminPage() {
   const cookieStore = await cookies();
