@@ -8,7 +8,7 @@ import {
   CheckCircle, Shield, Search, Filter,
   Eye, Ban, Mail, Calendar, MapPin,
   TrendingUp, Activity, Download, RefreshCw, Clock,
-  Send, MessageSquare, X, ChevronDown,
+  Send, MessageSquare, X, ChevronDown, Zap,
 } from 'lucide-react';
 
 export default function AdminDashboard({ serverSession }: { serverSession: any }) {
@@ -24,7 +24,9 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
   const [disputes, setDisputes] = useState<any[]>([]);
 
-  const [selectedEmails, setSelectedEmails] = useState<Set<string>>(new Set());
+  const [nearMissScanning, setNearMissScanning] = useState(false);
+  const [nearMissResult, setNearMissResult]     = useState<string | null>(null);
+  const [selectedEmails, setSelectedEmails]     = useState<Set<string>>(new Set());
   const [showCompose, setShowCompose]       = useState(false);
   const [composeTemplate, setComposeTemplate] = useState('thankyou');
   const [composeSubject, setComposeSubject] = useState('');
@@ -191,6 +193,25 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
     }
   };
 
+  const runNearMissScan = async () => {
+    setNearMissScanning(true);
+    setNearMissResult(null);
+    try {
+      const res  = await fetch('/api/admin/near-miss-scan', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Scan failed');
+      if (data.pairs === 0) {
+        setNearMissResult('No near-miss pairs found right now.');
+      } else {
+        setNearMissResult(`⚡ Sent ${data.sent} near-miss alert${data.sent !== 1 ? 's' : ''}${data.failed > 0 ? ` (${data.failed} failed)` : ''} across ${data.pairs} pair${data.pairs !== 1 ? 's' : ''}`);
+      }
+    } catch (err: any) {
+      setNearMissResult(`❌ ${err.message}`);
+    } finally {
+      setNearMissScanning(false);
+    }
+  };
+
   const filteredUsers = users.filter(trip => {
     const matchesSearch = !searchQuery ||
       trip.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -322,6 +343,30 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
               From fees
             </p>
           </div>
+        </div>
+
+        {/* NEAR-MISS QUICK ACTION */}
+        <div className="flex items-center gap-4 mb-6 flex-wrap">
+          <button
+            onClick={runNearMissScan}
+            disabled={nearMissScanning}
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-amber-500/40 transition-all disabled:opacity-60 disabled:cursor-not-allowed text-sm"
+          >
+            {nearMissScanning
+              ? <RefreshCw className="w-4 h-4 animate-spin" />
+              : <Zap className="w-4 h-4" />}
+            {nearMissScanning ? 'Scanning...' : 'Run Near-Miss Alerts'}
+          </button>
+          {nearMissResult && (
+            <span className={`text-sm font-medium px-4 py-2 rounded-xl ${
+              nearMissResult.startsWith('⚡') ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' :
+              nearMissResult.startsWith('❌') ? 'bg-red-500/20 text-red-300 border border-red-400/30' :
+              'bg-white/10 text-white/60 border border-white/10'
+            }`}>
+              {nearMissResult}
+            </span>
+          )}
+          <span className="text-white/30 text-xs ml-auto">Auto-runs daily at 10:00 UTC</span>
         </div>
 
         {/* SEARCH & FILTER BAR */}
