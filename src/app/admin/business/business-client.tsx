@@ -216,14 +216,20 @@ function AdminBusinessContent() {
       )}
 
       {/* Header */}
-      <div className="border-b border-white/8 px-6 py-4 flex items-center justify-between">
+      <div className="border-b border-white/8 px-6 py-4 flex items-center justify-between sticky top-0 bg-[#050a05]/90 backdrop-blur-sm z-20">
         <div className="flex items-center gap-3">
+          <a href="/admin" className="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-all" title="Back to Admin">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M19 12H5"/><path d="m12 5-7 7 7 7"/></svg>
+          </a>
           <span className="text-xl font-black">Boot<span className="text-emerald-400">Hop</span></span>
           <span className="text-xs font-bold bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full uppercase tracking-widest">Business Admin</span>
         </div>
-        <button onClick={load} className="text-white/30 hover:text-white transition-colors">
-          <RefreshCw className="h-4 w-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          <a href="/admin" className="text-white/40 hover:text-white text-xs transition-colors">← Admin</a>
+          <button onClick={load} className="text-white/30 hover:text-white transition-colors ml-2">
+            <RefreshCw className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-8">

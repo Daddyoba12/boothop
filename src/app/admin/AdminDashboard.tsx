@@ -9,6 +9,7 @@ import {
   Eye, Ban, Mail, Calendar, MapPin,
   TrendingUp, Activity, Download, RefreshCw, Clock,
   Send, MessageSquare, X, ChevronDown, Zap,
+  ArrowLeft, HelpCircle, ChevronRight,
 } from 'lucide-react';
 
 export default function AdminDashboard({ serverSession }: { serverSession: any }) {
@@ -24,6 +25,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
   const [disputes, setDisputes] = useState<any[]>([]);
 
+  const [showHelp, setShowHelp]                 = useState(false);
   const [nearMissScanning, setNearMissScanning] = useState(false);
   const [nearMissResult, setNearMissResult]     = useState<string | null>(null);
   const [selectedEmails, setSelectedEmails]     = useState<Set<string>>(new Set());
@@ -246,34 +248,45 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
       
-      {/* PREMIUM ADMIN HEADER */}
-      <nav className="bg-gradient-to-r from-red-600/20 via-orange-600/20 to-red-600/20 backdrop-blur-xl border-b border-red-400/30">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl flex items-center justify-center">
-              <Shield className="text-white w-7 h-7" />
+      {/* ADMIN HEADER */}
+      <nav className="bg-gradient-to-r from-red-600/20 via-orange-600/20 to-red-600/20 backdrop-blur-xl border-b border-red-400/30 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between gap-3">
+
+          {/* LEFT — back + title */}
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              onClick={() => router.back()}
+              className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all shrink-0"
+              title="Go back"
+            >
+              <ArrowLeft className="w-5 h-5 text-white" />
+            </button>
+            <div className="hidden md:flex w-10 h-10 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl items-center justify-center shrink-0">
+              <Shield className="text-white w-5 h-5" />
             </div>
-            <div>
-              <h1 className="font-bold text-white text-xl">Admin Control Center</h1>
-              <p className="text-white/60 text-sm">BootHop System Management</p>
+            <div className="min-w-0">
+              <h1 className="font-bold text-white text-base md:text-xl leading-tight truncate">Admin Control Center</h1>
+              {/* Breadcrumb */}
+              <div className="hidden md:flex items-center gap-1 text-white/40 text-xs">
+                <Link href="/dashboard" className="hover:text-white/70 transition-colors">Dashboard</Link>
+                <ChevronRight className="w-3 h-3" />
+                <span className="text-white/60">Admin</span>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            <Link href="/admin/hub" className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-xl transition-all text-sm font-medium">Hub</Link>
-            <Link href="/admin/customs" className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-xl transition-all text-sm font-medium">Customs</Link>
-            <Link href="/admin/business" className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-xl transition-all text-sm font-medium">Business</Link>
-            <button
-              onClick={loadDashboardData}
-              className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all"
-              title="Refresh"
-            >
-              <RefreshCw className="w-5 h-5 text-white" />
+          {/* RIGHT — sub-page links + actions */}
+          <div className="flex items-center gap-1.5 flex-wrap justify-end">
+            <Link href="/admin/hub"      className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-xl transition-all text-xs font-semibold">Hub</Link>
+            <Link href="/admin/customs"  className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-xl transition-all text-xs font-semibold">Customs</Link>
+            <Link href="/admin/business" className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-xl transition-all text-xs font-semibold">Business</Link>
+            <button onClick={loadDashboardData} className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all" title="Refresh data">
+              <RefreshCw className="w-4 h-4 text-white" />
             </button>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all font-medium text-sm"
-            >
+            <button onClick={() => setShowHelp(true)} className="p-2 bg-blue-600/40 hover:bg-blue-600/70 rounded-xl transition-all" title="Help & reference">
+              <HelpCircle className="w-4 h-4 text-blue-300" />
+            </button>
+            <button onClick={() => router.push('/dashboard')} className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all font-semibold text-xs">
               Exit
             </button>
           </div>
@@ -859,6 +872,123 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
         )}
 
       </div>
+
+      {/* HELP PANEL */}
+      {showHelp && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowHelp(false)} />
+          <div className="relative w-full max-w-sm h-full bg-gradient-to-b from-slate-900 to-slate-950 border-l border-white/10 shadow-2xl overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-slate-900/95 backdrop-blur-sm border-b border-white/10 px-6 py-4 flex items-center justify-between z-10">
+              <div className="flex items-center gap-3">
+                <HelpCircle className="w-5 h-5 text-blue-400" />
+                <h2 className="text-white font-bold text-lg">Help &amp; Reference</h2>
+              </div>
+              <button onClick={() => setShowHelp(false)} className="p-1.5 hover:bg-white/10 rounded-lg transition-all">
+                <X className="w-5 h-5 text-white/60" />
+              </button>
+            </div>
+
+            <div className="px-6 py-5 space-y-6">
+
+              {/* Navigation */}
+              <section>
+                <h3 className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">Navigation</h3>
+                <div className="space-y-2.5 text-sm">
+                  {[
+                    { icon: '←', label: 'Back button', desc: 'Returns to the previous page you were on.' },
+                    { icon: '🔄', label: 'Refresh', desc: 'Reloads all dashboard data from the database.' },
+                    { icon: '🚪', label: 'Exit', desc: 'Takes you back to your main user dashboard.' },
+                    { icon: 'Hub', label: 'Hub', desc: 'Africa-outbound match authorisation, payment confirmations, and dispute resolution.' },
+                    { icon: 'Customs', label: 'Customs', desc: 'AML review queue and duty/tax estimations for shipments.' },
+                    { icon: 'Business', label: 'Business', desc: 'Carrier job management — assign, track, and complete business deliveries.' },
+                  ].map(item => (
+                    <div key={item.label} className="flex gap-3">
+                      <span className="shrink-0 w-14 text-xs bg-white/10 text-white/60 rounded-lg px-2 py-1 font-mono text-center leading-relaxed">{item.icon}</span>
+                      <div>
+                        <p className="text-white font-semibold">{item.label}</p>
+                        <p className="text-white/50 text-xs mt-0.5">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <div className="border-t border-white/10" />
+
+              {/* Tabs */}
+              <section>
+                <h3 className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">Dashboard Tabs</h3>
+                <div className="space-y-4 text-sm">
+                  {[
+                    {
+                      icon: '✈️📦', label: 'Journeys',
+                      desc: 'Every active sender and traveller listing across the platform. Use checkboxes to select customers and send them messages.',
+                      tip: 'Filter by "Travellers only" or "Senders only" using the dropdown.',
+                    },
+                    {
+                      icon: '🔗', label: 'Matches',
+                      desc: 'Connections between a sender and a traveller that have been proposed or accepted.',
+                      tip: 'Click "View Full Details" to see the match page and timeline.',
+                    },
+                    {
+                      icon: '🔒', label: 'Escrow',
+                      desc: 'Payments held by BootHop until both parties confirm delivery. "Manual Release" bypasses the dual-confirmation — use with caution.',
+                      tip: 'Normal release happens automatically when both sides confirm.',
+                    },
+                    {
+                      icon: '⚠️', label: 'Disputes',
+                      desc: 'Issues raised by users during a match. Click "View Match" to investigate and resolve.',
+                      tip: '',
+                    },
+                  ].map(tab => (
+                    <div key={tab.label} className="bg-white/5 rounded-xl p-4 border border-white/10">
+                      <p className="text-white font-bold mb-1">{tab.icon} {tab.label}</p>
+                      <p className="text-white/60 text-xs leading-relaxed">{tab.desc}</p>
+                      {tab.tip && <p className="mt-2 text-blue-400 text-xs">💡 {tab.tip}</p>}
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <div className="border-t border-white/10" />
+
+              {/* Actions */}
+              <section>
+                <h3 className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">Admin Actions</h3>
+                <div className="space-y-4 text-sm">
+                  {[
+                    {
+                      icon: '⚡', label: 'Near-Miss Alerts',
+                      desc: 'Scans for senders and travellers with the same route but travel dates 1–2 days apart. Emails the sender asking if they can be flexible.',
+                      tip: 'Also runs automatically every day at 10:00 UTC.',
+                    },
+                    {
+                      icon: '✉️', label: 'Compose Message',
+                      desc: 'Tick one or more customers in the Journeys tab, then tap "Compose Message" in the bar that appears at the bottom. Choose a template or write your own.',
+                      tip: 'Emails are deduplicated — a customer with 3 listings only gets 1 email.',
+                    },
+                  ].map(action => (
+                    <div key={action.label} className="bg-white/5 rounded-xl p-4 border border-white/10">
+                      <p className="text-white font-bold mb-1">{action.icon} {action.label}</p>
+                      <p className="text-white/60 text-xs leading-relaxed">{action.desc}</p>
+                      {action.tip && <p className="mt-2 text-amber-400 text-xs">💡 {action.tip}</p>}
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <div className="border-t border-white/10" />
+
+              {/* Contact */}
+              <section className="pb-6">
+                <h3 className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">Support</h3>
+                <p className="text-white/60 text-sm">For platform issues or questions, email <span className="text-blue-400">info@boothop.com</span></p>
+              </section>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* STICKY SELECTION BAR */}
       {selectedEmails.size > 0 && !showCompose && (

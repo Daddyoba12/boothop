@@ -34,6 +34,20 @@ export default async function CustomsAdminPage() {
   ]);
 
   return (
+    <div className="min-h-screen bg-slate-50">
+      {/* Nav */}
+      <div className="sticky top-0 z-20 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3">
+          <a href="/admin" className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="m12 5-7 7 7 7"/></svg>
+            Admin
+          </a>
+          <span className="text-slate-300">/</span>
+          <span className="text-sm font-semibold text-slate-700">Customs &amp; Compliance</span>
+        </div>
+        <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full uppercase tracking-wide">Customs</span>
+      </div>
+
     <div className="p-6 space-y-8 max-w-7xl mx-auto">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Customs &amp; Compliance Dashboard</h1>
@@ -156,6 +170,7 @@ export default async function CustomsAdminPage() {
           </table>
         </div>
       </div>
+    </div>
     </div>
   );
 }

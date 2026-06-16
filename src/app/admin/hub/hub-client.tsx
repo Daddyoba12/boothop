@@ -124,14 +124,20 @@ function AdminHubContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white">
-      <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
-        <div>
+      <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between sticky top-0 bg-slate-950/90 backdrop-blur-sm z-20">
+        <div className="flex items-center gap-3">
+          <a href="/admin" className="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-all" title="Back to Admin">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M19 12H5"/><path d="m12 5-7 7 7 7"/></svg>
+          </a>
           <span className="text-xl font-bold">Boot<span className="text-blue-400">Hop</span></span>
-          <span className="ml-3 text-xs bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-full font-semibold uppercase tracking-wide">Admin Hub</span>
+          <span className="text-xs bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-full font-semibold uppercase tracking-wide">Admin Hub</span>
         </div>
-        <button onClick={load} className="text-white/40 hover:text-white transition-colors">
-          <RefreshCw className="h-4 w-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          <a href="/admin" className="text-white/40 hover:text-white text-xs transition-colors">← Admin</a>
+          <button onClick={load} className="text-white/40 hover:text-white transition-colors ml-2">
+            <RefreshCw className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
