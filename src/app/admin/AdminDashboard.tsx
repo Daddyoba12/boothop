@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createSupabaseClient } from '@/lib/supabase';
 import Link from 'next/link';
 import {
   Users, User, Package, DollarSign, AlertTriangle,
@@ -12,7 +11,6 @@ import {
 } from 'lucide-react';
 
 export default function AdminDashboard({ serverSession }: { serverSession: any }) {
-  const supabase = createSupabaseClient();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -53,71 +51,35 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
 
   const loadDashboardData = async () => {
     try {
-      // Load users
-      const { data: usersData } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const res  = await fetch('/api/admin/dashboard-data');
+      const data = await res.json();
 
-      setUsers(usersData || []);
+      const usersData    = data.users    || [];
+      const matchesData  = data.matches  || [];
+      const escrowData   = data.escrow   || [];
+      const disputesData = data.disputes || [];
 
-      // Load matches with full details
-      const { data: matchesData } = await supabase
-        .from('matches')
-        .select(`
-          *,
-          sender_trip:sender_trip_id(from_city, to_city, travel_date, user_id),
-          traveler_trip:traveler_trip_id(from_city, to_city, travel_date, user_id)
-        `)
-        .order('created_at', { ascending: false });
+      setUsers(usersData);
+      setMatches(matchesData);
+      setEscrowPayments(escrowData);
+      setDisputes(disputesData);
 
-      setMatches(matchesData || []);
-
-      // Load escrow payments
-      const { data: escrowData } = await supabase
-        .from('matches')
-        .select('*')
-        .eq('payment_status', 'escrowed');
-
-      setEscrowPayments(escrowData || []);
-
-      // Load disputes
-      const { data: disputesData } = await supabase
-        .from('disputes')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      setDisputes(disputesData || []);
-
-      // Calculate advanced stats
-      const verifiedCount = usersData?.filter((u: any) => u.id_verified).length || 0;
-      const activeCount = matchesData?.filter((m: any) => m.status === 'accepted' || m.status === 'in_transit').length || 0;
-      const completedCount = matchesData?.filter((m: any) => m.status === 'completed').length || 0;
-      const escrowSum = escrowData?.reduce((sum: number, m: any) => sum + Number(m.agreed_price || 0), 0) || 0;
-
-      const releasedData = matchesData?.filter((m: any) => m.payment_status === 'released');
-      const releasedSum = releasedData?.reduce((sum: number, m: any) => sum + Number(m.agreed_price || 0), 0) || 0;
-
-      // Calculate platform revenue (fees from completed matches)
-      const revenue = matchesData
-        ?.filter((m: any) => m.status === 'completed')
-        .reduce((sum: number, m: any) => {
-          const hooperFee = Number(m.hooper_pays || 0) - Number(m.agreed_price || 0);
-          const booterFee = Number(m.agreed_price || 0) - Number(m.booter_receives || 0);
-          return sum + hooperFee + booterFee;
-        }, 0) || 0;
-
-      const pendingDisputeCount = disputesData?.filter((d: any) => d.status === 'open' || d.status === 'pending').length || 0;
+      const activeCount      = matchesData.filter((m: any) => m.status === 'accepted' || m.status === 'in_transit').length;
+      const completedCount   = matchesData.filter((m: any) => m.status === 'completed').length;
+      const escrowSum        = escrowData.reduce((s: number, m: any) => s + Number(m.agreed_price || 0), 0);
+      const releasedSum      = matchesData.filter((m: any) => m.payment_status === 'released').reduce((s: number, m: any) => s + Number(m.agreed_price || 0), 0);
+      const pendingDisputes  = disputesData.filter((d: any) => d.status === 'open' || d.status === 'pending').length;
+      const revenue          = matchesData.filter((m: any) => m.status === 'completed').reduce((s: number, m: any) => s + (Number(m.hooper_pays || 0) - Number(m.booter_receives || 0)), 0);
 
       setStats({
-        totalUsers: usersData?.length || 0,
-        verifiedUsers: verifiedCount,
+        totalUsers: usersData.length,
+        verifiedUsers: 0,
         activeMatches: activeCount,
         completedMatches: completedCount,
         escrowAmount: escrowSum,
         releasedAmount: releasedSum,
-        pendingDisputes: pendingDisputeCount,
-        platformRevenue: revenue
+        pendingDisputes,
+        platformRevenue: revenue,
       });
 
       setLoading(false);
@@ -127,63 +89,15 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
     }
   };
 
-  const verifyUser = async (userId: string) => {
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          id_verified: true,
-          id_verified_at: new Date().toISOString()
-        })
-        .eq('id', userId);
-
-      if (error) throw error;
-
-      alert('✅ User verified successfully');
-      loadDashboardData();
-    } catch (error) {
-      console.error('Error verifying user:', error);
-      alert('❌ Failed to verify user');
-    }
-  };
-
-  const suspendUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to suspend this user?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          suspended: true,
-          suspended_at: new Date().toISOString()
-        })
-        .eq('id', userId);
-
-      if (error) throw error;
-
-      alert('✅ User suspended');
-      loadDashboardData();
-    } catch (error) {
-      console.error('Error suspending user:', error);
-      alert('❌ Failed to suspend user');
-    }
-  };
-
   const releaseEscrow = async (matchId: string) => {
     if (!confirm('⚠️ Are you sure you want to manually release this escrow payment?')) return;
-
     try {
-      const { error } = await supabase
-        .from('matches')
-        .update({ 
-          payment_status: 'released',
-          payment_released_at: new Date().toISOString(),
-          status: 'completed'
-        })
-        .eq('id', matchId);
-
-      if (error) throw error;
-
+      const res = await fetch('/api/admin/release-escrow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matchId }),
+      });
+      if (!res.ok) throw new Error(await res.text());
       alert('✅ Escrow released successfully');
       loadDashboardData();
     } catch (error) {
@@ -193,12 +107,12 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   };
 
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         user.email?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterStatus === 'all' ||
-                         (filterStatus === 'verified' && user.id_verified) ||
-                         (filterStatus === 'pending' && !user.id_verified);
+  const filteredUsers = users.filter(trip => {
+    const matchesSearch = !searchQuery ||
+      trip.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      trip.from_city?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      trip.to_city?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = filterStatus === 'all' || trip.status === filterStatus || trip.type === filterStatus;
     return matchesSearch && matchesFilter;
   });
 
@@ -396,101 +310,65 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
           })}
         </div>
 
-        {/* USERS TAB */}
+        {/* JOURNEYS TAB */}
         {activeTab === 'users' && (
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-white/5 border-b border-white/10">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">User Details</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Contact</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Joined</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Email</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Type</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Route</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Travel Date</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-white">Status</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Actions</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Listed</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredUsers.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-12 text-center text-white/60">
-                        No users found matching your criteria
+                      <td colSpan={6} className="px-6 py-12 text-center text-white/60">
+                        No journeys found
                       </td>
                     </tr>
                   ) : (
-                    filteredUsers.map((user) => (
-                      <tr key={user.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    filteredUsers.map((trip: any, i: number) => (
+                      <tr key={trip.id || i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-                              <User className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                              <p className="text-white font-medium">{user.full_name || 'N/A'}</p>
-                              <p className="text-white/60 text-xs">ID: {user.id.slice(0, 8)}...</p>
-                            </div>
+                          <div className="flex items-center gap-2 text-white/80">
+                            <Mail className="w-4 h-4 text-blue-400 shrink-0" />
+                            <span className="text-sm">{trip.email || '—'}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-2 text-white/70">
-                            <Mail className="w-4 h-4" />
-                            <span className="text-sm">{user.email}</span>
-                          </div>
+                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            trip.type === 'traveller' ? 'bg-blue-500/20 text-blue-300' : 'bg-purple-500/20 text-purple-300'
+                          }`}>
+                            {trip.type === 'traveller' ? '✈️ Traveller' : '📦 Sender'}
+                          </span>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-2 text-white/70">
-                            <Calendar className="w-4 h-4" />
-                            <span className="text-sm">
-                              {new Date(user.created_at).toLocaleDateString()}
-                            </span>
+                          <div className="flex items-center gap-1 text-white font-medium text-sm">
+                            <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
+                            {trip.from_city} → {trip.to_city}
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          {user.id_verified ? (
-                            <span className="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
-                              <CheckCircle className="w-4 h-4" />
-                              KYC Verified
-                            </span>
-                          ) : user.suspended ? (
-                            <span className="px-3 py-1 bg-red-500/20 text-red-300 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
-                              <Ban className="w-4 h-4" />
-                              Suspended
-                            </span>
-                          ) : (
-                            <span className="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
-                              <AlertTriangle className="w-4 h-4" />
-                              Pending
-                            </span>
-                          )}
+                        <td className="px-6 py-4 text-white/70 text-sm">
+                          {trip.travel_date ? new Date(trip.travel_date).toLocaleDateString() : '—'}
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex gap-2">
-                            {!user.id_verified && (
-                              <button
-                                onClick={() => verifyUser(user.id)}
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg text-xs font-semibold hover:bg-green-700 transition-all flex items-center gap-1"
-                              >
-                                <CheckCircle className="w-4 h-4" />
-                                Verify
-                              </button>
-                            )}
-                            {!user.suspended && (
-                              <button
-                                onClick={() => suspendUser(user.id)}
-                                className="px-4 py-2 bg-red-600/80 text-white rounded-lg text-xs font-semibold hover:bg-red-700 transition-all flex items-center gap-1"
-                              >
-                                <Ban className="w-4 h-4" />
-                                Suspend
-                              </button>
-                            )}
-                            <Link
-                              href={`/admin/users/${user.id}`}
-                              className="px-4 py-2 bg-blue-600/80 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-all flex items-center gap-1"
-                            >
-                              <Eye className="w-4 h-4" />
-                              View
-                            </Link>
-                          </div>
+                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            trip.status === 'active'   ? 'bg-green-500/20 text-green-300' :
+                            trip.status === 'matched'  ? 'bg-blue-500/20 text-blue-300' :
+                            trip.status === 'expired'  ? 'bg-red-500/20 text-red-300' :
+                            'bg-white/10 text-white/60'
+                          }`}>
+                            {trip.status || 'unknown'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-white/50 text-sm">
+                          {trip.created_at ? new Date(trip.created_at).toLocaleDateString() : '—'}
                         </td>
                       </tr>
                     ))
