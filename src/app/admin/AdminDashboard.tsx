@@ -8,6 +8,7 @@ import {
   CheckCircle, Shield, Search, Filter,
   Eye, Ban, Mail, Calendar, MapPin,
   TrendingUp, Activity, Download, RefreshCw, Clock,
+  Send, MessageSquare, X, ChevronDown,
 } from 'lucide-react';
 
 export default function AdminDashboard({ serverSession }: { serverSession: any }) {
@@ -22,6 +23,14 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   const [matches, setMatches] = useState<any[]>([]);
   const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
   const [disputes, setDisputes] = useState<any[]>([]);
+
+  const [selectedEmails, setSelectedEmails] = useState<Set<string>>(new Set());
+  const [showCompose, setShowCompose]       = useState(false);
+  const [composeTemplate, setComposeTemplate] = useState('thankyou');
+  const [composeSubject, setComposeSubject] = useState('');
+  const [composeBody, setComposeBody]       = useState('');
+  const [composeSending, setComposeSending] = useState(false);
+  const [composeResult, setComposeResult]   = useState<string | null>(null);
 
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -106,6 +115,81 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
     }
   };
 
+
+  const TEMPLATES: Record<string, { subject: string; body: string }> = {
+    thankyou: {
+      subject: 'Thank you for using BootHop',
+      body: `Hi there,\n\nThank you so much for being part of the BootHop community. We truly appreciate you trusting us to connect senders and travellers across borders.\n\nWe're constantly working to improve our matching — faster notifications, better route coverage, and smarter suggestions — so you spend less time waiting and more time doing.\n\nIf you ever have feedback or questions, just reply to this email. We read every message.\n\nWarm regards,\nThe BootHop Team`,
+    },
+    matching: {
+      subject: `We're improving matching on BootHop`,
+      body: `Hi there,\n\nWe've been working hard behind the scenes to make matching on BootHop faster and smarter.\n\nWhat's new:\n• Quicker match notifications\n• Better route coverage across more cities\n• Improved pricing suggestions\n\nIf you have an active listing, keep an eye on your dashboard — matches are happening more frequently than ever.\n\nThank you for your continued support.\n\nThe BootHop Team`,
+    },
+    promotion: {
+      subject: 'Something exciting is coming to BootHop 🚀',
+      body: `Hi there,\n\nWe have some exciting news coming to the BootHop community very soon. Stay tuned for updates that will make sending and travelling even better.\n\nIn the meantime, if you haven't listed a trip yet, now is a great time — we have active listings looking for someone like you.\n\nThe BootHop Team`,
+    },
+    nomatch: {
+      subject: `We're still looking for your match on BootHop`,
+      body: `Hi there,\n\nWe noticed you have an active listing on BootHop and we haven't found a match for you yet — but we haven't stopped looking.\n\nMatching the right sender with the right traveller takes time, and we want to make sure it's a great fit when it happens. We're constantly growing our network of routes and users, so your chances improve every day.\n\nYou are part of a community that is making cross-border delivery simpler and more affordable for everyone. We appreciate your patience and trust in us.\n\nAs soon as we find a match, you'll hear from us straight away.\n\nWarm regards,\nThe BootHop Team`,
+    },
+    custom: { subject: '', body: '' },
+  };
+
+  const applyTemplate = (key: string) => {
+    setComposeTemplate(key);
+    setComposeSubject(TEMPLATES[key].subject);
+    setComposeBody(TEMPLATES[key].body);
+  };
+
+  const toggleEmailSelect = (email: string) => {
+    setSelectedEmails(prev => {
+      const next = new Set(prev);
+      next.has(email) ? next.delete(email) : next.add(email);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    const allEmails = Array.from(new Set(filteredUsers.map((t: any) => t.email).filter(Boolean)));
+    if (selectedEmails.size === allEmails.length) {
+      setSelectedEmails(new Set());
+    } else {
+      setSelectedEmails(new Set(allEmails));
+    }
+  };
+
+  const openCompose = () => {
+    setComposeTemplate('thankyou');
+    setComposeSubject(TEMPLATES.thankyou.subject);
+    setComposeBody(TEMPLATES.thankyou.body);
+    setComposeResult(null);
+    setShowCompose(true);
+  };
+
+  const sendMessage = async () => {
+    if (!composeSubject.trim() || !composeBody.trim()) return;
+    setComposeSending(true);
+    setComposeResult(null);
+    try {
+      const res = await fetch('/api/admin/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          emails: Array.from(selectedEmails),
+          subject: composeSubject,
+          body: composeBody,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Send failed');
+      setComposeResult(`✅ Sent to ${data.sent} recipient${data.sent !== 1 ? 's' : ''}${data.failed > 0 ? ` (${data.failed} failed)` : ''}`);
+    } catch (err: any) {
+      setComposeResult(`❌ ${err.message}`);
+    } finally {
+      setComposeSending(false);
+    }
+  };
 
   const filteredUsers = users.filter(trip => {
     const matchesSearch = !searchQuery ||
@@ -319,6 +403,14 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
               <table className="w-full">
                 <thead className="bg-white/5 border-b border-white/10">
                   <tr>
+                    <th className="px-4 py-4 w-10">
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 accent-blue-500 cursor-pointer"
+                        checked={filteredUsers.length > 0 && selectedEmails.size === new Set(filteredUsers.map((t: any) => t.email).filter(Boolean)).size}
+                        onChange={toggleSelectAll}
+                      />
+                    </th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-white">Email</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-white">Type</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-white">Route</th>
@@ -331,7 +423,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                 <tbody>
                   {filteredUsers.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-white/60">
+                      <td colSpan={8} className="px-6 py-12 text-center text-white/60">
                         No journeys found
                       </td>
                     </tr>
@@ -339,7 +431,15 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                     filteredUsers.map((trip: any, i: number) => {
                       const isTraveller = trip.type === 'travel' || trip.type === 'traveller';
                       return (
-                        <tr key={trip.id || i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                        <tr key={trip.id || i} className={`border-b border-white/5 hover:bg-white/5 transition-colors ${trip.email && selectedEmails.has(trip.email) ? 'bg-blue-500/10' : ''}`}>
+                          <td className="px-4 py-4">
+                            <input
+                              type="checkbox"
+                              className="w-4 h-4 accent-blue-500 cursor-pointer"
+                              checked={!!trip.email && selectedEmails.has(trip.email)}
+                              onChange={() => trip.email && toggleEmailSelect(trip.email)}
+                            />
+                          </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2 text-white/80">
                               <Mail className="w-4 h-4 text-blue-400 shrink-0" />
@@ -714,6 +814,144 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
         )}
 
       </div>
+
+      {/* STICKY SELECTION BAR */}
+      {selectedEmails.size > 0 && !showCompose && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-r from-blue-900/95 to-indigo-900/95 backdrop-blur-xl border-t border-blue-400/30 px-6 py-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                {selectedEmails.size}
+              </div>
+              <span className="text-white font-medium">
+                {selectedEmails.size} customer{selectedEmails.size !== 1 ? 's' : ''} selected
+              </span>
+              <button
+                onClick={() => setSelectedEmails(new Set())}
+                className="text-white/50 hover:text-white text-xs underline"
+              >
+                Clear
+              </button>
+            </div>
+            <button
+              onClick={openCompose}
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-blue-500/50 transition-all"
+            >
+              <MessageSquare className="w-5 h-5" />
+              Compose Message
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* COMPOSE MODAL */}
+      {showCompose && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowCompose(false)} />
+          <div className="relative w-full max-w-2xl bg-gradient-to-br from-slate-900 to-blue-950 border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-8 py-5 border-b border-white/10 bg-white/5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                  <MessageSquare className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg">Compose Message</h3>
+                  <p className="text-white/50 text-xs">{selectedEmails.size} recipient{selectedEmails.size !== 1 ? 's' : ''}</p>
+                </div>
+              </div>
+              <button onClick={() => setShowCompose(false)} className="p-2 hover:bg-white/10 rounded-xl transition-all">
+                <X className="w-5 h-5 text-white/60" />
+              </button>
+            </div>
+
+            <div className="px-8 py-6 space-y-5">
+              {/* Template picker */}
+              <div>
+                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">Template</label>
+                <div className="relative">
+                  <select
+                    value={composeTemplate}
+                    onChange={e => applyTemplate(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none cursor-pointer pr-10"
+                  >
+                    <option value="thankyou">Thank You for Using BootHop</option>
+                    <option value="matching">We&apos;re Improving Matching</option>
+                    <option value="nomatch">Still Looking for Your Match</option>
+                    <option value="promotion">Exciting News Coming Soon</option>
+                    <option value="custom">Custom Message</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Subject */}
+              <div>
+                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">Subject</label>
+                <input
+                  type="text"
+                  value={composeSubject}
+                  onChange={e => setComposeSubject(e.target.value)}
+                  placeholder="Email subject..."
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              {/* Body */}
+              <div>
+                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">Message</label>
+                <textarea
+                  rows={8}
+                  value={composeBody}
+                  onChange={e => setComposeBody(e.target.value)}
+                  placeholder="Write your message here..."
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none font-mono text-sm leading-relaxed"
+                />
+              </div>
+
+              {/* Recipients preview */}
+              <div className="bg-white/5 rounded-xl px-4 py-3 border border-white/10">
+                <p className="text-white/50 text-xs mb-1.5 font-semibold uppercase tracking-wide">Sending to</p>
+                <p className="text-white/80 text-sm leading-relaxed">
+                  {Array.from(selectedEmails).slice(0, 5).join(', ')}
+                  {selectedEmails.size > 5 && <span className="text-white/40"> +{selectedEmails.size - 5} more</span>}
+                </p>
+              </div>
+
+              {/* Result */}
+              {composeResult && (
+                <div className={`px-4 py-3 rounded-xl text-sm font-medium ${
+                  composeResult.startsWith('✅') ? 'bg-green-500/20 text-green-300 border border-green-400/30' : 'bg-red-500/20 text-red-300 border border-red-400/30'
+                }`}>
+                  {composeResult}
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setShowCompose(false)}
+                  className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={sendMessage}
+                  disabled={composeSending || !composeSubject.trim() || !composeBody.trim()}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-blue-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {composeSending ? (
+                    <RefreshCw className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                  {composeSending ? 'Sending...' : `Send to ${selectedEmails.size}`}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
