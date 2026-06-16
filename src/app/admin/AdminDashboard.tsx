@@ -263,10 +263,12 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="pl-12 pr-8 py-3 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none cursor-pointer"
               >
-                <option value="all">All Status</option>
-                <option value="verified">Verified</option>
-                <option value="pending">Pending</option>
-                <option value="accepted">Accepted</option>
+                <option value="all">All</option>
+                <option value="travel">Travellers only</option>
+                <option value="sender">Senders only</option>
+                <option value="active">Active</option>
+                <option value="matched">Matched</option>
+                <option value="expired">Expired</option>
                 <option value="completed">Completed</option>
               </select>
             </div>
@@ -321,57 +323,64 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                     <th className="px-6 py-4 text-left text-sm font-semibold text-white">Type</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-white">Route</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-white">Travel Date</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Weight</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Price</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-white">Status</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Listed</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredUsers.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-12 text-center text-white/60">
+                      <td colSpan={7} className="px-6 py-12 text-center text-white/60">
                         No journeys found
                       </td>
                     </tr>
                   ) : (
-                    filteredUsers.map((trip: any, i: number) => (
-                      <tr key={trip.id || i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2 text-white/80">
-                            <Mail className="w-4 h-4 text-blue-400 shrink-0" />
-                            <span className="text-sm">{trip.email || '—'}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            trip.type === 'traveller' ? 'bg-blue-500/20 text-blue-300' : 'bg-purple-500/20 text-purple-300'
-                          }`}>
-                            {trip.type === 'traveller' ? '✈️ Traveller' : '📦 Sender'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-1 text-white font-medium text-sm">
-                            <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
-                            {trip.from_city} → {trip.to_city}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-white/70 text-sm">
-                          {trip.travel_date ? new Date(trip.travel_date).toLocaleDateString() : '—'}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            trip.status === 'active'   ? 'bg-green-500/20 text-green-300' :
-                            trip.status === 'matched'  ? 'bg-blue-500/20 text-blue-300' :
-                            trip.status === 'expired'  ? 'bg-red-500/20 text-red-300' :
-                            'bg-white/10 text-white/60'
-                          }`}>
-                            {trip.status || 'unknown'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-white/50 text-sm">
-                          {trip.created_at ? new Date(trip.created_at).toLocaleDateString() : '—'}
-                        </td>
-                      </tr>
-                    ))
+                    filteredUsers.map((trip: any, i: number) => {
+                      const isTraveller = trip.type === 'travel' || trip.type === 'traveller';
+                      return (
+                        <tr key={trip.id || i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2 text-white/80">
+                              <Mail className="w-4 h-4 text-blue-400 shrink-0" />
+                              <span className="text-sm">{trip.email || '—'}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                              isTraveller ? 'bg-blue-500/20 text-blue-300' : 'bg-purple-500/20 text-purple-300'
+                            }`}>
+                              {isTraveller ? '✈️ Traveller' : '📦 Sender'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-1 text-white font-medium text-sm">
+                              <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
+                              {trip.from_city} → {trip.to_city}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-white/70 text-sm">
+                            {trip.travel_date ? new Date(trip.travel_date).toLocaleDateString() : '—'}
+                          </td>
+                          <td className="px-6 py-4 text-white/80 text-sm">
+                            {trip.weight ? `${trip.weight} kg` : '—'}
+                          </td>
+                          <td className="px-6 py-4 text-white font-semibold text-sm">
+                            {trip.price ? `£${Number(trip.price).toFixed(2)}` : '—'}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                              trip.status === 'active'   ? 'bg-green-500/20 text-green-300' :
+                              trip.status === 'matched'  ? 'bg-blue-500/20 text-blue-300' :
+                              trip.status === 'expired'  ? 'bg-red-500/20 text-red-300' :
+                              'bg-white/10 text-white/60'
+                            }`}>
+                              {trip.status || 'unknown'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
