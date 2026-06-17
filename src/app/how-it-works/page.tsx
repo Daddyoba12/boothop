@@ -218,37 +218,6 @@ export default function HowItWorksPage() {
             </div>
           </div>
 
-          {/* Traveller diagram */}
-          <div className="max-w-5xl">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-semibold text-white/75">Traveller — step by step</span>
-              <a
-                href="/images/traveller-diagram.png"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-blue-400 transition-colors duration-200"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-                View full size
-              </a>
-            </div>
-            <div
-              className="rounded-2xl overflow-hidden border border-white/[0.07] transition-all duration-500 hover:-translate-y-2"
-              style={{ boxShadow: '0 24px 80px rgba(0,0,0,0.55)' }}
-            >
-              <img
-                src="/images/traveller-diagram.png"
-                alt="How it works for Travellers"
-                className="w-full h-auto block"
-              />
-            </div>
-            <div className="mt-5">
-              <Link href="/guide" className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-400 hover:text-white transition-colors duration-200 group">
-                View full process guide
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-              </Link>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -290,36 +259,78 @@ export default function HowItWorksPage() {
             </div>
           </div>
 
-          {/* Sender diagram */}
-          <div className="max-w-5xl">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-semibold text-white/75">Sender — step by step</span>
-              <a
-                href="/images/sender-diagram.png"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-emerald-400 transition-colors duration-200"
+        </div>
+      </section>
+
+      {/* ── BOTH DIAGRAMS SIDE BY SIDE ── */}
+      <section className="relative px-6 pb-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-10">
+
+            {/* Traveller */}
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-semibold text-white/75">Traveller — step by step</span>
+                <a
+                  href="/images/traveller-diagram.png"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-blue-400 transition-colors duration-200"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                  View full size
+                </a>
+              </div>
+              <div
+                className="rounded-2xl overflow-hidden border border-white/[0.07] transition-all duration-500 hover:-translate-y-1 flex-1"
+                style={{ boxShadow: '0 20px 64px rgba(0,0,0,0.5)' }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-                View full size
-              </a>
+                <img
+                  src="/images/traveller-diagram.png"
+                  alt="How it works for Travellers"
+                  className="w-full h-full object-cover block"
+                />
+              </div>
+              <div className="mt-4">
+                <Link href="/guide" className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-400 hover:text-white transition-colors duration-200 group">
+                  View full process guide
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                </Link>
+              </div>
             </div>
-            <div
-              className="rounded-2xl overflow-hidden border border-white/[0.07] transition-all duration-500 hover:-translate-y-2"
-              style={{ boxShadow: '0 24px 80px rgba(0,0,0,0.55)' }}
-            >
-              <img
-                src="/images/sender-diagram.png"
-                alt="How it works for Senders"
-                className="w-full h-auto block"
-              />
+
+            {/* Sender */}
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-semibold text-white/75">Sender — step by step</span>
+                <a
+                  href="/images/sender-diagram.png"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-emerald-400 transition-colors duration-200"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                  View full size
+                </a>
+              </div>
+              <div
+                className="rounded-2xl overflow-hidden border border-white/[0.07] transition-all duration-500 hover:-translate-y-1 flex-1"
+                style={{ boxShadow: '0 20px 64px rgba(0,0,0,0.5)' }}
+              >
+                <img
+                  src="/images/sender-diagram.png"
+                  alt="How it works for Senders"
+                  className="w-full h-full object-cover block"
+                />
+              </div>
+              <div className="mt-4">
+                <Link href="/guide" className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-400 hover:text-white transition-colors duration-200 group">
+                  View full process guide
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                </Link>
+              </div>
             </div>
-            <div className="mt-5">
-              <Link href="/guide" className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-400 hover:text-white transition-colors duration-200 group">
-                View full process guide
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-              </Link>
-            </div>
+
           </div>
         </div>
       </section>
