@@ -272,7 +272,7 @@ export default function HowItWorksPage() {
               <div className="flex items-center justify-between mb-4">
                 <span className="text-sm font-semibold text-white/75">Traveller — step by step</span>
                 <a
-                  href="/images/traveller-diagram.png"
+                  href="/images/traveller-diagram.jpg"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-blue-400 transition-colors duration-200"
@@ -286,7 +286,7 @@ export default function HowItWorksPage() {
                 style={{ boxShadow: '0 20px 64px rgba(0,0,0,0.5)' }}
               >
                 <img
-                  src="/images/traveller-diagram.png"
+                  src="/images/traveller-diagram.jpg"
                   alt="How it works for Travellers"
                   className="w-full h-full object-cover block"
                 />
@@ -304,7 +304,7 @@ export default function HowItWorksPage() {
               <div className="flex items-center justify-between mb-4">
                 <span className="text-sm font-semibold text-white/75">Sender — step by step</span>
                 <a
-                  href="/images/sender-diagram.png"
+                  href="/images/sender-diagram.jpg"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-emerald-400 transition-colors duration-200"
@@ -318,7 +318,7 @@ export default function HowItWorksPage() {
                 style={{ boxShadow: '0 20px 64px rgba(0,0,0,0.5)' }}
               >
                 <img
-                  src="/images/sender-diagram.png"
+                  src="/images/sender-diagram.jpg"
                   alt="How it works for Senders"
                   className="w-full h-full object-cover block"
                 />
