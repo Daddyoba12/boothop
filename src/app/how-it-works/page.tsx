@@ -219,24 +219,17 @@ export default function HowItWorksPage() {
           </div>
 
           {/* Traveller diagram */}
-          <div className="max-w-2xl">
-            <h3 className="text-3xl font-black mb-8 flex items-center gap-3">
-              <span className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center">✨</span>
-              How it works
-            </h3>
-            <div className="relative group cursor-pointer">
-              {/* Outer glow ring */}
-              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-blue-500/60 via-cyan-400/40 to-blue-600/60 blur-xl opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
-              {/* Push/lift shadow */}
-              <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-br from-blue-500/30 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative rounded-2xl overflow-hidden border border-blue-500/30 shadow-2xl shadow-blue-500/30 group-hover:shadow-blue-500/60 group-hover:-translate-y-2 transition-all duration-500">
-                <img
-                  src="/images/traveller-diagram.png"
-                  alt="How it works for Travellers"
-                  className="w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-950/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
+          <div className="max-w-4xl">
+            <p className="text-xs font-semibold tracking-widest text-blue-400/55 uppercase mb-5">Complete traveller flow</p>
+            <div
+              className="rounded-2xl overflow-hidden border border-white/[0.07] transition-all duration-500 hover:-translate-y-2"
+              style={{ boxShadow: '0 24px 80px rgba(0,0,0,0.55)' }}
+            >
+              <img
+                src="/images/traveller-diagram.png"
+                alt="How it works for Travellers"
+                className="w-full h-auto block"
+              />
             </div>
           </div>
         </div>
@@ -281,24 +274,17 @@ export default function HowItWorksPage() {
           </div>
 
           {/* Sender diagram */}
-          <div className="max-w-2xl">
-            <h3 className="text-3xl font-black mb-8 flex items-center gap-3">
-              <span className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-xl flex items-center justify-center">🎯</span>
-              How it works
-            </h3>
-            <div className="relative group cursor-pointer">
-              {/* Outer glow ring */}
-              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-emerald-500/60 via-teal-400/40 to-emerald-600/60 blur-xl opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
-              {/* Push/lift shadow */}
-              <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-br from-emerald-500/30 to-teal-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative rounded-2xl overflow-hidden border border-emerald-500/30 shadow-2xl shadow-emerald-500/30 group-hover:shadow-emerald-500/60 group-hover:-translate-y-2 transition-all duration-500">
-                <img
-                  src="/images/sender-diagram.png"
-                  alt="How it works for Senders"
-                  className="w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
+          <div className="max-w-4xl">
+            <p className="text-xs font-semibold tracking-widest text-emerald-400/55 uppercase mb-5">Complete sender flow</p>
+            <div
+              className="rounded-2xl overflow-hidden border border-white/[0.07] transition-all duration-500 hover:-translate-y-2"
+              style={{ boxShadow: '0 24px 80px rgba(0,0,0,0.55)' }}
+            >
+              <img
+                src="/images/sender-diagram.png"
+                alt="How it works for Senders"
+                className="w-full h-auto block"
+              />
             </div>
           </div>
         </div>
