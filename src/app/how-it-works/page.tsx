@@ -263,14 +263,14 @@ export default function HowItWorksPage() {
       </section>
 
       {/* ── BOTH DIAGRAMS SIDE BY SIDE ── */}
-      <section className="relative px-6 pb-16">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-6 lg:gap-10">
+      <section className="relative px-4 md:px-6 pb-16">
+        <div className="max-w-[1440px] mx-auto">
+          <div className="grid md:grid-cols-2 gap-4 lg:gap-6">
 
             {/* Traveller */}
             <div className="flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-white/75">Traveller — step by step</span>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-semibold text-white/80 tracking-wide">Traveller — step by step</span>
                 <a
                   href="/images/traveller-diagram.jpg"
                   target="_blank"
@@ -282,8 +282,8 @@ export default function HowItWorksPage() {
                 </a>
               </div>
               <div
-                className="rounded-2xl overflow-hidden border border-white/[0.07] transition-all duration-500 hover:-translate-y-1 flex-1"
-                style={{ boxShadow: '0 20px 64px rgba(0,0,0,0.5)' }}
+                className="rounded-2xl overflow-hidden border border-white/[0.07] transition-all duration-500 hover:-translate-y-1"
+                style={{ boxShadow: '0 20px 64px rgba(0,0,0,0.5)', aspectRatio: '4/3' }}
               >
                 <img
                   src="/images/traveller-diagram.jpg"
@@ -301,8 +301,8 @@ export default function HowItWorksPage() {
 
             {/* Sender */}
             <div className="flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-white/75">Sender — step by step</span>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-semibold text-white/80 tracking-wide">Sender — step by step</span>
                 <a
                   href="/images/sender-diagram.jpg"
                   target="_blank"
@@ -314,8 +314,8 @@ export default function HowItWorksPage() {
                 </a>
               </div>
               <div
-                className="rounded-2xl overflow-hidden border border-white/[0.07] transition-all duration-500 hover:-translate-y-1 flex-1"
-                style={{ boxShadow: '0 20px 64px rgba(0,0,0,0.5)' }}
+                className="rounded-2xl overflow-hidden border border-white/[0.07] transition-all duration-500 hover:-translate-y-1"
+                style={{ boxShadow: '0 20px 64px rgba(0,0,0,0.5)', aspectRatio: '4/3' }}
               >
                 <img
                   src="/images/sender-diagram.jpg"
