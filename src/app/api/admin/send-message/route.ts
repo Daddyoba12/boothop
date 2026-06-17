@@ -24,7 +24,7 @@ function buildHtml(body: string): string {
     );
 
   // wrap consecutive <li> into <ul>
-  const html = paragraphs.join('\n').replace(/(<li[^>]*>.*?<\/li>\n?)+/gs, m =>
+  const html = paragraphs.join('\n').replace(/(<li[^>]*>.*?<\/li>\n?)+/g, m =>
     `<ul style="margin:0 0 14px;padding-left:20px;">${m}</ul>`
   );
 
