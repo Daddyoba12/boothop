@@ -129,7 +129,7 @@ export default function HowItWorksPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white font-sans overflow-x-hidden">
 
       {/* BG */}
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.07),transparent_35%)]" />
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.04),transparent_35%)]" />
 
       <NavBar />
 
@@ -164,11 +164,11 @@ export default function HowItWorksPage() {
 
       {/* ── BOOTER SECTION ── */}
       <section className="relative py-20 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/3 to-transparent" />
 
         <div className="max-w-7xl mx-auto relative">
           {/* Hero Card */}
-          <div className="reveal reveal-scale relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/10 hover:scale-[1.015] active:scale-[0.98] hover:shadow-blue-500/25 transition-all duration-500 cursor-pointer touch-blue">
+          <div className="reveal reveal-scale relative mb-28 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/7 hover:scale-[1.015] active:scale-[0.98] hover:shadow-blue-500/14 transition-all duration-500 cursor-pointer touch-blue">
             <div className="absolute inset-0">
               <img
                 src="/images/delivery.jpg"
@@ -219,8 +219,19 @@ export default function HowItWorksPage() {
           </div>
 
           {/* Traveller diagram */}
-          <div className="max-w-4xl">
-            <p className="text-xs font-semibold tracking-widest text-blue-400/55 uppercase mb-5">Complete traveller flow</p>
+          <div className="max-w-5xl">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-semibold text-white/75">Traveller — step by step</span>
+              <a
+                href="/images/traveller-diagram.png"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-blue-400 transition-colors duration-200"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                View full size
+              </a>
+            </div>
             <div
               className="rounded-2xl overflow-hidden border border-white/[0.07] transition-all duration-500 hover:-translate-y-2"
               style={{ boxShadow: '0 24px 80px rgba(0,0,0,0.55)' }}
@@ -231,17 +242,23 @@ export default function HowItWorksPage() {
                 className="w-full h-auto block"
               />
             </div>
+            <div className="mt-5">
+              <Link href="/guide" className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-400 hover:text-white transition-colors duration-200 group">
+                View full process guide
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── HOOPER SECTION ── */}
       <section className="relative py-20 px-6 overflow-hidden mt-16">
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/3 to-transparent" />
 
         <div className="max-w-7xl mx-auto relative">
           {/* Hero Card */}
-          <div className="reveal reveal-scale relative mb-20 rounded-3xl overflow-hidden shadow-2xl shadow-emerald-500/10 hover:scale-[1.015] active:scale-[0.98] hover:shadow-emerald-500/25 transition-all duration-500 cursor-pointer touch-emerald">
+          <div className="reveal reveal-scale relative mb-28 rounded-3xl overflow-hidden shadow-2xl shadow-emerald-500/7 hover:scale-[1.015] active:scale-[0.98] hover:shadow-emerald-500/14 transition-all duration-500 cursor-pointer touch-emerald">
             <div className="absolute inset-0">
               <img
                 src="/images/GoingonHols.jpg"
@@ -274,8 +291,19 @@ export default function HowItWorksPage() {
           </div>
 
           {/* Sender diagram */}
-          <div className="max-w-4xl">
-            <p className="text-xs font-semibold tracking-widest text-emerald-400/55 uppercase mb-5">Complete sender flow</p>
+          <div className="max-w-5xl">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-semibold text-white/75">Sender — step by step</span>
+              <a
+                href="/images/sender-diagram.png"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-emerald-400 transition-colors duration-200"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                View full size
+              </a>
+            </div>
             <div
               className="rounded-2xl overflow-hidden border border-white/[0.07] transition-all duration-500 hover:-translate-y-2"
               style={{ boxShadow: '0 24px 80px rgba(0,0,0,0.55)' }}
@@ -285,6 +313,12 @@ export default function HowItWorksPage() {
                 alt="How it works for Senders"
                 className="w-full h-auto block"
               />
+            </div>
+            <div className="mt-5">
+              <Link href="/guide" className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-400 hover:text-white transition-colors duration-200 group">
+                View full process guide
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+              </Link>
             </div>
           </div>
         </div>
@@ -363,31 +397,27 @@ export default function HowItWorksPage() {
 
       {/* ── HOW IT WORKS VIDEO ── */}
       <section className="px-6 py-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
-              See It In{' '}
-              <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                Action
-              </span>
-            </h2>
-            <p className="text-slate-400 text-lg">Watch the full walkthrough — 2m 50s</p>
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-6">
+            <p className="text-xs font-semibold tracking-widest text-slate-400/60 uppercase mb-3">Quick walkthrough</p>
+            <h2 className="text-xl font-bold text-white mb-1">Need to see it in action?</h2>
+            <p className="text-slate-500 text-sm">Both flows explained in under 3 minutes</p>
           </div>
 
-          {/* Clickable card — links to /watch, plays video then returns to boothop.com */}
           <Link href="/watch"
-            className="group relative block rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-blue-500/20 hover:border-blue-500/40 hover:shadow-blue-500/30 transition-all duration-300 cursor-pointer">
-            <div className="relative bg-gradient-to-br from-slate-900 via-blue-950/30 to-slate-900"
-                 style={{ paddingBottom: '56.25%' }}>
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/10 border border-white/20 backdrop-blur-sm group-hover:bg-blue-500/30 group-hover:border-blue-400/50 group-hover:scale-110 transition-all duration-300">
-                  <svg viewBox="0 0 24 24" fill="white" className="h-9 w-9 ml-1">
+            className="group relative block rounded-2xl overflow-hidden border border-white/8 hover:border-white/15 transition-all duration-300 cursor-pointer"
+            style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.45)' }}
+          >
+            <div className="relative bg-gradient-to-br from-slate-900 to-slate-950" style={{ paddingBottom: '56.25%' }}>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/8 border border-white/14 group-hover:bg-white/12 group-hover:scale-110 transition-all duration-300">
+                  <svg viewBox="0 0 24 24" fill="white" className="h-7 w-7 ml-0.5">
                     <path d="M8 5v14l11-7z"/>
                   </svg>
                 </div>
                 <div className="text-center px-4">
-                  <p className="text-white font-bold text-xl mb-1">How BootHop Works</p>
-                  <p className="text-slate-400 text-sm">Step by Step · 2m 50s · After watching, you&apos;ll return to BootHop</p>
+                  <p className="text-white font-semibold text-base mb-0.5">Watch the full walkthrough</p>
+                  <p className="text-slate-500 text-xs">2m 50s · Returns to BootHop after</p>
                 </div>
               </div>
             </div>
