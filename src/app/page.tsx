@@ -902,7 +902,7 @@ function HomePageContent() {
                 <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-blue-500/50 via-cyan-400/30 to-blue-600/50 blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative rounded-2xl overflow-hidden border border-blue-500/25 shadow-2xl shadow-blue-500/20 group-hover:shadow-blue-500/50 group-hover:-translate-y-2 transition-all duration-500">
                   <img
-                    src="/images/traveller-diagram.png"
+                    src="/images/traveller-diagram.jpg"
                     alt="How it works for Travellers"
                     className="w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-700"
                   />
