@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 export const metadata: Metadata = {
   title: 'Blog | BootHop — Logistics, Diaspora & Same-Day Delivery Insights',
   description: 'Insights on same-day delivery, cross-border logistics, diaspora shipping, customs compliance, and the future of community-powered delivery from the BootHop team.',
+  alternates: { canonical: 'https://www.boothop.com/blog' },
 };
 
 const BLOG_ID = process.env.BLOGGER_BLOG_ID ?? '8031835400295900689';

@@ -30,7 +30,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!post) return { title: 'Post Not Found | BootHop Blog' };
   const title = post.title?.$t ?? 'Blog Post';
   const text  = (post.content?.$t ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
-  return { title: `${title} | BootHop Blog`, description: text };
+  return {
+    title: `${title} | BootHop Blog`,
+    description: text,
+    alternates: { canonical: `https://www.boothop.com/blog/${slug}` },
+  };
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {

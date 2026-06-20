@@ -90,6 +90,10 @@ export const metadata: Metadata = {
   },
   formatDetection: { telephone: false },
 
+  alternates: {
+    canonical: APP_URL,
+  },
+
   openGraph: {
     title:       'BootHop | Same-Day & Cross-Border Logistics Network',
     description: 'BootHop is a compliance-first logistics network connecting verified travellers, couriers, businesses, and consumers for same-day and cross-border delivery. Powered by AI-assisted customs screening, airport-enabled movement, and Stripe escrow on every transaction.',
@@ -276,7 +280,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
                   gtag('config', '${GA_ID}', {
-                    send_page_view: true,
+                    send_page_view: false,
                     anonymize_ip: false,
                     allow_google_signals: true,
                     allow_ad_personalization_signals: true,
