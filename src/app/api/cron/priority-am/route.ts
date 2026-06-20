@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Called every 30 minutes by Vercel Cron.
 // Monitors Priority Partner applications awaiting account manager contact:
@@ -9,7 +9,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -26,7 +25,7 @@ export async function GET() {
     .lte('created_at', hrs2ago);
 
   for (const p of escalate ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `🚨 ESCALATION — Priority Partner application > 2hrs, no AM call · ${p.company_name || p.email}`,
@@ -61,7 +60,7 @@ export async function GET() {
     .gt('created_at', hrs2ago);  // Between 90 min and 2 hrs old (older ones escalate above)
 
   for (const p of nudge ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `⏰ Priority Partner reminder — call ${p.company_name || p.email} in 30 minutes`,

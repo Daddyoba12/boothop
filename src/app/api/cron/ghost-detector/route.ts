@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const GHOST_THRESHOLD_HOURS = 48;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
 
-function getResend() { return new Resend(process.env.RESEND_API_KEY); }
 
 function isAuthorized(req: Request): boolean {
   const auth     = req.headers.get('authorization');
@@ -32,7 +31,6 @@ export async function POST(request: Request) {
 
 async function runGhostDetector() {
   const supabase = createSupabaseAdminClient();
-  const resend   = getResend();
   const cutoff   = new Date(Date.now() - GHOST_THRESHOLD_HOURS * 3_600_000).toISOString();
 
   // Find active/escrowed matches that were activated more than 48h ago
@@ -102,7 +100,7 @@ async function runGhostDetector() {
 
     // Notify sender
     if (match.sender_email) {
-      resend.emails.send({
+      sendResendEmail({
         from:    'BootHop Support <noreply@boothop.com>',
         to:      [match.sender_email],
         subject: 'Update on your delivery — traveller unresponsive',
@@ -123,7 +121,7 @@ async function runGhostDetector() {
 
     // Notify traveller
     if (match.traveler_email) {
-      resend.emails.send({
+      sendResendEmail({
         from:    'BootHop Support <noreply@boothop.com>',
         to:      [match.traveler_email],
         subject: 'Action required — please update your delivery status',
@@ -144,7 +142,7 @@ async function runGhostDetector() {
   // Admin summary email if any ghosts found
   if (ghostCount > 0) {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
-    resend.emails.send({
+    sendResendEmail({
       from:    'BootHop Support <noreply@boothop.com>',
       to:      [adminEmail],
       subject: `⚠️ Ghost detector: ${ghostCount} silent traveller${ghostCount > 1 ? 's' : ''} detected`,

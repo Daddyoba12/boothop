@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Called daily at 09:00 UTC.
 // Sends renewal reminders to Priority Partners approaching membership expiry:
@@ -9,7 +9,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -30,7 +29,7 @@ export async function GET() {
       ? new Date(p.membership_expires_at as string).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
       : 'soon';
 
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: p.email,
       subject: `⚠️ Priority membership expires in 14 days — action required · ${p.company_name}`,
@@ -54,7 +53,7 @@ export async function GET() {
       text: `Priority membership expires in 14 days.\n\nRenew now: £${(p.annual_fee ?? 0).toLocaleString()}\nAccount: BootHop Ltd | Sort: 23-08-01 | AC: 44947453\nReference: PP-${(p.company_name || '').replace(/[^A-Z0-9]/gi, '').toUpperCase().slice(0, 6)}-RENEW\n\nQuestions: +44 115 661 2825 / business@boothop.com`,
     });
 
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `⚠️ Priority renewal due in 14 days — ${p.company_name}`,
@@ -75,7 +74,7 @@ export async function GET() {
       ? new Date(p.membership_expires_at as string).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
       : 'in 60 days';
 
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: p.email,
       subject: `📋 Priority membership renewal — 60 day notice · ${p.company_name}`,

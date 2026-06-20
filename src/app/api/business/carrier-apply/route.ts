@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 export async function POST(request: NextRequest) {
   try {
@@ -119,13 +119,12 @@ export async function POST(request: NextRequest) {
 
     const vehicleList = Array.isArray(vehicle_types) ? vehicle_types.join(', ') : '—';
 
-    const resend     = new Resend(process.env.RESEND_API_KEY);
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
     const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
     const regRef     = `CN-${company_name.replace(/[^A-Z0-9]/gi, '').toUpperCase().slice(0, 6)}-REG`;
 
     // ── Admin notification ────────────────────────────────────────────────
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `🚛 Carrier Network Application — ${company_name} (£250 payment pending)`,
@@ -168,7 +167,7 @@ export async function POST(request: NextRequest) {
     });
 
     // ── Applicant confirmation email ─────────────────────────────────────
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: email,
       subject: `Application received — ${company_name}`,

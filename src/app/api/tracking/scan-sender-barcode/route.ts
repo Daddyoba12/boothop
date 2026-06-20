@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { validateBarcode } from '@/lib/utils/barcode';
 import { getTierConfig } from '@/lib/services/tier-manager';
 import { sendPushToEmail, logCost } from '@/lib/services/notifications';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
 
@@ -92,8 +92,7 @@ export async function POST(req: NextRequest) {
       url: `${APP_URL}/track/${match.traveller_barcode}`,
     }).catch(() => {});
 
-    const resend = new Resend(process.env.RESEND_API_KEY!);
-    resend.emails.send({
+    sendResendEmail({
       from: 'BootHop Tracking <noreply@boothop.com>',
       to: match.traveler_email,
       subject: 'Location request from your sender',

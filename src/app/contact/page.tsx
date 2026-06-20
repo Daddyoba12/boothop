@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { trackEvent } from '@/lib/analytics';
 import { Mail, MessageCircle, Clock, CheckCircle, AlertCircle, ArrowRight, Sparkles, Shield, Phone } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
@@ -40,7 +41,9 @@ export default function ContactPage() {
       });
       if (!res.ok) { setStatus('error'); return; }
       const data = await res.json();
-      setStatus(data.pending === 'verify' ? 'awaiting_verification' : 'sent');
+      const nextStatus = data.pending === 'verify' ? 'awaiting_verification' : 'sent';
+      if (nextStatus === 'sent') trackEvent('contact_form_sent');
+      setStatus(nextStatus);
     } catch {
       setStatus('error');
     }

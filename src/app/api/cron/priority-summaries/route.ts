@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Called on the 1st of each month at 08:00 UTC.
 // Sends monthly delivery summary + invoice to each active Priority Partner.
 
 export async function GET() {
   const supabase = createSupabaseAdminClient();
-  const resend   = new Resend(process.env.RESEND_API_KEY);
   const from     = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
   // Calculate previous month window
@@ -55,7 +54,7 @@ export async function GET() {
       </tr>
     `).join('');
 
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: partner.email,
       subject: `BootHop Priority — Monthly report · ${monthLabel} · ${invoiceNum}-${(partner.company_name || '').replace(/[^A-Z0-9]/gi, '').toUpperCase().slice(0, 4)}`,

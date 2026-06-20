@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getAppSession } from '@/lib/auth/session';
 import { cookies } from 'next/headers';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 import { sendMatchCancelledEmail } from '@/lib/email/sendMatchEmail';
 
 // Free cancel — no payment made yet
@@ -85,11 +85,10 @@ export async function POST(request: Request) {
       const adminEmail   = process.env.ADMIN_EMAIL   || 'admin@boothop.com';
       const from         = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
       const appUrl       = process.env.NEXT_PUBLIC_APP_URL || '';
-      const resend       = new Resend(process.env.RESEND_API_KEY);
 
       await Promise.allSettled([
         // Alert admin
-        resend.emails.send({
+        sendResendEmail({
           from,
           to: adminEmail,
           subject: `[REFUND REQUEST] ${fromCity} → ${toCity} — £${refundAmount}`,
@@ -108,7 +107,7 @@ export async function POST(request: Request) {
           text: `Refund request: ${fromCity} → ${toCity}\nBy: ${email}\nAmount: £${refundAmount}\nReason: ${reason}`,
         }),
         // Confirm to canceller
-        resend.emails.send({
+        sendResendEmail({
           from,
           to: email,
           subject: `Cancellation request received — ${fromCity} → ${toCity}`,
@@ -124,7 +123,7 @@ export async function POST(request: Request) {
           text: `Cancellation received. Refund of £${refundAmount} will be processed within 3-5 business days.`,
         }),
         // Notify other party
-        resend.emails.send({
+        sendResendEmail({
           from,
           to: match.sender_email === email ? match.traveler_email : match.sender_email,
           subject: `Match cancelled — ${fromCity} → ${toCity}`,

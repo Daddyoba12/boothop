@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const from   = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
@@ -12,10 +12,9 @@ export async function sendCarrierPaymentProcessingEmail(params: {
   agreedPrice: number;
   matchId:   string;
 }) {
-  const resend  = new Resend(process.env.RESEND_API_KEY);
   const dateStr = new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   const matchUrl = `${appUrl}/matches/${params.matchId}`;
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Payment in progress — ${params.fromCity} → ${params.toCity}`,
@@ -60,13 +59,12 @@ export async function sendAdminPaymentAlertEmail(params: {
   insuranceFee:     number;
   totalDue:         number;
 }) {
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const confirmUrl = `${appUrl}/api/admin/confirm-payment?matchId=${params.matchId}&adminKey=${process.env.ADMIN_SECRET}`;
   const dateStr    = new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric',
   });
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: adminEmail,
     subject: `[ACTION] Payment request — ${params.fromCity} → ${params.toCity} — £${params.totalDue.toFixed(2)}`,
@@ -116,9 +114,8 @@ export async function sendPaymentRequestedEmail(params: {
   totalDue:  number;
   matchId:   string;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Payment request received — ${params.fromCity} → ${params.toCity}`,
@@ -157,7 +154,6 @@ export async function sendContactReleasedEmail(params: {
   otherEmail:     string;
   role:           'sender' | 'traveler';
 }) {
-  const resend  = new Resend(process.env.RESEND_API_KEY);
   const dateStr = new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric',
   });
@@ -165,7 +161,7 @@ export async function sendContactReleasedEmail(params: {
   const isSender  = params.role === 'sender';
   const roleLabel = isSender ? 'Carrier (Booter)' : 'Sender (Hooper)';
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Payment confirmed — Contact details released | ${params.fromCity} → ${params.toCity}`,

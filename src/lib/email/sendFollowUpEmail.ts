@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const from       = process.env.AUTH_FROM_EMAIL  || 'BootHop <noreply@boothop.com>';
 const appUrl     = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
@@ -12,7 +12,6 @@ export async function sendFollowUpUnmatchedEmail(params: {
   travelDate: string;   // YYYY-MM-DD
   type:       'send' | 'travel';
 }) {
-  const resend       = new Resend(process.env.RESEND_API_KEY);
   const dateLabel    = new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric',
   });
@@ -21,7 +20,7 @@ export async function sendFollowUpUnmatchedEmail(params: {
   const registerUrl  = `${appUrl}/register`;
   const journeysUrl  = `${appUrl}/journeys`;
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `No match yet for ${params.fromCity} → ${params.toCity} — here's what to do next`,

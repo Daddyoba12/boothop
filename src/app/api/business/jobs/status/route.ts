@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 import { createHmac } from 'crypto';
 
 // GET /api/business/jobs/status?job=[id]&action=[collected|in_transit|delivered]&token=[hmac]
@@ -71,7 +71,6 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = createSupabaseAdminClient();
-  const resend   = new Resend(process.env.RESEND_API_KEY);
   const from     = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -113,7 +112,7 @@ export async function GET(request: NextRequest) {
     in_transit: '🚛 In transit',
     delivered:  '✅ Delivered',
   };
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: adminEmail,
     subject: `${actionLabels[action]} — ${job.reference}`,
@@ -122,7 +121,7 @@ export async function GET(request: NextRequest) {
 
   // Notify client on delivery
   if (action === 'delivered') {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: job.client_email,
       subject: `✅ Delivered — ${job.reference}`,

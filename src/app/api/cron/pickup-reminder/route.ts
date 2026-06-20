@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Every 15 minutes.
 // Reminds assigned carrier to collect if 30+ minutes have passed since assignment.
@@ -8,7 +8,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -27,7 +26,7 @@ export async function GET() {
 
   for (const job of late ?? []) {
     const carrier = (job as Record<string, unknown>).carrier_profiles as Record<string, string> | null;
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `🚨 ${job.reference} — carrier not collected after 60 min`,
@@ -53,7 +52,7 @@ export async function GET() {
     const secret = process.env.JOB_STATUS_SECRET || 'boothop-jobs-secret-2026';
     const token  = createHmac('sha256', secret).update(`${job.id}:collected`).digest('hex').slice(0, 16);
 
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: carrier.email,
       subject: `⏰ Reminder — please collect job ${job.reference}`,

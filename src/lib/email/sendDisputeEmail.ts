@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const from         = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 const appUrl       = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
@@ -16,10 +16,9 @@ export async function sendDisputeRaisedAdminEmail(params: {
   toCity:        string;
   agreedPrice:   number;
 }) {
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const adminUrl   = `${appUrl}/admin/hub?adminKey=${process.env.ADMIN_SECRET}`;
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: [adminEmail, supportEmail],
     subject: `[DISPUTE] ${params.fromCity} → ${params.toCity} — Action required`,
@@ -55,9 +54,8 @@ export async function sendDisputeAcknowledgedEmail(params: {
   toCity:    string;
   disputeId: string;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     replyTo: supportEmail,
@@ -90,8 +88,7 @@ export async function sendDisputeNotifiedEmail(params: {
   reason:      string;
   disputeId:   string;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     replyTo: supportEmail,
@@ -126,9 +123,8 @@ export async function sendDisputeResolvedEmail(params: {
   resolution:  string;
   note:        string;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     replyTo: supportEmail,

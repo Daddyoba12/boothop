@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { sendBusinessJobPaymentConfirmedEmail } from '@/lib/email/sendBusinessEmail';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 export const runtime = 'nodejs';
 
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
           price,
           isPriority,
         }),
-        new Resend(process.env.RESEND_API_KEY).emails.send({
+        sendResendEmail({
           from:    process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>',
           to:      process.env.ADMIN_EMAIL     || 'admin@boothop.com',
           subject: `💳 Payment received — ${jobRef}${isPriority ? ' [PRIORITY]' : ''}`,

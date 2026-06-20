@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Daily at 11:00 UTC.
 // Sends a post-delivery feedback request to Priority Partner clients
@@ -8,7 +8,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase = createSupabaseAdminClient();
-  const resend   = new Resend(process.env.RESEND_API_KEY);
   const from     = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
   const hrs24 = new Date(Date.now() - 24 * 3600000).toISOString();
@@ -24,7 +23,7 @@ export async function GET() {
     .gte('delivered_at', hrs48);
 
   for (const job of jobs ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: job.client_email,
       subject: `How was your delivery? — ${job.reference}`,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 import { createHmac } from 'crypto';
 
 // GET  /api/business/jobs/accept?job=[id]&carrier=[carrier_id]
@@ -46,7 +46,6 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -106,7 +105,7 @@ export async function POST(request: NextRequest) {
   const typeLabel = job.delivery_type === 'uk' ? 'UK' : 'International';
 
   // ── Carrier: job confirmation with full details ───────────────────────────
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: carrier.email,
     subject: `✅ Job confirmed — ${job.reference} · £${job.partner_rate?.toLocaleString() ?? '—'}`,
@@ -169,7 +168,7 @@ export async function POST(request: NextRequest) {
   });
 
   // ── Admin notification ──────────────────────────────────────────────────
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: adminEmail,
     subject: `✅ ${job.reference} — accepted by ${carrier.company_name} · £${job.partner_rate?.toLocaleString() ?? '—'} payout`,
@@ -178,7 +177,7 @@ export async function POST(request: NextRequest) {
   });
 
   // ── Client: carrier assigned notification ─────────────────────────────
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: job.client_email,
     subject: `🚛 Carrier assigned — ${job.reference}`,

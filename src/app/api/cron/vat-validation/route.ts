@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Daily at 07:00 UTC.
 // Validates VAT numbers via HMRC API for carrier_profiles that have a vat_number.
@@ -8,7 +8,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -26,7 +25,7 @@ export async function GET() {
   }
 
   // Without HMRC API, compile manual review list for admin
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: adminEmail,
     subject: `📋 VAT numbers for manual verification (${unvalidated.length})`,

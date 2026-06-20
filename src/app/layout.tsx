@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import Script from 'next/script';
+import { Suspense } from 'react';
 import './globals.css';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
 import DeviceFingerprint from '@/components/DeviceFingerprint';
 import WorldCupWidget from '@/components/WorldCupWidget';
+import GATracker from '@/components/GATracker';
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
@@ -87,10 +89,6 @@ export const metadata: Metadata = {
     title: 'BootHop',
   },
   formatDetection: { telephone: false },
-
-  alternates: {
-    canonical: APP_URL,
-  },
 
   openGraph: {
     title:       'BootHop | Same-Day & Cross-Border Logistics Network',
@@ -256,7 +254,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/images/boothop1.png" />
-        <link rel="canonical" href={APP_URL} />
 
         {/* Preconnect to critical origins */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -279,7 +276,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
                   gtag('config', '${GA_ID}', {
-                    page_path: window.location.pathname,
                     send_page_view: true,
                     anonymize_ip: false,
                     allow_google_signals: true,
@@ -296,6 +292,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <DeviceFingerprint />
         <PWAInstallBanner />
         <WorldCupWidget />
+        {GA_ID && (
+          <Suspense fallback={null}>
+            <GATracker gaId={GA_ID} />
+          </Suspense>
+        )}
         <Script
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&loading=async`}
           strategy="afterInteractive"

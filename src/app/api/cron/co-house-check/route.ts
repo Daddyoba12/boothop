@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Called daily at 06:30 UTC.
 // Verifies company registration numbers via Companies House API for unverified carriers.
@@ -39,7 +39,6 @@ async function checkCompaniesHouse(regNum: string): Promise<{ ok: boolean; name?
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -67,7 +66,7 @@ export async function GET() {
     if (result.error === 'COMPANIES_HOUSE_API_KEY not configured') {
       // Manual review mode — alert admin once per run not per carrier
       skipped = (unverified?.length ?? 0);
-      await resend.emails.send({
+      await sendResendEmail({
         from,
         to: adminEmail,
         subject: `📋 ${unverified?.length} carrier${unverified?.length !== 1 ? 's' : ''} awaiting manual Companies House verification`,
@@ -85,7 +84,7 @@ export async function GET() {
 
     if (result.ok) {
       // Verified — notify admin
-      await resend.emails.send({
+      await sendResendEmail({
         from,
         to: adminEmail,
         subject: `✅ Companies House verified — ${c.company_name} (${c.company_reg_number})`,
@@ -94,14 +93,14 @@ export async function GET() {
       verified++;
     } else {
       // Failed — notify admin and carrier
-      await resend.emails.send({
+      await sendResendEmail({
         from,
         to: adminEmail,
         subject: `⚠️ Companies House check failed — ${c.company_name} (${c.company_reg_number})`,
         html: `<div style="font-family:Arial,sans-serif;padding:24px;"><h3>Companies House verification failed</h3><p><strong>${c.company_name}</strong> (${c.company_reg_number})<br>Email: ${c.email}<br>Reason: ${result.error || 'Company not found or not active (status: ' + result.status + ')'}</p><p>Please review manually and contact the carrier if required.</p></div>`,
         text: `CH check failed: ${c.company_name} (${c.company_reg_number})\nReason: ${result.error || result.status}\nCarrier: ${c.email}`,
       });
-      await resend.emails.send({
+      await sendResendEmail({
         from,
         to: c.email,
         subject: `Action required — Companies House verification for ${c.company_name}`,

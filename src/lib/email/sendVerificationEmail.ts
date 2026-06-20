@@ -1,13 +1,12 @@
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 export async function sendVerificationEmail(params: {
   to: string;
   code: string;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
   const from = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
-  const { error } = await resend.emails.send({
+  const { error } = await sendResendEmail({
     from,
     to: params.to,
     subject: `${params.code} is your BootHop verification code`,

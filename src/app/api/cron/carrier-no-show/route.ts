@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Every 20 minutes.
 // Detects carriers who accepted a job but have gone silent (no-show):
@@ -9,7 +9,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -46,7 +45,7 @@ export async function GET() {
       .eq('id', job.id);
 
     // Alert admin
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `🚨 Carrier no-show — ${job.reference} re-opened · ${carrier?.company_name || 'unknown'}`,
@@ -72,7 +71,7 @@ export async function GET() {
     });
 
     // Alert client
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: job.client_email,
       subject: `Important update — ${job.reference}`,

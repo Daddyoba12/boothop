@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Daily at 09:00 UTC.
 // Sends the 3-email carrier onboarding sequence triggered by verification events:
@@ -10,7 +10,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase = createSupabaseAdminClient();
-  const resend   = new Resend(process.env.RESEND_API_KEY);
   const from     = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
   const days7 = new Date(Date.now() - 7 * 86400000).toISOString();
@@ -26,7 +25,7 @@ export async function GET() {
     .gte('co_house_checked_at', new Date(Date.now() - 24 * 3600000).toISOString());
 
   for (const c of chVerified ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: c.email,
       subject: `✅ Companies House verified — one step left · ${c.company_name}`,
@@ -67,7 +66,7 @@ export async function GET() {
 
   for (const c of newlyActive ?? []) {
     const vehicleList = Array.isArray(c.vehicle_types) ? (c.vehicle_types as string[]).join(', ') : '—';
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: c.email,
       subject: `🚀 You're live — job alerts have started · ${c.company_name}`,
@@ -110,7 +109,7 @@ export async function GET() {
     .gte('updated_at', new Date(Date.now() - 8 * 86400000).toISOString());
 
   for (const c of sevenDayFollowUp ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: c.email,
       subject: `How's it going? — ${c.company_name}`,

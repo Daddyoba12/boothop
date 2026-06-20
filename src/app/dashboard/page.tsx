@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { trackEvent } from '@/lib/analytics';
 import {
   Package, Plane, CheckCircle, Clock, XCircle,
   ArrowRight, Shield, AlertCircle, FileEdit, Rocket, Trash2, PlusCircle, ThumbsUp, ThumbsDown,
@@ -80,6 +81,7 @@ export default function DashboardPage() {
         alert(data.error || `Failed to ${action} match — please try again`);
         return;
       }
+      if (action === 'accept') trackEvent('match_accepted', { match_id: matchId });
       loadDashboard();
     } catch {
       alert('Network error — please check your connection and try again');
@@ -355,6 +357,7 @@ export default function DashboardPage() {
                         <p className="text-slate-500 text-xs mt-0.5">
                           {tripDate ? new Date(tripDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
                           {match.agreed_price ? ` · £${Number(match.agreed_price).toFixed(2)}` : ''}
+                          {senderTrip?.weight_capacity ? ` · ${senderTrip.weight_capacity} kg` : ''}
                         </p>
                       </div>
                       <div className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border shrink-0 ${

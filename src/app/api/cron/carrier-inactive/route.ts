@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Called daily at 10:00 UTC.
 // Checks for inactive carriers:
@@ -9,7 +9,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -27,7 +26,7 @@ export async function GET() {
     .lte('created_at', day90ago);  // Profile is at least 90 days old
 
   for (const c of stale90 ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `🔍 Carrier inactive 90+ days — review required · ${c.company_name}`,
@@ -54,7 +53,7 @@ export async function GET() {
     .gt('created_at', day90ago);  // Profile is between 14 and 90 days old (older ones go to 90-day)
 
   for (const c of stale14 ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: c.email,
       subject: `How are things going, ${c.contact_name || c.company_name}?`,

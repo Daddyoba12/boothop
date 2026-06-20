@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { getAppSession } from '@/lib/auth/session';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { translateTripCities } from '@/lib/translation';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 export async function POST(request: Request) {
   try {
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
     }
 
     // Notify admin of new trip (best-effort, non-blocking)
-    new Resend(process.env.RESEND_API_KEY).emails.send({
+    sendResendEmail({
       from: 'BootHop Notifications <noreply@boothop.com>',
       to: ['info@boothop.com'],
       subject: `New trip posted: ${from} → ${to} (${mode})`,

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { popFailedEvents, setWebhookEventStatus } from '@/lib/redis';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -9,7 +9,6 @@ function getStripe() {
   return new Stripe(key, { apiVersion: '2026-02-25.clover' as any });
 }
 
-function getResend() { return new Resend(process.env.RESEND_API_KEY); }
 
 function isAuthorized(req: Request): boolean {
   const auth     = req.headers.get('authorization');
@@ -80,7 +79,7 @@ async function runQueueProcessor() {
   // Notify admin if events still failing
   if (stillFailed.length > 0) {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
-    getResend().emails.send({
+    sendResendEmail({
       from:    'BootHop System <noreply@boothop.com>',
       to:      [adminEmail],
       subject: `⚠️ Stripe webhook retry: ${stillFailed.length} event(s) still failing`,

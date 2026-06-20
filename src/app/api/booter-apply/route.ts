@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,8 +24,7 @@ export async function POST(request: NextRequest) {
       status:  'pending',
     });
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    await resend.emails.send({
+    await sendResendEmail({
       from:    'BootHop <noreply@boothop.com>',
       to:      [process.env.ADMIN_EMAIL ?? 'admin@boothop.com'],
       subject: `New Carrier Application — ${name}`,

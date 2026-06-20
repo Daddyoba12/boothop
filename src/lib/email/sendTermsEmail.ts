@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const from   = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
@@ -12,14 +12,13 @@ export async function sendTermsAcceptanceEmail(params: {
   matchId:    string;
   role:       'sender' | 'traveler';
 }) {
-  const resend  = new Resend(process.env.RESEND_API_KEY);
   const dateStr = new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric',
   });
   const commitUrl = `${appUrl}/commit?matchId=${params.matchId}`;
   const roleLabel = params.role === 'sender' ? 'Sender (Hooper)' : 'Carrier (Booter)';
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Action required — Read & Accept Terms to proceed | ${params.fromCity} → ${params.toCity}`,
@@ -61,10 +60,9 @@ export async function sendBothTermsAcceptedEmail(params: {
   toCity:     string;
   matchId:    string;
 }) {
-  const resend   = new Resend(process.env.RESEND_API_KEY);
   const kycUrl   = `${appUrl}/kyc?matchId=${params.matchId}`;
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Terms accepted — Complete your identity verification | ${params.fromCity} → ${params.toCity}`,

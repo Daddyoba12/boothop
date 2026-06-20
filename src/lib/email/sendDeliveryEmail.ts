@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const from     = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 const appUrl   = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
@@ -13,10 +13,9 @@ export async function sendCarrierDeliveryReminderEmail(params: {
   matchId:  string;
   confirmToken: string;
 }) {
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const confirmUrl = `${appUrl}/confirm?token=${params.confirmToken}`;
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Reminder: Confirm delivery | ${params.fromCity} → ${params.toCity}`,
@@ -49,10 +48,9 @@ export async function sendSenderReceiptReminderEmail(params: {
   matchId:  string;
   confirmToken: string;
 }) {
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const confirmUrl = `${appUrl}/confirm?token=${params.confirmToken}`;
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Reminder: Confirm you received your package | ${params.fromCity} → ${params.toCity}`,
@@ -87,9 +85,8 @@ export async function sendCarrierConfirmedEmail(params: {
   matchId:  string;
   confirmToken: string;
 }) {
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const confirmUrl = `${appUrl}/confirm?token=${params.confirmToken}`;
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Carrier confirmed delivery — please confirm receipt | ${params.fromCity} → ${params.toCity}`,
@@ -125,11 +122,10 @@ export async function sendDeliveryEscalationEmail(params: {
   role:      'sender' | 'traveler';
   confirmToken: string;
 }) {
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const confirmUrl = `${appUrl}/confirm?token=${params.confirmToken}`;
   const supportEmail = process.env.SUPPORT_EMAIL || 'info@boothop.com';
   const isSender   = params.role === 'sender';
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `⚠️ Action required — delivery confirmation overdue | ${params.fromCity} → ${params.toCity}`,
@@ -171,9 +167,8 @@ export async function sendAdminCarrierPayoutAlertEmail(params: {
   agreedPrice:   number;
   carrierPayout: number;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: adminEmail,
     subject: `[PAYOUT] Transfer £${params.carrierPayout.toFixed(2)} to carrier | ${params.fromCity} → ${params.toCity}`,
@@ -228,11 +223,10 @@ export async function sendDeliveryCompleteEmail(params: {
   matchId:  string;
   role:     'sender' | 'traveler';
 }) {
-  const resend    = new Resend(process.env.RESEND_API_KEY);
   const matchUrl  = `${appUrl}/matches/${params.matchId}`;
   const isSender  = params.role === 'sender';
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Delivery complete — thank you! | ${params.fromCity} → ${params.toCity}`,

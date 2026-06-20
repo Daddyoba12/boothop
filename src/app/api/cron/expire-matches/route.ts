@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const from = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
@@ -14,7 +14,6 @@ export async function GET(request: Request) {
 
   try {
     const supabase  = createSupabaseAdminClient();
-    const resend    = new Resend(process.env.RESEND_API_KEY);
     const cutoff4h  = new Date(Date.now() -   4 * 3_600_000).toISOString();
     const cutoff12h = new Date(Date.now() -  12 * 3_600_000).toISOString();
     const cutoff72h = new Date(Date.now() -  72 * 3_600_000).toISOString();
@@ -90,7 +89,7 @@ export async function GET(request: Request) {
 
       const emails = [match.sender_email, match.traveler_email].filter(Boolean);
       await Promise.allSettled(emails.map((email: string) =>
-        resend.emails.send({
+        sendResendEmail({
           from,
           to: email,
           subject: `Match expired — ${route}`,

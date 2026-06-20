@@ -1,7 +1,5 @@
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 import { qrImageUrl } from '@/lib/utils/barcode';
-
-function getResend() { return new Resend(process.env.RESEND_API_KEY!); }
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
 
 // ── Push (web-push) ──────────────────────────────────────────────────────────
@@ -110,13 +108,13 @@ export async function sendBarcodeNotification(opts: BarcodeNotificationOpts): Pr
   const common = { fromCity: opts.fromCity, toCity: opts.toCity, tier: opts.tier, matchId: opts.matchId, premiumTracking: !!opts.premiumTracking };
 
   await Promise.allSettled([
-    getResend().emails.send({
+    sendResendEmail({
       from: 'BootHop <noreply@boothop.com>',
       to: opts.senderEmail,
       subject: `Your BootHop tracking barcode — ${opts.fromCity} → ${opts.toCity}`,
       html: barcodeEmailHtml({ barcode: opts.senderBarcode, role: 'sender', ...common }),
     }),
-    getResend().emails.send({
+    sendResendEmail({
       from: 'BootHop <noreply@boothop.com>',
       to: opts.travellerEmail,
       subject: `Your BootHop carrier barcode — ${opts.fromCity} → ${opts.toCity}`,
@@ -167,7 +165,7 @@ export async function sendCheckpointNotification(opts: CheckpointNotificationOpt
   const subject = `BootHop: ${label}`;
   const textBody = `Your delivery checkpoint: ${label} at ${opts.location}`;
 
-  await getResend().emails.send({
+  await sendResendEmail({
     from: 'BootHop Tracking <noreply@boothop.com>',
     to: opts.recipientEmail,
     subject,

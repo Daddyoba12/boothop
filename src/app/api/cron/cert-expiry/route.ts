@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Called daily at 06:00 UTC.
 // Checks carrier certificate and insurance expiry dates:
@@ -10,7 +10,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -28,7 +27,7 @@ export async function GET() {
 
   for (const c of expired ?? []) {
     await supabase.from('carrier_profiles').update({ status_active: false }).eq('id', c.id);
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: c.email,
       subject: `⚠️ Your BootHop carrier profile has been suspended — certification expired`,
@@ -43,7 +42,7 @@ export async function GET() {
       `,
       text: `Your BootHop carrier profile has been suspended due to expired certifications.\n\nPlease email renewed documents to carriers@boothop.com to reactivate.\n\nQuestions: +44 115 661 2825 / business@boothop.com`,
     });
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `🔴 Carrier suspended — ${c.company_name} (cert/insurance expired)`,
@@ -60,7 +59,7 @@ export async function GET() {
     .or(`cert_expiry_date.eq.${in7},insurance_expiry_date.eq.${in7}`);
 
   for (const c of warn7 ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: c.email,
       subject: `⚠️ Action required — certification expires in 7 days · ${c.company_name}`,
@@ -85,7 +84,7 @@ export async function GET() {
     .or(`cert_expiry_date.eq.${in30},insurance_expiry_date.eq.${in30}`);
 
   for (const c of warn30 ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: c.email,
       subject: `📋 Renewal reminder — certification expires in 30 days · ${c.company_name}`,

@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Daily at 18:00 UTC.
 // Sends end-of-day performance report to admin.
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -42,7 +41,7 @@ export async function GET() {
   const pendingPayout  = (pendingPayments ?? []).reduce((s, j) => s + (j.partner_rate ?? 0), 0);
   const openApps       = (openApplications as unknown as { count?: number } | null)?.count ?? 0;
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: adminEmail,
     subject: `📊 Daily report — ${dateLabel}`,

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const FROM   = 'BootHop <noreply@boothop.com>';
 
@@ -27,7 +27,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
   try {
     const { matchId } = await request.json();
     const supabase = createSupabaseAdminClient();
@@ -74,7 +73,7 @@ export async function POST(request: Request) {
       const confirmUrl = confirmToken ? `${appUrl}/confirm?token=${confirmToken}` : `${appUrl}/matches/${matchId}`;
       const declineUrl = declineToken ? `${appUrl}/confirm?token=${declineToken}` : `${appUrl}/matches/${matchId}`;
 
-      return resend.emails.send({
+      return sendResendEmail({
         from: FROM,
         to:   toEmail,
         subject: `BootHop Match Found: ${route}`,

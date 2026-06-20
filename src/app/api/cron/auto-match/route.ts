@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { sendMatchConfirmedEmail } from '@/lib/email/sendMatchEmail';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 import { isAfricanCity } from '@/lib/africanCities';
 
 async function createActionToken(
@@ -205,7 +205,6 @@ async function runAutoMatch() {
 
       if (isAfricaOutbound) {
         // ── Africa-outbound: email admin only, hold match for authorisation ──
-        const resend   = new Resend(process.env.RESEND_API_KEY);
         const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
         const appUrl     = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
 
@@ -218,7 +217,7 @@ async function runAutoMatch() {
         const approveUrl = `${appUrl}/api/admin/authorise-match?matchId=${matchRecord.id}&action=approve&token=${approveTokenRow.data?.token ?? ''}`;
         const rejectUrl  = `${appUrl}/api/admin/authorise-match?matchId=${matchRecord.id}&action=reject&token=${rejectTokenRow.data?.token ?? ''}`;
 
-        await resend.emails.send({
+        await sendResendEmail({
           from:    process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>',
           to:      adminEmail,
           subject: `[Auth required] Africa-outbound match — ${send.from_city} → ${send.to_city}`,

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const FROM   = 'BootHop <noreply@boothop.com>';
 
@@ -22,7 +22,6 @@ async function createActionToken(
 }
 
 export async function POST(request: Request) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
   try {
     const { matchId } = await request.json();
     const supabase = createSupabaseAdminClient();
@@ -69,7 +68,7 @@ export async function POST(request: Request) {
       const acceptUrl = acceptToken ? `${appUrl}/confirm?token=${acceptToken}` : `${appUrl}/matches/${matchId}`;
       const rejectUrl = rejectToken ? `${appUrl}/confirm?token=${rejectToken}` : `${appUrl}/matches/${matchId}`;
 
-      return resend.emails.send({
+      return sendResendEmail({
         from: FROM,
         to:   toEmail,
         subject: `BootHop Price Negotiation: ${route}`,

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Every Monday at 09:00 UTC.
 // Sends admin a full payment reconciliation report:
@@ -11,7 +11,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -37,7 +36,7 @@ export async function GET() {
   const weekRevenue = (weekJobs       ?? []).filter(j => j.status === 'delivered').reduce((s, j) => s + (j.client_paid ?? 0), 0);
   const weekMargin  = (weekJobs       ?? []).filter(j => j.status === 'delivered').reduce((s, j) => s + (j.boothop_margin ?? 0), 0);
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: adminEmail,
     subject: `💷 Weekly payment reconciliation — ${weekLabel}`,

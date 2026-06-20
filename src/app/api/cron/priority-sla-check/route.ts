@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Every 30 minutes (same schedule as priority-am).
 // Monitors active Priority Partner jobs for 2-hour response SLA compliance.
@@ -8,7 +8,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -27,7 +26,7 @@ export async function GET() {
     const minsWaiting = Math.floor((Date.now() - new Date(job.created_at as string).getTime()) / 60000);
     const isCritical  = minsWaiting >= 120;
 
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `${isCritical ? '🚨 SLA BREACH' : '⚠️ SLA WARNING'} — Priority job ${job.reference} · ${minsWaiting} min unmatched`,

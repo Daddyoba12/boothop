@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { trackEvent } from '@/lib/analytics';
 import {
   ArrowRight, Shield, Clock, CheckCircle, Mail,
   RefreshCw, PlusCircle, AlertCircle,
@@ -129,7 +130,7 @@ export default function LoginPage() {
     }
 
     localStorage.setItem('boothop_login_email', email);
-    //window.location.href = data.redirectTo || '/dashboard';
+    trackEvent('login');
     window.location.assign(data.redirectTo || '/dashboard');
   };
 

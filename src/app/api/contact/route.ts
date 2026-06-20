@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 const DISPOSABLE_DOMAINS = new Set([
@@ -144,8 +144,7 @@ export async function POST(request: Request) {
     const status = getStatus(spamScore);
 
     if (status === 'REJECTED') {
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      await resend.emails.send({
+      await sendResendEmail({
         from: 'BootHop Support <noreply@boothop.com>',
         to: [email],
         subject: 'BootHop Contact Form – Submission Failed',
@@ -176,8 +175,7 @@ export async function POST(request: Request) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
     const verifyLink = `${appUrl}/api/contact/verify?token=${data.token}`;
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    await resend.emails.send({
+    await sendResendEmail({
       from: 'BootHop Support <noreply@boothop.com>',
       to: [email],
       subject: 'Confirm your message to BootHop',

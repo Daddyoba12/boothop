@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const from   = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
@@ -11,11 +11,10 @@ export async function sendRatingRequestEmail(params: {
   role:        'sender' | 'traveler';
   agreedPrice: number;
 }) {
-  const resend    = new Resend(process.env.RESEND_API_KEY);
   const matchUrl  = `${appUrl}/matches/${params.matchId}`;
   const isCarrier = params.role === 'traveler';
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `${isCarrier ? '💸 Payment released — ' : ''}Rate your experience | ${params.fromCity} → ${params.toCity}`,

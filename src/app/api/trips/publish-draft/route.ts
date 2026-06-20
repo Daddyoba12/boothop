@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getSessionCookieName, verifyAppSession } from '@/lib/auth/session';
 import { translateTripCities } from '@/lib/translation';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 export async function POST(request: Request) {
   try {
@@ -80,11 +80,10 @@ export async function POST(request: Request) {
     const typeLabel    = draft.type === 'travel' ? 'Booter (traveller)' : 'Hooper (sender)';
     const appUrl       = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
     const from         = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
-    const resend       = new Resend(process.env.RESEND_API_KEY);
     const dateStr      = new Date(draft.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
     // Confirmation to trip creator (non-blocking)
-    resend.emails.send({
+    sendResendEmail({
       from,
       to:      session.email,
       subject: `Your trip is live — ${draft.from_city} → ${draft.to_city}`,
@@ -114,7 +113,7 @@ export async function POST(request: Request) {
       text: `Your trip is live: ${draft.from_city} → ${draft.to_city} on ${dateStr}. Price: £${draft.price}.\n\nWe'll email you when we find a match. Dashboard: ${appUrl}/dashboard`,
     }).catch(e => console.error('Trip creator confirmation email error:', e));
 
-    resend.emails.send({
+    sendResendEmail({
       from,
       to:      supportEmail,
       subject: `🚀 New trip registered — ${draft.from_city} → ${draft.to_city} (${typeLabel})`,

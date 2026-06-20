@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // GET  /api/admin/priority?status=all
 // PATCH /api/admin/priority { id, ...fields }
@@ -44,11 +44,10 @@ export async function PATCH(request: NextRequest) {
 
   // Send activation email if status just changed to active
   if (fields.status === 'active' && partner.status !== 'active') {
-    const resend = new Resend(process.env.RESEND_API_KEY);
     const from   = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
     const fee    = partner.annual_fee ?? 0;
 
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: partner.email,
       subject: `✅ Priority Partner account activated — ${partner.company_name || partner.email}`,

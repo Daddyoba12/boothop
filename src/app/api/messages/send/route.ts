@@ -1,3 +1,4 @@
+import { sendResendEmail } from '@/lib/resend-client';
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getAppSession } from '@/lib/auth/session';
@@ -103,9 +104,7 @@ export async function POST(request: Request) {
         });
       } catch { /* non-fatal */ }
 
-      const { Resend } = await import('resend');
-      const resend     = new Resend(process.env.RESEND_API_KEY);
-      resend.emails.send({
+      sendResendEmail({
         from:    process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>',
         to:      process.env.ADMIN_EMAIL     || 'admin@boothop.com',
         subject: `[BLOCKED] Contact-sharing attempt — Match ${matchId}`,
@@ -135,8 +134,7 @@ export async function POST(request: Request) {
       });
 
       // Alert admin asynchronously
-      const { Resend } = await import('resend');
-      new Resend(process.env.RESEND_API_KEY).emails.send({
+      sendResendEmail({
         from:    process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>',
         to:      process.env.ADMIN_EMAIL     || 'admin@boothop.com',
         subject: `[HELD:${moderation.category}] Message held for review — Match ${matchId}`,

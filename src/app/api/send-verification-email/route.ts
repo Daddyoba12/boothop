@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://boothop-one.vercel.app';
 
@@ -9,7 +9,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
   try {
     const { email, from, to } = await request.json();
 
@@ -87,7 +86,7 @@ export async function POST(request: Request) {
 </body>
 </html>`;
 
-    await resend.emails.send({
+    await sendResendEmail({
       from: 'BootHop <noreply@boothop.com>',
       to: email,
       subject: '🔗 Your BootHop magic link is ready',

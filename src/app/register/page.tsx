@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
+import { trackEvent } from '@/lib/analytics';
 import {
   Package, Plane, MapPin, Calendar, ArrowRight,
   CheckCircle, AlertCircle, Mail, Home, PlusCircle,
@@ -373,6 +374,8 @@ function RegisterForm() {
           type: mode,
           redirectTo: data.redirectTo || '/journeys?listing=new',
         });
+        trackEvent('trip_published', { mode, from: form.from, to: form.to });
+        trackEvent('sign_up');
         setStep('success');
         // Auto-redirect after 3 seconds
         setTimeout(() => {

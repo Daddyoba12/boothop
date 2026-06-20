@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { sendPaymentConfirmationEmail } from '@/lib/email';
+import { sendResendEmail } from '@/lib/resend-client';
 import { sendDeliveryCompleteEmail } from '@/lib/email/sendDeliveryEmail';
 import {
   getWebhookEventStatus,
@@ -584,10 +585,9 @@ async function sendPaymentFailureNotification(matchId: string) {
     .single();
   if (!match) return;
   const trip = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
-  const resend = new (await import('resend')).Resend(process.env.RESEND_API_KEY);
   const from = 'BootHop <noreply@boothop.com>';
   await Promise.allSettled([
-    match.sender_email && resend.emails.send({
+    match.sender_email && sendResendEmail({
       from, to: match.sender_email,
       subject: 'Payment failed — action required',
       html: `<p>Your payment for the <strong>${trip?.from_city} → ${trip?.to_city}</strong> delivery could not be processed. Please retry via the BootHop dashboard.</p>`,
@@ -620,9 +620,8 @@ async function sendRefundNotifications(matchId: string) {
     .single();
   if (!match) return;
   const trip = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
-  const resend = new (await import('resend')).Resend(process.env.RESEND_API_KEY);
   await Promise.allSettled([
-    match.sender_email && resend.emails.send({
+    match.sender_email && sendResendEmail({
       from: 'BootHop <noreply@boothop.com>',
       to: match.sender_email,
       subject: 'Your refund is on its way',

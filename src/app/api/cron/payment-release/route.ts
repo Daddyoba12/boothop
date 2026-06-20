@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Called daily at 07:00 UTC.
 // Finds delivered jobs where 7 days have elapsed since delivery — marks payment released
@@ -13,7 +13,6 @@ export async function GET(request: Request) {
   }
 
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -60,7 +59,7 @@ export async function GET(request: Request) {
 
     // Carrier payment notification
     if (partner.email) {
-      await resend.emails.send({
+      await sendResendEmail({
         from,
         to: partner.email,
         subject: `💷 Payment released — ${job.reference} · £${job.partner_rate?.toLocaleString() ?? '—'}`,
@@ -89,7 +88,7 @@ export async function GET(request: Request) {
     }
 
     // Admin record
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `💷 Payment released — ${job.reference} · £${job.partner_rate?.toLocaleString() ?? '—'} to ${partner.company_name || partner.email}`,

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Every 30 minutes.
 // Flags in-transit jobs that are taking too long based on delivery type:
@@ -9,7 +9,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -41,7 +40,7 @@ export async function GET() {
     const carrier = (job as Record<string, unknown>).carrier_profiles as Record<string, string> | null;
     const threshold = job.delivery_type === 'uk' ? '4 hours' : '48 hours';
 
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `⚠️ ${job.reference} — late delivery (${threshold} in transit) · ${job.delivery_type?.toUpperCase()}`,
@@ -64,7 +63,7 @@ export async function GET() {
     });
 
     // Also alert client
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: job.client_email,
       subject: `Update on your delivery — ${job.reference}`,

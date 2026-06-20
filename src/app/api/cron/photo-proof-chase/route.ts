@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Every 4 hours.
 // Chases carriers for delivery photo proof after a job is marked delivered.
@@ -8,7 +8,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
   const now       = Date.now();
@@ -29,7 +28,7 @@ export async function GET() {
     const carrier = (job as Record<string, unknown>).carrier_profiles as Record<string, string> | null;
     if (!carrier?.email) continue;
 
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: carrier.email,
       subject: `📸 Photo proof needed — ${job.reference}`,

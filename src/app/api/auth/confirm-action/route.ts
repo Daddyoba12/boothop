@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { signAppSession, getSessionCookieName } from '@/lib/auth/session';
 import { sendTermsAcceptanceEmail } from '@/lib/email/sendTermsEmail';
+import { sendResendEmail } from '@/lib/resend-client';
 import { sendAdminCarrierPayoutAlertEmail, sendDeliveryCompleteEmail, sendCarrierConfirmedEmail } from '@/lib/email/sendDeliveryEmail';
 import { sendRatingRequestEmail } from '@/lib/email/sendRatingEmail';
 import { sendMatchDeclinedEmail, sendMatchCancelledEmail } from '@/lib/email/sendMatchEmail';
@@ -196,10 +197,8 @@ export async function POST(request: Request) {
           if (fullNeg) {
             const negTrip = (fullNeg as any).sender_trip;
             const negAppUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
-            const { Resend: ResendCls } = await import('resend');
-            const negResend = new ResendCls(process.env.RESEND_API_KEY);
             const negFrom   = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
-            const sendNegConfirm = (toEmail: string) => negResend.emails.send({
+            const sendNegConfirm = (toEmail: string) => sendResendEmail({
               from: negFrom, to: toEmail,
               subject: `Price agreed — ${negTrip?.from_city} → ${negTrip?.to_city}`,
               html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0f172a;">

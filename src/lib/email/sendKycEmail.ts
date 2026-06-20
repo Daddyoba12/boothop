@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const from   = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
@@ -9,10 +9,9 @@ export async function sendKycVerifiedEmail(params: {
   toCity:    string;
   matchId:   string;
 }) {
-  const resend  = new Resend(process.env.RESEND_API_KEY);
   const kycUrl  = `${appUrl}/kyc?matchId=${params.matchId}`;
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Your identity is verified — waiting for your match | ${params.fromCity} → ${params.toCity}`,
@@ -46,7 +45,6 @@ export async function sendBothKycVerifiedEmail(params: {
   role:        'sender' | 'traveler';
   agreedPrice: number;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
   const kycUrl = `${appUrl}/kyc?matchId=${params.matchId}`;
 
   const isSender  = params.role === 'sender';
@@ -56,7 +54,7 @@ export async function sendBothKycVerifiedEmail(params: {
   const ctaLabel  = isSender ? 'Proceed to Payment →' : 'View Match Status →';
   const ctaColor  = isSender ? '#16a34a' : '#2563eb';
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Both identities verified — ${isSender ? 'Proceed to payment' : 'Waiting for payment'} | ${params.fromCity} → ${params.toCity}`,

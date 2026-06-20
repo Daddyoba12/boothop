@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 import { requireAdminApi } from '@/lib/auth/admin';
 
 const appUrl  = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
@@ -91,7 +91,6 @@ export async function POST(request: NextRequest) {
   // Deduplicate
   const unique = Array.from(new Set(emails.map((e: string) => e.toLowerCase().trim()).filter(Boolean)));
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
   const from   = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const html   = buildHtml(body);
   const text   = body;
@@ -103,7 +102,7 @@ export async function POST(request: NextRequest) {
   for (let i = 0; i < unique.length; i += 50) {
     const batch = unique.slice(i, i + 50);
     const results = await Promise.allSettled(
-      batch.map(to => resend.emails.send({ from, to, subject, html, text }))
+      batch.map(to => sendResendEmail({ from, to, subject, html, text }))
     );
     for (const r of results) {
       r.status === 'fulfilled' ? sent++ : failed++;

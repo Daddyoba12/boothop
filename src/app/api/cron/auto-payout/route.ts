@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getStripe, calculateFees } from '@/lib/stripe';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 import { sendRatingRequestEmail } from '@/lib/email/sendRatingEmail';
 
 // Captures escrowed Stripe funds and transfers the traveler's share to their
@@ -32,7 +32,6 @@ export async function POST(request: Request) {
 async function runAutoPayout() {
   const supabase = createSupabaseAdminClient();
   const stripe   = getStripe();
-  const resend   = new Resend(process.env.RESEND_API_KEY);
 
   const cutoff = new Date(Date.now() - RELEASE_AFTER_HOURS * 3_600_000).toISOString();
 
@@ -158,7 +157,7 @@ async function runAutoPayout() {
   if (released.length > 0 || skippedDispute.length > 0) {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
     const appUrl     = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
-    await resend.emails.send({
+    await sendResendEmail({
       from:    process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>',
       to:      adminEmail,
       subject: `Auto-payout: ${released.length} released${skippedDispute.length ? `, ${skippedDispute.length} held for dispute` : ''}`,

@@ -1,3 +1,4 @@
+import { sendResendEmail } from '@/lib/resend-client';
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { signBdSession, getBdCookieName, BD_ALLOWED_EMAIL } from '@/lib/auth/session';
@@ -27,9 +28,7 @@ export async function POST(request: Request) {
       expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     });
 
-    const { Resend } = await import('resend');
-    const resend     = new Resend(process.env.RESEND_API_KEY);
-    const { error }  = await resend.emails.send({
+    const { error }  = await sendResendEmail({
       from:    process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>',
       to:      BD_ALLOWED_EMAIL,
       subject: `${otp} — Your BootHop BD Pipeline code`,

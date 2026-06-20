@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const PRICES: Record<string, Record<string, number>> = {
   uk:            { small: 300,  medium: 550,  large: 850,  pallet: 1400 },
@@ -70,12 +70,11 @@ export async function POST(request: NextRequest) {
 
     const typeLabel = delivery_type === 'uk' ? 'UK' : 'International';
 
-    const resend     = new Resend(process.env.RESEND_API_KEY);
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
     const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
     // Admin notification
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `⚡ Express Booking — ${ref} · ${email} · £${price?.toLocaleString() ?? '?'}`,
@@ -108,7 +107,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Client confirmation email
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: email,
       subject: `✅ BootHop Express — Booking Confirmed · ${ref}`,

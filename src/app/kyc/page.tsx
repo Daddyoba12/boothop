@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { trackEvent } from '@/lib/analytics';
 import {
   Shield, CheckCircle, Clock, UserCheck, CreditCard,
   Package, Plane, AlertCircle, ArrowRight, Loader2,
@@ -122,6 +123,7 @@ function KycContent() {
       });
       const json = await res.json();
       if (!res.ok) { setError(json.error || 'Could not create checkout.'); return; }
+      trackEvent('kyc_started', { match_id: matchId });
       window.location.href = json.url;
     } catch (e: any) {
       setError(e.message);

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { trackEvent } from '@/lib/analytics';
 import { 
   Package, 
   CreditCard,
@@ -53,6 +54,7 @@ function CheckoutForm({ matchId, amount }: { matchId: string; amount: number }) 
         throw new Error(confirmError.message);
       }
 
+      trackEvent('begin_checkout', { match_id: matchId, amount });
       setSuccess(true);
     } catch (err: any) {
       setError(err.message || 'Payment failed');

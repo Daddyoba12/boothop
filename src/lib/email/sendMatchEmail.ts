@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const from   = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
@@ -11,9 +11,8 @@ export async function sendMatchCancelledEmail(params: {
   cancelledByYou: boolean;
   reason?:   string;
 }) {
-  const resend  = new Resend(process.env.RESEND_API_KEY);
   const dateStr = new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Match cancelled — ${params.fromCity} → ${params.toCity}`,
@@ -47,9 +46,8 @@ export async function sendMatchDeclinedEmail(params: {
   toCity:    string;
   travelDate: string;
 }) {
-  const resend  = new Resend(process.env.RESEND_API_KEY);
   const dateStr = new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Match declined — ${params.fromCity} → ${params.toCity}`,
@@ -92,8 +90,7 @@ export async function sendInterestEmail(params: {
   const portalUrl  = params.loginToken ? `${appUrl}/confirm?token=${params.loginToken}` : `${appUrl}/dashboard`;
   const dateStr    = params.travelDate ? new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `${isOffer ? 'New offer' : 'New interest'} on your trip — ${params.fromCity} → ${params.toCity}`,
@@ -140,8 +137,7 @@ export async function sendMatchAcceptedEmail(params: {
 }) {
   const portalUrl = params.loginToken ? `${params.appUrl}/confirm?token=${params.loginToken}` : `${params.appUrl}/dashboard`;
   const dateStr   = params.travelDate ? new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-  const resend    = new Resend(process.env.RESEND_API_KEY);
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `Your interest was accepted — ${params.fromCity} → ${params.toCity}`,
@@ -185,12 +181,11 @@ export async function sendMatchConfirmedEmail(params: {
   acceptToken?: string;
   declineToken?: string;
 }) {
-  const resend    = new Resend(process.env.RESEND_API_KEY);
   const acceptUrl = params.acceptToken  ? `${appUrl}/confirm?token=${params.acceptToken}`  : `${appUrl}/dashboard`;
   const declineUrl= params.declineToken ? `${appUrl}/confirm?token=${params.declineToken}` : `${appUrl}/dashboard`;
   const dateStr   = new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.toEmail,
     subject: `🎉 Match found — ${params.fromCity} → ${params.toCity} — Action required`,

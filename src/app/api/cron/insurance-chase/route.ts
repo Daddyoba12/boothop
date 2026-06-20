@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Daily at 10:00 UTC.
 // Chases carriers who haven't uploaded an insurance certificate.
@@ -8,7 +8,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -26,7 +25,7 @@ export async function GET() {
   // Day 14 — escalate to admin
   const { data: stale } = await base.lte('created_at', day14);
   if (stale && stale.length > 0) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `⚠️ ${stale.length} carrier${stale.length !== 1 ? 's' : ''} still missing insurance certificate (14+ days)`,
@@ -45,7 +44,7 @@ export async function GET() {
     .gt('created_at', day14);
 
   for (const c of week ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: c.email,
       subject: `⚠️ Insurance certificate still needed — ${c.company_name}`,
@@ -74,7 +73,7 @@ export async function GET() {
     .gt('created_at', day7);
 
   for (const c of day3carriers ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: c.email,
       subject: `Reminder — insurance certificate needed · ${c.company_name}`,

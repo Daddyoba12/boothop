@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Daily at 08:00 UTC.
 // Auto-confirms delivered jobs as complete if 48 hours have passed with no dispute raised.
@@ -8,7 +8,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -29,7 +28,7 @@ export async function GET() {
     await supabase.from('jobs').update({ payment_due_at: paymentDueAt }).eq('id', job.id);
 
     // Notify client delivery is confirmed
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: job.client_email,
       subject: `✅ Delivery confirmed — ${job.reference}`,
@@ -47,7 +46,7 @@ export async function GET() {
   }
 
   if (jobs && jobs.length > 0) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `✅ ${jobs.length} job${jobs.length !== 1 ? 's' : ''} auto-confirmed — payment clocks started`,

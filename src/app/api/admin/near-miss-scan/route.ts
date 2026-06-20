@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 import { getAppSession } from '@/lib/auth/session';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { ADMIN_EMAILS } from '@/lib/auth/admin';
@@ -210,7 +210,6 @@ async function runScan() {
     return NextResponse.json({ pairs: 0, sent: 0, message: 'No near-miss pairs found.' });
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
   const from   = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
   let sent = 0;
@@ -227,7 +226,7 @@ async function runScan() {
       daysDiff:      diff,
     });
 
-    const result = await resend.emails.send({ from, to: email, subject, html, text });
+    const result = await sendResendEmail({ from, to: email, subject, html, text });
     if ((result as any).error) { failed++; } else { sent++; }
 
     previews.push({

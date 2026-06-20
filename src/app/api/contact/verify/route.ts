@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function GET(request: NextRequest) {
@@ -35,7 +35,6 @@ export async function GET(request: NextRequest) {
   // Delete token first to prevent reuse
   await supabase.from('action_tokens').delete().eq('token', token);
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
   const score = spamScore ?? 0;
   const scoreClass = score >= 60 ? 'high' : score >= 30 ? 'medium' : 'low';
   const riskLabel = status === 'REVIEW' ? '⚠️ NEEDS REVIEW' : '✅ VERIFIED';
@@ -45,7 +44,7 @@ export async function GET(request: NextRequest) {
     : '✅ All checks passed';
 
   // Forward verified message to admin — only fires after real email click
-  await resend.emails.send({
+  await sendResendEmail({
     from: 'BootHop Contact <noreply@boothop.com>',
     to: ['info@boothop.com', 'titobalo12@gmail.com'],
     replyTo: email,

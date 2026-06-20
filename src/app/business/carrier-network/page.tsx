@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { trackEvent } from '@/lib/analytics';
 import {
   Users, CheckCircle, ArrowRight, ArrowLeft, Loader2,
   Truck, Shield, Clock, ChevronLeft, AlertCircle,
@@ -274,6 +275,7 @@ export default function CarrierNetworkPage() {
       });
       const j = await res.json();
       if (!res.ok) { setError(j.error || 'Something went wrong. Please try again.'); return; }
+      trackEvent('business_applied', { type: 'carrier' });
       router.push(
         `/business/carrier-network/payment?email=${encodeURIComponent(form.email)}&company=${encodeURIComponent(form.company_name)}`
       );

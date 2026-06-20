@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const FEES: Record<string, number> = {
   uk:            10000,
@@ -63,7 +63,6 @@ export async function POST(request: NextRequest) {
 
     if (error) throw error;
 
-    const resend     = new Resend(process.env.RESEND_API_KEY);
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
     const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
     const typeLabel  = delivery_type === 'international'
@@ -74,7 +73,7 @@ export async function POST(request: NextRequest) {
       ? what_moving.join(', ')
       : '—';
 
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `⭐ Priority Partner Application — ${company_name || email} (${typeLabel})`,
@@ -108,7 +107,7 @@ export async function POST(request: NextRequest) {
     });
 
     // ── Applicant confirmation email ─────────────────────────────────────
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: email,
       subject: `Your Priority Partner application — what happens next`,

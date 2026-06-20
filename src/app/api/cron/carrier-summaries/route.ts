@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Called every Monday at 08:00 UTC.
 // Sends weekly earnings summary to each active carrier.
 
 export async function GET() {
   const supabase = createSupabaseAdminClient();
-  const resend   = new Resend(process.env.RESEND_API_KEY);
   const from     = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
   // Past 7 days window
@@ -55,7 +54,7 @@ export async function GET() {
       </tr>
     `).join('');
 
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: carrier.email,
       subject: `Weekly summary — ${weekStart}–${weekEnd} · ${completedJobs.length} job${completedJobs.length !== 1 ? 's' : ''}`,

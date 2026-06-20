@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Called every 5 minutes by Vercel Cron.
 // Widens match radius for unaccepted jobs:
@@ -10,7 +10,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase = createSupabaseAdminClient();
-  const resend   = new Resend(process.env.RESEND_API_KEY);
   const from     = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -31,7 +30,7 @@ export async function GET() {
       is_boothop_direct: true,
     }).eq('id', job.id);
 
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `🚨 ${job.reference} — 20 MIN EXCEEDED · BootHop Direct required`,
@@ -64,7 +63,7 @@ export async function GET() {
 
   for (const job of widen100 ?? []) {
     await supabase.from('jobs').update({ match_radius_miles: 100 }).eq('id', job.id);
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `📡 ${job.reference} — radius widened to 100 miles`,
@@ -83,7 +82,7 @@ export async function GET() {
 
   for (const job of widen75 ?? []) {
     await supabase.from('jobs').update({ match_radius_miles: 75 }).eq('id', job.id);
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `📡 ${job.reference} — radius widened to 75 miles`,

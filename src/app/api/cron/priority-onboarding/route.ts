@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Daily at 10:00 UTC.
 // Sends Priority Partner onboarding sequence after account activation:
@@ -10,7 +10,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase = createSupabaseAdminClient();
-  const resend   = new Resend(process.env.RESEND_API_KEY);
   const from     = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
   const now    = Date.now();
@@ -26,7 +25,7 @@ export async function GET() {
     .gte('updated_at', day1);
 
   for (const p of newActive ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: p.email,
       subject: `Welcome to BootHop Priority — your account is live · ${p.company_name}`,
@@ -73,7 +72,7 @@ export async function GET() {
     .gt('updated_at', new Date(now - 8 * 86400000).toISOString());
 
   for (const p of week1 ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: p.email,
       subject: `One week in — how can we help? · ${p.company_name}`,
@@ -101,7 +100,7 @@ export async function GET() {
     .gt('updated_at', new Date(now - 31 * 86400000).toISOString());
 
   for (const p of month1 ?? []) {
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: p.email,
       subject: `Your first month with BootHop Priority · ${p.company_name}`,

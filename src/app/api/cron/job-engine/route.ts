@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Called every 2 minutes by Vercel Cron.
 // Finds 'received' jobs, alerts all eligible active partners, transitions to 'matching'.
 
 export async function GET() {
   const supabase = createSupabaseAdminClient();
-  const resend   = new Resend(process.env.RESEND_API_KEY);
   const from     = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
   // Find all jobs awaiting partner matching
@@ -52,7 +51,7 @@ export async function GET() {
 
     if (eligible.length === 0) {
       // No partners available — alert ops immediately
-      await notifyOps(resend, from, job, 'No active partners found — BootHop Direct required');
+      await notifyOps(from, job, 'No active partners found — BootHop Direct required');
       await supabase.from('jobs').update({
         status: 'matching',
         matched_at: new Date().toISOString(),
@@ -82,7 +81,7 @@ export async function GET() {
     // Send partner alerts (fire-and-forget per partner)
     await Promise.allSettled(
       eligible.map((partner) =>
-        resend.emails.send({
+        sendResendEmail({
           from,
           to: partner.email,
           subject: `⚡ New job available — ${job.reference} · ${job.delivery_type === 'uk' ? 'UK' : 'International'} · Expires ${expiresStr}`,
@@ -127,7 +126,7 @@ export async function GET() {
 
     // Admin notification
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
-    await resend.emails.send({
+    await sendResendEmail({
       from,
       to: adminEmail,
       subject: `⚡ ${job.reference} — matching started · ${eligible.length} partner${eligible.length !== 1 ? 's' : ''} alerted`,
@@ -141,9 +140,9 @@ export async function GET() {
   return NextResponse.json({ ok: true, processed });
 }
 
-async function notifyOps(resend: Resend, from: string, job: Record<string, unknown>, reason: string) {
+async function notifyOps(from: string, job: Record<string, unknown>, reason: string) {
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: adminEmail,
     subject: `🚨 ${job.reference} — BootHop Direct required`,

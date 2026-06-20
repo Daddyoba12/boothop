@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 const from   = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
@@ -18,9 +18,8 @@ function footer(extra = '') {
 export async function sendBusinessJobPaymentConfirmedEmail(params: {
   to: string; jobRef: string; pickup: string; dropoff: string; price: number; isPriority?: boolean;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
   const tag    = params.isPriority ? '⭐ Priority' : '✅ Payment confirmed';
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.to,
     subject: `${tag} — Ref: ${params.jobRef}`,
@@ -48,8 +47,7 @@ export async function sendBusinessJobPaymentConfirmedEmail(params: {
 }
 
 export async function sendBusinessOtpEmail(params: { to: string; code: string }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.to,
     subject: `${params.code} — BootHop Business verification code`,
@@ -69,9 +67,8 @@ export async function sendBusinessOtpEmail(params: { to: string; code: string })
 export async function sendBusinessJobConfirmationEmail(params: {
   to: string; jobRef: string; pickup: string; dropoff: string; urgency: string; price: number;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
   const urgencyLabel = params.urgency === 'same_day' ? 'Same Day' : 'Next Morning';
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.to,
     subject: `Delivery request confirmed — Ref: ${params.jobRef}`,
@@ -104,10 +101,9 @@ export async function sendBusinessJobAdminAlertEmail(params: {
   description: string; weight: string; declaredValue: string; category: string;
   urgency: string; insurance: boolean; price: number;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
   const urgencyLabel = params.urgency === 'same_day' ? 'Same Day' : 'Next Morning';
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: adminEmail,
     subject: `⚡ New Business Job — ${params.jobRef} | ${params.pickup} → ${params.dropoff}`,
@@ -141,8 +137,7 @@ export async function sendBusinessDriverAssignedEmail(params: {
   to: string; jobRef: string; pickup: string; dropoff: string;
   driverName: string; driverPhone?: string | null; driverEmail?: string | null;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.to,
     subject: `Driver assigned — Ref: ${params.jobRef}`,
@@ -174,8 +169,7 @@ export async function sendBusinessDriverAssignedEmail(params: {
 export async function sendBusinessInTransitEmail(params: {
   to: string; jobRef: string; pickup: string; dropoff: string;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.to,
     subject: `Your delivery is on the way — Ref: ${params.jobRef}`,
@@ -202,8 +196,7 @@ export async function sendBusinessInTransitEmail(params: {
 export async function sendBusinessDeliveredEmail(params: {
   to: string; jobRef: string; pickup: string; dropoff: string; price: number;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.to,
     subject: `Delivery complete — Invoice: ${params.jobRef}`,
@@ -235,8 +228,7 @@ export async function sendBusinessDeliveredEmail(params: {
 export async function sendBusinessFailedEmail(params: {
   to: string; jobRef: string; pickup: string; dropoff: string;
 }) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: params.to,
     subject: `Delivery issue — Action required: ${params.jobRef}`,

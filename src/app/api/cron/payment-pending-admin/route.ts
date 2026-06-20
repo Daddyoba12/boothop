@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { sendResendEmail } from '@/lib/resend-client';
 
 // Daily at 07:30 UTC.
 // Alerts admin of all partner payments that will become due in the next 3 days,
@@ -8,7 +8,6 @@ import { Resend } from 'resend';
 
 export async function GET() {
   const supabase   = createSupabaseAdminClient();
-  const resend     = new Resend(process.env.RESEND_API_KEY);
   const from       = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
@@ -33,7 +32,7 @@ export async function GET() {
 
   const totalDue = upcoming.reduce((s, j) => s + (j.partner_rate ?? 0), 0);
 
-  await resend.emails.send({
+  await sendResendEmail({
     from,
     to: adminEmail,
     subject: `💷 ${upcoming.length} partner payment${upcoming.length !== 1 ? 's' : ''} due in 3 days — £${totalDue.toLocaleString()} total`,

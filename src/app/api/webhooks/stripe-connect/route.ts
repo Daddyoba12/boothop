@@ -1,3 +1,4 @@
+import { sendResendEmail } from '@/lib/resend-client';
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
@@ -126,9 +127,7 @@ async function handleAccountUpdated(account: Stripe.Account, supabase: ReturnTyp
     console.log(`✅ Traveller ${user.email} fully verified — payouts enabled`);
 
     // Send confirmation email
-    const { Resend } = await import('resend');
-    const resend = new Resend(process.env.RESEND_API_KEY!);
-    await resend.emails.send({
+    await sendResendEmail({
       from: 'BootHop <noreply@boothop.com>',
       to: user.email,
       subject: '✅ Your BootHop traveller account is verified',
@@ -144,9 +143,7 @@ async function handleAccountUpdated(account: Stripe.Account, supabase: ReturnTyp
   const disabledReason = (account as any).disabled_reason;
   if (disabledReason) {
     console.warn(`⚠️  Account ${account.id} disabled: ${disabledReason}`);
-    const { Resend } = await import('resend');
-    const resend = new Resend(process.env.RESEND_API_KEY!);
-    await resend.emails.send({
+    await sendResendEmail({
       from: 'BootHop <noreply@boothop.com>',
       to: user.email,
       subject: '⚠️ Action required — BootHop account needs attention',
@@ -213,9 +210,7 @@ async function handlePayoutCreated(
 
   if (!user) return { handled: false };
 
-  const { Resend } = await import('resend');
-  const resend = new Resend(process.env.RESEND_API_KEY!);
-  await resend.emails.send({
+  await sendResendEmail({
     from: 'BootHop <noreply@boothop.com>',
     to: user.email,
     subject: `💸 Payout of £${(payout.amount / 100).toFixed(2)} is on its way`,
@@ -244,9 +239,7 @@ async function handlePayoutFailed(
 
   if (!user) return { handled: false };
 
-  const { Resend } = await import('resend');
-  const resend = new Resend(process.env.RESEND_API_KEY!);
-  await resend.emails.send({
+  await sendResendEmail({
     from: 'BootHop <noreply@boothop.com>',
     to: user.email,
     subject: '⚠️ Payout failed — action required',
