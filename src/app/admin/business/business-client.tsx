@@ -59,9 +59,9 @@ function fmt(ts: string | null) {
 
 // ── Assign driver modal ───────────────────────────────────────────────────────
 function AssignModal({
-  job, adminKey, onDone, onCancel,
+  job, onDone, onCancel,
 }: {
-  job: Job; adminKey: string; onDone: (updated: Partial<Job>) => void; onCancel: () => void;
+  job: Job; onDone: (updated: Partial<Job>) => void; onCancel: () => void;
 }) {
   const [name,    setName]    = useState('');
   const [email,   setEmail]   = useState('');
@@ -208,7 +208,7 @@ function AdminBusinessContent() {
     <div className="min-h-screen bg-[#050a05] text-white">
 
       {assignJob && (
-        <AssignModal job={assignJob} adminKey={adminKey} onDone={handleAssigned} onCancel={() => setAssignJob(null)} />
+        <AssignModal job={assignJob} onDone={handleAssigned} onCancel={() => setAssignJob(null)} />
       )}
 
       {/* Header */}
