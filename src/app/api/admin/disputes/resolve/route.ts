@@ -5,10 +5,9 @@ import { sendDisputeResolvedEmail } from '@/lib/email/sendDisputeEmail';
 // resolution options: refund_sender | pay_carrier | split | no_action
 export async function POST(request: NextRequest) {
   try {
-    const adminKey = request.headers.get('x-admin-key');
-    if (!adminKey || adminKey !== process.env.ADMIN_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
-    }
+    const { requireAdminApi } = await import('@/lib/auth/admin');
+    const session = await requireAdminApi();
+    if (!session) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
 
     const { disputeId, resolution, note } = await request.json();
     if (!disputeId || !resolution) {

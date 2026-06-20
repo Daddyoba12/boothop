@@ -10,10 +10,9 @@ import {
 const VALID_STATUSES = ['pending', 'assigned', 'in_transit', 'delivered', 'cancelled', 'failed'];
 
 export async function POST(request: NextRequest) {
-  const adminKey = request.headers.get('x-admin-key');
-  if (!adminKey || adminKey !== process.env.ADMIN_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
-  }
+  const { requireAdminApi } = await import('@/lib/auth/admin');
+  const session = await requireAdminApi();
+  if (!session) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
 
   const { id, status, driverName, driverEmail, driverPhone } = await request.json();
   if (!id || !VALID_STATUSES.includes(status)) {

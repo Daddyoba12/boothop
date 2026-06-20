@@ -1,71 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminApi } from '@/lib/auth/admin';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { sendContactReleasedEmail } from '@/lib/email/sendPaymentEmail';
 
+// GET — triggered from an email link; authenticated by ADMIN_SECRET in query string.
 export async function GET(request: NextRequest) {
-  return handleConfirm(request);
+  const url      = new URL(request.url);
+  const matchId  = url.searchParams.get('matchId');
+  const adminKey = url.searchParams.get('adminKey');
+
+  if (!adminKey || adminKey !== process.env.ADMIN_SECRET) {
+    return new NextResponse('Unauthorized.', { status: 401 });
+  }
+  if (!matchId) return new NextResponse('matchId is required.', { status: 400 });
+
+  const result = await confirmPayment(matchId);
+  if (!result.ok) return new NextResponse(result.error, { status: result.status });
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
+  return NextResponse.redirect(`${appUrl}/admin?confirmed=${matchId}`);
 }
 
+// POST — called from the Hub dashboard; authenticated by session cookie.
 export async function POST(request: NextRequest) {
-  return handleConfirm(request);
+  const session = await requireAdminApi();
+  if (!session) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
+
+  const { matchId } = await request.json();
+  if (!matchId) return NextResponse.json({ error: 'matchId is required.' }, { status: 400 });
+
+  const result = await confirmPayment(matchId);
+  if (!result.ok) return NextResponse.json({ error: result.error }, { status: result.status });
+
+  return NextResponse.json({ ok: true, matchId, status: 'active' });
 }
 
-async function handleConfirm(request: NextRequest) {
+async function confirmPayment(matchId: string): Promise<{ ok: boolean; error?: string; status?: number }> {
   try {
-    const url      = new URL(request.url);
-    const matchId  = url.searchParams.get('matchId');
-    const adminKey = url.searchParams.get('adminKey');
-
-    // Also check body for POST calls from the admin dashboard
-    let bodyMatchId  = matchId;
-    let bodyAdminKey = adminKey;
-    if (request.method === 'POST') {
-      try {
-        const body   = await request.json();
-        bodyMatchId  = body.matchId  ?? matchId;
-        bodyAdminKey = body.adminKey ?? adminKey;
-      } catch {}
-    }
-
-    const resolvedMatchId = bodyMatchId;
-    const resolvedKey     = bodyAdminKey;
-
-    if (!resolvedKey || resolvedKey !== process.env.ADMIN_SECRET) {
-      if (request.method === 'GET') {
-        return new NextResponse('Unauthorized.', { status: 401 });
-      }
-      return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
-    }
-
-    if (!resolvedMatchId) {
-      return NextResponse.json({ error: 'matchId is required.' }, { status: 400 });
-    }
-
     const supabase = createSupabaseAdminClient();
 
     const { data: match, error: matchErr } = await supabase
       .from('matches')
       .select('id, status, sender_email, traveler_email, agreed_price, sender_trip:sender_trip_id(from_city, to_city, travel_date)')
-      .eq('id', resolvedMatchId)
+      .eq('id', matchId)
       .maybeSingle();
 
-    if (matchErr || !match) {
-      return NextResponse.json({ error: 'Match not found.' }, { status: 404 });
-    }
+    if (matchErr || !match) return { ok: false, error: 'Match not found.', status: 404 };
 
     if (match.status !== 'payment_processing') {
-      const msg = `Match status is '${match.status}' — already confirmed or not in payment_processing.`;
-      if (request.method === 'GET') {
-        return new NextResponse(msg, { status: 400 });
-      }
-      return NextResponse.json({ error: msg }, { status: 400 });
+      return { ok: false, error: `Match status is '${match.status}' — already confirmed or not in payment_processing.`, status: 400 };
     }
 
-    // Advance to active
     await supabase
       .from('matches')
       .update({ status: 'active', payment_confirmed_at: new Date().toISOString() })
-      .eq('id', resolvedMatchId);
+      .eq('id', matchId);
 
     const trip       = (match as any).sender_trip;
     const fromCity   = trip?.from_city   ?? '';
@@ -74,35 +63,16 @@ async function handleConfirm(request: NextRequest) {
 
     await Promise.allSettled([
       match.sender_email && sendContactReleasedEmail({
-        toEmail:    match.sender_email,
-        fromCity,
-        toCity,
-        travelDate,
-        matchId:    resolvedMatchId,
-        otherEmail: match.traveler_email,
-        role:       'sender',
+        toEmail: match.sender_email, fromCity, toCity, travelDate, matchId, otherEmail: match.traveler_email, role: 'sender',
       }),
       match.traveler_email && sendContactReleasedEmail({
-        toEmail:    match.traveler_email,
-        fromCity,
-        toCity,
-        travelDate,
-        matchId:    resolvedMatchId,
-        otherEmail: match.sender_email,
-        role:       'traveler',
+        toEmail: match.traveler_email, fromCity, toCity, travelDate, matchId, otherEmail: match.sender_email, role: 'traveler',
       }),
     ]);
 
-    if (request.method === 'GET') {
-      // Redirect admin to dashboard after confirming via email link
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
-      return NextResponse.redirect(`${appUrl}/admin?confirmed=${resolvedMatchId}`);
-    }
-
-    return NextResponse.json({ ok: true, matchId: resolvedMatchId, status: 'active' });
-
+    return { ok: true };
   } catch (error) {
     console.error('admin/confirm-payment error:', error);
-    return NextResponse.json({ error: 'Something went wrong.' }, { status: 500 });
+    return { ok: false, error: 'Something went wrong.', status: 500 };
   }
 }

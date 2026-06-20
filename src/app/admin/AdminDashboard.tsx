@@ -15,7 +15,6 @@ import {
 export default function AdminDashboard({ serverSession }: { serverSession: any }) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState<'users' | 'matches' | 'escrow' | 'disputes'>('users');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -48,19 +47,8 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   });
 
   useEffect(() => {
-    checkAdmin();
-  }, []);
-
-  const checkAdmin = async () => {
-    // Server component already verified admin access before rendering this page.
-    // serverSession is guaranteed to exist and belong to an admin email.
-    if (!serverSession?.user) {
-      router.push('/login?next=/admin');
-      return;
-    }
-    setIsAdmin(true);
     loadDashboardData();
-  };
+  }, []);
 
   const loadDashboardData = async () => {
     try {
@@ -239,10 +227,6 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
         </div>
       </div>
     );
-  }
-
-  if (!isAdmin) {
-    return null;
   }
 
   return (

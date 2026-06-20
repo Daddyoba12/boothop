@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getAppSession } from '@/lib/auth/session';
 import { cookies } from 'next/headers';
+import { isAdminEmail } from '@/lib/auth/admin';
 
 // Phase 4 — enterprise audit trail export.
 // Returns a complete record of events for a match: messages, calls, attachments,
@@ -30,10 +31,8 @@ export async function GET(
 
     if (!match) return NextResponse.json({ error: 'Match not found.' }, { status: 404 });
 
-    // Allow participants and admins (check env var, not just domain)
-    const ADMIN_EMAILS  = (process.env.ADMIN_EMAILS ?? 'daddyoba12@gmail.com,info@boothop.com').split(',').map(e => e.trim());
     const isParticipant = match.sender_email === email || match.traveler_email === email;
-    const isAdmin       = ADMIN_EMAILS.includes(email);
+    const isAdmin       = isAdminEmail(email);
     if (!isParticipant && !isAdmin) {
       return NextResponse.json({ error: 'Access denied.' }, { status: 403 });
     }

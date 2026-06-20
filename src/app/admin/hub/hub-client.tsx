@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import {
   CheckCircle, XCircle, AlertTriangle, Clock,
   Loader2, RefreshCw, DollarSign, Truck, Scale, Globe,
@@ -46,10 +45,7 @@ function Badge({ status }: { status: string }) {
   );
 }
 
-function AdminHubContent() {
-  const searchParams = useSearchParams();
-  const adminKey     = searchParams.get('adminKey');
-
+export default function AdminHubClient() {
   const [tab,           setTab]           = useState<'africa_auth' | 'payments' | 'disputes' | 'refunds'>('africa_auth');
   const [matches,       setMatches]       = useState<Match[]>([]);
   const [disputes,      setDisputes]      = useState<Dispute[]>([]);
@@ -64,11 +60,11 @@ function AdminHubContent() {
     setLoading(true);
     try {
       const [mRes, dRes] = await Promise.all([
-        fetch(`/api/admin/hub/matches?adminKey=${adminKey}`),
-        fetch(`/api/admin/hub/disputes?adminKey=${adminKey}`),
+        fetch('/api/admin/hub/matches'),
+        fetch('/api/admin/hub/disputes'),
       ]);
-      if (mRes.ok) setMatches(await mRes.json().then(j => j.matches ?? []));
-      if (dRes.ok) setDisputes(await dRes.json().then(j => j.disputes ?? []));
+      if (mRes.ok) setMatches(await mRes.json().then((j: { matches?: Match[] }) => j.matches ?? []));
+      if (dRes.ok) setDisputes(await dRes.json().then((j: { disputes?: Dispute[] }) => j.disputes ?? []));
     } catch {}
     setLoading(false);
   };
@@ -80,7 +76,7 @@ function AdminHubContent() {
     const res = await fetch('/api/admin/confirm-payment', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ matchId, adminKey }),
+      body:    JSON.stringify({ matchId }),
     });
     const j = await res.json();
     setFeedback(res.ok ? 'Payment confirmed — contact details released.' : j.error);
@@ -92,7 +88,7 @@ function AdminHubContent() {
     setActionLoading(matchId);
     const res = await fetch('/api/admin/release-payment', {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey ?? '' },
+      headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ matchId }),
     });
     const j = await res.json();
@@ -106,7 +102,7 @@ function AdminHubContent() {
     setActionLoading(resolveModal.id);
     const res = await fetch('/api/admin/disputes/resolve', {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey ?? '' },
+      headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ disputeId: resolveModal.id, resolution: resolutionVal, note: noteVal }),
     });
     const j = await res.json();
@@ -225,7 +221,7 @@ function AdminHubContent() {
                             setActionLoading(m.id);
                             const res = await fetch('/api/admin/authorise-match', {
                               method:  'POST',
-                              headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey ?? '' },
+                              headers: { 'Content-Type': 'application/json' },
                               body:    JSON.stringify({ matchId: m.id, action: 'approve' }),
                             });
                             setFeedback(res.ok ? `Match approved — both parties notified.` : 'Error approving match.');
@@ -243,7 +239,7 @@ function AdminHubContent() {
                             setActionLoading(m.id + '_reject');
                             const res = await fetch('/api/admin/authorise-match', {
                               method:  'POST',
-                              headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey ?? '' },
+                              headers: { 'Content-Type': 'application/json' },
                               body:    JSON.stringify({ matchId: m.id, action: 'reject' }),
                             });
                             setFeedback(res.ok ? 'Match rejected and cancelled.' : 'Error rejecting match.');
@@ -271,8 +267,8 @@ function AdminHubContent() {
                 </h2>
                 {paymentPending.length === 0 && <p className="text-white/30 text-sm text-center py-10">No pending payments.</p>}
                 {paymentPending.map(m => {
-                  const trip     = m.sender_trip;
-                  const total    = (m.agreed_price ?? 0) + (m.insurance_fee ?? 0);
+                  const trip  = m.sender_trip;
+                  const total = (m.agreed_price ?? 0) + (m.insurance_fee ?? 0);
                   return (
                     <div key={m.id} className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
                       <div className="flex items-start justify-between mb-3">
@@ -436,17 +432,5 @@ function AdminHubContent() {
         </div>
       )}
     </div>
-  );
-}
-
-export default function AdminHubPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center">
-        <Loader2 className="h-10 w-10 text-blue-400 animate-spin" />
-      </div>
-    }>
-      <AdminHubContent />
-    </Suspense>
   );
 }

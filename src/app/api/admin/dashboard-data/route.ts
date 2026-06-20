@@ -1,20 +1,10 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { getAppSession } from '@/lib/auth/session';
+import { requireAdminApi } from '@/lib/auth/admin';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
-const ADMIN_EMAILS = [
-  'daddyoba12@gmail.com',
-  ...(process.env.ADMIN_EMAILS ?? 'info@boothop.com').split(',').map(e => e.trim()).filter(Boolean),
-];
-
 export async function GET() {
-  const cookieStore = await cookies();
-  const session = getAppSession(cookieStore);
-
-  if (!session || !ADMIN_EMAILS.includes(session.email)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const session = await requireAdminApi();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const supabase = createSupabaseAdminClient();
 

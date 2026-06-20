@@ -1,13 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { requireAdminApi } from '@/lib/auth/admin';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
-export async function GET(request: NextRequest) {
-  const url      = new URL(request.url);
-  const adminKey = url.searchParams.get('adminKey');
-
-  if (!adminKey || adminKey !== process.env.ADMIN_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
-  }
+export async function GET() {
+  const session = await requireAdminApi();
+  if (!session) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
 
   const supabase = createSupabaseAdminClient();
 

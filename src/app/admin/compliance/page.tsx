@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { ShieldAlert } from 'lucide-react';
+import { requireAdminPage } from '@/lib/auth/admin';
 
 export const dynamic = 'force-dynamic';
 
-export default function AdminCompliancePage() {
+export default async function AdminCompliancePage() {
+  await requireAdminPage();
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center p-6">
       <div className="bg-white/5 border border-white/10 rounded-2xl p-12 text-center max-w-md">

@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import {
   Loader2, RefreshCw, Package, MapPin, Clock,
   CheckCircle, Truck, AlertCircle, XCircle, User,
@@ -76,7 +75,7 @@ function AssignModal({
     try {
       const res = await fetch('/api/business/update-status', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+        headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ id: job.id, status: 'assigned', driverName: name.trim(), driverEmail: email.trim() || undefined, driverPhone: phone.trim() || undefined }),
       });
       if (!res.ok) { setError('Failed to assign. Try again.'); return; }
@@ -156,9 +155,6 @@ function AssignModal({
 
 // ─────────────────────────────────────────────────────────────────────────────
 function AdminBusinessContent() {
-  const searchParams = useSearchParams();
-  const adminKey     = searchParams.get('adminKey') ?? '';
-
   const [jobs,       setJobs]       = useState<Job[]>([]);
   const [loading,    setLoading]    = useState(true);
   const [updating,   setUpdating]   = useState<string | null>(null);
@@ -169,7 +165,7 @@ function AdminBusinessContent() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/business/get-jobs?adminKey=${adminKey}`);
+      const res = await fetch('/api/business/get-jobs');
       if (res.ok) setJobs((await res.json()).jobs ?? []);
     } catch {}
     setLoading(false);
@@ -185,7 +181,7 @@ function AdminBusinessContent() {
     try {
       await fetch('/api/business/update-status', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+        headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ id: job.id, status: newStatus }),
       });
       setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: newStatus } : j));
@@ -421,14 +417,6 @@ function AdminBusinessContent() {
   );
 }
 
-export default function AdminBusinessPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#050a05] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 text-emerald-400 animate-spin" />
-      </div>
-    }>
-      <AdminBusinessContent />
-    </Suspense>
-  );
+export default function AdminBusinessClient() {
+  return <AdminBusinessContent />;
 }

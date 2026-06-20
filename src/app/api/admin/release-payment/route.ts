@@ -58,10 +58,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const adminKey = request.headers.get('x-admin-key');
-    if (!adminKey || adminKey !== process.env.ADMIN_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
-    }
+    const { requireAdminApi } = await import('@/lib/auth/admin');
+    const session = await requireAdminApi();
+    if (!session) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
 
     const { matchId } = await request.json();
     if (!matchId) {

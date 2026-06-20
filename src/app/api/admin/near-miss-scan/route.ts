@@ -3,11 +3,7 @@ import { cookies } from 'next/headers';
 import { Resend } from 'resend';
 import { getAppSession } from '@/lib/auth/session';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-
-const ADMIN_EMAILS = [
-  'daddyoba12@gmail.com',
-  ...(process.env.ADMIN_EMAILS ?? 'info@boothop.com').split(',').map(e => e.trim()).filter(Boolean),
-];
+import { ADMIN_EMAILS } from '@/lib/auth/admin';
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
 

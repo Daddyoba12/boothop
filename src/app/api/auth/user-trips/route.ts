@@ -3,11 +3,7 @@ import { cookies } from 'next/headers';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { normalizeEmail } from '@/lib/auth/code';
 import { getAppSession } from '@/lib/auth/session';
-
-const ADMIN_EMAILS = [
-  'daddyoba12@gmail.com',
-  ...(process.env.ADMIN_EMAILS ?? 'info@boothop.com').split(',').map(e => e.trim()).filter(Boolean),
-];
+import { ADMIN_EMAILS } from '@/lib/auth/admin';
 
 export async function POST(req: Request) {
   try {

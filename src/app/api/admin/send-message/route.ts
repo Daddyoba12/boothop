@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { Resend } from 'resend';
-import { getAppSession } from '@/lib/auth/session';
-
-const ADMIN_EMAILS = [
-  'daddyoba12@gmail.com',
-  ...(process.env.ADMIN_EMAILS ?? 'info@boothop.com').split(',').map(e => e.trim()).filter(Boolean),
-];
+import { requireAdminApi } from '@/lib/auth/admin';
 
 const appUrl  = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
 const logoUrl = `${appUrl}/images/boothop-logo.png`;
@@ -82,12 +76,8 @@ function buildHtml(body: string): string {
 }
 
 export async function POST(request: NextRequest) {
-  const cookieStore = await cookies();
-  const session = getAppSession(cookieStore);
-
-  if (!session || !ADMIN_EMAILS.includes(session.email)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const session = await requireAdminApi();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { emails, subject, body } = await request.json();
 

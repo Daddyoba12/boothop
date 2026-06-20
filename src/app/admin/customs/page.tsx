@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import { requireAdminPage } from '@/lib/auth/admin';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import AmlReviewActions from './AmlReviewActions';
 
@@ -18,6 +19,7 @@ function riskBadge(level: string) {
 }
 
 export default async function CustomsAdminPage() {
+  await requireAdminPage();
   const supabase = createSupabaseAdminClient();
 
   const [{ data: estimations }, { data: amlQueue }] = await Promise.all([
