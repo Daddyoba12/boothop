@@ -49,20 +49,20 @@ async function runGhostDetector() {
 
   for (const match of activeMatches) {
     // Skip if there is any tracking activity in the last 48h
-    const [{ count: checkpoints }, { count: locRequests }] = await Promise.all([
+    const [{ count: points }, { count: events }] = await Promise.all([
       supabase
-        .from('tracking_checkpoints')
+        .from('tracking_points')
         .select('id', { count: 'exact', head: true })
         .eq('match_id', match.id)
-        .gte('created_at', cutoff),
+        .gte('recorded_at', cutoff),
       supabase
-        .from('location_requests')
+        .from('tracking_events')
         .select('id', { count: 'exact', head: true })
         .eq('match_id', match.id)
         .gte('created_at', cutoff),
     ]);
 
-    if ((checkpoints ?? 0) > 0 || (locRequests ?? 0) > 0) continue;
+    if ((points ?? 0) > 0 || (events ?? 0) > 0) continue;
 
     // Skip if an open ghost incident already exists for this match
     const { data: existing } = await supabase

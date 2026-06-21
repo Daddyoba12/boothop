@@ -273,12 +273,19 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }),
   ]);
 
-  // Generate tracking barcodes asynchronously — does not block checkout confirmation
-  fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/tracking/generate-barcodes`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ matchId }),
-  }).catch(err => console.error('Barcode generation failed:', err));
+  // Send tracking-ready notifications asynchronously — does not block checkout confirmation
+  import('@/lib/services/notifications').then(({ sendTrackingNotification }) => {
+    const senderTrip = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
+    return sendTrackingNotification({
+      senderEmail:    match.sender_email,
+      travellerEmail: match.traveler_email,
+      fromCity:       senderTrip?.from_city ?? '',
+      toCity:         senderTrip?.to_city ?? '',
+      travelDate:     senderTrip?.travel_date,
+      matchId,
+      supabase,
+    });
+  }).catch(err => console.error('Tracking notification failed:', err));
 
   return {
     success: true,

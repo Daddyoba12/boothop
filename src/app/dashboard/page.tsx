@@ -404,12 +404,22 @@ export default function DashboardPage() {
                           <p className="text-xs text-white/30 text-center mb-2">Waiting for listing owner to respond…</p>
                         )
                     })()}
-                    <Link
-                      href={`/matches/${match.id}`}
-                      className="flex items-center justify-center gap-1.5 w-full py-2 bg-white/6 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold rounded-xl transition-all"
-                    >
-                      View details <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                    <div className="flex gap-2">
+                      <Link
+                        href={`/matches/${match.id}`}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white/6 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold rounded-xl transition-all"
+                      >
+                        View details <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                      {['escrowed', 'active'].includes(match.status) && (
+                        <Link
+                          href={`/track/${match.id}`}
+                          className="flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/30 text-blue-300 text-xs font-semibold rounded-xl transition-all shrink-0"
+                        >
+                          <Rocket className="w-3.5 h-3.5" /> Track
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 );
               })}
