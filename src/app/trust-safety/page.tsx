@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
   Shield, CheckCircle, Lock, EyeOff,
-  FileText, AlertTriangle, ArrowRight, UserCheck, Sparkles,
+  FileText, AlertTriangle, ArrowRight, UserCheck, Sparkles, Navigation,
 } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
@@ -16,7 +16,7 @@ const pipeline = [
   { label: 'ACCEPTED',     desc: 'Both parties confirm intent to proceed', color: 'from-indigo-600 to-indigo-400' },
   { label: 'KYC PENDING',  desc: 'Identity documents verified for both',   color: 'from-violet-600 to-violet-400' },
   { label: 'PAYMENT HELD', desc: 'Funds locked in escrow via Stripe',      color: 'from-amber-600 to-amber-400' },
-  { label: 'ACTIVE',       desc: 'Details shared — delivery underway',     color: 'from-orange-600 to-orange-400' },
+  { label: 'ACTIVE',       desc: 'Details shared — GPS tracking live',      color: 'from-orange-600 to-orange-400' },
   { label: 'COMPLETED',    desc: 'Both parties confirm delivery',          color: 'from-green-600 to-green-400' },
   { label: 'RELEASED',     desc: 'Payment sent to traveller',              color: 'from-emerald-600 to-emerald-400' },
 ];
@@ -72,6 +72,19 @@ const pillars = [
       'Prohibited items blocked at listing stage',
       'AI-powered compliance check on every submission',
       'Traveller is never liable for undeclared sender contents',
+    ],
+  },
+  {
+    icon: Navigation,
+    title: 'Real-Time GPS Tracking',
+    gradient: 'from-cyan-500 to-blue-400',
+    glow: 'shadow-cyan-500/50',
+    hover: 'hover:border-cyan-500/50 hover:shadow-cyan-500/20',
+    points: [
+      'Traveller shares live GPS during active deliveries only',
+      'Journey milestones: Collected → At Airport → Departed → Landed → Delivered',
+      'Consent-based — tracking starts and stops with the delivery, never outside it',
+      'Sender sees live map and progress in real time',
     ],
   },
 ];

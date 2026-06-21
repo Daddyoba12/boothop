@@ -520,10 +520,11 @@ function HomePageContent() {
                 ))}
               </div>
 
-              {/* Trust strip — two specific, human facts. Not four corporate claims. */}
+              {/* Trust strip */}
               <div className="flex flex-wrap gap-5 text-white/50 text-xs">
                 <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Every traveller ID-verified before matching</span>
                 <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Payment held in escrow until you confirm delivery</span>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Real-time GPS tracking on every active delivery</span>
               </div>
             </div>
 
