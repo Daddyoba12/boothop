@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
 
   description:
-    'BootHop is a compliance-first logistics network connecting verified travellers, couriers, businesses, and consumers for same-day and cross-border delivery. Powered by AI-assisted customs screening, airport-enabled movement, and Stripe escrow on every transaction.',
+    'BootHop is a compliance-first logistics network connecting verified travellers, couriers, businesses, and consumers for same-day and cross-border delivery. Real-time GPS package tracking, AI-assisted customs screening, and Stripe escrow on every transaction.',
 
   keywords: [
     // Core concept
@@ -43,8 +43,10 @@ export const metadata: Metadata = {
     'earn from spare baggage', 'side income travelling',
     // Brand
     'BootHop', 'boothop delivery', 'boothop shipping',
-    // Trust / safety
+    // Trust / safety & tracking
     'verified traveller delivery', 'safe peer delivery', 'escrow parcel delivery',
+    'real time package tracking', 'live parcel tracking', 'GPS package tracking',
+    'track package internationally', 'parcel tracking app', 'live delivery tracking',
     // Compliance & customs
     'customs clearance services', 'UK customs clearance', 'cross-border compliance', 'pre-departure customs screening',
     // Business / enterprise
@@ -96,7 +98,7 @@ export const metadata: Metadata = {
 
   openGraph: {
     title:       'BootHop | Same-Day & Cross-Border Logistics Network',
-    description: 'BootHop is a compliance-first logistics network connecting verified travellers, couriers, businesses, and consumers for same-day and cross-border delivery. Powered by AI-assisted customs screening, airport-enabled movement, and Stripe escrow on every transaction.',
+    description: 'BootHop is a compliance-first logistics network connecting verified travellers, couriers, businesses, and consumers for same-day and cross-border delivery. Real-time GPS tracking, AI customs screening, and Stripe escrow on every transaction.',
     type:        'website',
     siteName:    'BootHop',
     url:         APP_URL,
@@ -122,7 +124,7 @@ export const metadata: Metadata = {
     site:        '@boothop',
     creator:     '@boothop',
     title:       'BootHop – Ship Anything. Anywhere.',
-    description: 'BootHop is a compliance-first logistics network connecting verified travellers, couriers, businesses, and consumers for same-day and cross-border delivery. AI customs screening and Stripe escrow on every transaction.',
+    description: 'BootHop is a compliance-first logistics network connecting verified travellers, couriers, businesses, and consumers for same-day and cross-border delivery. Real-time GPS tracking, AI customs screening, and Stripe escrow on every transaction.',
     images:      ['/images/og-image.png'],
   },
 
@@ -207,7 +209,7 @@ const jsonLd = {
         ],
       },
       description:
-        'Verified travellers carry parcels on their existing journeys, connecting senders with affordable international delivery worldwide.',
+        'Verified travellers carry parcels on their existing journeys, connecting senders with affordable international delivery worldwide. Real-time GPS tracking, AI customs screening, and Stripe escrow on every delivery.',
     },
     {
       '@type': 'FAQPage',
