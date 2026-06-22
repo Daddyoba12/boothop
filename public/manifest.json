@@ -1,7 +1,8 @@
 {
+  "id": "com.boothop.app",
   "name": "BootHop – Ship Anything. Anywhere.",
   "short_name": "BootHop",
-  "description": "Peer-to-peer international delivery. Connect verified travellers with senders worldwide.",
+  "description": "Peer-to-peer international delivery with real-time GPS tracking. Connect with verified travellers, track your package live, and pay securely via escrow.",
   "start_url": "/?source=pwa",
   "display": "standalone",
   "background_color": "#0a0f1e",
@@ -9,7 +10,9 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
-  "categories": ["travel", "shopping", "logistics"],
+  "dir": "ltr",
+  "categories": ["travel", "shopping", "logistics", "business"],
+  "iarc_rating_id": "",
   "icons": [
     {
       "src": "/icon-96x96.png",
