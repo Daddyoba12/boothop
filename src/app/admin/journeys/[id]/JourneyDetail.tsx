@@ -216,47 +216,90 @@ export default function JourneyDetail({
                 </div>
               ) : (
                 <div className="divide-y divide-white/5">
-                  {matches.map(m => (
-                    <div key={m.id} className="px-6 py-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                          m.status === 'completed'                              ? 'bg-green-500/20 text-green-300'  :
-                          m.status === 'cancelled'                              ? 'bg-red-500/20 text-red-300'      :
-                          m.status === 'accepted' || m.status === 'in_transit' ? 'bg-blue-500/20 text-blue-300'    :
-                          'bg-yellow-500/20 text-yellow-300'
-                        }`}>{m.status}</span>
-                        <span className="text-white/40 text-xs">{fmt(m.created_at)}</span>
-                      </div>
+                  {matches.map(m => {
+                    const statusColor =
+                      m.status === 'completed'                 ? 'bg-green-500/20 text-green-300'   :
+                      m.status === 'cancelled' || m.status === 'cancellation_requested'
+                                                               ? 'bg-red-500/20 text-red-300'        :
+                      m.status === 'payment_processing' || m.status === 'delivery_confirmed'
+                                                               ? 'bg-purple-500/20 text-purple-300'  :
+                      m.status === 'kyc_pending' || m.status === 'kyc_complete' || m.status === 'awaiting_authorisation'
+                                                               ? 'bg-amber-500/20 text-amber-300'    :
+                      m.status === 'agreed' || m.status === 'committed'
+                                                               ? 'bg-blue-500/20 text-blue-300'      :
+                      'bg-yellow-500/20 text-yellow-300';
 
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-white font-semibold text-sm">£{Number(m.agreed_price || 0).toFixed(2)}</span>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                          m.payment_status === 'released' ? 'bg-green-500/20 text-green-300' :
-                          m.payment_status === 'escrowed' ? 'bg-yellow-500/20 text-yellow-300' :
-                          'bg-white/10 text-white/50'
-                        }`}>{m.payment_status || 'pending'}</span>
-                      </div>
+                    return (
+                      <div key={m.id} className="px-6 py-5 space-y-3">
 
-                      {/* confirmations */}
-                      <div className="flex gap-3 text-xs mb-3">
-                        <span className={`flex items-center gap-1 ${m.booter_confirmed_delivery ? 'text-green-400' : 'text-white/30'}`}>
-                          {m.booter_confirmed_delivery ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
-                          Booter
-                        </span>
-                        <span className={`flex items-center gap-1 ${m.hooper_confirmed_receipt ? 'text-green-400' : 'text-white/30'}`}>
-                          {m.hooper_confirmed_receipt ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
-                          Hooper
-                        </span>
-                      </div>
+                        {/* Status + date */}
+                        <div className="flex items-center justify-between">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${statusColor}`}>
+                            {m.status?.replace(/_/g, ' ')}
+                          </span>
+                          <span className="text-white/35 text-xs">{fmtTs(m.created_at)}</span>
+                        </div>
 
-                      <Link
-                        href={`/matches/${m.id}`}
-                        className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 w-fit"
-                      >
-                        <Eye className="w-3 h-3" /> View full match
-                      </Link>
-                    </div>
-                  ))}
+                        {/* Parties */}
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="bg-white/5 rounded-lg px-3 py-2">
+                            <p className="text-white/40 mb-0.5">Sender</p>
+                            <p className="text-white/80 truncate">{m.sender_email || '—'}</p>
+                          </div>
+                          <div className="bg-white/5 rounded-lg px-3 py-2">
+                            <p className="text-white/40 mb-0.5">Traveller</p>
+                            <p className="text-white/80 truncate">{m.traveler_email || '—'}</p>
+                          </div>
+                        </div>
+
+                        {/* Price */}
+                        {(m.agreed_price || m.proposed_price) && (
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-white/40">{m.agreed_price ? 'Agreed price' : 'Proposed price'}</span>
+                            <span className="text-white font-bold">£{Number(m.agreed_price || m.proposed_price).toFixed(2)}</span>
+                          </div>
+                        )}
+
+                        {/* KYC */}
+                        {(m.sender_kyc_status || m.traveler_kyc_status) && (
+                          <div className="flex gap-3 text-xs">
+                            <span className={`flex items-center gap-1 ${m.sender_kyc_status === 'approved' ? 'text-green-400' : 'text-white/30'}`}>
+                              <CheckCircle className="w-3 h-3" /> Sender KYC: {m.sender_kyc_status || 'pending'}
+                            </span>
+                            <span className={`flex items-center gap-1 ${m.traveler_kyc_status === 'approved' ? 'text-green-400' : 'text-white/30'}`}>
+                              <CheckCircle className="w-3 h-3" /> Traveller KYC: {m.traveler_kyc_status || 'pending'}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Delivery confirmations */}
+                        <div className="flex gap-4 text-xs">
+                          <span className={`flex items-center gap-1 ${m.booter_confirmed_delivery ? 'text-green-400' : 'text-white/25'}`}>
+                            {m.booter_confirmed_delivery ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+                            Booter confirmed
+                          </span>
+                          <span className={`flex items-center gap-1 ${m.hooper_confirmed_receipt ? 'text-green-400' : 'text-white/25'}`}>
+                            {m.hooper_confirmed_receipt ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+                            Hooper confirmed
+                          </span>
+                        </div>
+
+                        {/* Cancellation reason */}
+                        {m.cancellation_reason && (
+                          <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-xs text-red-300">
+                            <span className="font-semibold">Reason: </span>{m.cancellation_reason}
+                          </div>
+                        )}
+
+                        <Link
+                          href={`/matches/${m.id}`}
+                          className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 w-fit"
+                        >
+                          <Eye className="w-3 h-3" /> View full match
+                        </Link>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
