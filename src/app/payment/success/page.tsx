@@ -1,12 +1,13 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   CheckCircle, Lock, ArrowRight,
   Shield, Eye, CreditCard, Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
+import { ttTrack } from '@/lib/tiktok';
 
 // Pipeline display (same as KYC page)
 const STAGES = [
@@ -23,7 +24,10 @@ const STAGES = [
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const matchId      = searchParams?.get('match_id');
-  // Activation is handled server-side by the Stripe webhook.
+
+  useEffect(() => {
+    ttTrack('CompletePayment', { content_id: matchId ?? '', content_type: 'delivery' });
+  }, [matchId]);
 
   // Pipeline: active = stage index 5 (0-based)
   const activeStage = 5;

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { trackEvent } from '@/lib/analytics';
+import { ttTrack } from '@/lib/tiktok';
 import { 
   Package, 
   CreditCard,
@@ -157,6 +158,7 @@ export default function CheckoutPage({ params }: { params: { matchId: string } }
       }
 
       setClientSecret(data.clientSecret);
+      ttTrack('InitiateCheckout', { content_id: params.matchId, value: data.amount, currency: 'GBP' });
     } catch (error: any) {
       console.error('Error initializing payment:', error);
       alert(error.message);

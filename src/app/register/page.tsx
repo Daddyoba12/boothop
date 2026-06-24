@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { trackEvent } from '@/lib/analytics';
+import { ttTrack } from '@/lib/tiktok';
 import {
   Package, Plane, MapPin, Calendar, ArrowRight,
   CheckCircle, AlertCircle, Mail, Home, PlusCircle,
@@ -376,6 +377,7 @@ function RegisterForm() {
         });
         trackEvent('trip_published', { mode, from: form.from, to: form.to });
         trackEvent('sign_up');
+        ttTrack('CompleteRegistration', { content_type: mode === 'travel' ? 'traveller' : 'sender' });
         setStep('success');
         // Auto-redirect after 3 seconds
         setTimeout(() => {

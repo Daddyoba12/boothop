@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import RoleToggle from '@/components/RoleToggle';
 import { createSupabaseClient } from '@/lib/supabase';
+import { ttTrack } from '@/lib/tiktok';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 
@@ -119,7 +120,18 @@ function LiveJourneysContent() {
 
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
-  useEffect(() => { fetchTrips(); }, []);
+  useEffect(() => {
+    fetchTrips();
+    ttTrack('ViewContent', { content_name: 'Journeys Listings', content_type: 'product_group' });
+  }, []);
+
+  useEffect(() => {
+    if (!searchTerm) return;
+    const t = setTimeout(() => {
+      ttTrack('Search', { query: searchTerm });
+    }, 800);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   // Open modal once trips are loaded if a ?open=id param was passed
   useEffect(() => {
