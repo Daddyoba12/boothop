@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
     const { data: match, error: matchErr } = await supabase
       .from('matches')
-      .select('id, status, sender_email, traveler_email, agreed_price, sender_trip:sender_trip_id(from_city, to_city, travel_date)')
+      .select('id, status, sender_email, traveler_email, agreed_price, sender_trip_id, traveler_trip_id, sender_trip:sender_trip_id(from_city, to_city, travel_date, auto_created), traveler_trip:traveler_trip_id(auto_created)')
       .eq('id', matchId)
       .maybeSingle();
 
@@ -55,6 +55,18 @@ export async function POST(request: Request) {
         .from('matches')
         .update({ status: 'cancelled', cancelled_by: email, cancelled_at: new Date().toISOString(), cancellation_reason: reason ?? null })
         .eq('id', matchId);
+
+      // Reset trips: restore original to 'active', delete auto-created mirror
+      const senderTrip   = Array.isArray((match as any).sender_trip)   ? (match as any).sender_trip[0]   : (match as any).sender_trip;
+      const travelerTrip = Array.isArray((match as any).traveler_trip) ? (match as any).traveler_trip[0] : (match as any).traveler_trip;
+      const originalTripId = senderTrip?.auto_created ? (match as any).traveler_trip_id : (match as any).sender_trip_id;
+      const mirrorTripId   = senderTrip?.auto_created ? (match as any).sender_trip_id
+        : travelerTrip?.auto_created ? (match as any).traveler_trip_id : null;
+
+      await Promise.all([
+        originalTripId && supabase.from('trips').update({ status: 'active' }).eq('id', originalTripId).eq('status', 'matched'),
+        mirrorTripId   && supabase.from('trips').delete().eq('id', mirrorTripId).eq('auto_created', true),
+      ]);
 
       const trip      = (match as any).sender_trip;
       const fromCity  = trip?.from_city   ?? '';
