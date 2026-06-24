@@ -266,8 +266,11 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
       const br = `${b.from_city}${b.to_city}`;
       return sortDir === 'asc' ? ar.localeCompare(br) : br.localeCompare(ar);
     };
-    const active = filteredUsers.filter((t: any) => t.status === 'active').sort(compare);
-    const rest   = filteredUsers.filter((t: any) => t.status !== 'active').sort(compare);
+    const nowMs = Date.now();
+    const isLiveActive = (t: any) =>
+      t.status === 'active' && (!t.travel_date || new Date(t.travel_date).getTime() >= nowMs);
+    const active = filteredUsers.filter(isLiveActive).sort(compare);
+    const rest   = filteredUsers.filter((t: any) => !isLiveActive(t)).sort(compare);
     return [...active, ...rest];
   }, [filteredUsers, sortField, sortDir]);
 
@@ -640,15 +643,17 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                       </tr>
                     ) : (
                       sortedJourneys.map((trip: any, i: number) => {
-                        const isActive    = trip.status === 'active';
-                        const isPast      = ['expired', 'cancelled', 'inactive', 'completed'].includes(trip.status);
+                        const travelMs  = trip.travel_date ? new Date(trip.travel_date).getTime() : null;
+                        const isActive  = trip.status === 'active' && (!travelMs || travelMs >= Date.now());
+                        const isPast    = ['expired', 'cancelled', 'inactive', 'completed'].includes(trip.status) ||
+                                          (trip.status === 'active' && !!travelMs && travelMs < Date.now());
                         const isTraveller = trip.type === 'travel' || trip.type === 'traveller';
                         const isChecked   = !!trip.email && selectedEmails.has(trip.email);
 
                         return (
                           <tr
                             key={trip.id || i}
-                            onClick={() => openTripDetail(trip)}
+                            onClick={() => router.push(`/admin/journeys/${trip.id}`)}
                             className={`border-b transition-all cursor-pointer ${
                               isChecked
                                 ? 'bg-blue-500/10 border-white/5'

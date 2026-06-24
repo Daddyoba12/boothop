@@ -319,7 +319,18 @@ function HomePageContent() {
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    if (localStorage.getItem('banner_dismissed_v1')) setShowBanner(false);
+  }, []);
+
+  const dismissBanner = () => {
+    setShowBanner(false);
+    localStorage.setItem('banner_dismissed_v1', '1');
+  };
+
   const [routeCounts, setRouteCounts] = useState<Record<string, number>>({});
+  const [showBanner, setShowBanner] = useState(true);
+  const [routesLoaded, setRoutesLoaded] = useState(false);
 
   const resetForm = () => {
     setTrip({ from: '', to: '', date: '', price: '', email: '', weight: '' });
@@ -349,6 +360,7 @@ function HomePageContent() {
         }
       }
       setRouteCounts(counts);
+      setRoutesLoaded(true);
     }
   }, []);
 
@@ -408,8 +420,22 @@ function HomePageContent() {
   return (
     <div className="min-h-screen bg-[#07111f] text-white overflow-x-hidden">
 
+      {/* ── ANNOUNCEMENT BANNER ── */}
+      {showBanner && (
+        <div className="fixed top-0 left-0 right-0 z-[70] h-10 flex items-center justify-center gap-3 bg-amber-500/15 border-b border-amber-500/25 backdrop-blur-md px-4">
+          <span className="text-amber-300 text-xs font-semibold hidden sm:inline">🎁 New members get £20 delivery credit — first 500 only · No subscription needed</span>
+          <span className="text-amber-300 text-xs font-semibold sm:hidden">🎁 Get £20 delivery credit — first 500 members</span>
+          <Link href="/register" className="rounded-full bg-amber-500 text-black text-xs font-bold px-3 py-1 hover:bg-amber-400 transition-colors whitespace-nowrap">
+            Claim yours →
+          </Link>
+          <button onClick={dismissBanner} className="ml-1 text-amber-400/60 hover:text-amber-300 transition-colors" aria-label="Dismiss">
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* ── NAV ── */}
-      <nav className={`fixed top-0 z-50 w-full transition-all duration-500 ${scrolled ? 'border-b border-white/10 bg-[#07111f]/90 shadow-xl backdrop-blur-2xl' : 'bg-transparent backdrop-blur-sm'}`}>
+      <nav className={`fixed z-50 w-full transition-all duration-500 ${showBanner ? 'top-10' : 'top-0'} ${scrolled ? 'border-b border-white/10 bg-[#07111f]/90 shadow-xl backdrop-blur-2xl' : 'bg-transparent backdrop-blur-sm'}`}>
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 md:px-8">
           <Link href="/" className="flex items-center">
             <BootHopLogo size="md" />
@@ -452,7 +478,7 @@ function HomePageContent() {
       </nav>
 
       {/* ── HERO ── */}
-      <section className="relative min-h-screen overflow-hidden flex flex-col justify-center pt-16">
+      <section className={`relative min-h-screen overflow-hidden flex flex-col justify-center ${showBanner ? 'pt-[104px]' : 'pt-16'}`}>
 
         {/* PLANE VIDEO — SPEED SIGNAL */}
         <video autoPlay muted loop playsInline
@@ -484,7 +510,7 @@ function HomePageContent() {
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-wrap gap-3 mb-4">
+              <div className="flex flex-wrap gap-3 mb-2">
                 <Link href="#booking-form"
                   onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
                   className="px-7 py-3 rounded-full bg-white text-black font-semibold text-sm hover:scale-105 hover:shadow-[0_12px_32px_rgba(255,255,255,0.2)] transition-all">
@@ -494,11 +520,13 @@ function HomePageContent() {
                   className="px-7 py-3 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-sm font-medium hover:bg-emerald-500/30 transition-all">
                   Earn as a Traveller
                 </Link>
-                <Link href="/business"
-                  className="px-7 py-3 rounded-full border border-white/30 text-white text-sm font-medium hover:bg-white/10 transition-all">
-                  For Business
-                </Link>
               </div>
+              <p className="text-xs text-white/35 mb-4">
+                Using BootHop for business?{' '}
+                <Link href="/business" className="underline underline-offset-2 hover:text-white/55 transition-colors">
+                  Explore Business Portal →
+                </Link>
+              </p>
 
               {/* £20 signup credit pill */}
               <a href="#emotional-hook"
@@ -1084,41 +1112,60 @@ function HomePageContent() {
               View all →
             </Link>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredRoutes.map((route) => {
-              const liveCount = routeCounts[`${route.from}→${route.to}`] ?? 0;
+
+          {!routesLoaded ? (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="rounded-2xl border border-white/10 bg-white/[0.03] h-28 animate-pulse" />
+              ))}
+            </div>
+          ) : (() => {
+            const liveRoutes = featuredRoutes.filter(r => (routeCounts[`${r.from}→${r.to}`] ?? 0) > 0);
+            if (liveRoutes.length === 0) {
               return (
-                <div key={`${route.from}-${route.to}`}
-                  onClick={() => router.push(`/journeys?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`)}
-                  className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${route.color} ${route.border} p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer`}>
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${route.badge}`}>{route.tag}</span>
-                    {liveCount > 0 && (
-                      <div className="flex items-center gap-1.5">
-                        <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-                        <span className="text-[10px] text-green-400 font-semibold">Live</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-base font-semibold text-white">{route.from}</span>
-                    <ArrowRight className="h-4 w-4 text-white/30" />
-                    <span className="text-base font-semibold text-white">{route.to}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <p className="flex items-center gap-1 text-xs text-white/40">
-                      <Users className="h-3 w-3" />
-                      {liveCount > 0
-                        ? `${liveCount} traveller${liveCount !== 1 ? 's' : ''} available`
-                        : 'No travellers yet — be first'
-                      }
-                    </p>
-                    <span className="text-xs text-white/25 group-hover:text-white/60 transition-colors">Book →</span>
-                  </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-10 text-center">
+                  <p className="text-white/40 text-sm mb-4">No active corridors right now — post your delivery and we&apos;ll match you when a traveller registers.</p>
+                  <Link href="#booking-form"
+                    onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
+                    className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors font-medium">
+                    Post a delivery <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
                 </div>
               );
-            })}
-          </div>
+            }
+            return (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {liveRoutes.map((route) => {
+                  const liveCount = routeCounts[`${route.from}→${route.to}`] ?? 0;
+                  return (
+                    <div key={`${route.from}-${route.to}`}
+                      onClick={() => router.push(`/journeys?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`)}
+                      className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${route.color} ${route.border} p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer`}>
+                      <div className="mb-3 flex items-center justify-between">
+                        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${route.badge}`}>{route.tag}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+                          <span className="text-[10px] text-green-400 font-semibold">Live</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-base font-semibold text-white">{route.from}</span>
+                        <ArrowRight className="h-4 w-4 text-white/30" />
+                        <span className="text-base font-semibold text-white">{route.to}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="flex items-center gap-1 text-xs text-white/40">
+                          <Users className="h-3 w-3" />
+                          {`${liveCount} traveller${liveCount !== 1 ? 's' : ''} available`}
+                        </p>
+                        <span className="text-xs text-white/25 group-hover:text-white/60 transition-colors">Book →</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       </section>
 
@@ -1133,12 +1180,12 @@ function HomePageContent() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              { icon: '⚙️', title: 'Business-Critical Parts', body: 'Aerospace components, AOG spares, engineering parts — same-day with full compliance documentation.', tag: 'B2B', tagColor: 'bg-blue-500/15 text-blue-300' },
+              { icon: '🌍', title: 'Diaspora & Home Goods', body: 'Birthday gifts, food parcels, personal items — from family in the UK to loved ones across Africa and Europe.', tag: 'Consumer', tagColor: 'bg-emerald-500/15 text-emerald-300' },
+              { icon: '🛫', title: 'Airport Hand-Carry', body: 'High-value or fragile items that need a human escort — carried personally, door to door.', tag: 'Premium', tagColor: 'bg-rose-500/15 text-rose-300' },
               { icon: '📄', title: 'Legal Documents', body: 'Signed contracts, court bundles, mortgage deeds — time-sensitive paperwork that cannot wait for a depot.', tag: 'B2B & Personal', tagColor: 'bg-violet-500/15 text-violet-300' },
               { icon: '🧬', title: 'Medical & Pharmaceutical', body: 'Clinical samples, patient medication, medical devices — tracked and compliance-aware delivery.', tag: 'B2B', tagColor: 'bg-blue-500/15 text-blue-300' },
-              { icon: '🌍', title: 'Diaspora & Home Goods', body: 'Birthday gifts, food parcels, personal items — from family in the UK to loved ones across Africa and Europe.', tag: 'Consumer', tagColor: 'bg-emerald-500/15 text-emerald-300' },
+              { icon: '⚙️', title: 'Business-Critical Parts', body: 'Aerospace components, AOG spares, engineering parts — same-day with full compliance documentation.', tag: 'B2B', tagColor: 'bg-blue-500/15 text-blue-300' },
               { icon: '🛍️', title: 'Retail & E-Commerce', body: 'Overflow fulfilment, marketplace orders, boutique deliveries — where standard couriers are too slow or too costly.', tag: 'B2B', tagColor: 'bg-amber-500/15 text-amber-300' },
-              { icon: '🛫', title: 'Airport Hand-Carry', body: 'High-value or fragile items that need a human escort — carried personally, door to door.', tag: 'Premium', tagColor: 'bg-rose-500/15 text-rose-300' },
             ].map(({ icon, title, body, tag, tagColor }) => (
               <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 hover:border-white/20 hover:bg-white/[0.05] transition-all duration-300 hover:-translate-y-1">
                 <span className="text-3xl mb-4 block">{icon}</span>
@@ -1185,13 +1232,19 @@ function HomePageContent() {
             <Link href="#booking-form"
               onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
               className="inline-flex items-center gap-2 bg-white text-black px-8 py-3.5 rounded-full font-bold text-sm hover:bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(255,255,255,0.18)]">
-              Post a Journey <ArrowRight className="h-4 w-4" />
+              Send My First Package <ArrowRight className="h-4 w-4" />
             </Link>
             <Link href="/journeys"
               className="inline-flex items-center gap-2 border border-white/25 text-white/80 px-8 py-3.5 rounded-full text-sm font-medium hover:border-white/50 hover:text-white transition-all">
               Browse Live Routes
             </Link>
           </div>
+          <p className="mt-4 text-xs text-white/35">
+            Are you a traveller?{' '}
+            <Link href="/register?type=booter" className="underline underline-offset-2 hover:text-white/55 transition-colors">
+              Start earning from your empty luggage →
+            </Link>
+          </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <p className="text-xs text-white/25">Free to join · No subscription · Cancel anytime</p>
             <span className="text-white/15">·</span>
