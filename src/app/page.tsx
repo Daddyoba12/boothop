@@ -36,9 +36,9 @@ const navLinks = [
 ];
 
 const testimonials = [
-  { name: 'Toyin A.', role: 'MSc Student, London', route: 'Lagos → London', text: 'I travelled from Lagos to London and used BootHop to send documents ahead. Everything arrived before I did.', rating: 5 },
-  { name: 'Kunle O.', role: 'Tech Consultant', route: 'Lagos → London', text: 'Moving from Lagos to London for work was hectic, but BootHop made sending personal items simple.', rating: 5 },
-  { name: 'James R.', role: 'Management Consultant', route: 'London → New York', text: 'Delivered a small parcel via BootHop on my London–New York trip. Straightforward process and great communication.', rating: 5 },
+  { name: 'Toyin A.', role: 'MSc Student', route: 'Lagos → London', text: 'I travelled from Lagos to London and used BootHop to send documents ahead. Everything arrived before I did.', rating: 5, outcome: 'Delivered same day · Escrow payment released' },
+  { name: 'Kunle O.', role: 'Tech Consultant', route: 'Lagos → London', text: 'Moving from Lagos to London for work was hectic, but BootHop made sending personal items simple.', rating: 5, outcome: 'Items delivered · Payment secured via escrow' },
+  { name: 'James R.', role: 'Management Consultant', route: 'London → New York', text: 'Delivered a small parcel via BootHop on my London–New York trip. Straightforward process and great communication.', rating: 5, outcome: 'Same-day delivery · Traveller rated 5 stars' },
 ];
 
 const featuredRoutes = [
@@ -80,7 +80,7 @@ function TestimonialsSection() {
           <p className="text-2xl md:text-3xl font-medium text-white/85 leading-snug italic mb-6">
             &ldquo;{testimonials[0].text}&rdquo;
           </p>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-500/20 text-sm font-bold text-blue-300">
               {testimonials[0].name[0]}
             </div>
@@ -91,6 +91,9 @@ function TestimonialsSection() {
             <div className="ml-4">
               <StarRating count={testimonials[0].rating} />
             </div>
+          </div>
+          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1 text-xs text-green-400 font-medium">
+            <CheckCircle className="h-3 w-3 shrink-0" /> {testimonials[0].outcome}
           </div>
         </div>
 
@@ -108,6 +111,9 @@ function TestimonialsSection() {
                   <p className="text-sm font-medium text-white/80">{t.name}</p>
                   <p className="text-xs text-white/35">{t.role} · {t.route}</p>
                 </div>
+              </div>
+              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1 text-xs text-green-400 font-medium">
+                <CheckCircle className="h-3 w-3 shrink-0" /> {t.outcome}
               </div>
             </div>
           ))}
@@ -496,47 +502,42 @@ function HomePageContent() {
             <div>
               {/* H1 anchored at top — visible immediately above the fold */}
               <h1 className="text-4xl md:text-6xl font-semibold text-white leading-tight mb-4 tracking-tight">
-                Move Almost Anything.<br />Anywhere. Same Day.
+                Sending home shouldn&apos;t<br />cost £300 and take a week.
               </h1>
 
               <p className="text-white/80 text-lg mb-1 max-w-xl leading-relaxed">
-                Your fastest delivery option is already moving.
+                Connect with a verified traveller already flying your route.
               </p>
-              <p className="text-white/55 text-sm mb-3 max-w-xl">
-                Powered by verified travellers, couriers, and logistics partners across the UK &amp; Europe.
-              </p>
-              <p className="text-white/55 text-sm mb-7">
+              <p className="text-white/55 text-sm mb-7 max-w-xl">
+                Same day. You set the price. Payment protected.{' '}
                 <Link href="/trust-safety" className="underline underline-offset-2 hover:text-white/80 transition-colors">What can I send? →</Link>
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-wrap gap-3 mb-2">
-                <Link href="#booking-form"
-                  onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
-                  className="px-7 py-3 rounded-full bg-white text-black font-semibold text-sm hover:scale-105 hover:shadow-[0_12px_32px_rgba(255,255,255,0.2)] transition-all">
-                  Send a Package
-                </Link>
-                <Link href="/register?type=booter"
-                  className="px-7 py-3 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-sm font-medium hover:bg-emerald-500/30 transition-all">
-                  Earn as a Traveller
+              <div className="mb-3">
+                <Link href="/register"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.45)] shadow-lg shadow-amber-500/30">
+                  🎁 Send a Package — Claim £20 Free
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-              <p className="text-xs text-white/35 mb-4">
-                Using BootHop for business?{' '}
-                <Link href="/business" className="underline underline-offset-2 hover:text-white/55 transition-colors">
-                  Explore Business Portal →
-                </Link>
+              <p className="text-white/55 text-sm mb-5">
+                Most deliveries cost <span className="text-white font-semibold">£30–£120</span>. You set the price.
               </p>
-
-              {/* £20 signup credit pill */}
-              <a href="#emotional-hook"
-                onClick={(e) => { e.preventDefault(); document.getElementById('emotional-hook')?.scrollIntoView({ behavior: 'smooth' }); }}
-                className="inline-flex items-center gap-2 rounded-full border border-amber-500/35 bg-amber-500/10 backdrop-blur-sm px-5 py-2.5 text-sm font-semibold text-amber-300 hover:bg-amber-500/15 transition-all mb-5 cursor-pointer">
-                🎁 New members get £20 delivery credit — claim yours
-                <ArrowRight className="h-3.5 w-3.5" />
-              </a>
-
-              <p className="text-white/55 text-sm mb-7">⚡ Get matched with a verified traveller in minutes</p>
+              <div className="flex flex-col gap-1.5 mb-7">
+                <p className="text-sm text-white/45">
+                  Are you a traveller?{' '}
+                  <Link href="/register?type=booter" className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300 transition-colors font-medium">
+                    Earn from your empty luggage →
+                  </Link>
+                </p>
+                <p className="text-xs text-white/30">
+                  Using BootHop for business?{' '}
+                  <Link href="/business" className="underline underline-offset-2 hover:text-white/50 transition-colors">
+                    Explore Business Portal →
+                  </Link>
+                </p>
+              </div>
 
               {/* Micro How It Works */}
               <div className="flex flex-wrap items-center gap-2 text-white/45 text-sm mb-6">
@@ -596,6 +597,87 @@ function HomePageContent() {
           </div>
         </div>
 
+      </section>
+
+      {/* ── WHY NOT DHL? — comparison table, moved to section 2 ── */}
+      <section className="relative py-24 md:py-32 px-6 overflow-hidden">
+
+        {/* Video 1 & 2 crossfading as full background */}
+        {[1, 2].map((n, i) => (
+          <video
+            key={n}
+            autoPlay muted loop playsInline
+            preload={i === 0 ? 'auto' : 'none'}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[3000ms] ease-in-out"
+            style={{ opacity: i === winsVid ? 1 : 0 }}
+          >
+            <source src={`/videos/onecall/test_v/video${n}.mp4`} type="video/mp4" />
+          </video>
+        ))}
+
+        <div className="absolute inset-0 bg-black/58" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_60%,rgba(59,130,246,0.10),transparent_70%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050D1A]/90 via-transparent to-[#040C19]/90 pointer-events-none" />
+
+        <div className="relative z-10 max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300/70 mb-3">Why not just use DHL?</p>
+            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">Same package. Very different experience.</h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6 mb-12">
+
+            {/* Traditional — glass with red tint */}
+            <div className="rounded-3xl border border-red-500/20 bg-black/30 backdrop-blur-xl p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+              <div className="flex items-center gap-3 mb-7">
+                <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-sm">✕</div>
+                <h3 className="text-white font-semibold text-lg">Traditional Courier</h3>
+              </div>
+              <ul className="space-y-4">
+                {[
+                  '1–5 day delivery windows',
+                  'Fixed pricing with hidden fees',
+                  'No idea who handles your package',
+                  'Customs delays, lost items, no recourse',
+                  'Depot-to-depot — not door-to-door',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-white/50">
+                    <span className="mt-0.5 text-red-400/60 shrink-0">—</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* BootHop — glass with blue glow */}
+            <div className="rounded-3xl border border-blue-500/30 bg-blue-950/30 backdrop-blur-xl p-8 shadow-[0_0_60px_rgba(59,130,246,0.15),inset_0_1px_0_rgba(255,255,255,0.08)]">
+              <div className="flex items-center gap-3 mb-7">
+                <div className="w-8 h-8 rounded-full bg-blue-500/25 flex items-center justify-center text-sm">✓</div>
+                <h3 className="text-white font-semibold text-lg">BootHop</h3>
+              </div>
+              <ul className="space-y-4">
+                {[
+                  'Same-day delivery on most routes',
+                  'You set the price — transparent, no surprises',
+                  'ID-verified traveller, rated by the community',
+                  'Escrow protection — funds held until delivery confirmed',
+                  'Airport-to-door, city-to-city, or wherever you need',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-white/80">
+                    <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <Link href="/register"
+              className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-8 py-3.5 rounded-full font-bold text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(245,158,11,0.4)]">
+              🎁 Try it free — Claim £20 credit <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* ── EMOTIONAL STORY — "Sending home" + £20 credit ── */}
@@ -1016,90 +1098,6 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* ── WHY BOOTHOP WINS — video background + glass cards ── */}
-      <section className="relative py-24 md:py-32 px-6 overflow-hidden">
-
-        {/* Video 1 & 2 crossfading as full background */}
-        {[1, 2].map((n, i) => (
-          <video
-            key={n}
-            autoPlay muted loop playsInline
-            preload={i === 0 ? 'auto' : 'none'}
-            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[3000ms] ease-in-out"
-            style={{ opacity: i === winsVid ? 1 : 0 }}
-          >
-            <source src={`/videos/onecall/test_v/video${n}.mp4`} type="video/mp4" />
-          </video>
-        ))}
-
-        {/* Controlled dark overlay — dim enough for text, light enough to feel the video */}
-        <div className="absolute inset-0 bg-black/58" />
-
-        {/* Soft blue ambient glow — lifts the section */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_60%,rgba(59,130,246,0.10),transparent_70%)]" />
-
-        {/* Fade edges into adjacent sections */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050D1A]/90 via-transparent to-[#040C19]/90 pointer-events-none" />
-
-        {/* Content */}
-        <div className="relative z-10 max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-6 mb-12">
-
-            {/* Traditional — glass with red tint */}
-            <div className="rounded-3xl border border-red-500/20 bg-black/30 backdrop-blur-xl p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-              <div className="flex items-center gap-3 mb-7">
-                <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-sm">✕</div>
-                <h3 className="text-white font-semibold text-lg">Traditional Courier</h3>
-              </div>
-              <ul className="space-y-4">
-                {[
-                  '1–5 day delivery windows',
-                  'Fixed pricing with hidden fees',
-                  'No idea who handles your package',
-                  'Customs delays, lost items, no recourse',
-                  'Depot-to-depot — not door-to-door',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-white/50">
-                    <span className="mt-0.5 text-red-400/60 shrink-0">—</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* BootHop — glass with blue glow */}
-            <div className="rounded-3xl border border-blue-500/30 bg-blue-950/30 backdrop-blur-xl p-8 shadow-[0_0_60px_rgba(59,130,246,0.15),inset_0_1px_0_rgba(255,255,255,0.08)]">
-              <div className="flex items-center gap-3 mb-7">
-                <div className="w-8 h-8 rounded-full bg-blue-500/25 flex items-center justify-center text-sm">✓</div>
-                <h3 className="text-white font-semibold text-lg">BootHop</h3>
-              </div>
-              <ul className="space-y-4">
-                {[
-                  'Same-day delivery on most routes',
-                  'You set the price — transparent, no surprises',
-                  'ID-verified traveller, rated by the community',
-                  'Escrow protection — funds held until delivery confirmed',
-                  'Airport-to-door, city-to-city, or wherever you need',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-white/80">
-                    <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="text-center">
-            <Link href="#booking-form"
-              onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
-              className="inline-flex items-center gap-2 bg-white text-black px-8 py-3.5 rounded-full font-semibold text-sm hover:bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(255,255,255,0.15)]">
-              Try it free <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* ── FEATURED ROUTES ── */}
       <section className="relative py-20 md:py-28 bg-[#050D1A]">
         <div className="mx-auto max-w-7xl px-6 md:px-8">
@@ -1228,15 +1226,15 @@ function HomePageContent() {
           <p className="text-white/50 text-base mb-10 max-w-sm mx-auto leading-relaxed">
             Post in 30 seconds. Match with a verified traveller on their way now.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="#booking-form"
-              onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
-              className="inline-flex items-center gap-2 bg-white text-black px-8 py-3.5 rounded-full font-bold text-sm hover:bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(255,255,255,0.18)]">
-              Send My First Package <ArrowRight className="h-4 w-4" />
+          <div className="mb-5">
+            <Link href="/register"
+              className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-8 py-4 rounded-full font-bold text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.45)] shadow-lg shadow-amber-500/30">
+              🎁 Send My First Package — Claim £20 Free <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/journeys"
-              className="inline-flex items-center gap-2 border border-white/25 text-white/80 px-8 py-3.5 rounded-full text-sm font-medium hover:border-white/50 hover:text-white transition-all">
-              Browse Live Routes
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+            <Link href="/journeys" className="text-white/40 hover:text-white/70 transition-colors underline underline-offset-2">
+              Browse live routes →
             </Link>
           </div>
           <p className="mt-4 text-xs text-white/35">
