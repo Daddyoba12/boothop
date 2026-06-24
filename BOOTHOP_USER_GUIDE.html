@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BootHop — How It Works</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #1e293b;
+    background: #ffffff;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 40px;
+    page-break-after: always;
+  }
+  .cover-logo { font-size: 52px; font-weight: 900; margin-bottom: 8px; }
+  .cover-logo span { color: #60a5fa; }
+  .cover-tagline { font-size: 18px; opacity: 0.85; margin-bottom: 48px; }
+  .cover-title { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+  .cover-subtitle { font-size: 14px; opacity: 0.7; }
+  .cover-badges { display: flex; gap: 16px; margin-top: 48px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 999px;
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ── PAGE LAYOUT ── */
+  .page { padding: 40px 50px; max-width: 900px; margin: 0 auto; }
+  .page-break { page-break-before: always; padding-top: 40px; }
+
+  /* ── HEADINGS ── */
+  h1 { font-size: 24px; color: #1e3a8a; border-bottom: 3px solid #2563eb; padding-bottom: 10px; margin-bottom: 24px; }
+  h2 { font-size: 18px; color: #1e3a8a; margin: 28px 0 12px; }
+  h3 { font-size: 14px; color: #2563eb; margin: 20px 0 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  p { margin-bottom: 10px; color: #374151; }
+
+  /* ── SECTION INTRO BOX ── */
+  .intro-box {
+    background: #eff6ff;
+    border-left: 4px solid #2563eb;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-size: 13px;
+  }
+
+  /* ── TWO COLUMN ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 20px 0; }
+
+  /* ── ROLE CARDS ── */
+  .role-card {
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+  }
+  .role-card.sender { background: #eff6ff; border: 2px solid #2563eb; }
+  .role-card.traveller { background: #f0fdf4; border: 2px solid #16a34a; }
+  .role-card.business { background: #fdf4ff; border: 2px solid #9333ea; }
+  .role-icon { font-size: 40px; margin-bottom: 10px; }
+  .role-card h2 { color: #1e293b; border: none; margin: 4px 0; font-size: 16px; }
+  .role-card p { font-size: 12px; color: #64748b; }
+
+  /* ── STEP FLOW ── */
+  .steps { display: flex; flex-direction: column; gap: 0; margin: 20px 0; }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    position: relative;
+    padding-bottom: 20px;
+  }
+  .step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 40px;
+    bottom: 0;
+    width: 2px;
+    background: #e2e8f0;
+  }
+  .step-num {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 14px;
+    flex-shrink: 0;
+    color: white;
+  }
+  .step-num.blue { background: #2563eb; }
+  .step-num.green { background: #16a34a; }
+  .step-num.purple { background: #9333ea; }
+  .step-body { flex: 1; padding-top: 8px; }
+  .step-body strong { display: block; font-size: 14px; margin-bottom: 4px; color: #0f172a; }
+  .step-body p { font-size: 12px; color: #475569; margin: 0; }
+  .step-note {
+    background: #fef9c3;
+    border: 1px solid #fbbf24;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 6px;
+    font-size: 11px;
+    color: #78350f;
+  }
+  .step-highlight {
+    background: #ecfdf5;
+    border: 1px solid #6ee7b7;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 6px;
+    font-size: 11px;
+    color: #064e3b;
+  }
+
+  /* ── LIFECYCLE DIAGRAM ── */
+  .lifecycle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 24px 0;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+  }
+  .lc-item {
+    text-align: center;
+    padding: 10px 8px;
+    min-width: 80px;
+  }
+  .lc-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    margin: 0 auto 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .lc-label { font-size: 10px; font-weight: 600; color: #374151; line-height: 1.3; }
+  .lc-arrow { font-size: 22px; color: #94a3b8; padding: 0 2px; margin-top: -16px; }
+
+  /* ── BARCODE SECTION ── */
+  .barcode-demo {
+    background: #f8fafc;
+    border: 2px dashed #94a3b8;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 16px 0;
+    text-align: center;
+  }
+  .qr-mock {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    background: white;
+    border: 3px solid #1e293b;
+    border-radius: 8px;
+    padding: 8px;
+    margin: 10px 20px;
+    position: relative;
+  }
+  .qr-inner {
+    width: 100%;
+    height: 100%;
+    background:
+      repeating-linear-gradient(0deg, #000 0, #000 4px, transparent 4px, transparent 8px),
+      repeating-linear-gradient(90deg, #000 0, #000 4px, transparent 4px, transparent 8px);
+    background-size: 12px 12px;
+    opacity: 0.7;
+    border-radius: 4px;
+  }
+  .qr-corner {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 3px solid #000;
+    border-radius: 2px;
+  }
+  .qr-corner.tl { top: 10px; left: 10px; }
+  .qr-corner.tr { top: 10px; right: 10px; }
+  .qr-corner.bl { bottom: 10px; left: 10px; }
+  .qr-label { font-size: 11px; font-weight: 700; color: #475569; margin-top: 6px; }
+  .barcode-cols { display: flex; justify-content: center; align-items: flex-start; gap: 40px; flex-wrap: wrap; }
+  .barcode-col { text-align: center; }
+  .barcode-vs {
+    display: flex;
+    align-items: center;
+    font-size: 28px;
+    color: #94a3b8;
+    margin-top: 20px;
+  }
+
+  /* ── TRACKING TIMELINE ── */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 16px 0;
+    padding: 0 10px;
+  }
+  .tl-event {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    position: relative;
+    padding-bottom: 18px;
+  }
+  .tl-event:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #2563eb, #e2e8f0);
+  }
+  .tl-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #2563eb;
+    background: white;
+  }
+  .tl-dot.done { background: #2563eb; box-shadow: 0 0 0 2px #2563eb; }
+  .tl-dot.active { background: #fbbf24; box-shadow: 0 0 0 2px #fbbf24; }
+  .tl-dot.pending { background: #e2e8f0; box-shadow: 0 0 0 2px #94a3b8; }
+  .tl-info { flex: 1; padding-top: 4px; }
+  .tl-info strong { font-size: 13px; color: #0f172a; }
+  .tl-info span { font-size: 11px; color: #64748b; display: block; }
+  .tl-time { font-size: 10px; color: #94a3b8; white-space: nowrap; margin-top: 2px; }
+
+  /* ── MONEY FLOW ── */
+  .money-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .money-box {
+    background: white;
+    border-radius: 12px;
+    padding: 16px 20px;
+    text-align: center;
+    min-width: 130px;
+    border: 2px solid;
+  }
+  .money-box.sender-box { border-color: #2563eb; background: #eff6ff; }
+  .money-box.escrow-box { border-color: #f59e0b; background: #fffbeb; }
+  .money-box.traveller-box { border-color: #16a34a; background: #f0fdf4; }
+  .money-box .mb-icon { font-size: 28px; margin-bottom: 4px; }
+  .money-box .mb-label { font-size: 12px; font-weight: 700; color: #374151; }
+  .money-box .mb-desc { font-size: 10px; color: #64748b; margin-top: 2px; }
+  .money-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 8px;
+  }
+  .arrow-line {
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(90deg, #94a3b8, #475569);
+    position: relative;
+    margin: 2px 0;
+  }
+  .arrow-line::after {
+    content: '▶';
+    position: absolute;
+    right: -8px;
+    top: -7px;
+    font-size: 10px;
+    color: #475569;
+  }
+  .arrow-label { font-size: 10px; color: #64748b; text-align: center; max-width: 60px; }
+
+  /* ── INFO TABLE ── */
+  .info-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  .info-table th {
+    background: #1e3a8a;
+    color: white;
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .info-table td { padding: 9px 12px; border-bottom: 1px solid #e2e8f0; font-size: 12px; vertical-align: top; }
+  .info-table tr:nth-child(even) td { background: #f8fafc; }
+  .info-table tr:last-child td { border-bottom: none; }
+
+  /* ── TIER TABLE ── */
+  .tier-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  .tier-table th { padding: 12px; text-align: center; font-size: 12px; }
+  .tier-table td { padding: 10px 12px; text-align: center; font-size: 12px; border: 1px solid #e2e8f0; }
+  .tier-table .feature-col { text-align: left; font-weight: 600; background: #f8fafc; }
+  .tier-table .std-col { background: #f0f9ff; }
+  .tier-table .biz-col { background: #f0fdf4; }
+  .tier-table .pri-col { background: #fdf4ff; }
+  .tier-header { font-size: 13px; font-weight: 900; padding: 14px; }
+  .tier-header.std { background: #0ea5e9; color: white; border-radius: 8px 8px 0 0; }
+  .tier-header.biz { background: #16a34a; color: white; border-radius: 8px 8px 0 0; }
+  .tier-header.pri { background: #9333ea; color: white; border-radius: 8px 8px 0 0; }
+
+  /* ── SAFETY GRID ── */
+  .safety-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+  .safety-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+  }
+  .safety-icon { font-size: 24px; flex-shrink: 0; }
+  .safety-text strong { font-size: 12px; color: #0f172a; display: block; margin-bottom: 2px; }
+  .safety-text span { font-size: 11px; color: #475569; }
+  .layer-num {
+    background: #1e3a8a;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+
+  /* ── PILL BADGES ── */
+  .pill { display: inline-block; border-radius: 999px; padding: 3px 10px; font-size: 10px; font-weight: 700; margin: 2px; }
+  .pill-blue { background: #dbeafe; color: #1d4ed8; }
+  .pill-green { background: #dcfce7; color: #15803d; }
+  .pill-red { background: #fee2e2; color: #b91c1c; }
+  .pill-amber { background: #fef3c7; color: #92400e; }
+  .pill-purple { background: #f3e8ff; color: #7e22ce; }
+
+  /* ── ALLOWED / BLOCKED TABLE ── */
+  .allow-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .allow-col { border-radius: 10px; overflow: hidden; border: 2px solid; }
+  .allow-col.yes-col { border-color: #16a34a; }
+  .allow-col.no-col { border-color: #dc2626; }
+  .allow-header { padding: 10px 14px; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .allow-header.yes { background: #16a34a; color: white; }
+  .allow-header.no { background: #dc2626; color: white; }
+  .allow-list { padding: 12px 14px; }
+  .allow-list li { list-style: none; font-size: 12px; color: #374151; padding: 4px 0; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 8px; }
+  .allow-list li:last-child { border-bottom: none; }
+
+  /* ── DISPUTE FLOW ── */
+  .dispute-flow {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+    margin: 16px 0;
+    background: #f8fafc;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+  }
+  .dispute-step {
+    flex: 1;
+    padding: 16px 14px;
+    text-align: center;
+    border-right: 1px solid #e2e8f0;
+    position: relative;
+  }
+  .dispute-step:last-child { border-right: none; }
+  .dispute-step::after {
+    content: '→';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #2563eb;
+    font-size: 18px;
+    font-weight: 900;
+    z-index: 1;
+  }
+  .dispute-step:last-child::after { display: none; }
+  .dispute-step .ds-icon { font-size: 28px; margin-bottom: 6px; }
+  .dispute-step .ds-title { font-size: 11px; font-weight: 700; color: #0f172a; }
+  .dispute-step .ds-desc { font-size: 10px; color: #64748b; margin-top: 2px; }
+
+  /* ── OUTCOME BOXES ── */
+  .outcomes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 16px 0; }
+  .outcome-box { border-radius: 10px; padding: 14px; text-align: center; border: 2px solid; }
+  .outcome-box.refund { border-color: #2563eb; background: #eff6ff; }
+  .outcome-box.release { border-color: #16a34a; background: #f0fdf4; }
+  .outcome-box.split { border-color: #f59e0b; background: #fffbeb; }
+  .outcome-box .ob-icon { font-size: 28px; margin-bottom: 6px; }
+  .outcome-box .ob-title { font-size: 12px; font-weight: 700; }
+  .outcome-box .ob-desc { font-size: 10px; color: #64748b; margin-top: 4px; }
+
+  /* ── QUICK REF ── */
+  .quick-ref { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+  .qr-item { background: #f8fafc; border-radius: 8px; padding: 12px 14px; border: 1px solid #e2e8f0; }
+  .qr-item strong { font-size: 12px; color: #1e3a8a; display: block; margin-bottom: 4px; }
+  .qr-item span { font-size: 11px; color: #475569; }
+
+  /* ── FOOTER ── */
+  .doc-footer {
+    background: #0f172a;
+    color: #94a3b8;
+    padding: 30px 50px;
+    text-align: center;
+    font-size: 11px;
+    margin-top: 40px;
+  }
+  .doc-footer strong { color: white; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin: 12px 0;
+  }
+  .callout.info { background: #eff6ff; border: 1px solid #bfdbfe; }
+  .callout.warn { background: #fffbeb; border: 1px solid #fcd34d; }
+  .callout.success { background: #f0fdf4; border: 1px solid #86efac; }
+  .callout .ci { font-size: 20px; flex-shrink: 0; }
+  .callout p { font-size: 12px; color: #374151; margin: 0; }
+  .callout strong { color: #0f172a; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════ COVER ══ -->
+<div class="cover">
+  <div class="cover-logo">Boot<span>Hop</span></div>
+  <div class="cover-tagline">Ship Anything. Anywhere. With a Verified Traveller.</div>
+  <div class="cover-title">How BootHop Works</div>
+  <div class="cover-subtitle">A Plain-English Guide for Users &amp; Business Stakeholders · June 2026</div>
+  <div class="cover-badges">
+    <div class="badge">📦 For Senders</div>
+    <div class="badge">✈️ For Travellers</div>
+    <div class="badge">🏢 For Businesses</div>
+    <div class="badge">🔒 Safe &amp; Verified</div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════ WHAT IS IT ══ -->
+<div class="page">
+  <h1>What is BootHop?</h1>
+
+  <div class="intro-box">
+    BootHop is a platform that connects people who need to send parcels with people who are already travelling the same route. The Traveller earns money from spare luggage space. The Sender pays far less than a traditional courier. BootHop holds the money safely in the middle and only releases it once both sides confirm the delivery is done.
+  </div>
+
+  <div class="three-col">
+    <div class="role-card sender">
+      <div class="role-icon">📦</div>
+      <h2>The Sender</h2>
+      <p><strong>Also called: Hooper</strong></p>
+      <p>Needs a parcel delivered. Posts a request and pays when matched with a Traveller.</p>
+    </div>
+    <div class="role-card traveller">
+      <div class="role-icon">✈️</div>
+      <h2>The Traveller</h2>
+      <p><strong>Also called: Booter</strong></p>
+      <p>Already making a journey. Carries a parcel for earnings — no extra trip needed.</p>
+    </div>
+    <div class="role-card business">
+      <div class="role-icon">🏢</div>
+      <h2>The Business</h2>
+      <p><strong>Enterprise tier</strong></p>
+      <p>Companies needing reliable, time-critical, or cross-border delivery at scale.</p>
+    </div>
+  </div>
+
+  <h2>The Big Picture — How a Delivery Happens</h2>
+
+  <div class="lifecycle">
+    <div class="lc-item">
+      <div class="lc-circle" style="background:#dbeafe;">📋</div>
+      <div class="lc-label">Sender<br>posts request</div>
+    </div>
+    <div class="lc-arrow">→</div>
+    <div class="lc-item">
+      <div class="lc-circle" style="background:#dcfce7;">🔍</div>
+      <div class="lc-label">BootHop<br>finds a match</div>
+    </div>
+    <div class="lc-arrow">→</div>
+    <div class="lc-item">
+      <div class="lc-circle" style="background:#fef9c3;">🤝</div>
+      <div class="lc-label">Both<br>agree price</div>
+    </div>
+    <div class="lc-arrow">→</div>
+    <div class="lc-item">
+      <div class="lc-circle" style="background:#fce7f3;">💳</div>
+      <div class="lc-label">Sender<br>pays securely</div>
+    </div>
+    <div class="lc-arrow">→</div>
+    <div class="lc-item">
+      <div class="lc-circle" style="background:#e0e7ff;">📬</div>
+      <div class="lc-label">Contacts<br>shared</div>
+    </div>
+    <div class="lc-arrow">→</div>
+    <div class="lc-item">
+      <div class="lc-circle" style="background:#ffedd5;">📡</div>
+      <div class="lc-label">Live<br>tracking</div>
+    </div>
+    <div class="lc-arrow">→</div>
+    <div class="lc-item">
+      <div class="lc-circle" style="background:#dcfce7;">✅</div>
+      <div class="lc-label">Both<br>confirm delivery</div>
+    </div>
+    <div class="lc-arrow">→</div>
+    <div class="lc-item">
+      <div class="lc-circle" style="background:#fef3c7;">💰</div>
+      <div class="lc-label">Traveller<br>gets paid</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════ SENDER JOURNEY ══ -->
+<div class="page page-break">
+  <h1>The Sender Journey — Step by Step</h1>
+  <p style="color:#64748b;margin-bottom:20px;"><em>"I need to get something delivered"</em></p>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num blue">1</div>
+      <div class="step-body">
+        <strong>Create a Free Account</strong>
+        <p>Sign up at boothop.com with your email address. Takes less than 2 minutes. You receive a <strong>£20 welcome credit</strong> automatically applied to your first booking.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num blue">2</div>
+      <div class="step-body">
+        <strong>Post Your Delivery Request</strong>
+        <p>Fill in a simple form: where the parcel is going, when it needs to arrive, what's inside, how much it's worth, and what you're willing to pay. BootHop automatically checks whether your item can be sent on that route.</p>
+        <div class="step-note">⚠️ Be honest about what's inside. BootHop uses AI to screen items. Prohibited goods will be blocked automatically.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num blue">3</div>
+      <div class="step-body">
+        <strong>Get Matched with a Traveller</strong>
+        <p>BootHop searches for Travellers heading the same way around the same time. You'll receive an email when a match is found. You can also browse Travellers manually and express interest.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num blue">4</div>
+      <div class="step-body">
+        <strong>Agree on Price</strong>
+        <p>Review the Traveller's route, date, and star rating. You can negotiate the price by sending a counter-offer. Once both sides agree, the match moves forward.</p>
+        <div class="step-note">⚠️ Africa routes (Nigeria, Ghana, Kenya, etc.): A BootHop team member reviews the match before you're asked to pay. This takes a few hours during business hours.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num blue">5</div>
+      <div class="step-body">
+        <strong>Pay Securely — Money is Held, Not Released Yet</strong>
+        <p>You pay via a secure card page. Your money goes into a <strong>holding account (escrow)</strong> — it is NOT given to the Traveller yet. Your card is authorised but only charged when delivery is confirmed.</p>
+        <div class="step-highlight">✅ Your £20 welcome credit is deducted automatically here.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num blue">6</div>
+      <div class="step-body">
+        <strong>Receive Contact Details &amp; Arrange Handoff</strong>
+        <p>Once payment is in place, you receive the Traveller's phone number and email. Arrange a convenient time and place to hand over the parcel before their journey.</p>
+        <div class="step-highlight">✅ Both of you also receive a unique QR barcode by email — your tracking tool throughout the delivery.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num blue">7</div>
+      <div class="step-body">
+        <strong>Track Your Delivery Live</strong>
+        <p>Visit the tracking link sent by email or scan your QR barcode. You can see exactly where your parcel is. You can also "ping" the Traveller to request a location update.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num blue">8</div>
+      <div class="step-body">
+        <strong>Confirm Receipt</strong>
+        <p>When your parcel arrives, click "Confirm Delivery" in your BootHop dashboard. One tap is all it takes.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num blue">9</div>
+      <div class="step-body">
+        <strong>Done — Leave a Rating</strong>
+        <p>Once both you and the Traveller have confirmed, the Traveller is paid. You're invited to leave a star rating and comment. Your feedback helps future Senders choose reliable Travellers.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════ TRAVELLER JOURNEY ══ -->
+<div class="page page-break">
+  <h1>The Traveller Journey — Step by Step</h1>
+  <p style="color:#64748b;margin-bottom:20px;"><em>"I'm travelling and I want to earn money from my spare luggage space"</em></p>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num green">1</div>
+      <div class="step-body">
+        <strong>Create a Free Account</strong>
+        <p>Sign up at boothop.com with your email address.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num green">2</div>
+      <div class="step-body">
+        <strong>Verify Your Identity (Required Before Earning)</strong>
+        <p>Before you can carry anything, you must complete identity verification: upload a government-issued ID and add your bank account details. This is handled securely through Stripe — the same technology used by Amazon and Deliveroo.</p>
+        <div class="step-note">⚠️ Verification typically takes 24–48 hours. You cannot accept matches until this is complete. This protects both you and the Sender.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num green">3</div>
+      <div class="step-body">
+        <strong>Post Your Travel Route</strong>
+        <p>Fill in a simple form: where you're travelling from and to, when you're departing, how much spare space you have, and how much you want to earn.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num green">4</div>
+      <div class="step-body">
+        <strong>Get Matched &amp; Accept</strong>
+        <p>BootHop finds Senders who need something delivered on your route. You receive an email with the details — parcel type, weight, price offered. You can accept, decline, or counter-offer.</p>
+        <div class="step-highlight">✅ You only carry what you're comfortable with. You are never forced to accept a match.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num green">5</div>
+      <div class="step-body">
+        <strong>Collect the Parcel</strong>
+        <p>Once the Sender has paid, you both receive each other's contact details and your QR barcodes. Arrange collection of the parcel before your journey.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num green">6</div>
+      <div class="step-body">
+        <strong>Carry &amp; Log Updates</strong>
+        <p>As you travel, use your barcode to log checkpoints in the BootHop app: parcel collected → in transit → arrived at destination → delivered. The Sender can see these updates live.</p>
+        <div class="step-note">⚠️ If you go 48 hours without logging any update, BootHop will contact you and the Sender. Always keep your status current.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num green">7</div>
+      <div class="step-body">
+        <strong>Deliver &amp; Confirm</strong>
+        <p>Hand the parcel to the recipient and confirm delivery in your BootHop dashboard.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num green">8</div>
+      <div class="step-body">
+        <strong>Get Paid</strong>
+        <p>Once both you and the Sender confirm delivery, payment is transferred to your bank account — typically within 1–2 business days.</p>
+        <div class="step-highlight">💰 Typical earnings: £20–£50 (domestic) · £50–£120 (UK–Europe) · £85–£320 (UK–Africa)</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════ BARCODES & TRACKING ══ -->
+<div class="page page-break">
+  <h1>Barcodes &amp; Live Tracking — How It Works</h1>
+
+  <div class="intro-box">
+    Every delivery on BootHop comes with two unique QR barcodes — one for the Sender, one for the Traveller. These are your delivery's identity card and your live tracking tool throughout the journey.
+  </div>
+
+  <h2>Your Two Barcodes</h2>
+
+  <div class="barcode-demo">
+    <div class="barcode-cols">
+      <div class="barcode-col">
+        <div class="qr-mock">
+          <div class="qr-corner tl"></div>
+          <div class="qr-corner tr"></div>
+          <div class="qr-corner bl"></div>
+          <div class="qr-inner"></div>
+        </div>
+        <div class="qr-label">📦 SENDER BARCODE</div>
+        <p style="font-size:11px;color:#64748b;margin-top:6px;max-width:160px;">Scan to visit the live tracking page. Use the "Ping Traveller" button to request a location update.</p>
+      </div>
+
+      <div class="barcode-vs">↔️</div>
+
+      <div class="barcode-col">
+        <div class="qr-mock">
+          <div class="qr-corner tl"></div>
+          <div class="qr-corner tr"></div>
+          <div class="qr-corner bl"></div>
+          <div class="qr-inner"></div>
+        </div>
+        <div class="qr-label">✈️ TRAVELLER BARCODE</div>
+        <p style="font-size:11px;color:#64748b;margin-top:6px;max-width:160px;">Use to log checkpoints at each stage of the journey — pickup, in transit, arrival, delivery.</p>
+      </div>
+    </div>
+    <p style="font-size:11px;color:#94a3b8;margin-top:16px;">Both barcodes are emailed automatically when payment is confirmed. They can also be found in the BootHop dashboard.</p>
+  </div>
+
+  <h2>The Tracking Timeline — What Both Parties See</h2>
+
+  <div class="two-col">
+    <div class="timeline">
+      <div class="tl-event">
+        <div class="tl-dot done">📦</div>
+        <div class="tl-info">
+          <strong>Parcel Collected</strong>
+          <span>Traveller confirms pickup from Sender</span>
+        </div>
+        <div class="tl-time">Day 1 · 09:14</div>
+      </div>
+      <div class="tl-event">
+        <div class="tl-dot done">🚗</div>
+        <div class="tl-info">
+          <strong>In Transit</strong>
+          <span>En route to departure point</span>
+        </div>
+        <div class="tl-time">Day 1 · 11:30</div>
+      </div>
+      <div class="tl-event">
+        <div class="tl-dot done">✈️</div>
+        <div class="tl-info">
+          <strong>Location Check</strong>
+          <span>Traveller at airport / station</span>
+        </div>
+        <div class="tl-time">Day 1 · 14:05</div>
+      </div>
+      <div class="tl-event">
+        <div class="tl-dot active">📍</div>
+        <div class="tl-info">
+          <strong>Arrived at Destination</strong>
+          <span>Traveller has landed — arranging handoff</span>
+        </div>
+        <div class="tl-time">Day 2 · 08:20</div>
+      </div>
+      <div class="tl-event">
+        <div class="tl-dot pending">🎉</div>
+        <div class="tl-info">
+          <strong>Delivered</strong>
+          <span>Awaiting delivery confirmation</span>
+        </div>
+        <div class="tl-time">Pending</div>
+      </div>
+    </div>
+
+    <div>
+      <h3>What each status means</h3>
+      <table class="info-table">
+        <tr><th>Checkpoint</th><th>What it means</th></tr>
+        <tr><td>📦 Collected</td><td>Traveller has the parcel and the journey has started</td></tr>
+        <tr><td>🚗 In Transit</td><td>Parcel is physically moving</td></tr>
+        <tr><td>📍 Location Check</td><td>Sender or Traveller shared a location update</td></tr>
+        <tr><td>✈️ At Destination</td><td>Traveller has arrived — delivery imminent</td></tr>
+        <tr><td>✅ Delivered</td><td>Handed to recipient — both parties to confirm</td></tr>
+      </table>
+
+      <div class="callout warn">
+        <div class="ci">⏰</div>
+        <p><strong>48-Hour Rule:</strong> If a Traveller logs no update for 48 hours, BootHop automatically contacts both parties and raises an internal alert. The Sender is kept informed at every step.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Sender: How to "Ping" the Traveller</h2>
+  <div class="steps" style="margin-top:10px;">
+    <div class="step">
+      <div class="step-num blue" style="width:32px;height:32px;font-size:12px;">1</div>
+      <div class="step-body"><strong>Scan your Sender barcode</strong> <p>Opens the live tracking page — no login required</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num blue" style="width:32px;height:32px;font-size:12px;">2</div>
+      <div class="step-body"><strong>Tap "Ping Traveller"</strong> <p>Sends a location request to the Traveller's device</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num blue" style="width:32px;height:32px;font-size:12px;">3</div>
+      <div class="step-body"><strong>Traveller shares their location</strong> <p>Checkpoint appears on your tracking page within minutes</p></div>
+    </div>
+  </div>
+  <div class="callout info" style="margin-top:8px;">
+    <div class="ci">ℹ️</div>
+    <p>Pings are rate-limited to prevent harassment — Standard: 3 pings per window · Business: 5 pings · Priority: unlimited</p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════ PAYMENT & MONEY ══ -->
+<div class="page page-break">
+  <h1>Payment &amp; How the Money Works</h1>
+
+  <div class="intro-box">
+    BootHop uses a <strong>secure holding system (called escrow)</strong>. The Sender's money is authorised but not actually charged until both parties confirm delivery. This protects the Sender if anything goes wrong, and guarantees the Traveller will be paid if delivery is successful.
+  </div>
+
+  <h2>The Money Flow — Step by Step</h2>
+
+  <div class="money-flow">
+    <div class="money-box sender-box">
+      <div class="mb-icon">💳</div>
+      <div class="mb-label">Sender Pays</div>
+      <div class="mb-desc">Card authorised.<br>Not charged yet.</div>
+    </div>
+    <div class="money-arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-label">Held safely</div>
+    </div>
+    <div class="money-box escrow-box">
+      <div class="mb-icon">🔒</div>
+      <div class="mb-label">Escrow (Held)</div>
+      <div class="mb-desc">Funds locked.<br>Neither party<br>can touch them.</div>
+    </div>
+    <div class="money-arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-label">Both confirm delivery</div>
+    </div>
+    <div class="money-box sender-box" style="border-color:#7c3aed;background:#f5f3ff;">
+      <div class="mb-icon">✅</div>
+      <div class="mb-label">Card Charged</div>
+      <div class="mb-desc">Only now does<br>money leave<br>Sender's account</div>
+    </div>
+    <div class="money-arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-label">Instant transfer</div>
+    </div>
+    <div class="money-box traveller-box">
+      <div class="mb-icon">🏦</div>
+      <div class="mb-label">Traveller Paid</div>
+      <div class="mb-desc">Arrives in bank<br>within 1–2<br>business days</div>
+    </div>
+  </div>
+
+  <div class="callout success">
+    <div class="ci">🔑</div>
+    <p><strong>Key point:</strong> The Sender's card is never charged if delivery is not confirmed. The Traveller can always see payment is secured before they collect the parcel.</p>
+  </div>
+
+  <h2>What the Sender Pays — Price Breakdown</h2>
+
+  <table class="info-table">
+    <tr><th>Item</th><th>What it is</th><th>Example</th></tr>
+    <tr><td><strong>Delivery fee</strong></td><td>Agreed between Sender and Traveller</td><td>£50.00</td></tr>
+    <tr><td><strong>Platform fee</strong></td><td>BootHop service charge (3–5%)</td><td>£2.50</td></tr>
+    <tr><td><strong>Insurance</strong></td><td>7.5% of declared goods value — covers loss or damage</td><td>£7.50 (on £100 goods)</td></tr>
+    <tr><td><strong>Welcome credit</strong></td><td>£20 discount on first booking</td><td>−£20.00</td></tr>
+    <tr style="background:#eff6ff;"><td><strong>Total charged</strong></td><td>All shown before payment</td><td><strong>£40.00</strong></td></tr>
+  </table>
+
+  <h2>What the Traveller Earns</h2>
+
+  <table class="info-table">
+    <tr><th>Route Type</th><th>Typical Earnings</th></tr>
+    <tr><td>Domestic UK (same city / short distance)</td><td>£20 – £50</td></tr>
+    <tr><td>UK to Europe</td><td>£50 – £120</td></tr>
+    <tr><td>UK to Nigeria / Ghana / Kenya</td><td>£85 – £320</td></tr>
+    <tr><td>UK to Dubai / Middle East</td><td>£70 – £180</td></tr>
+    <tr><td>UK to USA / Canada</td><td>£60 – £150</td></tr>
+  </table>
+  <p style="font-size:11px;color:#64748b;">Actual earnings depend on agreed price, parcel weight, and route. BootHop deducts a small platform commission before transferring.</p>
+</div>
+
+
+<!-- ════════════════════════════════════════ TRACKING TIERS ══ -->
+<div class="page page-break">
+  <h1>Tracking Service Levels</h1>
+  <p style="margin-bottom:20px;">BootHop offers three levels of tracking service depending on whether you're a regular user, a business, or need priority delivery.</p>
+
+  <table class="tier-table">
+    <thead>
+      <tr>
+        <th class="feature-col" style="background:#f8fafc;border:1px solid #e2e8f0;"></th>
+        <th><div class="tier-header std">⭐ Standard</div></th>
+        <th><div class="tier-header biz">🏢 Business</div></th>
+        <th><div class="tier-header pri">💎 Priority</div></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="feature-col">Who it's for</td>
+        <td class="std-col">Everyday senders &amp; travellers</td>
+        <td class="biz-col">Small &amp; medium businesses</td>
+        <td class="pri-col">Time-critical shipments</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Location pings</td>
+        <td class="std-col">Up to 3 per window</td>
+        <td class="biz-col">Up to 5 per window</td>
+        <td class="pri-col">Unlimited</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Location accuracy</td>
+        <td class="std-col">City level</td>
+        <td class="biz-col">Street level</td>
+        <td class="pri-col">Building level</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Live GPS</td>
+        <td class="std-col">❌</td>
+        <td class="biz-col">❌</td>
+        <td class="pri-col">✅ Yes</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Photo proof required</td>
+        <td class="std-col">Optional</td>
+        <td class="biz-col">✅ Required</td>
+        <td class="pri-col">✅ Required</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Notifications</td>
+        <td class="std-col">Email + App</td>
+        <td class="biz-col">Email + SMS</td>
+        <td class="pri-col">Email + SMS + Phone Call</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Support response</td>
+        <td class="std-col">Standard (48h)</td>
+        <td class="biz-col">24 hours</td>
+        <td class="pri-col">2 hours</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Account manager</td>
+        <td class="std-col">❌</td>
+        <td class="biz-col">❌</td>
+        <td class="pri-col">✅ Dedicated</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Premium tracking add-on</td>
+        <td class="std-col" colspan="2" style="text-align:center;">+£2.00 per delivery — unlocks enhanced features for that shipment</td>
+        <td class="pri-col">✅ Included</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout info" style="margin-top:16px;">
+    <div class="ci">ℹ️</div>
+    <p>Priority tier is best for: AOG aircraft parts, pharmaceutical shipments, legal documents, time-sensitive commercial goods. <strong>Businesses can apply for Priority Partner status</strong> to access this tier permanently with a dedicated account manager.</p>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════ WHAT CAN BE SENT ══ -->
+<div class="page page-break">
+  <h1>What Can (and Cannot) Be Sent</h1>
+  <p style="margin-bottom:16px;">BootHop uses intelligent screening to check all items automatically when a delivery request is posted. Here is a plain-English guide to what is and isn't permitted.</p>
+
+  <div class="allow-grid">
+    <div class="allow-col yes-col">
+      <div class="allow-header yes">✅ Generally Permitted</div>
+      <ul class="allow-list">
+        <li>👕 Clothing and personal items</li>
+        <li>💻 Electronics (phones, tablets, laptops)</li>
+        <li>📄 Documents and paperwork</li>
+        <li>🎁 Gifts and household goods</li>
+        <li>🍱 Non-perishable food &amp; groceries</li>
+        <li>💍 Jewellery (subject to value limits)</li>
+        <li>👟 Shoes and accessories</li>
+        <li>🧴 Personal care products</li>
+        <li>📚 Books and educational materials</li>
+        <li>🧸 Toys and children's items</li>
+      </ul>
+    </div>
+    <div class="allow-col no-col">
+      <div class="allow-header no">❌ Never Permitted</div>
+      <ul class="allow-list">
+        <li>🔫 Weapons or ammunition of any kind</li>
+        <li>💊 Illegal drugs or controlled substances</li>
+        <li>💣 Explosives or flammable materials</li>
+        <li>🐾 Live animals</li>
+        <li>🎭 Counterfeit or stolen goods</li>
+        <li>💸 Large cash amounts (varies by route)</li>
+        <li>☢️ Radioactive or hazardous materials</li>
+        <li>🚫 Child exploitation material</li>
+        <li>💀 Human remains</li>
+        <li>🎰 Gambling devices (certain routes)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Items That Need Special Review</h2>
+
+  <table class="info-table">
+    <tr><th>Item Type</th><th>Why It Needs Review</th><th>What Happens</th></tr>
+    <tr>
+      <td>💊 Medicines &amp; pharmaceuticals</td>
+      <td>Require valid prescription on many routes</td>
+      <td>Admin team reviews before confirming</td>
+    </tr>
+    <tr>
+      <td>💰 High-value items (over £5,000)</td>
+      <td>Special insurance and customs rules apply</td>
+      <td>Admin team reviews; enhanced insurance required</td>
+    </tr>
+    <tr>
+      <td>🏦 Transactions over £10,000</td>
+      <td>Anti-money laundering (AML) regulations</td>
+      <td>BootHop compliance team must review first</td>
+    </tr>
+    <tr>
+      <td>🌍 Deliveries to Africa (Nigeria, Ghana, Kenya, etc.)</td>
+      <td>Additional customs and compliance checks required</td>
+      <td>BootHop team approves within a few hours on business days</td>
+    </tr>
+    <tr>
+      <td>🍷 Alcohol, pork products (to UAE, Saudi etc.)</td>
+      <td>Prohibited in destination country</td>
+      <td>Automatically blocked by the system</td>
+    </tr>
+  </table>
+
+  <div class="callout warn" style="margin-top:16px;">
+    <div class="ci">⚠️</div>
+    <p><strong>Customs Duties:</strong> When sending internationally, the recipient may need to pay import duties or taxes at the destination country. BootHop shows an estimated customs cost when you post your request. BootHop does not collect these — they are paid directly to local customs authorities.</p>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════ SAFETY ══ -->
+<div class="page page-break">
+  <h1>Safety &amp; Trust — 8 Layers of Protection</h1>
+  <p style="margin-bottom:20px;">Every single delivery on BootHop is protected by eight automatic safety layers. You don't need to do anything — these all run in the background.</p>
+
+  <div class="safety-grid">
+    <div class="safety-item">
+      <div class="safety-icon">🔍</div>
+      <div class="safety-text">
+        <strong><span class="layer-num">1</span> Identity Verification</strong>
+        <span>Every Traveller must verify their government ID before they can carry anything. Powered by Stripe Identity — the same system banks use.</span>
+      </div>
+    </div>
+    <div class="safety-item">
+      <div class="safety-icon">🖥️</div>
+      <div class="safety-text">
+        <strong><span class="layer-num">2</span> Device Fingerprinting</strong>
+        <span>BootHop silently identifies the device being used. Known fraud devices are blocked before any harm is done.</span>
+      </div>
+    </div>
+    <div class="safety-item">
+      <div class="safety-icon">🚨</div>
+      <div class="safety-text">
+        <strong><span class="layer-num">3</span> Account &amp; IP Ban Checks</strong>
+        <span>Any account or internet address previously flagged for fraud is automatically blocked from accepting new matches.</span>
+      </div>
+    </div>
+    <div class="safety-item">
+      <div class="safety-icon">🧠</div>
+      <div class="safety-text">
+        <strong><span class="layer-num">4</span> Fraud Risk Scoring</strong>
+        <span>Every match is scored across five factors — identity, past behaviour, transaction value, route risk, and device signals. High-risk matches are blocked automatically.</span>
+      </div>
+    </div>
+    <div class="safety-item">
+      <div class="safety-icon">📦</div>
+      <div class="safety-text">
+        <strong><span class="layer-num">5</span> Item Screening</strong>
+        <span>Every item is checked against a prohibited goods list and route-specific rules. Banned or restricted items are caught before a match is confirmed.</span>
+      </div>
+    </div>
+    <div class="safety-item">
+      <div class="safety-icon">🤖</div>
+      <div class="safety-text">
+        <strong><span class="layer-num">6</span> AI Customs Check</strong>
+        <span>Artificial intelligence classifies each item and checks it against international customs rules for that specific country pair.</span>
+      </div>
+    </div>
+    <div class="safety-item">
+      <div class="safety-icon">🔒</div>
+      <div class="safety-text">
+        <strong><span class="layer-num">7</span> Stripe Secure Payment</strong>
+        <span>Payments are processed by Stripe with bank-level 3D Secure authentication. Money is held in escrow — not released until delivery is confirmed.</span>
+      </div>
+    </div>
+    <div class="safety-item">
+      <div class="safety-icon">✅</div>
+      <div class="safety-text">
+        <strong><span class="layer-num">8</span> Dual Delivery Confirmation</strong>
+        <span>Both the Sender AND the Traveller must confirm delivery before any money moves. Neither party can release funds alone.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ DISPUTES ══ -->
+<div class="page page-break">
+  <h1>If Something Goes Wrong</h1>
+
+  <h2>Raising a Dispute</h2>
+  <p style="margin-bottom:16px;">If there is a problem with your delivery, either party can raise a formal dispute through their BootHop dashboard within 24 hours of delivery confirmation.</p>
+
+  <div class="dispute-flow">
+    <div class="dispute-step">
+      <div class="ds-icon">🚩</div>
+      <div class="ds-title">Dispute Raised</div>
+      <div class="ds-desc">Either party raises dispute in dashboard</div>
+    </div>
+    <div class="dispute-step">
+      <div class="ds-icon">📧</div>
+      <div class="ds-title">Both Notified</div>
+      <div class="ds-desc">Both parties emailed. BootHop team alerted.</div>
+    </div>
+    <div class="dispute-step">
+      <div class="ds-icon">🔍</div>
+      <div class="ds-title">BootHop Reviews</div>
+      <div class="ds-desc">Team reviews tracking history, photos, and evidence</div>
+    </div>
+    <div class="dispute-step">
+      <div class="ds-icon">⚖️</div>
+      <div class="ds-title">Decision Made</div>
+      <div class="ds-desc">One of three outcomes decided</div>
+    </div>
+  </div>
+
+  <h2>Possible Outcomes</h2>
+
+  <div class="outcomes">
+    <div class="outcome-box refund">
+      <div class="ob-icon">↩️</div>
+      <div class="ob-title">Full Refund to Sender</div>
+      <div class="ob-desc">Sender receives full refund to original payment method within 5–10 business days</div>
+    </div>
+    <div class="outcome-box release">
+      <div class="ob-icon">✅</div>
+      <div class="ob-title">Payment to Traveller</div>
+      <div class="ob-desc">Dispute resolved in Traveller's favour — full payment released</div>
+    </div>
+    <div class="outcome-box split">
+      <div class="ob-icon">⚖️</div>
+      <div class="ob-title">Split Decision</div>
+      <div class="ob-desc">BootHop splits the payment fairly based on evidence provided</div>
+    </div>
+  </div>
+
+  <h2>Ghost Traveller — When a Traveller Goes Silent</h2>
+
+  <div class="steps" style="margin-top:12px;">
+    <div class="step">
+      <div class="step-num" style="background:#f59e0b;width:32px;height:32px;font-size:12px;">1</div>
+      <div class="step-body"><strong>48 Hours of Silence</strong><p>No tracking updates logged by the Traveller for 48+ hours</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:#f59e0b;width:32px;height:32px;font-size:12px;">2</div>
+      <div class="step-body"><strong>Automatic Alert</strong><p>BootHop system flags the delivery and alerts the operations team immediately</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:#f59e0b;width:32px;height:32px;font-size:12px;">3</div>
+      <div class="step-body"><strong>Both Parties Contacted</strong><p>Sender receives reassurance email. Traveller receives urgent message to update status.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:#f59e0b;width:32px;height:32px;font-size:12px;">4</div>
+      <div class="step-body"><strong>Escalation If No Response</strong><p>If Traveller still does not respond, the BootHop team investigates and can initiate a refund for the Sender</p></div>
+    </div>
+  </div>
+
+  <div class="callout info" style="margin-top:16px;">
+    <div class="ci">💡</div>
+    <p><strong>Remember:</strong> The Sender's money is safe in escrow throughout this process. It cannot be released to anyone until the situation is resolved.</p>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ BUSINESS ══ -->
+<div class="page page-break">
+  <h1>BootHop for Businesses</h1>
+
+  <div class="intro-box">
+    BootHop's Business tier is built for companies that need reliable, on-demand, or cross-border delivery — from spare parts and documents to pharmaceutical shipments and retail stock.
+  </div>
+
+  <div class="three-col">
+    <div style="background:#f8fafc;border-radius:10px;padding:16px;border:1px solid #e2e8f0;text-align:center;">
+      <div style="font-size:28px;margin-bottom:6px;">⚡</div>
+      <strong style="font-size:13px;">Time-Critical</strong>
+      <p style="font-size:11px;color:#64748b;margin-top:4px;">AOG aircraft parts, legal documents, urgent samples</p>
+    </div>
+    <div style="background:#f8fafc;border-radius:10px;padding:16px;border:1px solid #e2e8f0;text-align:center;">
+      <div style="font-size:28px;margin-bottom:6px;">🌍</div>
+      <strong style="font-size:13px;">Cross-Border</strong>
+      <p style="font-size:11px;color:#64748b;margin-top:4px;">UK–EU, UK–Africa, UK–Middle East commercial shipments</p>
+    </div>
+    <div style="background:#f8fafc;border-radius:10px;padding:16px;border:1px solid #e2e8f0;text-align:center;">
+      <div style="font-size:28px;margin-bottom:6px;">🔄</div>
+      <strong style="font-size:13px;">Regular Volume</strong>
+      <p style="font-size:11px;color:#64748b;margin-top:4px;">Recurring deliveries with a dedicated account manager</p>
+    </div>
+  </div>
+
+  <h2>Business Journey</h2>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num purple">1</div>
+      <div class="step-body"><strong>Create a Business Account</strong><p>Separate business portal with OTP-based login. No password required.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num purple">2</div>
+      <div class="step-body"><strong>Post a Delivery Job</strong><p>Full address details, item type, weight, urgency level (standard / priority / critical), and delivery mode (door-to-door, airport-to-door, etc.).</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num purple">3</div>
+      <div class="step-body"><strong>Carriers Matched</strong><p>Verified Travellers or couriers on the same route are matched to your job automatically.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num purple">4</div>
+      <div class="step-body"><strong>Pay &amp; Track</strong><p>Same secure escrow payment system. Business tier includes SMS updates, required photo proof, and street-level tracking.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num purple">5</div>
+      <div class="step-body"><strong>Confirm &amp; Complete</strong><p>Delivery confirmed. Payment released. Full audit trail available for your records.</p></div>
+    </div>
+  </div>
+
+  <h2>Priority Partner Programme</h2>
+  <table class="info-table">
+    <tr><th>Feature</th><th>Standard Business</th><th>Priority Partner</th></tr>
+    <tr><td>Delivery SLA</td><td>24-hour support</td><td><strong>2-hour response</strong></td></tr>
+    <tr><td>Account manager</td><td>❌</td><td><strong>✅ Dedicated</strong></td></tr>
+    <tr><td>Live GPS tracking</td><td>❌</td><td><strong>✅ Included</strong></td></tr>
+    <tr><td>Unlimited pings</td><td>❌</td><td><strong>✅ Included</strong></td></tr>
+    <tr><td>Phone escalation</td><td>❌</td><td><strong>✅ Included</strong></td></tr>
+    <tr><td>How to apply</td><td>—</td><td>Visit boothop.com/business/priority-partner</td></tr>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════════ QUICK REFERENCE ══ -->
+<div class="page page-break">
+  <h1>Quick Reference Guide</h1>
+
+  <div class="quick-ref">
+    <div class="qr-item">
+      <strong>📦 I want to send a parcel</strong>
+      <span>Sign up at boothop.com → Post a request → Wait for a match → Pay when matched. Use the £20 welcome credit on your first booking.</span>
+    </div>
+    <div class="qr-item">
+      <strong>✈️ I want to earn as a Traveller</strong>
+      <span>Sign up → Verify your identity (ID + bank details) → Post your travel route → Accept a match → Carry and deliver → Get paid.</span>
+    </div>
+    <div class="qr-item">
+      <strong>📡 How do I track my delivery?</strong>
+      <span>Scan the QR barcode emailed to you, or visit the tracking link. No login required. Updates appear in real time.</span>
+    </div>
+    <div class="qr-item">
+      <strong>💳 When will I be charged?</strong>
+      <span>Your card is authorised when you pay, but only actually charged when both parties confirm delivery is complete.</span>
+    </div>
+    <div class="qr-item">
+      <strong>💰 When does the Traveller get paid?</strong>
+      <span>Within 1–2 business days after both parties confirm delivery. Payment goes directly to their bank account.</span>
+    </div>
+    <div class="qr-item">
+      <strong>🚩 How do I raise a dispute?</strong>
+      <span>Go to your BootHop dashboard → find the match → tap "Raise a Dispute". You have 24 hours after delivery confirmation to do this.</span>
+    </div>
+    <div class="qr-item">
+      <strong>🌍 Can I send to Africa?</strong>
+      <span>Yes — Nigeria, Ghana, Kenya and more. There is an extra review step by the BootHop team, which takes a few hours on business days.</span>
+    </div>
+    <div class="qr-item">
+      <strong>🏢 I'm a business — where do I start?</strong>
+      <span>Visit boothop.com/business for an overview. Apply for a business account or Priority Partner status from there.</span>
+    </div>
+    <div class="qr-item">
+      <strong>❓ I need help</strong>
+      <span>Email: info@boothop.com<br>Website: boothop.com/contact<br>Response: typically within 24 hours</span>
+    </div>
+    <div class="qr-item">
+      <strong>🔒 Is my payment safe?</strong>
+      <span>Yes. BootHop uses Stripe — the same technology as Amazon and Deliveroo. Your money is held in escrow and never released to anyone until delivery is confirmed by both parties.</span>
+    </div>
+  </div>
+
+  <div style="margin-top:32px;background:#eff6ff;border-radius:12px;padding:24px;text-align:center;border:2px solid #2563eb;">
+    <div style="font-size:32px;font-weight:900;color:#1e3a8a;margin-bottom:4px;">Boot<span style="color:#2563eb;">Hop</span></div>
+    <div style="font-size:14px;color:#475569;margin-bottom:16px;">Ship Anything. Anywhere. With a Verified Traveller.</div>
+    <div style="display:flex;justify-content:center;gap:32px;flex-wrap:wrap;">
+      <div><strong style="font-size:12px;color:#1e3a8a;">🌐 Website</strong><br><span style="font-size:12px;color:#475569;">www.boothop.com</span></div>
+      <div><strong style="font-size:12px;color:#1e3a8a;">📧 Email</strong><br><span style="font-size:12px;color:#475569;">info@boothop.com</span></div>
+      <div><strong style="font-size:12px;color:#1e3a8a;">🏢 Business</strong><br><span style="font-size:12px;color:#475569;">boothop.com/business</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<div class="doc-footer">
+  <strong>BootHop</strong> — Ship Anything. Anywhere. With a Verified Traveller.<br>
+  www.boothop.com · info@boothop.com<br><br>
+  This document is for end-user and business stakeholder reference · June 2026
+</div>
+
+</body>
+</html>

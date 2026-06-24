@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)file:///C:/Users/babso/Downloads/company-report.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="format-detection" content="telephone=no">
+    <title>BOOTHOP BD LTD</title>
+    <style type="text/css">
+
+      #page-container {
+        max-width: 960px;
+        margin: 0 15px;
+      }
+
+      @media (min-width: 641px) {
+        #page-container {
+            margin: 0 30px;
+         }
+       }
+
+       @media (min-width: 1020px) {
+        #page-container {
+          margin: 0 auto;
+        }
+      }
+      .header-list {
+        font-size: 19px;
+        line-height: 1.31579;
+        padding: 0;
+        margin-top: 5px;
+        list-style-type: disc;
+        padding-left: 20px;
+        font-family: "proxima_nova", Arial, sans-serif;
+        font-weight: 400;
+        text-transform: none;
+      }
+
+     main {
+        padding-bottom: 3em;
+        font-family: "proxima_nova", Arial, sans-serif;
+        font-weight: 400;
+        text-transform: none;
+      }
+
+      @media (min-width: 641px) {
+      main {
+        font-size: 19px;
+        line-height: 1.31579;
+        }
+      }
+
+      h1.heading-xlarge {
+        word-wrap: break-word;
+        font: 48px proxima_nova, Arial, sans-serif;
+        font-weight: 700;
+        text-transform: none;
+        margin: 30px 0 60px;
+      }
+
+      .heading-large {
+        margin-bottom: 1em;
+        font-family: "proxima_nova", Arial, sans-serif;
+        font-weight: 700;
+        text-transform: none;
+      }
+
+       @media (min-width: 641px) {
+         .heading-large {
+           font-size: 36px;
+           line-height: 1.11111;
+         }
+       }
+
+      .heading-medium {
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.25;
+      }
+
+      @media (min-width: 641px) {
+          .heading-medium {
+            margin-top: 1.875em;
+            margin-bottom: 0.83333em;
+          }
+       }
+
+      .heading-small {
+        font-family: "proxima_nova", Arial, sans-serif;
+        font-weight: 700;
+        text-transform: none;
+        margin-bottom: 0.3125em
+      }
+
+       @media (min-width: 641px) {
+         .heading-small {
+           margin-top: 1.05263em;
+           font-size: 19px;
+           line-height: 1.31579;
+           }
+        }
+
+     .list {
+        padding: 0;
+        margin-top: 5px;
+        margin-bottom: 20px;
+      }
+
+      .list-bullet {
+       list-style-type: disc;
+       padding-left: 20px;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        width: 1px;
+        margin: -1px;
+        padding: 0;
+        border: 0;
+      }
+
+      span.status-tag {
+        background-color: #006435;
+        color: #fff;
+        margin-left: 0.75em;
+        vertical-align: baseline;
+        padding: 2px 5px 1px;
+        font-weight: 700;
+        font-size: 14px;
+        text-transform: uppercase;
+        display: inline-block;
+        position: relative;
+        top: -0.05em;
+      }
+
+      span.status-tag.ceased-tag {
+        background-color: #4B5253;
+      }
+
+      table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+      }
+
+      table tr td {
+        vertical-align: text-top;
+      }
+
+      table th, table td {
+        font-family: "proxima_nova", Arial, sans-serif;
+        font-weight: 400;
+        text-transform: none;
+        padding: 0.6em 1em 1em 0;
+        text-align: left;
+        color: #0b0c0c;
+        border-bottom: 1px solid #bfc1c3;
+      }
+
+      @media (min-width: 641px) {
+      table th, table td {
+        font-size: 19px;
+        line-height: 1.31579;
+        }
+      }
+
+       table th {
+        font-weight: 700;
+      }
+
+      .grid-row {
+        margin: 0 -15px;
+      }
+
+      @media (min-width: 641px) {
+        .column-quarter {
+           float: left;
+           width: 25%;
+         }
+       }
+
+        .column-quarter {
+          padding: 0 15px;
+          box-sizing: border-box;
+        }
+
+      .column-half {
+        float: left;
+        width: 50%;
+      }
+
+      .data {
+        font-weight: bold;
+      }
+
+      .normal {
+        font-weight: normal;
+      }
+
+      .heading-with-border {
+        border-top: 1px solid #bec0c2;
+        padding-top: 1.25em;
+      }
+
+      .pagebreak {
+        page-break-before: always;
+      }
+
+      .foreign-company-details-table {
+        margin-bottom: 1em;
+      }
+
+      .sentence-case {
+        text-transform: lowercase;
+        display: inline-block;
+      }
+
+      .sentence-case::first-letter {
+        text-transform: uppercase;
+      }
+
+      .bold {
+        font-weight: 700px;
+      }
+
+      .charge {
+        margin: 20px 0px;
+      }
+
+      .spacer {
+        width: 50%;
+      }
+
+      .particulars {
+        margin-top: 20px;
+      }
+
+      @media print {
+
+        .page-break {
+          min-height: 400px;
+          page-break-before: always;
+        }
+        .page {
+          min-height: 25cm;
+          border-style: solid;
+          border-width: 0;
+          page-break-after: always;
+          margin: 0 auto;
+          width: 170mm;
+          position: relative;
+        }
+        @page {
+          size: A4;
+        }
+        @media print {
+          body,
+          html {
+            height: 257mm;
+            margin: 0 auto;
+            width: 170mm;
+            font-size: 12px;
+          }
+        }
+        @media screen {
+          .page {
+            margin-bottom: 5em;
+          }
+        }
+        .section-marker {
+          left: 0;
+          position: absolute;
+          top: 0;
+
+          * {
+            position: relative;
+          }
+        }
+    </style>
+</head>
+<body id="page-container">
+
+<header role="banner">
+    <span class="visually-hidden">BOOTHOP BD LTD</span><img src="./BOOTHOP BD LTD_files/ch-logo.png" alt="">
+
+    <h1 class="heading-xlarge">BOOTHOP BD LTD<br>
+        17241701</h1>
+
+    
+
+    <p class="heading-small">Created: 28 May 2026 18:24:17 (UTC)</p>
+    <p class="heading-small">Companies House does not check the accuracy of the information filed</p>
+</header>
+<main role="main">
+
+    <h2 class="heading-large">Overview</h2>
+    <ul class="list list-bullet">
+        
+            
+        <li>
+
+            
+                Registered office address:
+            
+
+            
+            
+            
+            
+            Suite 418, 37 Westminster Buildings Theatre Square,
+            
+            
+            
+            Nottingham,
+            
+            
+            
+            United Kingdom
+                
+            
+            
+            NG1 6LG
+            
+        </li>
+        
+        
+
+        
+
+        
+            <li>Company type: Private limited company
+                </li>
+        
+
+        
+            
+        
+
+        
+            <li>Incorporated on: 26 May 2026</li>
+        
+
+        
+
+        
+            <li>Status: Active
+                </li>
+        
+
+        
+    </ul>
+
+    
+
+        
+
+        
+
+            
+                <h3 class="heading-small">Key filing dates</h3>
+                <ul class="list list-bullet">
+                    
+                        <li>Accounting reference date: 31 May </li>
+                    
+                    
+                    
+                        <li>Next accounts due: 26 February 2028</li>
+                    
+                    
+                    
+                        <li>Next confirmation statement due: 8 June 2027</li>
+                    
+                    
+                </ul>
+            
+        
+
+    
+
+    
+    <h3 class="heading-small">Nature of business (SIC)</h3>
+    <ul class="list list-bullet">
+        
+        <li>58290 Other software publishing</li>
+        
+    </ul>
+    
+
+    
+
+    
+
+    <h2 class="heading-large">People</h2>
+
+    <h2 class="heading-medium">Officers:<br>
+         1 officers  /
+        
+             0 resignations 
+        
+    </h2>
+    
+        
+            <ul class="list list-bullet">
+
+                <li>Director OLUFEKO, Oluwatoyin Titilayo
+
+                    
+                        
+                            <span id="officer-status-tag-active" class="status-tag">Active</span>
+                        
+                    
+
+                    </li>
+
+                    
+                        <li>Nationality: British</li>
+                    
+
+                    
+                        
+                            <li>Appointed: 26 May 2026</li>
+                        
+                    
+
+                    
+                        <li>Date of birth: March 1971 </li>
+                    
+
+                    
+
+                    
+
+                    
+                        <li>Correspondence address:
+                            
+
+                            
+
+                            
+                                Suite 418, 37 Westminster Buildings,
+                            
+
+                            
+                                Theatre Square,
+                            
+
+                            
+
+                            
+                                Nottingham,
+                            
+
+                            
+
+                            
+                                United Kingdom,
+                            
+
+                            
+                            NG1 6LG
+                            
+
+                        </li>
+                    
+
+                    
+
+                    
+
+                    
+                         <li>Country/State of Residence: United Kingdom</li>
+                    
+
+                    
+
+                    
+
+                    
+                        
+                            <li>Identity verification status: Verification requirements complete</li>
+                        
+
+
+                        
+                
+            </ul>
+            <hr>
+        
+    
+
+    
+
+    
+
+    <h2 class="heading-medium">
+        
+            Persons with significant control:
+        <br>
+
+        
+
+        
+
+        
+            
+                1 active  person  with significant control
+             /
+        
+        
+            0 active statements
+        
+    </h2>
+    
+        
+            
+                <ul class="list list-bullet">
+                    <li>
+                            Oluwatoyin Titilayo Olufeko
+                        
+
+                        
+                            
+                                <span id="pscs-status-tag-active" class="status-tag">Active</span>
+                            
+                        
+                    </li>
+
+                    
+
+                    
+
+                    
+                    <li>Correspondence address:
+
+                        
+
+                        
+
+                        
+                        Suite 418, 37 Westminster Buildings,
+                        
+
+                        
+                        Theatre Square,
+                        
+
+                        
+
+                        
+                        Nottingham,
+                        
+
+                        
+
+                        
+                        United Kingdom,
+                        
+
+                        
+                        NG1 6LG
+                        
+
+                    </li>
+                    
+
+                    
+
+                    
+                    <li> Notified on: 26 May 2026 </li>
+                    
+
+                    
+
+                    
+                    <li>Date of birth: March 1971 </li>
+                    
+
+                    
+                    <li>Nationality: British</li>
+                    
+
+                    
+                    <li>Country of residence: United Kingdom</li>
+                    
+
+                    
+                    
+                        
+                            <li>Identity verification status: Verification requirements complete</li>
+                        
+                        
+                    
+                </ul>
+
+                
+                <h3 class="heading-small">Nature of control:</h3>
+
+                <ul class="list list-bullet">
+                    
+                    <li> Ownership of shares – 75% or more</li>
+                    
+                    <li> Ownership of voting rights - 75% or more</li>
+                    
+                    <li> Right to appoint or remove directors</li>
+                    
+                </ul>
+
+                
+            <hr>
+            
+        
+
+        
+    
+
+    
+        <h3 class="heading-large">Recent Filing History</h3>
+        <table>
+            <caption class="visually-hidden">Recent Filing History</caption>
+            
+            <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Form</th>
+                <th scope="col">Description</th>
+            </tr>
+            </thead>
+            <tbody><tr>
+                <td nowrap="nowrap">26 May 2026</td>
+                <td scope="row">NEWINC</td>
+                <td>Incorporation<br>
+                    
+                                <ul class="list list-bullet">
+                                    <li>MODEL ARTICLES model-articles-adopted</li>
+                                </ul>
+                            
+                        
+                                Statement of capital on 2026-05-26
+GBP 1
+                            
+                        
+                    
+                    <ul class="list list-bullet">
+                    
+                    
+                    </ul>
+                </td>
+            </tr>
+            
+            </tbody>
+        </table>
+    
+
+    
+
+    
+
+    
+
+    
+
+
+</main>
+
+
+</body></html>

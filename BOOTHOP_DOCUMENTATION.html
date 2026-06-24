@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BootHop Platform Documentation</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; line-height: 1.55; color: #1e293b; background: #f8fafc; }
+
+  /* HEADER */
+  .header { background: #0f172a; color: #f1f5f9; padding: 32px 48px 24px; }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .header .subtitle { color: #94a3b8; margin-top: 4px; font-size: 13px; }
+  .header .meta { margin-top: 14px; display: flex; gap: 24px; font-size: 11px; color: #64748b; }
+  .header .meta span { background: #1e293b; padding: 3px 10px; border-radius: 4px; }
+
+  /* PRODUCT BADGES */
+  .badge-p2p { background: #065f46; color: #6ee7b7; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-biz { background: #78350f; color: #fcd34d; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-admin { background: #1e3a5f; color: #93c5fd; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* LAYOUT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 48px; }
+  section { margin-bottom: 40px; }
+
+  /* SECTION HEADERS */
+  .section-title { font-size: 18px; font-weight: 700; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+  .section-title.p2p { border-color: #10b981; }
+  .section-title.biz { border-color: #f59e0b; }
+  .section-title.admin-sec { border-color: #3b82f6; }
+
+  .subsection-title { font-size: 14px; font-weight: 600; color: #334155; margin: 20px 0 10px; }
+
+  /* OVERVIEW CARDS */
+  .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px; }
+  .card.p2p-card { border-left: 4px solid #10b981; }
+  .card.biz-card { border-left: 4px solid #f59e0b; }
+  .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .card ul { padding-left: 16px; color: #475569; }
+  .card ul li { margin-bottom: 3px; }
+
+  /* TABLES */
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; margin-bottom: 18px; font-size: 12px; }
+  thead { background: #0f172a; color: #f1f5f9; }
+  thead.p2p-head { background: #064e3b; }
+  thead.biz-head { background: #78350f; }
+  thead.admin-head { background: #1e3a5f; }
+  thead.cron-head { background: #312e81; }
+  th { padding: 9px 12px; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; }
+  td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: #f8fafc; }
+  tr:hover { background: #f0f9ff; }
+
+  /* CODE / MONO */
+  code { font-family: 'Courier New', monospace; background: #f1f5f9; color: #0f172a; padding: 1px 5px; border-radius: 3px; font-size: 11px; border: 1px solid #e2e8f0; }
+  .status { font-family: 'Courier New', monospace; font-size: 11px; padding: 2px 7px; border-radius: 3px; font-weight: 600; white-space: nowrap; }
+  .status.green { background: #dcfce7; color: #166534; }
+  .status.blue { background: #dbeafe; color: #1e40af; }
+  .status.amber { background: #fef3c7; color: #92400e; }
+  .status.red { background: #fee2e2; color: #991b1b; }
+  .status.slate { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+  .status.purple { background: #ede9fe; color: #5b21b6; }
+
+  /* STATE MACHINE */
+  .state-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 18px; margin-bottom: 14px; }
+  .state-flow .arrow { color: #94a3b8; font-size: 14px; }
+  .side-states { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+
+  /* URL LIST */
+  .url-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .url-item { display: flex; align-items: baseline; gap: 8px; padding: 4px 8px; border-radius: 4px; }
+  .url-item:hover { background: #f8fafc; }
+  .url-item code { flex-shrink: 0; }
+  .url-item span { color: #64748b; font-size: 11px; }
+
+  /* EMAIL NUMBERS */
+  .email-num { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: #0f172a; color: #f1f5f9; border-radius: 50%; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+
+  /* CALLOUT BOX */
+  .callout { border-radius: 6px; padding: 12px 16px; margin-bottom: 14px; font-size: 12px; }
+  .callout.info { background: #eff6ff; border-left: 3px solid #3b82f6; color: #1e40af; }
+  .callout.warn { background: #fffbeb; border-left: 3px solid #f59e0b; color: #92400e; }
+  .callout.success { background: #f0fdf4; border-left: 3px solid #22c55e; color: #166534; }
+
+  /* TIER CARDS */
+  .tier-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .tier-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
+  .tier-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .tier-card .price { font-size: 15px; font-weight: 700; color: #f59e0b; margin-bottom: 8px; }
+  .tier-card ul { padding-left: 14px; color: #475569; font-size: 11px; }
+  .tier-card ul li { margin-bottom: 3px; }
+
+  /* ENV VAR */
+  .env-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .env-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px; }
+  .env-item .env-key { font-family: 'Courier New', monospace; font-size: 11px; font-weight: 700; color: #0f172a; }
+  .env-item .env-desc { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+  /* DB TABLES GRID */
+  .db-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .db-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px 16px; }
+  .db-card h4 { font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #0f172a; font-family: 'Courier New', monospace; }
+  .db-card .cols { font-size: 11px; color: #475569; line-height: 1.6; }
+  .db-card .cols span { display: inline-block; background: #f1f5f9; border-radius: 3px; padding: 0 5px; margin: 1px 2px; font-family: 'Courier New', monospace; }
+
+  /* TREE */
+  .tree { background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 20px 24px; font-family: 'Courier New', monospace; font-size: 11.5px; line-height: 1.7; overflow-x: auto; }
+  .tree .dir { color: #93c5fd; font-weight: 600; }
+  .tree .file { color: #a7f3d0; }
+  .tree .comment { color: #64748b; }
+
+  /* PAGE BREAKS */
+  .page-break { page-break-before: always; break-before: page; }
+
+  /* FOOTER */
+  .footer { background: #0f172a; color: #475569; padding: 20px 48px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; margin-top: 48px; }
+  .footer .brand { color: #94a3b8; font-weight: 600; }
+
+  /* PRINT */
+  @media print {
+    body { background: #fff; font-size: 11px; }
+    .container { padding: 20px 30px; }
+    .header { padding: 20px 30px; }
+    .footer { padding: 14px 30px; }
+    .page-break { page-break-before: always; }
+    table { font-size: 10px; }
+    tr:hover { background: inherit; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>BootHop Platform — Technical Documentation</h1>
+  <div class="subtitle">QA Testing &amp; Business Analysis Reference · Two-Product Single Codebase</div>
+  <div class="meta">
+    <span>Version 2.0</span>
+    <span>Last updated: 15 June 2026</span>
+    <span>Platform: Next.js 14 · Supabase · Stripe · Vercel</span>
+    <span>Audience: QA Testers, Business Analysts</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ========== VERSION 2.0 CHANGELOG ========== -->
+<section>
+  <div class="section-title" style="border-color:#f59e0b;">What Changed in v2.0 (15 June 2026)</div>
+  <div class="callout warn">
+    18 fixes applied across 3 commits + 5 uncommitted files. See <code>BOOTHOP_CHANGES_2026-06-15.html</code> for full necessity assessment.
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Area</th><th>What Was Wrong</th><th>Fix</th><th>Commit</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Messages inbox</td><td>Queried dead <code>delivery_matches</code> / <code>messages</code> tables — inbox showed nothing</td><td>Complete rewrite using <code>/api/auth/me</code> + <code>/api/dashboard</code></td><td><span style="font-family:monospace;font-size:11px;background:#1e3a5f;color:#93c5fd;padding:1px 6px;border-radius:3px;">3ccc27f</span></td></tr>
+      <tr><td>2</td><td>Africa-outbound matches</td><td><code>awaiting_authorisation</code> status never expired — trips locked forever if admin didn't act</td><td>Added 7-day expiry bucket to expire-matches cron</td><td><span style="font-family:monospace;font-size:11px;background:#1e3a5f;color:#93c5fd;padding:1px 6px;border-radius:3px;">3ccc27f</span></td></tr>
+      <tr><td>3</td><td>Expire-matches cron</td><td>Ran once daily at 03:00 — 4h timeouts could wait 23h to process</td><td>Changed schedule to every 6 hours <code>0 */6 * * *</code></td><td><span style="font-family:monospace;font-size:11px;background:#1e3a5f;color:#93c5fd;padding:1px 6px;border-radius:3px;">3ccc27f</span></td></tr>
+      <tr><td>4</td><td>Barcode scan</td><td>No lifecycle guard — location requestable before delivery was active</td><td>Status guard: only <code>active</code> or <code>delivery_confirmed</code> allowed</td><td><span style="font-family:monospace;font-size:11px;background:#1e3a5f;color:#93c5fd;padding:1px 6px;border-radius:3px;">3ccc27f</span></td></tr>
+      <tr><td>5</td><td>Barcode scan</td><td>Null barcode sent <code>/track/null</code> in push notifications</td><td>Added null check returning 400 before any notification sent</td><td><span style="font-family:monospace;font-size:11px;background:#1e3a5f;color:#93c5fd;padding:1px 6px;border-radius:3px;">3ccc27f</span></td></tr>
+      <tr><td>6</td><td>Priority portal</td><td><code>d.discount</code> → field doesn't exist; discount badge always blank</td><td>Corrected to <code>d.partner_discount</code></td><td><span style="font-family:monospace;font-size:11px;background:#1e3a5f;color:#93c5fd;padding:1px 6px;border-radius:3px;">38e9411</span></td></tr>
+      <tr><td>7</td><td>Priority Stripe redirect</td><td>Standard portal stripped <code>?payment=success&amp;jobRef=</code> when bouncing priority users — success screen never showed</td><td>Preserve query string in redirect; priority portal reads params on mount</td><td><span style="font-family:monospace;font-size:11px;background:#1e3a5f;color:#93c5fd;padding:1px 6px;border-radius:3px;">38e9411</span></td></tr>
+      <tr><td>8</td><td>Both portals</td><td>Ghost <code>pending_payment</code> jobs appeared in active list with no action buttons</td><td>Separated into "Incomplete bookings" section; main list filters them out</td><td><span style="font-family:monospace;font-size:11px;background:#1e3a5f;color:#93c5fd;padding:1px 6px;border-radius:3px;">38e9411</span></td></tr>
+      <tr><td>9</td><td>Business webhook</td><td>Webhook updated DB but sent no email when Stripe payment landed</td><td>Webhook now sends payment-confirmed email to client + admin alert</td><td><span style="font-family:monospace;font-size:11px;background:#1e3a5f;color:#93c5fd;padding:1px 6px;border-radius:3px;">38e9411</span></td></tr>
+      <tr><td>10</td><td>Payment success URL</td><td>Folder named <code>payment/succes/</code> — <code>/api/payment/create-checkout</code> sent users to 404</td><td>Renamed to <code>payment/success/</code>; cleared <code>.next/types</code> cache</td><td><span style="font-family:monospace;font-size:11px;background:#1e3a5f;color:#93c5fd;padding:1px 6px;border-radius:3px;">0ce4d81</span></td></tr>
+      <tr><td>11</td><td>Checkout return URL</td><td><code>return_url</code> pointed to <code>/checkout/success</code> — page never existed</td><td>Corrected to <code>/payment/success?match_id=</code></td><td><span style="font-family:monospace;font-size:11px;background:#1e3a5f;color:#93c5fd;padding:1px 6px;border-radius:3px;">0ce4d81</span></td></tr>
+      <tr><td>12</td><td>BusinessNav</td><td>"I'm a Priority Client" linked to marketing/sign-up page, not sign-in</td><td>Updated both dropdown and banner to <code>/business/priority-sign-in</code></td><td>uncommitted</td></tr>
+      <tr><td>13</td><td>New page</td><td>No dedicated sign-in page for priority clients (amber branding)</td><td>Created <code>/business/priority-sign-in</code> with amber theme + correct routing</td><td>uncommitted</td></tr>
+      <tr><td>14</td><td>OTP input (all 3 sign-ins)</td><td><code>replace(/\D/g,'')</code> stripped the letter from 5-char OTP — login impossible for all business users</td><td>Changed to <code>replace(/[^A-Z0-9]/gi,'')</code>, maxLength 5, disabled threshold 5</td><td>uncommitted</td></tr>
+      <tr><td>15</td><td>Priority sign-in routing</td><td>Hard-coded push to priority portal regardless of account type</td><td>Calls <code>/api/business/auth/me</code> post-verify; routes by <code>partner_status</code></td><td>uncommitted</td></tr>
+      <tr><td>16</td><td>Carrier sign-in mobile</td><td><code>inputMode="numeric"</code> — numeric keyboard on mobile has no letter key for the OTP letter</td><td>Changed to <code>inputMode="text"</code></td><td>uncommitted</td></tr>
+      <tr><td>17</td><td>Sign-in pages (UX)</td><td>Logged-in users saw sign-in form again</td><td>Auth check on mount; redirect to correct portal if already signed in</td><td>uncommitted</td></tr>
+      <tr><td>18</td><td>Client email check (cleanup)</td><td>Redundant substring-match email domain check duplicating API validation</td><td>Removed client-side check; API response drives error</td><td>uncommitted</td></tr>
+    </tbody>
+  </table>
+  <div class="callout info" style="margin-top:12px;">
+    <strong>Still open — Fix 5 (OTP expired UX):</strong> When OTP expires mid-flow, user sees an error but must manually click back to restart. Approach to be decided: actionable error link vs auto-reset. Not yet implemented.
+  </div>
+</section>
+
+<!-- ========== SECTION 1: OVERVIEW ========== -->
+<section>
+  <div class="section-title">1 — Platform Overview</div>
+
+  <div class="callout info">
+    BootHop runs <strong>two independent products</strong> from a single Next.js codebase. Each has its own authentication, database tables, email flows, and admin interfaces. They share infrastructure (Supabase, Vercel, Stripe, SendGrid).
+  </div>
+
+  <div class="overview-grid">
+    <div class="card p2p-card">
+      <h3><span class="badge-p2p">P2P</span> &nbsp;Marketplace — Hoopers &amp; Booters</h3>
+      <ul>
+        <li><strong>Hoopers</strong> (senders) post delivery requests</li>
+        <li><strong>Booters</strong> (travellers) carry goods along their route</li>
+        <li>Custom JWT auth — email OTP, cookie: <code>boothop_session</code></li>
+        <li>9-stage match state machine + 3 side states</li>
+        <li>Stripe Identity KYC (no Stripe payments — manual admin)</li>
+        <li>21 transactional emails across full lifecycle</li>
+        <li>3 core cron jobs (auto-match, reminders, expiry)</li>
+      </ul>
+    </div>
+    <div class="card biz-card">
+      <h3><span class="badge-biz">B2B</span> &nbsp;Business Platform — Logistics</h3>
+      <ul>
+        <li>Three service tiers: Express Booking, Carrier Network, Priority Partner</li>
+        <li>Separate OTP auth — cookie: <code>boothop_biz_session</code></li>
+        <li>Stripe checkout for all B2B payments</li>
+        <li>Automated job-engine with carrier matching &amp; escalation</li>
+        <li>34 scheduled cron jobs across the full platform</li>
+        <li>Dedicated admin dashboards per tier</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="subsection-title">Tech Stack at a Glance</div>
+  <table>
+    <thead><tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>Frontend</td><td>Next.js 14 (App Router, TypeScript)</td><td>All UI — P2P, Business, Admin, Carrier portals</td></tr>
+      <tr><td>Database</td><td>Supabase (PostgreSQL)</td><td>All tables, RLS, realtime; 17 migration files</td></tr>
+      <tr><td>Auth</td><td>Custom JWT (email OTP)</td><td>Two separate sessions: P2P and Business</td></tr>
+      <tr><td>Payments</td><td>Stripe Checkout + Stripe Identity</td><td>B2B fees, carrier registration, KYC verification</td></tr>
+      <tr><td>Email</td><td>SendGrid</td><td>34+ transactional email types</td></tr>
+      <tr><td>Hosting / Cron</td><td>Vercel</td><td>Deployment + 34 scheduled cron endpoints</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ========== SECTION 2: P2P MARKETPLACE ========== -->
+<section class="page-break">
+  <div class="section-title p2p">2 — P2P Marketplace <span class="badge-p2p">Product 1</span></div>
+
+  <!-- 2A: Screens -->
+  <div class="subsection-title">2.1 — Key Screens &amp; Routes</div>
+  <div class="url-grid">
+    <div class="url-item"><code>/</code><span>Home / landing page</span></div>
+    <div class="url-item"><code>/login</code><span>Email entry for OTP</span></div>
+    <div class="url-item"><code>/verify</code><span>OTP code entry</span></div>
+    <div class="url-item"><code>/register</code><span>New user profile setup</span></div>
+    <div class="url-item"><code>/intent</code><span>Choose role: Hooper or Booter</span></div>
+    <div class="url-item"><code>/dashboard</code><span>Matches, trips, drafts overview</span></div>
+    <div class="url-item"><code>/matches/[id]</code><span>Full match detail, chat, disputes, ratings</span></div>
+    <div class="url-item"><code>/commit</code><span>Sign Terms &amp; Conditions</span></div>
+    <div class="url-item"><code>/kyc</code><span>Stripe Identity + payment form</span></div>
+    <div class="url-item"><code>/checkout/[matchId]</code><span>Payment submission by Hooper</span></div>
+    <div class="url-item"><code>/journeys</code><span>Booter: list of posted trips</span></div>
+    <div class="url-item"><code>/journeys/create</code><span>Booter: post a new trip</span></div>
+    <div class="url-item"><code>/requests</code><span>Hooper: list of delivery requests</span></div>
+    <div class="url-item"><code>/requests/create</code><span>Hooper: create a delivery request</span></div>
+    <div class="url-item"><code>/messages</code><span>Messaging inbox — lists all active/confirmed/disputed matches</span></div>
+    <div class="url-item"><code>/messages/[matchId]</code><span>In-app chat per match</span></div>
+    <div class="url-item"><code>/payment/success</code><span>Post-Stripe payment confirmation screen</span></div>
+    <div class="url-item"><code>/admin/hub</code><span>Payments, disputes, refunds tabs</span></div>
+  </div>
+
+  <!-- 2B: State Machine -->
+  <div class="subsection-title">2.2 — Match State Machine (9 Stages)</div>
+  <div class="state-flow">
+    <span class="status slate">matched</span>
+    <span class="arrow">→</span>
+    <span class="status blue">agreed</span>
+    <span class="arrow">→</span>
+    <span class="status blue">committed</span>
+    <span class="arrow">→</span>
+    <span class="status amber">kyc_pending</span>
+    <span class="arrow">→</span>
+    <span class="status amber">kyc_complete</span>
+    <span class="arrow">→</span>
+    <span class="status purple">payment_processing</span>
+    <span class="arrow">→</span>
+    <span class="status green">active</span>
+    <span class="arrow">→</span>
+    <span class="status green">delivery_confirmed</span>
+    <span class="arrow">→</span>
+    <span class="status green">completed</span>
+  </div>
+  <div class="side-states">
+    <strong style="font-size:11px;color:#475569;">Side states:</strong>
+    <span class="status red">cancelled</span>
+    <span class="status red">cancellation_requested</span>
+    <span class="status red">disputed</span>
+    <span class="status amber">awaiting_authorisation</span>
+    <span style="font-size:11px;color:#92400e;">(Africa-outbound only — admin must approve; auto-expires after 7 days)</span>
+  </div>
+
+  <br>
+  <table>
+    <thead class="p2p-head"><tr><th>Stage</th><th>Trigger</th><th>Who Acts</th><th>Next Stage</th></tr></thead>
+    <tbody>
+      <tr><td><span class="status slate">matched</span></td><td>Auto-match cron finds compatible trip + request</td><td>System</td><td>agreed</td></tr>
+      <tr><td><span class="status blue">agreed</span></td><td>Both parties accept the match</td><td>Hooper + Booter</td><td>committed</td></tr>
+      <tr><td><span class="status blue">committed</span></td><td>Both parties sign T&amp;Cs at <code>/commit</code></td><td>Hooper + Booter</td><td>kyc_pending</td></tr>
+      <tr><td><span class="status amber">kyc_pending</span></td><td>T&amp;Cs complete, awaiting identity verification</td><td>System</td><td>kyc_complete</td></tr>
+      <tr><td><span class="status amber">kyc_complete</span></td><td>Both KYC sessions approved by Stripe Identity</td><td>Stripe webhook</td><td>payment_processing</td></tr>
+      <tr><td><span class="status purple">payment_processing</span></td><td>Hooper submits payment at <code>/checkout/[matchId]</code></td><td>Hooper</td><td>active (admin)</td></tr>
+      <tr><td><span class="status green">active</span></td><td>Admin confirms payment received in hub</td><td>Admin (manual)</td><td>delivery_confirmed</td></tr>
+      <tr><td><span class="status green">delivery_confirmed</span></td><td>Both parties confirm delivery</td><td>Hooper + Booter</td><td>completed (admin)</td></tr>
+      <tr><td><span class="status green">completed</span></td><td>Admin releases payment to Booter</td><td>Admin (manual)</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 2C: Email Flows -->
+  <div class="subsection-title">2.3 — Email Flows (21 Emails)</div>
+  <table>
+    <thead class="p2p-head"><tr><th>#</th><th>Email Name</th><th>Recipients</th><th>Trigger</th></tr></thead>
+    <tbody>
+      <tr><td><span class="email-num">1</span></td><td>OTP Code</td><td>User</td><td>Login / Register — email entry</td></tr>
+      <tr><td><span class="email-num">2</span></td><td>Match Found</td><td>Both parties</td><td>Auto-match cron — includes Accept/Decline buttons</td></tr>
+      <tr><td><span class="email-num">3</span></td><td>Match Confirmed</td><td>Both parties</td><td>Both accept the match</td></tr>
+      <tr><td><span class="email-num">4</span></td><td>Terms Signed</td><td>Signer</td><td>Each individual T&amp;C signature</td></tr>
+      <tr><td><span class="email-num">5</span></td><td>Both Terms Signed</td><td>Both parties</td><td>Second signer completes — triggers KYC step</td></tr>
+      <tr><td><span class="email-num">6</span></td><td>Your ID Verified</td><td>Individual party</td><td>Stripe Identity approves one party's KYC</td></tr>
+      <tr><td><span class="email-num">7</span></td><td>Both IDs Verified</td><td>Both parties</td><td>Both KYC complete — Hooper told to pay, Booter to wait</td></tr>
+      <tr><td><span class="email-num">8</span></td><td>Admin Payment Alert</td><td>Admin</td><td>Hooper submits payment — admin clicks Confirm</td></tr>
+      <tr><td><span class="email-num">9</span></td><td>Payment Request Received</td><td>Hooper</td><td>Hooper's payment submission confirmed</td></tr>
+      <tr><td><span class="email-num">10</span></td><td>Contact Details Released</td><td>Both parties</td><td>Admin confirms payment — both receive each other's email</td></tr>
+      <tr><td><span class="email-num">11</span></td><td>Carrier Delivery Reminder</td><td>Booter</td><td>Cron (6h) — active matches approaching delivery</td></tr>
+      <tr><td><span class="email-num">12</span></td><td>Sender Receipt Reminder</td><td>Hooper</td><td>Cron (6h) — active matches, prompt Hooper to confirm</td></tr>
+      <tr><td><span class="email-num">13</span></td><td>Admin Release Payment Alert</td><td>Admin</td><td>Both parties confirm delivery — admin prompted to release</td></tr>
+      <tr><td><span class="email-num">14</span></td><td>Delivery Complete</td><td>Both parties</td><td>Admin releases payment — confirms job done</td></tr>
+      <tr><td><span class="email-num">15</span></td><td>Rating Request</td><td>Both parties</td><td>Admin releases payment — prompts rating submission</td></tr>
+      <tr><td><span class="email-num" style="background:#7f1d1d;">D1</span></td><td>Dispute Raised</td><td>Admin + Support</td><td>Either party raises a dispute on match</td></tr>
+      <tr><td><span class="email-num" style="background:#7f1d1d;">D2</span></td><td>Dispute Acknowledged</td><td>Raiser</td><td>Admin acknowledges the dispute</td></tr>
+      <tr><td><span class="email-num" style="background:#7f1d1d;">D3</span></td><td>Dispute Resolved</td><td>Both parties</td><td>Admin resolves dispute via hub</td></tr>
+      <tr><td><span class="email-num" style="background:#374151;">X1</span></td><td>Match Expired</td><td>Both parties</td><td>Cron (3h) — stale match auto-cancelled</td></tr>
+      <tr><td><span class="email-num" style="background:#374151;">C1</span></td><td>Refund Request</td><td>Admin</td><td>Hooper requests cancellation</td></tr>
+      <tr><td><span class="email-num" style="background:#374151;">C2</span></td><td>Cancellation Confirmed</td><td>Hooper</td><td>Admin confirms cancellation and refund</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 2D: Admin Actions -->
+  <div class="subsection-title">2.4 — Admin Manual Actions (P2P)</div>
+  <div class="callout warn">
+    P2P payments are <strong>NOT processed through Stripe</strong>. Admin manually verifies receipt and releases funds. Three discrete manual steps exist.
+  </div>
+  <table>
+    <thead class="p2p-head"><tr><th>Step</th><th>Admin Action</th><th>Location</th><th>Result</th><th>API Endpoint</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Confirm Payment Received</td><td><code>/admin/hub</code> → Payments tab</td><td>Status → <span class="status green">active</span>, contact details released</td><td><code>/api/admin/confirm-payment</code></td></tr>
+      <tr><td>2</td><td>Release Payment to Booter</td><td><code>/admin/hub</code> → Payments tab</td><td>Status → <span class="status green">completed</span>, rating emails sent</td><td><code>/api/admin/release-payment</code></td></tr>
+      <tr><td>3</td><td>Resolve Dispute</td><td><code>/admin/hub</code> → Disputes tab</td><td>Dispute closed, D3 emails sent to both parties</td><td><code>/api/admin/disputes/resolve</code></td></tr>
+    </tbody>
+  </table>
+
+  <!-- 2E: Auth -->
+  <div class="subsection-title">2.5 — Authentication (P2P)</div>
+  <table>
+    <thead class="p2p-head"><tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/api/auth/request-code</code></td><td>POST</td><td>Send OTP to email</td></tr>
+      <tr><td><code>/api/auth/verify-code</code></td><td>POST</td><td>Validate OTP → sets <code>boothop_session</code> cookie</td></tr>
+      <tr><td><code>/api/auth/confirm-action</code></td><td>POST</td><td>Validate action tokens (accept/decline links in emails)</td></tr>
+      <tr><td><code>/api/auth/me</code></td><td>GET</td><td>Return current session user</td></tr>
+      <tr><td><code>/api/auth/logout</code></td><td>POST</td><td>Clear session cookie</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ========== SECTION 3: BUSINESS PLATFORM ========== -->
+<section class="page-break">
+  <div class="section-title biz">3 — Business Platform (B2B) <span class="badge-biz">Product 2</span></div>
+
+  <div class="callout info">
+    Auth: separate OTP flow, cookie <code>boothop_biz_session</code>. OTP format: <strong>4 digits + 1 letter = 5 characters</strong> (e.g. <code>4827A</code>). Remember-me cookie <code>boothop_biz_remember</code> (30 days) skips OTP on trusted devices. Three independent service tiers share the same auth API, each has its own branded sign-in page.
+  </div>
+
+  <div class="tier-grid">
+    <div class="tier-card" style="border-top:3px solid #f59e0b;">
+      <h4>A — Express Booking</h4>
+      <div class="price">UK £300+ / Intl £1,000+</div>
+      <ul>
+        <li>6-step booking wizard</li>
+        <li>Route → Cargo → Urgency → Add-ons → Review → Pay</li>
+        <li>Stripe Checkout payment</li>
+        <li>Admin assigns carrier manually</li>
+        <li>Data in <code>business_jobs</code> table</li>
+      </ul>
+    </div>
+    <div class="tier-card" style="border-top:3px solid #10b981;">
+      <h4>B — Carrier Network</h4>
+      <div class="price">£250 registration</div>
+      <ul>
+        <li>Application at <code>/business/carrier-network</code></li>
+        <li>Auto Companies House verification</li>
+        <li>Stripe fee payment</li>
+        <li>Admin approves at <code>/admin/business/carriers</code></li>
+        <li>On job: HMAC-signed status links emailed</li>
+        <li>Carrier earns 70% of client fee</li>
+      </ul>
+    </div>
+    <div class="tier-card" style="border-top:3px solid #8b5cf6;">
+      <h4>C — Priority Partner</h4>
+      <div class="price">UK £10,000 / Intl £15,000/yr</div>
+      <ul>
+        <li>Application at <code>/business/priority-partner</code></li>
+        <li>2-hour AM call SLA guaranteed</li>
+        <li>5% discount on all bookings</li>
+        <li>Dedicated account manager</li>
+        <li>Monthly reports</li>
+        <li>Admin manages at <code>/admin/business/priority</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 3A: Business Screens -->
+  <div class="subsection-title">3.1 — Key Business Screens</div>
+  <div class="url-grid">
+    <div class="url-item"><code>/business</code><span>B2B landing page</span></div>
+    <div class="url-item"><code>/business/express</code><span>Express 6-step booking wizard</span></div>
+    <div class="url-item"><code>/business/carrier-network</code><span>Carrier application form</span></div>
+    <div class="url-item"><code>/business/carrier-network/payment</code><span>£250 registration fee</span></div>
+    <div class="url-item"><code>/business/priority-partner</code><span>Priority Partner application</span></div>
+    <div class="url-item"><code>/business/priority-partner/payment</code><span>Annual fee payment</span></div>
+    <div class="url-item"><code>/business/sign-in</code><span>Express Client OTP sign-in (emerald)</span></div>
+    <div class="url-item"><code>/business/priority-sign-in</code><span>Priority Partner OTP sign-in (amber) — NEW v2.0</span></div>
+    <div class="url-item"><code>/business/carrier-sign-in</code><span>Carrier OTP sign-in (blue)</span></div>
+    <div class="url-item"><code>/business/portal</code><span>Express Client job portal — pending_payment jobs separated</span></div>
+    <div class="url-item"><code>/business/portal/priority</code><span>Priority Partner portal — discount badge + Stripe success fixed</span></div>
+    <div class="url-item"><code>/carrier/accept</code><span>Carrier job acceptance page</span></div>
+    <div class="url-item"><code>/admin/business/ops</code><span>Live ops dashboard (auto-refresh 60s)</span></div>
+    <div class="url-item"><code>/admin/business/carriers</code><span>Carrier network management</span></div>
+    <div class="url-item"><code>/admin/business/priority</code><span>Priority Partners management</span></div>
+  </div>
+
+  <!-- 3B: Job Status Flow -->
+  <div class="subsection-title">3.2 — Business Job Status Flow</div>
+  <div class="state-flow">
+    <span class="status purple">pending_payment</span>
+    <span class="arrow">→</span>
+    <span class="status slate">review</span>
+    <span class="arrow">→</span>
+    <span class="status blue">matching</span>
+    <span class="arrow">→</span>
+    <span class="status amber">assigned</span>
+    <span class="arrow">→</span>
+    <span class="status amber">collected</span>
+    <span class="arrow">→</span>
+    <span class="status purple">in_transit</span>
+    <span class="arrow">→</span>
+    <span class="status green">delivered</span>
+  </div>
+
+  <table>
+    <thead class="biz-head"><tr><th>Status</th><th>Trigger</th><th>Actor</th></tr></thead>
+    <tbody>
+      <tr><td><span class="status purple">pending_payment</span></td><td>Client creates booking but Stripe checkout not yet completed; expires if abandoned</td><td>System</td></tr>
+      <tr><td><span class="status slate">review</span></td><td>Stripe <code>checkout.session.completed</code> webhook fires — payment confirmed; email sent to client + admin</td><td>Stripe webhook</td></tr>
+      <tr><td><span class="status slate">received</span> <em style="font-size:10px;color:#94a3b8;">(legacy)</em></td><td>Previous label for review state — may appear in older jobs</td><td>System / Stripe webhook</td></tr>
+      <tr><td><span class="status blue">matching</span></td><td>Job-engine runs, alerts all active carriers</td><td>Cron (every 2 min)</td></tr>
+      <tr><td><span class="status amber">assigned</span></td><td>Carrier accepts via emailed link at <code>/carrier/accept</code></td><td>Carrier</td></tr>
+      <tr><td><span class="status amber">collected</span></td><td>Carrier clicks HMAC-signed "Collected" link from email</td><td>Carrier (email link)</td></tr>
+      <tr><td><span class="status purple">in_transit</span></td><td>Carrier clicks HMAC-signed "In transit" link from email</td><td>Carrier (email link)</td></tr>
+      <tr><td><span class="status green">delivered</span></td><td>Carrier clicks HMAC-signed "Delivered" link from email</td><td>Carrier (email link)</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3C: Job Engine -->
+  <div class="subsection-title">3.3 — Automated Job Engine</div>
+  <table>
+    <thead class="biz-head"><tr><th>Cron</th><th>Interval</th><th>Behaviour</th></tr></thead>
+    <tbody>
+      <tr><td><code>job-engine</code></td><td>Every 2 min</td><td>Finds <span class="status slate">received</span> jobs → emails all active carriers in range with "Accept this job" link</td></tr>
+      <tr><td><code>match-widen</code></td><td>Every 5 min</td><td>No acceptance → expands search radius: 50 → 75 → 100 miles</td></tr>
+      <tr><td><code>carrier-no-show</code></td><td>Every 20 min</td><td>90 min uncollected → suspends carrier → reopens job to network</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3D: Business Emails -->
+  <div class="subsection-title">3.4 — Business Email Flows</div>
+  <table>
+    <thead class="biz-head"><tr><th>Email</th><th>Recipients</th><th>Trigger</th></tr></thead>
+    <tbody>
+      <tr><td>Express quote enquiry</td><td>Admin</td><td>Client submits express booking enquiry</td></tr>
+      <tr><td>Booking received</td><td>Client</td><td>Client submits booking before Stripe payment — "we have your request"</td></tr>
+      <tr><td>Payment confirmed</td><td>Client + Admin</td><td>Stripe <code>checkout.session.completed</code> webhook — payment landed (priority-aware copy)</td></tr>
+      <tr><td>Carrier applied</td><td>Applicant + Admin</td><td>Carrier submits application form</td></tr>
+      <tr><td>Carrier approved</td><td>Carrier</td><td>Admin approves carrier application</td></tr>
+      <tr><td>Priority applied</td><td>Applicant</td><td>Priority Partner application submitted — confirms AM call promise</td></tr>
+      <tr><td>Priority activated</td><td>Client</td><td>Admin activates account — welcome email with benefits</td></tr>
+      <tr><td>Job available</td><td>Carriers (all active)</td><td>Job-engine cron — includes "Accept this job" link</td></tr>
+      <tr><td>Job accepted</td><td>Carrier</td><td>Carrier accepts — receives full addresses + HMAC status links</td></tr>
+      <tr><td>Carrier assigned</td><td>Client</td><td>Carrier accepted — client notified</td></tr>
+      <tr><td>Job collected</td><td>Admin</td><td>Carrier clicks Collected link</td></tr>
+      <tr><td>Job in transit</td><td>Admin + Client</td><td>Carrier clicks In Transit link</td></tr>
+      <tr><td>Job delivered</td><td>Admin + Client</td><td>Carrier clicks Delivered link — payment countdown starts</td></tr>
+      <tr><td>Job auto-complete (48h)</td><td>Client</td><td>48h after delivered with no dispute — job auto-completed</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3E: Priority Partner Admin -->
+  <div class="subsection-title">3.5 — Priority Partner Admin Actions</div>
+  <table>
+    <thead class="biz-head"><tr><th>Action</th><th>Location</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Mark AM Called</td><td><code>/admin/business/priority</code></td><td>Records AM call completion against SLA</td></tr>
+      <tr><td>Activate Account</td><td><code>/admin/business/priority</code></td><td>Sends welcome email with benefits; account goes live</td></tr>
+      <tr><td>Suspend</td><td><code>/admin/business/priority</code></td><td>Disables client access; suspends SLA obligations</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ========== SECTION 4: ADMIN OPERATIONS ========== -->
+<section class="page-break">
+  <div class="section-title admin-sec">4 — Admin Operations <span class="badge-admin">Internal</span></div>
+
+  <table>
+    <thead class="admin-head"><tr><th>Admin Route</th><th>Purpose</th><th>Key Actions</th></tr></thead>
+    <tbody>
+      <tr><td><code>/admin/hub</code></td><td>P2P central hub</td><td>Payments tab (confirm/release), Disputes tab (resolve), Refunds tab</td></tr>
+      <tr><td><code>/admin/compliance</code></td><td>P2P KYC &amp; compliance</td><td>View Stripe Identity results, flag issues</td></tr>
+      <tr><td><code>/admin/customs</code></td><td>Customs documentation</td><td>View/manage customs forms for cross-border shipments</td></tr>
+      <tr><td><code>/admin/business/ops</code></td><td>B2B live operations</td><td>Auto-refresh 60s, live job status board, carrier assignment</td></tr>
+      <tr><td><code>/admin/business/carriers</code></td><td>Carrier network management</td><td>Approve/reject applications, suspend carriers, view profiles</td></tr>
+      <tr><td><code>/admin/business/priority</code></td><td>Priority Partner management</td><td>AM call logging, activate/suspend accounts, renewal tracking</td></tr>
+    </tbody>
+  </table>
+
+  <div class="subsection-title">4.1 — Admin API Endpoints</div>
+  <table>
+    <thead class="admin-head"><tr><th>Endpoint</th><th>Method</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td><code>/api/admin/hub</code></td><td>GET</td><td>Fetch all actionable matches for admin review</td></tr>
+      <tr><td><code>/api/admin/confirm-payment</code></td><td>POST</td><td>Mark payment received → status: active</td></tr>
+      <tr><td><code>/api/admin/release-payment</code></td><td>POST</td><td>Release to Booter → status: completed</td></tr>
+      <tr><td><code>/api/admin/disputes/resolve</code></td><td>POST</td><td>Resolve dispute, notify both parties</td></tr>
+      <tr><td><code>/api/admin/carriers</code></td><td>GET/POST</td><td>List carrier applications; approve/reject</td></tr>
+      <tr><td><code>/api/admin/ops</code></td><td>GET</td><td>Live job board data for ops dashboard</td></tr>
+      <tr><td><code>/api/admin/priority</code></td><td>GET/POST</td><td>Priority Partner list; AM call / activate / suspend</td></tr>
+      <tr><td><code>/api/business/update-status</code></td><td>POST</td><td>Manually update a business job status</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ========== SECTION 5: CRON JOBS ========== -->
+<section class="page-break">
+  <div class="section-title" style="border-color:#6366f1;">5 — Cron Job Schedule (34 Jobs)</div>
+
+  <div class="callout info">All cron jobs are defined in <code>vercel.json</code> and invoke <code>/api/cron/[name]</code> endpoints. Jobs run on Vercel's infrastructure with cron syntax.</div>
+
+  <div class="subsection-title">5.1 — Sub-Minute / Frequent (Business Automation)</div>
+  <table>
+    <thead class="cron-head"><tr><th>Job</th><th>Endpoint</th><th>Interval</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>job-engine</td><td><code>/api/cron/job-engine</code></td><td>Every 2 min</td><td>Find new jobs, alert carrier network</td></tr>
+      <tr><td>match-widen</td><td><code>/api/cron/match-widen</code></td><td>Every 5 min</td><td>Expand carrier search radius if no acceptance</td></tr>
+      <tr><td>pickup-reminder</td><td><code>/api/cron/pickup-reminder</code></td><td>Every 15 min</td><td>Chase assigned carrier to collect</td></tr>
+      <tr><td>carrier-no-show</td><td><code>/api/cron/carrier-no-show</code></td><td>Every 20 min</td><td>90min uncollected → suspend carrier, reopen job</td></tr>
+      <tr><td>priority-am</td><td><code>/api/cron/priority-am</code></td><td>Every 30 min</td><td>Check Priority Partner AM call obligations</td></tr>
+      <tr><td>priority-sla-check</td><td><code>/api/cron/priority-sla-check</code></td><td>Every 30 min</td><td>Monitor 2-hour SLA compliance</td></tr>
+      <tr><td>late-delivery-alert</td><td><code>/api/cron/late-delivery-alert</code></td><td>Every 30 min</td><td>Alert admin of overdue deliveries</td></tr>
+    </tbody>
+  </table>
+
+  <div class="subsection-title">5.2 — Daily Jobs</div>
+  <table>
+    <thead class="cron-head"><tr><th>Job</th><th>Time (UTC)</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>payment-release</code></td><td>07:00</td><td>Auto-release held payments to carriers</td></tr>
+      <tr><td><code>payment-pending-admin</code></td><td>07:30</td><td>Alert admin of pending payment confirmations</td></tr>
+      <tr><td><code>cert-expiry</code></td><td>06:00</td><td>Check carrier certification expiry dates</td></tr>
+      <tr><td><code>co-house-check</code></td><td>06:30</td><td>Companies House status verification</td></tr>
+      <tr><td><code>vat-validation</code></td><td>07:00</td><td>Validate VAT numbers for carriers</td></tr>
+      <tr><td><code>carrier-onboarding</code></td><td>09:00</td><td>Onboarding tasks for newly approved carriers</td></tr>
+      <tr><td><code>carrier-inactive</code></td><td>10:00</td><td>Flag or suspend inactive carriers</td></tr>
+      <tr><td><code>insurance-chase</code></td><td>10:00</td><td>Chase carriers for insurance document submission</td></tr>
+      <tr><td><code>priority-renewals</code></td><td>09:00</td><td>Process Priority Partner annual renewals</td></tr>
+      <tr><td><code>priority-onboarding</code></td><td>10:00</td><td>Onboarding tasks for new Priority Partners</td></tr>
+      <tr><td><code>priority-am-daily</code></td><td>08:00</td><td>Daily AM call scheduling for Priority Partners</td></tr>
+      <tr><td><code>priority-feedback</code></td><td>11:00</td><td>Send feedback requests to Priority Partners</td></tr>
+      <tr><td><code>booking-abandoned</code></td><td>14:00</td><td>Follow up incomplete/abandoned bookings</td></tr>
+      <tr><td><code>job-auto-complete</code></td><td>08:00</td><td>Auto-complete jobs 48h after delivered status</td></tr>
+      <tr><td><code>job-daily-stats</code></td><td>18:00</td><td>Compile and store daily job metrics</td></tr>
+      <tr><td><code>photo-proof-chase</code></td><td>Every 4h</td><td>Chase carriers for delivery photo proof</td></tr>
+      <tr><td><code>auto-payout</code></td><td>02:00</td><td>Process automated carrier payouts</td></tr>
+      <tr><td><code>expire-matches</code></td><td>Every 6h (00:00, 06:00, 12:00, 18:00)</td><td>P2P: cancel stale matches (4h/12h/72h/7d thresholds), send X1 email. Includes <code>awaiting_authorisation</code> 7-day bucket.</td></tr>
+      <tr><td><code>delivery-reminders</code></td><td>09:00</td><td>P2P: delivery reminder emails (emails 11+12)</td></tr>
+      <tr><td><code>follow-up-unmatched</code></td><td>11:00</td><td>P2P: follow up on unmatched requests</td></tr>
+      <tr><td><code>ghost-detector</code></td><td>04:00</td><td>Detect users who accepted match but went silent</td></tr>
+      <tr><td><code>process-webhook-queue</code></td><td>00:00</td><td>Process any queued webhooks from Stripe/external</td></tr>
+      <tr><td><code>instagram-post</code></td><td>09:00</td><td>Automated Instagram content publishing</td></tr>
+    </tbody>
+  </table>
+
+  <div class="subsection-title">5.3 — Weekly Jobs</div>
+  <table>
+    <thead class="cron-head"><tr><th>Job</th><th>Schedule</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>carrier-summaries</code></td><td>Monday 08:00</td><td>Weekly performance summary to all active carriers</td></tr>
+      <tr><td><code>payment-reconciliation</code></td><td>Monday 09:00</td><td>Reconcile all payments for the week</td></tr>
+      <tr><td><code>instagram-analytics</code></td><td>Monday 10:00</td><td>Pull and store Instagram engagement analytics</td></tr>
+    </tbody>
+  </table>
+
+  <div class="subsection-title">5.4 — Monthly Jobs</div>
+  <table>
+    <thead class="cron-head"><tr><th>Job</th><th>Schedule</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>priority-summaries</code></td><td>1st of month 08:00</td><td>Monthly performance &amp; usage reports to Priority Partners</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ========== SECTION 6: DATABASE TABLES ========== -->
+<section class="page-break">
+  <div class="section-title" style="border-color:#0ea5e9;">6 — Database Tables (Supabase / PostgreSQL)</div>
+
+  <div class="callout info">17 migration files in <code>supabase/migrations/</code> — must be run in order. All tables use Row Level Security (RLS).</div>
+
+  <div class="subsection-title">6.1 — Core P2P Tables</div>
+  <div class="db-grid">
+    <div class="db-card">
+      <h4>profiles</h4>
+      <div class="cols">User accounts for P2P. <span>id</span><span>email</span><span>full_name</span><span>role</span><span>phone</span><span>kyc_status</span><span>stripe_identity_id</span><span>created_at</span></div>
+    </div>
+    <div class="db-card">
+      <h4>trips</h4>
+      <div class="cols">Booter journey posts. <span>id</span><span>booter_id</span><span>origin</span><span>destination</span><span>travel_date</span><span>available_space</span><span>status</span><span>created_at</span></div>
+    </div>
+    <div class="db-card">
+      <h4>matches</h4>
+      <div class="cols">Core match entity. <span>id</span><span>trip_id</span><span>request_id</span><span>hooper_id</span><span>booter_id</span><span>status</span><span>agreed_price</span><span>expires_at</span><span>created_at</span></div>
+    </div>
+    <div class="db-card">
+      <h4>terms_acceptance</h4>
+      <div class="cols">T&amp;C signatures. <span>id</span><span>match_id</span><span>user_id</span><span>signed_at</span><span>ip_address</span></div>
+    </div>
+    <div class="db-card">
+      <h4>action_tokens</h4>
+      <div class="cols">Email action links (accept/decline/confirm). <span>id</span><span>token</span><span>match_id</span><span>user_id</span><span>action</span><span>expires_at</span><span>used_at</span></div>
+    </div>
+    <div class="db-card">
+      <h4>disputes</h4>
+      <div class="cols">P2P dispute records. <span>id</span><span>match_id</span><span>raised_by</span><span>reason</span><span>status</span><span>resolution</span><span>created_at</span><span>resolved_at</span></div>
+    </div>
+    <div class="db-card">
+      <h4>ratings</h4>
+      <div class="cols">Post-delivery ratings. <span>id</span><span>match_id</span><span>rater_id</span><span>ratee_id</span><span>score</span><span>comment</span><span>created_at</span></div>
+    </div>
+    <div class="db-card">
+      <h4>match_messages</h4>
+      <div class="cols">In-app chat messages. <span>id</span><span>match_id</span><span>sender_id</span><span>content</span><span>created_at</span><span>read_at</span></div>
+    </div>
+    <div class="db-card">
+      <h4>email_login_codes</h4>
+      <div class="cols">OTP codes for auth. <span>id</span><span>email</span><span>code</span><span>expires_at</span><span>used_at</span><span>created_at</span></div>
+    </div>
+    <div class="db-card">
+      <h4>booter_applications</h4>
+      <div class="cols">Booter onboarding applications. <span>id</span><span>user_id</span><span>documents</span><span>status</span><span>reviewed_at</span><span>created_at</span></div>
+    </div>
+  </div>
+
+  <div class="subsection-title">6.2 — Business Platform Tables</div>
+  <div class="db-grid">
+    <div class="db-card">
+      <h4>business_jobs</h4>
+      <div class="cols">Express booking jobs. <span>id</span><span>client_id</span><span>route</span><span>cargo</span><span>urgency</span><span>addons</span><span>price</span><span>status</span><span>carrier_id</span><span>stripe_session_id</span><span>created_at</span></div>
+    </div>
+    <div class="db-card">
+      <h4>express_quotes</h4>
+      <div class="cols">Pre-booking quote records. <span>id</span><span>email</span><span>route</span><span>cargo_type</span><span>estimated_price</span><span>created_at</span></div>
+    </div>
+    <div class="db-card">
+      <h4>carrier_profiles</h4>
+      <div class="cols">Registered B2B carriers. <span>id</span><span>company_name</span><span>companies_house_no</span><span>status</span><span>contact_email</span><span>coverage_radius</span><span>stripe_payment_id</span><span>approved_at</span></div>
+    </div>
+    <div class="db-card">
+      <h4>priority_partners</h4>
+      <div class="cols">Priority Partner accounts. <span>id</span><span>company_name</span><span>contact_email</span><span>tier</span><span>status</span><span>annual_fee</span><span>am_called_at</span><span>activated_at</span><span>renewal_date</span></div>
+    </div>
+    <div class="db-card">
+      <h4>jobs</h4>
+      <div class="cols">Carrier network job assignments. <span>id</span><span>business_job_id</span><span>carrier_id</span><span>status</span><span>accepted_at</span><span>collected_at</span><span>delivered_at</span><span>hmac_token</span></div>
+    </div>
+    <div class="db-card">
+      <h4>job_match_log</h4>
+      <div class="cols">Carrier matching audit trail. <span>id</span><span>job_id</span><span>carrier_id</span><span>alerted_at</span><span>response</span><span>radius_at_alert</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 7: PROJECT TREE ========== -->
+<section class="page-break">
+  <div class="section-title" style="border-color:#64748b;">7 — Project Structure</div>
+  <div class="tree">
+<span class="dir">src/app/</span>
+├── <span class="file">page.tsx</span>                         <span class="comment">// Home landing</span>
+├── <span class="dir">login/ verify/ register/ intent/</span>  <span class="comment">// P2P auth flow</span>
+├── <span class="dir">dashboard/</span>                       <span class="comment">// Matches, trips, drafts</span>
+├── <span class="dir">matches/[id]/</span>                    <span class="comment">// Match detail + chat + dispute</span>
+├── <span class="dir">commit/ kyc/ checkout/[matchId]/</span> <span class="comment">// T&amp;Cs, KYC, payment</span>
+├── <span class="dir">journeys/ journeys/create/</span>        <span class="comment">// Booter trip management</span>
+├── <span class="dir">requests/ requests/create/</span>        <span class="comment">// Hooper request management</span>
+├── <span class="dir">messages/[matchId]/</span>              <span class="comment">// In-app chat</span>
+├── <span class="dir">profile/ ratings/ confirm/</span>        <span class="comment">// Profile, ratings, confirmations</span>
+│
+├── <span class="dir">admin/</span>
+│   ├── <span class="dir">hub/</span>                             <span class="comment">// P2P: payments, disputes, refunds</span>
+│   ├── <span class="dir">compliance/ customs/</span>             <span class="comment">// KYC review, customs docs</span>
+│   └── <span class="dir">business/</span>
+│       ├── <span class="dir">ops/</span>                         <span class="comment">// Live ops dashboard (60s refresh)</span>
+│       ├── <span class="dir">carriers/</span>                    <span class="comment">// Carrier network management</span>
+│       └── <span class="dir">priority/</span>                    <span class="comment">// Priority Partner management</span>
+│
+├── <span class="dir">business/</span>
+│   ├── <span class="file">page.tsx</span>                     <span class="comment">// B2B landing</span>
+│   ├── <span class="dir">express/</span>                     <span class="comment">// 6-step booking wizard</span>
+│   ├── <span class="dir">sign-in/</span>                     <span class="comment">// Express Client OTP sign-in (emerald)</span>
+│   ├── <span class="dir">priority-sign-in/</span>            <span class="comment">// Priority Partner OTP sign-in (amber) — NEW v2.0</span>
+│   ├── <span class="dir">carrier-sign-in/</span>             <span class="comment">// Carrier OTP sign-in (blue)</span>
+│   ├── <span class="dir">carrier-network/ .../payment/</span> <span class="comment">// Carrier application + fee</span>
+│   ├── <span class="dir">priority-partner/ .../payment/</span> <span class="comment">// PP application + annual fee (marketing page)</span>
+│   ├── <span class="dir">portal/</span>                      <span class="comment">// Express Client job portal</span>
+│   └── <span class="dir">portal/priority/</span>             <span class="comment">// Priority Partner client portal</span>
+│
+├── <span class="dir">carrier/accept/</span>                  <span class="comment">// Carrier job acceptance page</span>
+│
+└── <span class="dir">api/</span>
+    ├── <span class="dir">auth/</span>                            <span class="comment">// request-code, verify-code, confirm-action, logout, me</span>
+    ├── <span class="dir">business/auth/</span>                   <span class="comment">// send-otp, verify-otp, me, logout</span>
+    ├── <span class="dir">matches/[id]/</span>                    <span class="comment">// details, respond, confirm-delivery, rate, express-interest, cancel</span>
+    ├── <span class="dir">business/</span>                        <span class="comment">// express-quote, create-job, my-jobs, carrier-apply, priority-apply</span>
+    │                                        <span class="comment">// jobs/accept, jobs/status, checkout, update-status</span>
+    ├── <span class="dir">admin/</span>                           <span class="comment">// hub, confirm-payment, release-payment, disputes/resolve</span>
+    │                                        <span class="comment">// carriers, ops, priority</span>
+    └── <span class="dir">cron/</span>                            <span class="comment">// 36 scheduled endpoints — see Section 5</span>
+
+<span class="dir">supabase/migrations/</span>                 <span class="comment">// 17 SQL migration files — run in sequence</span>
+<span class="dir">public/</span>                              <span class="comment">// Static assets</span>
+<span class="file">vercel.json</span>                          <span class="comment">// Cron schedule + deployment config</span>
+<span class="file">next.config.js</span>                       <span class="comment">// Next.js config</span>
+  </div>
+</section>
+
+<!-- ========== SECTION 8: ENVIRONMENT VARIABLES ========== -->
+<section class="page-break">
+  <div class="section-title" style="border-color:#ec4899;">8 — Environment Variables Required</div>
+
+  <div class="callout warn">All variables must be set in Vercel project settings and in <code>.env.local</code> for local development. Never commit to source control.</div>
+
+  <div class="subsection-title">8.1 — Database &amp; Auth</div>
+  <div class="env-grid">
+    <div class="env-item"><div class="env-key">NEXT_PUBLIC_SUPABASE_URL</div><div class="env-desc">Supabase project URL (public)</div></div>
+    <div class="env-item"><div class="env-key">NEXT_PUBLIC_SUPABASE_ANON_KEY</div><div class="env-desc">Supabase anon/public key</div></div>
+    <div class="env-item"><div class="env-key">SUPABASE_SERVICE_ROLE_KEY</div><div class="env-desc">Supabase service role key (server-only)</div></div>
+    <div class="env-item"><div class="env-key">JWT_SECRET</div><div class="env-desc">Secret for signing P2P session JWTs</div></div>
+    <div class="env-item"><div class="env-key">BIZ_JWT_SECRET</div><div class="env-desc">Secret for signing Business session JWTs</div></div>
+    <div class="env-item"><div class="env-key">CRON_SECRET</div><div class="env-desc">Bearer token to authenticate cron endpoint calls</div></div>
+  </div>
+
+  <div class="subsection-title">8.2 — Stripe</div>
+  <div class="env-grid">
+    <div class="env-item"><div class="env-key">STRIPE_SECRET_KEY</div><div class="env-desc">Stripe API secret key (server-only)</div></div>
+    <div class="env-item"><div class="env-key">NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</div><div class="env-desc">Stripe publishable key (client-side)</div></div>
+    <div class="env-item"><div class="env-key">STRIPE_WEBHOOK_SECRET</div><div class="env-desc">Stripe webhook endpoint signing secret</div></div>
+    <div class="env-item"><div class="env-key">STRIPE_IDENTITY_WEBHOOK_SECRET</div><div class="env-desc">Stripe Identity webhook signing secret</div></div>
+  </div>
+
+  <div class="subsection-title">8.3 — Email</div>
+  <div class="env-grid">
+    <div class="env-item"><div class="env-key">SENDGRID_API_KEY</div><div class="env-desc">SendGrid API key for transactional emails</div></div>
+    <div class="env-item"><div class="env-key">EMAIL_FROM</div><div class="env-desc">Sender email address (e.g. hello@boothop.co.uk)</div></div>
+    <div class="env-item"><div class="env-key">ADMIN_EMAIL</div><div class="env-desc">Admin notification recipient email</div></div>
+    <div class="env-item"><div class="env-key">SUPPORT_EMAIL</div><div class="env-desc">Support team email for dispute notifications</div></div>
+  </div>
+
+  <div class="subsection-title">8.4 — Application</div>
+  <div class="env-grid">
+    <div class="env-item"><div class="env-key">NEXT_PUBLIC_BASE_URL</div><div class="env-desc">Base URL for email links (e.g. https://boothop.co.uk)</div></div>
+    <div class="env-item"><div class="env-key">HMAC_SECRET</div><div class="env-desc">Secret for signing carrier status update links</div></div>
+    <div class="env-item"><div class="env-key">COMPANIES_HOUSE_API_KEY</div><div class="env-desc">Companies House API for carrier verification</div></div>
+    <div class="env-item"><div class="env-key">INSTAGRAM_ACCESS_TOKEN</div><div class="env-desc">Instagram Graph API token for social posting</div></div>
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <div>
+    <div class="brand">BootHop Platform Documentation</div>
+    <div style="margin-top:3px;">Version 1.0 &nbsp;·&nbsp; Generated 7 June 2026 &nbsp;·&nbsp; For internal QA and business analysis use only</div>
+  </div>
+  <div style="text-align:right;">
+    <div style="color:#64748b;">Two Products · One Codebase</div>
+    <div style="margin-top:3px;">Next.js 14 · Supabase · Stripe · Vercel · SendGrid</div>
+  </div>
+</div>
+
+</body>
+</html>

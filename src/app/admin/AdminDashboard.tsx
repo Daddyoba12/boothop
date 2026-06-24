@@ -1,54 +1,96 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  Users, User, Package, DollarSign, AlertTriangle,
+  Users, Package, DollarSign, AlertTriangle,
   CheckCircle, Shield, Search, Filter,
-  Eye, Ban, Mail, Calendar, MapPin,
+  Eye, Mail, Calendar, MapPin,
   TrendingUp, Activity, Download, RefreshCw, Clock,
   Send, MessageSquare, X, ChevronDown, Zap,
   ArrowLeft, HelpCircle, ChevronRight,
+  Plus, Trash2, Edit2,
 } from 'lucide-react';
+
+// ─── helpers ────────────────────────────────────────────────────────────────
+
+function fmt(date: string | null | undefined) {
+  if (!date) return '—';
+  return new Date(date).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'short', year: 'numeric',
+  });
+}
+
+function fmtLong(date: string | null | undefined) {
+  if (!date) return '—';
+  return new Date(date).toLocaleString('en-GB', {
+    day: 'numeric', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  });
+}
+
+// ─── component ───────────────────────────────────────────────────────────────
 
 export default function AdminDashboard({ serverSession }: { serverSession: any }) {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'users' | 'matches' | 'escrow' | 'disputes'>('users');
-  const [searchQuery, setSearchQuery] = useState('');
+
+  // original state
+  const [loading, setLoading]   = useState(true);
+  const [activeTab, setActiveTab] = useState<'journeys' | 'matches' | 'escrow' | 'disputes'>('journeys');
+  const [searchQuery, setSearchQuery]   = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  
-  const [users, setUsers] = useState<any[]>([]);
-  const [matches, setMatches] = useState<any[]>([]);
-  const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
-  const [disputes, setDisputes] = useState<any[]>([]);
+
+  const [users, setUsers]                     = useState<any[]>([]);
+  const [matches, setMatches]                 = useState<any[]>([]);
+  const [escrowPayments, setEscrowPayments]   = useState<any[]>([]);
+  const [disputes, setDisputes]               = useState<any[]>([]);
 
   const [showHelp, setShowHelp]                 = useState(false);
   const [nearMissScanning, setNearMissScanning] = useState(false);
   const [nearMissResult, setNearMissResult]     = useState<string | null>(null);
   const [selectedEmails, setSelectedEmails]     = useState<Set<string>>(new Set());
-  const [showCompose, setShowCompose]       = useState(false);
-  const [composeTemplate, setComposeTemplate] = useState('thankyou');
-  const [composeSubject, setComposeSubject] = useState('');
-  const [composeBody, setComposeBody]       = useState('');
-  const [composeSending, setComposeSending] = useState(false);
-  const [composeResult, setComposeResult]   = useState<string | null>(null);
+  const [showCompose, setShowCompose]           = useState(false);
+  const [composeTemplate, setComposeTemplate]   = useState('thankyou');
+  const [composeSubject, setComposeSubject]     = useState('');
+  const [composeBody, setComposeBody]           = useState('');
+  const [composeSending, setComposeSending]     = useState(false);
+  const [composeResult, setComposeResult]       = useState<string | null>(null);
 
   const [stats, setStats] = useState({
-    totalUsers: 0,
-    verifiedUsers: 0,
-    activeMatches: 0,
-    completedMatches: 0,
-    escrowAmount: 0,
-    releasedAmount: 0,
-    pendingDisputes: 0,
-    platformRevenue: 0
+    totalUsers: 0, verifiedUsers: 0, activeMatches: 0, completedMatches: 0,
+    escrowAmount: 0, releasedAmount: 0, pendingDisputes: 0, platformRevenue: 0,
   });
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
+  // journey command state
+  const [sortField, setSortField] = useState<'date' | 'status' | 'route'>('date');
+  const [sortDir, setSortDir]     = useState<'asc' | 'desc'>('desc');
+
+  const [selectedTrip, setSelectedTrip]   = useState<any>(null);
+  const [tripDetail, setTripDetail]       = useState<any>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [actionResult, setActionResult]   = useState<string | null>(null);
+
+  const [showAddJourney, setShowAddJourney] = useState(false);
+  const [addForm, setAddForm] = useState({
+    from_city: '', to_city: '', travel_date: '', weight: '', price: '', type: 'travel',
+  });
+  const [addBusy, setAddBusy]   = useState(false);
+  const [addError, setAddError] = useState('');
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteReason, setDeleteReason]       = useState('');
+  const [deleteBusy, setDeleteBusy]           = useState(false);
+
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updateField, setUpdateField]         = useState('status');
+  const [updateValue, setUpdateValue]         = useState('');
+  const [updateReason, setUpdateReason]       = useState('');
+  const [updateBusy, setUpdateBusy]           = useState(false);
+
+  // ── data loading ─────────────────────────────────────────────────────────
+
+  useEffect(() => { loadDashboardData(); }, []);
 
   const loadDashboardData = async () => {
     try {
@@ -65,30 +107,27 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
       setEscrowPayments(escrowData);
       setDisputes(disputesData);
 
-      const activeCount      = matchesData.filter((m: any) => m.status === 'accepted' || m.status === 'in_transit').length;
-      const completedCount   = matchesData.filter((m: any) => m.status === 'completed').length;
-      const escrowSum        = escrowData.reduce((s: number, m: any) => s + Number(m.agreed_price || 0), 0);
-      const releasedSum      = matchesData.filter((m: any) => m.payment_status === 'released').reduce((s: number, m: any) => s + Number(m.agreed_price || 0), 0);
-      const pendingDisputes  = disputesData.filter((d: any) => d.status === 'open' || d.status === 'pending').length;
-      const revenue          = matchesData.filter((m: any) => m.status === 'completed').reduce((s: number, m: any) => s + (Number(m.hooper_pays || 0) - Number(m.booter_receives || 0)), 0);
+      const activeCount    = matchesData.filter((m: any) => m.status === 'accepted' || m.status === 'in_transit').length;
+      const completedCount = matchesData.filter((m: any) => m.status === 'completed').length;
+      const escrowSum      = escrowData.reduce((s: number, m: any) => s + Number(m.agreed_price || 0), 0);
+      const releasedSum    = matchesData.filter((m: any) => m.payment_status === 'released').reduce((s: number, m: any) => s + Number(m.agreed_price || 0), 0);
+      const pendingDisputeCount = disputesData.filter((d: any) => d.status === 'open' || d.status === 'pending').length;
+      const revenue        = matchesData.filter((m: any) => m.status === 'completed').reduce((s: number, m: any) => s + (Number(m.hooper_pays || 0) - Number(m.booter_receives || 0)), 0);
 
       setStats({
-        totalUsers: usersData.length,
-        verifiedUsers: 0,
-        activeMatches: activeCount,
-        completedMatches: completedCount,
-        escrowAmount: escrowSum,
-        releasedAmount: releasedSum,
-        pendingDisputes,
-        platformRevenue: revenue,
+        totalUsers: usersData.length, verifiedUsers: 0,
+        activeMatches: activeCount, completedMatches: completedCount,
+        escrowAmount: escrowSum, releasedAmount: releasedSum,
+        pendingDisputes: pendingDisputeCount, platformRevenue: revenue,
       });
-
       setLoading(false);
-    } catch (error) {
-      console.error('Error loading admin data:', error);
+    } catch (err) {
+      console.error('Error loading admin data:', err);
       setLoading(false);
     }
   };
+
+  // ── escrow ────────────────────────────────────────────────────────────────
 
   const releaseEscrow = async (matchId: string) => {
     if (!confirm('⚠️ Are you sure you want to manually release this escrow payment?')) return;
@@ -101,12 +140,147 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
       if (!res.ok) throw new Error(await res.text());
       alert('✅ Escrow released successfully');
       loadDashboardData();
-    } catch (error) {
-      console.error('Error releasing escrow:', error);
+    } catch (err) {
+      console.error(err);
       alert('❌ Failed to release escrow');
     }
   };
 
+  // ── journey handlers ──────────────────────────────────────────────────────
+
+  const openTripDetail = async (trip: any) => {
+    setSelectedTrip(trip);
+    setTripDetail(null);
+    setDetailLoading(true);
+    setActionResult(null);
+    try {
+      const res  = await fetch(`/api/admin/journeys/${trip.id}/detail`);
+      const data = await res.json();
+      setTripDetail(data);
+    } catch {}
+    setDetailLoading(false);
+  };
+
+  const closeTripDrawer = () => {
+    setSelectedTrip(null);
+    setActionResult(null);
+  };
+
+  const handleAddJourney = async () => {
+    if (!addForm.from_city || !addForm.to_city || !addForm.travel_date) {
+      setAddError('From city, to city, and travel date are required');
+      return;
+    }
+    setAddBusy(true);
+    setAddError('');
+    try {
+      const res  = await fetch('/api/admin/journeys/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(addForm),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setShowAddJourney(false);
+      setAddForm({ from_city: '', to_city: '', travel_date: '', weight: '', price: '', type: 'travel' });
+      loadDashboardData();
+      setActionResult('✅ Journey posted as Künle A Aluko — now active.');
+    } catch (err: any) {
+      setAddError(err.message);
+    }
+    setAddBusy(false);
+  };
+
+  const handleDeleteTrip = async () => {
+    if (!selectedTrip || deleteReason.trim().length < 10) return;
+    setDeleteBusy(true);
+    try {
+      const res  = await fetch(`/api/admin/journeys/${selectedTrip.id}/delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: deleteReason }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setShowDeleteModal(false);
+      setDeleteReason('');
+      setSelectedTrip(null);
+      setActionResult(`✅ Journey cancelled. ${data.notified} parties notified.`);
+      loadDashboardData();
+    } catch (err: any) {
+      setShowDeleteModal(false);
+      setActionResult(`❌ ${err.message}`);
+    }
+    setDeleteBusy(false);
+  };
+
+  const handleUpdateTrip = async () => {
+    if (!selectedTrip || !updateValue || updateReason.trim().length < 10) return;
+    setUpdateBusy(true);
+    try {
+      const res  = await fetch(`/api/admin/journeys/${selectedTrip.id}/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ field: updateField, value: updateValue, reason: updateReason }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setShowUpdateModal(false);
+      setUpdateReason('');
+      setUpdateValue('');
+      setSelectedTrip((prev: any) => prev ? { ...prev, [updateField]: updateValue } : prev);
+      setActionResult('✅ Journey updated successfully.');
+      loadDashboardData();
+    } catch (err: any) {
+      setShowUpdateModal(false);
+      setActionResult(`❌ ${err.message}`);
+    }
+    setUpdateBusy(false);
+  };
+
+  // ── filtering & sorting ───────────────────────────────────────────────────
+
+  const filteredUsers = useMemo(() => users.filter(trip => {
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !q ||
+      trip.email?.toLowerCase().includes(q) ||
+      trip.from_city?.toLowerCase().includes(q) ||
+      trip.to_city?.toLowerCase().includes(q);
+    const matchesFilter = filterStatus === 'all' || trip.status === filterStatus || trip.type === filterStatus;
+    return matchesSearch && matchesFilter;
+  }), [users, searchQuery, filterStatus]);
+
+  const sortedJourneys = useMemo(() => {
+    const compare = (a: any, b: any) => {
+      if (sortField === 'date') {
+        const at = new Date(a.travel_date || a.created_at || 0).getTime();
+        const bt = new Date(b.travel_date || b.created_at || 0).getTime();
+        return sortDir === 'desc' ? bt - at : at - bt;
+      }
+      if (sortField === 'status') {
+        const as = a.status || '';
+        const bs = b.status || '';
+        return sortDir === 'asc' ? as.localeCompare(bs) : bs.localeCompare(as);
+      }
+      const ar = `${a.from_city}${a.to_city}`;
+      const br = `${b.from_city}${b.to_city}`;
+      return sortDir === 'asc' ? ar.localeCompare(br) : br.localeCompare(ar);
+    };
+    const active = filteredUsers.filter((t: any) => t.status === 'active').sort(compare);
+    const rest   = filteredUsers.filter((t: any) => t.status !== 'active').sort(compare);
+    return [...active, ...rest];
+  }, [filteredUsers, sortField, sortDir]);
+
+  const filteredMatches = useMemo(() => matches.filter(match => {
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !q ||
+      match.sender_trip?.from_city?.toLowerCase().includes(q) ||
+      match.sender_trip?.to_city?.toLowerCase().includes(q);
+    const matchesFilter = filterStatus === 'all' || match.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  }), [matches, searchQuery, filterStatus]);
+
+  // ── email compose ─────────────────────────────────────────────────────────
 
   const TEMPLATES: Record<string, { subject: string; body: string }> = {
     thankyou: {
@@ -164,7 +338,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
     setComposeSending(true);
     setComposeResult(null);
     try {
-      const res = await fetch('/api/admin/send-message', {
+      const res  = await fetch('/api/admin/send-message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -190,11 +364,11 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
       const res  = await fetch('/api/admin/near-miss-scan', { method: 'POST' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Scan failed');
-      if (data.pairs === 0) {
-        setNearMissResult('No near-miss pairs found right now.');
-      } else {
-        setNearMissResult(`⚡ Sent ${data.sent} near-miss alert${data.sent !== 1 ? 's' : ''}${data.failed > 0 ? ` (${data.failed} failed)` : ''} across ${data.pairs} pair${data.pairs !== 1 ? 's' : ''}`);
-      }
+      setNearMissResult(
+        data.pairs === 0
+          ? 'No near-miss pairs found right now.'
+          : `⚡ Sent ${data.sent} near-miss alert${data.sent !== 1 ? 's' : ''}${data.failed > 0 ? ` (${data.failed} failed)` : ''} across ${data.pairs} pair${data.pairs !== 1 ? 's' : ''}`
+      );
     } catch (err: any) {
       setNearMissResult(`❌ ${err.message}`);
     } finally {
@@ -202,21 +376,26 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
     }
   };
 
-  const filteredUsers = users.filter(trip => {
-    const matchesSearch = !searchQuery ||
-      trip.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      trip.from_city?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      trip.to_city?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || trip.status === filterStatus || trip.type === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
+  // ── sort column header ────────────────────────────────────────────────────
 
-  const filteredMatches = matches.filter(match => {
-    const matchesSearch = match.sender_trip?.from_city?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         match.sender_trip?.to_city?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || match.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
+  const SortTh = ({ field, label }: { field: 'date' | 'status' | 'route'; label: string }) => (
+    <th
+      className="px-6 py-4 text-left text-sm font-semibold text-white cursor-pointer hover:text-blue-300 transition-colors select-none"
+      onClick={() => {
+        if (sortField === field) setSortDir(d => (d === 'asc' ? 'desc' : 'asc'));
+        else { setSortField(field); setSortDir('desc'); }
+      }}
+    >
+      <div className="flex items-center gap-1.5">
+        {label}
+        <span className={`text-xs ${sortField === field ? 'text-blue-400' : 'text-white/20'}`}>
+          {sortField === field ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
+        </span>
+      </div>
+    </th>
+  );
+
+  // ── loading screen ────────────────────────────────────────────────────────
 
   if (loading) {
     return (
@@ -229,28 +408,23 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
     );
   }
 
+  // ── render ────────────────────────────────────────────────────────────────
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
-      
-      {/* ADMIN HEADER */}
+
+      {/* ── HEADER ──────────────────────────────────────────────────────── */}
       <nav className="bg-gradient-to-r from-red-600/20 via-orange-600/20 to-red-600/20 backdrop-blur-xl border-b border-red-400/30 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between gap-3">
-
-          {/* LEFT — back + title */}
           <div className="flex items-center gap-3 min-w-0">
-            <button
-              onClick={() => router.back()}
-              className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all shrink-0"
-              title="Go back"
-            >
+            <button onClick={() => router.back()} className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all shrink-0" title="Go back">
               <ArrowLeft className="w-5 h-5 text-white" />
             </button>
             <div className="hidden md:flex w-10 h-10 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl items-center justify-center shrink-0">
               <Shield className="text-white w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="font-bold text-white text-base md:text-xl leading-tight truncate">Admin Control Center</h1>
-              {/* Breadcrumb */}
+              <h1 className="font-bold text-white text-base md:text-xl leading-tight truncate">Admin Control Centre</h1>
               <div className="hidden md:flex items-center gap-1 text-white/40 text-xs">
                 <Link href="/dashboard" className="hover:text-white/70 transition-colors">Dashboard</Link>
                 <ChevronRight className="w-3 h-3" />
@@ -258,16 +432,14 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
               </div>
             </div>
           </div>
-
-          {/* RIGHT — sub-page links + actions */}
           <div className="flex items-center gap-1.5 flex-wrap justify-end">
             <Link href="/admin/hub"      className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-xl transition-all text-xs font-semibold">Hub</Link>
             <Link href="/admin/customs"  className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-xl transition-all text-xs font-semibold">Customs</Link>
             <Link href="/admin/business" className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-xl transition-all text-xs font-semibold">Business</Link>
-            <button onClick={loadDashboardData} className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all" title="Refresh data">
+            <button onClick={loadDashboardData} className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all" title="Refresh">
               <RefreshCw className="w-4 h-4 text-white" />
             </button>
-            <button onClick={() => setShowHelp(true)} className="p-2 bg-blue-600/40 hover:bg-blue-600/70 rounded-xl transition-all" title="Help & reference">
+            <button onClick={() => setShowHelp(true)} className="p-2 bg-blue-600/40 hover:bg-blue-600/70 rounded-xl transition-all" title="Help">
               <HelpCircle className="w-4 h-4 text-blue-300" />
             </button>
             <button onClick={() => router.push('/dashboard')} className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all font-semibold text-xs">
@@ -278,80 +450,41 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
       </nav>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
-        
-        {/* ENHANCED STATS GRID */}
+
+        {/* ── STATS GRID ────────────────────────────────────────────────── */}
         <div className="grid md:grid-cols-4 gap-6 mb-12">
-          {/* Total Users */}
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Users className="w-7 h-7 text-white" />
+          {[
+            { label: 'Total Journeys', value: stats.totalUsers,      sub: `${stats.verifiedUsers} KYC verified`,         icon: Users,      from: 'from-blue-500',   to: 'to-cyan-500',   accent: 'text-green-400',  iconRight: TrendingUp },
+            { label: 'Active Matches', value: stats.activeMatches,   sub: `${stats.completedMatches} completed`,          icon: Package,    from: 'from-green-500',  to: 'to-emerald-500', accent: 'text-blue-400', iconRight: Activity },
+            { label: 'In Escrow',      value: `£${stats.escrowAmount.toFixed(2)}`,  sub: `£${stats.releasedAmount.toFixed(2)} released`, icon: DollarSign, from: 'from-yellow-500', to: 'to-orange-500', accent: 'text-yellow-400', iconRight: Shield },
+            { label: 'Platform Revenue', value: `£${stats.platformRevenue.toFixed(2)}`, sub: 'From fees',               icon: TrendingUp, from: 'from-purple-500', to: 'to-pink-500',   accent: 'text-green-400',  iconRight: CheckCircle },
+          ].map(s => {
+            const Icon  = s.icon;
+            const IconR = s.iconRight;
+            return (
+              <div key={s.label} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all group">
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-14 h-14 bg-gradient-to-br ${s.from} ${s.to} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                    <Icon className="w-7 h-7 text-white" />
+                  </div>
+                  <IconR className={`w-5 h-5 ${s.accent}`} />
+                </div>
+                <p className="text-white/60 text-sm mb-1">{s.label}</p>
+                <p className="text-3xl font-bold text-white mb-2">{s.value}</p>
+                <p className={`text-xs ${s.accent}`}>{s.sub}</p>
               </div>
-              <TrendingUp className="w-5 h-5 text-green-400" />
-            </div>
-            <p className="text-white/60 text-sm mb-1">Total Users</p>
-            <p className="text-3xl font-bold text-white mb-2">{stats.totalUsers}</p>
-            <p className="text-xs text-green-400">
-              {stats.verifiedUsers} KYC verified ({stats.totalUsers > 0 ? ((stats.verifiedUsers / stats.totalUsers) * 100).toFixed(0) : 0}%)
-            </p>
-          </div>
-
-          {/* Active Matches */}
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Package className="w-7 h-7 text-white" />
-              </div>
-              <Activity className="w-5 h-5 text-blue-400" />
-            </div>
-            <p className="text-white/60 text-sm mb-1">Active Matches</p>
-            <p className="text-3xl font-bold text-white mb-2">{stats.activeMatches}</p>
-            <p className="text-xs text-blue-400">
-              {stats.completedMatches} completed
-            </p>
-          </div>
-
-          {/* Escrow Amount */}
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <DollarSign className="w-7 h-7 text-white" />
-              </div>
-              <Shield className="w-5 h-5 text-yellow-400" />
-            </div>
-            <p className="text-white/60 text-sm mb-1">In Escrow</p>
-            <p className="text-3xl font-bold text-white mb-2">£{stats.escrowAmount.toFixed(2)}</p>
-            <p className="text-xs text-yellow-400">
-              £{stats.releasedAmount.toFixed(2)} released
-            </p>
-          </div>
-
-          {/* Platform Revenue */}
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <TrendingUp className="w-7 h-7 text-white" />
-              </div>
-              <CheckCircle className="w-5 h-5 text-green-400" />
-            </div>
-            <p className="text-white/60 text-sm mb-1">Platform Revenue</p>
-            <p className="text-3xl font-bold text-white mb-2">£{stats.platformRevenue.toFixed(2)}</p>
-            <p className="text-xs text-green-400">
-              From fees
-            </p>
-          </div>
+            );
+          })}
         </div>
 
-        {/* NEAR-MISS QUICK ACTION */}
+        {/* ── NEAR-MISS ─────────────────────────────────────────────────── */}
         <div className="flex items-center gap-4 mb-6 flex-wrap">
           <button
             onClick={runNearMissScan}
             disabled={nearMissScanning}
             className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-amber-500/40 transition-all disabled:opacity-60 disabled:cursor-not-allowed text-sm"
           >
-            {nearMissScanning
-              ? <RefreshCw className="w-4 h-4 animate-spin" />
-              : <Zap className="w-4 h-4" />}
+            {nearMissScanning ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
             {nearMissScanning ? 'Scanning...' : 'Run Near-Miss Alerts'}
           </button>
           {nearMissResult && (
@@ -366,27 +499,24 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
           <span className="text-white/30 text-xs ml-auto">Auto-runs daily at 10:00 UTC</span>
         </div>
 
-        {/* SEARCH & FILTER BAR */}
+        {/* ── SEARCH & FILTER ───────────────────────────────────────────── */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
               <input
                 type="text"
-                placeholder="Search users, matches, emails..."
+                placeholder="Search by email, route, city..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
             </div>
-
-            {/* Filter */}
             <div className="relative">
               <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
               <select
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
+                onChange={e => setFilterStatus(e.target.value)}
                 className="pl-12 pr-8 py-3 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none cursor-pointer"
               >
                 <option value="all">All</option>
@@ -396,25 +526,24 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                 <option value="matched">Matched</option>
                 <option value="expired">Expired</option>
                 <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
               </select>
             </div>
-
-            {/* Export Button */}
             <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-500/50 transition-all flex items-center gap-2">
               <Download className="w-5 h-5" />
-              Export Data
+              Export
             </button>
           </div>
         </div>
 
-        {/* TABS */}
+        {/* ── TABS ──────────────────────────────────────────────────────── */}
         <div className="flex gap-3 mb-8 overflow-x-auto pb-2">
           {[
-            { key: 'users',    label: 'Users',    icon: Users,          count: users.length },
-            { key: 'matches',  label: 'Matches',  icon: Package,        count: matches.length },
-            { key: 'escrow',   label: 'Escrow',   icon: Shield,         count: escrowPayments.length },
-            { key: 'disputes', label: 'Disputes', icon: AlertTriangle,  count: disputes.length },
-          ].map((tab) => {
+            { key: 'journeys', label: 'Journeys', icon: Users,         count: users.length },
+            { key: 'matches',  label: 'Matches',  icon: Package,       count: matches.length },
+            { key: 'escrow',   label: 'Escrow',   icon: Shield,        count: escrowPayments.length },
+            { key: 'disputes', label: 'Disputes', icon: AlertTriangle, count: disputes.length },
+          ].map(tab => {
             const Icon = tab.icon;
             return (
               <button
@@ -428,9 +557,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
               >
                 <Icon className="w-5 h-5" />
                 {tab.label}
-                <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                  activeTab === tab.key ? 'bg-white/20' : 'bg-white/10'
-                }`}>
+                <span className={`px-2 py-1 rounded-full text-xs font-bold ${activeTab === tab.key ? 'bg-white/20' : 'bg-white/10'}`}>
                   {tab.count}
                 </span>
               </button>
@@ -438,99 +565,158 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
           })}
         </div>
 
-        {/* JOURNEYS TAB */}
-        {activeTab === 'users' && (
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-white/5 border-b border-white/10">
-                  <tr>
-                    <th className="px-4 py-4 w-10">
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 accent-blue-500 cursor-pointer"
-                        checked={filteredUsers.length > 0 && selectedEmails.size === new Set(filteredUsers.map((t: any) => t.email).filter(Boolean)).size}
-                        onChange={toggleSelectAll}
-                      />
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Email</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Type</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Route</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Travel Date</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Weight</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Price</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.length === 0 ? (
+        {/* ══════════════════════════════════════════════════════════════════
+            JOURNEYS TAB
+        ══════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'journeys' && (
+          <div>
+            {/* tab toolbar */}
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+              <div className="flex items-center gap-5 text-xs text-white/50">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse inline-block" />
+                  Active — pinned to top
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-400 inline-block" />
+                  Past / Cancelled
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-white/30 inline-block" />
+                  Click any row for full details
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setAddError('');
+                  setAddForm({ from_city: '', to_city: '', travel_date: '', weight: '', price: '', type: 'travel' });
+                  setShowAddJourney(true);
+                }}
+                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-green-500/40 transition-all text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Post Journey as Admin
+              </button>
+            </div>
+
+            {/* global action result banner */}
+            {actionResult && !selectedTrip && (
+              <div className={`mb-4 px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-between ${
+                actionResult.startsWith('✅') ? 'bg-green-500/20 text-green-300 border border-green-400/30' : 'bg-red-500/20 text-red-300 border border-red-400/30'
+              }`}>
+                <span>{actionResult}</span>
+                <button onClick={() => setActionResult(null)} className="text-white/40 hover:text-white ml-3">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-white/5 border-b border-white/10">
                     <tr>
-                      <td colSpan={8} className="px-6 py-12 text-center text-white/60">
-                        No journeys found
-                      </td>
+                      <th className="px-4 py-4 w-10">
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 accent-blue-500 cursor-pointer"
+                          checked={filteredUsers.length > 0 && selectedEmails.size === new Set(filteredUsers.map((t: any) => t.email).filter(Boolean)).size}
+                          onChange={toggleSelectAll}
+                        />
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-white">Email</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-white">Type</th>
+                      <SortTh field="route"  label="Route" />
+                      <SortTh field="date"   label="Travel Date" />
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-white">Weight</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-white">Price</th>
+                      <SortTh field="status" label="Status" />
                     </tr>
-                  ) : (
-                    filteredUsers.map((trip: any, i: number) => {
-                      const isTraveller = trip.type === 'travel' || trip.type === 'traveller';
-                      return (
-                        <tr key={trip.id || i} className={`border-b border-white/5 hover:bg-white/5 transition-colors ${trip.email && selectedEmails.has(trip.email) ? 'bg-blue-500/10' : ''}`}>
-                          <td className="px-4 py-4">
-                            <input
-                              type="checkbox"
-                              className="w-4 h-4 accent-blue-500 cursor-pointer"
-                              checked={!!trip.email && selectedEmails.has(trip.email)}
-                              onChange={() => trip.email && toggleEmailSelect(trip.email)}
-                            />
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2 text-white/80">
-                              <Mail className="w-4 h-4 text-blue-400 shrink-0" />
-                              <span className="text-sm">{trip.email || '—'}</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                              isTraveller ? 'bg-blue-500/20 text-blue-300' : 'bg-purple-500/20 text-purple-300'
-                            }`}>
-                              {isTraveller ? '✈️ Traveller' : '📦 Sender'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-1 text-white font-medium text-sm">
-                              <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
-                              {trip.from_city} → {trip.to_city}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 text-white/70 text-sm">
-                            {trip.travel_date ? new Date(trip.travel_date).toLocaleDateString() : '—'}
-                          </td>
-                          <td className="px-6 py-4 text-white/80 text-sm">
-                            {trip.weight ? `${trip.weight} kg` : '—'}
-                          </td>
-                          <td className="px-6 py-4 text-white font-semibold text-sm">
-                            {trip.price ? `£${Number(trip.price).toFixed(2)}` : '—'}
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                              trip.status === 'active'   ? 'bg-green-500/20 text-green-300' :
-                              trip.status === 'matched'  ? 'bg-blue-500/20 text-blue-300' :
-                              trip.status === 'expired'  ? 'bg-red-500/20 text-red-300' :
-                              'bg-white/10 text-white/60'
-                            }`}>
-                              {trip.status || 'unknown'}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {sortedJourneys.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="px-6 py-12 text-center text-white/60">No journeys found</td>
+                      </tr>
+                    ) : (
+                      sortedJourneys.map((trip: any, i: number) => {
+                        const isActive    = trip.status === 'active';
+                        const isPast      = ['expired', 'cancelled', 'inactive', 'completed'].includes(trip.status);
+                        const isTraveller = trip.type === 'travel' || trip.type === 'traveller';
+                        const isChecked   = !!trip.email && selectedEmails.has(trip.email);
+
+                        return (
+                          <tr
+                            key={trip.id || i}
+                            onClick={() => openTripDetail(trip)}
+                            className={`border-b transition-all cursor-pointer ${
+                              isChecked
+                                ? 'bg-blue-500/10 border-white/5'
+                                : isActive
+                                ? 'bg-green-500/5 hover:bg-green-500/10 border-l-2 border-l-green-500 border-b-white/5'
+                                : isPast
+                                ? 'bg-red-500/5 hover:bg-red-500/10 border-l-2 border-l-red-500/40 border-b-white/5'
+                                : 'hover:bg-white/5 border-white/5'
+                            }`}
+                          >
+                            <td className="px-4 py-4" onClick={e => e.stopPropagation()}>
+                              <input
+                                type="checkbox"
+                                className="w-4 h-4 accent-blue-500 cursor-pointer"
+                                checked={isChecked}
+                                onChange={() => trip.email && toggleEmailSelect(trip.email)}
+                              />
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-2 text-white/80">
+                                <Mail className="w-4 h-4 text-blue-400 shrink-0" />
+                                <span className="text-sm truncate max-w-48">{trip.email || '—'}</span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className={`px-2 py-1 rounded-full text-xs font-semibold ${isTraveller ? 'bg-blue-500/20 text-blue-300' : 'bg-purple-500/20 text-purple-300'}`}>
+                                {isTraveller ? '✈️ Traveller' : '📦 Sender'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-1 text-white font-medium text-sm">
+                                <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
+                                {trip.from_city} → {trip.to_city}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-white/70 text-sm">{fmt(trip.travel_date)}</td>
+                            <td className="px-6 py-4 text-white/80 text-sm">{trip.weight ? `${trip.weight} kg` : '—'}</td>
+                            <td className="px-6 py-4 text-white font-semibold text-sm">
+                              {trip.price ? `£${Number(trip.price).toFixed(2)}` : '—'}
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-2">
+                                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse shrink-0" />}
+                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                  isActive                        ? 'bg-green-500/20 text-green-300'  :
+                                  trip.status === 'matched'       ? 'bg-blue-500/20 text-blue-300'    :
+                                  trip.status === 'in_transit'    ? 'bg-cyan-500/20 text-cyan-300'    :
+                                  isPast                          ? 'bg-red-500/20 text-red-300'       :
+                                  'bg-white/10 text-white/60'
+                                }`}>
+                                  {trip.status || 'unknown'}
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
 
-        {/* MATCHES TAB */}
+        {/* ══════════════════════════════════════════════════════════════════
+            MATCHES TAB
+        ══════════════════════════════════════════════════════════════════ */}
         {activeTab === 'matches' && (
           <div className="space-y-4">
             {filteredMatches.length === 0 ? (
@@ -539,11 +725,8 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                 <p className="text-white/60">No matches found</p>
               </div>
             ) : (
-              filteredMatches.map((match) => (
-                <div
-                  key={match.id}
-                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all"
-                >
+              filteredMatches.map(match => (
+                <div key={match.id} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
@@ -554,19 +737,18 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                           <MapPin className="w-4 h-4 text-blue-400" />
                           {match.sender_trip?.from_city} → {match.sender_trip?.to_city}
                         </p>
-                        <p className="text-white/60 text-sm">Match ID: {match.id.slice(0, 12)}...</p>
+                        <p className="text-white/60 text-sm">Match ID: {match.id?.slice(0, 12)}...</p>
                       </div>
                     </div>
                     <div className={`px-4 py-2 rounded-full text-sm font-semibold border ${
-                      match.status === 'completed' ? 'bg-green-500/20 text-green-300 border-green-400/30' :
-                      match.status === 'accepted' || match.status === 'in_transit' ? 'bg-blue-500/20 text-blue-300 border-blue-400/30' :
-                      match.status === 'pending' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30' :
+                      match.status === 'completed'                                    ? 'bg-green-500/20 text-green-300 border-green-400/30' :
+                      match.status === 'accepted' || match.status === 'in_transit'   ? 'bg-blue-500/20 text-blue-300 border-blue-400/30' :
+                      match.status === 'pending'                                     ? 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30' :
                       'bg-red-500/20 text-red-300 border-red-400/30'
                     }`}>
                       {match.status}
                     </div>
                   </div>
-
                   <div className="grid md:grid-cols-2 gap-3 text-sm mb-4 bg-white/5 rounded-xl p-4">
                     <div className="flex items-center gap-2">
                       <Mail className="w-4 h-4 text-blue-400 shrink-0" />
@@ -583,49 +765,22 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                       </div>
                     </div>
                   </div>
-
                   <div className="grid md:grid-cols-5 gap-4 text-sm mb-4">
-                    <div>
-                      <p className="text-white/60 mb-1">Payment Status</p>
-                      <p className="text-white font-medium">{match.payment_status || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-white/60 mb-1">Amount</p>
-                      <p className="text-white font-medium">£{Number(match.agreed_price || 0).toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-white/60 mb-1">Travel Date</p>
-                      <p className="text-white font-medium">
-                        {match.sender_trip?.travel_date ? new Date(match.sender_trip.travel_date).toLocaleDateString() : 'N/A'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-white/60 mb-1">Created</p>
-                      <p className="text-white font-medium">
-                        {new Date(match.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
+                    <div><p className="text-white/60 mb-1">Payment</p><p className="text-white font-medium">{match.payment_status || 'N/A'}</p></div>
+                    <div><p className="text-white/60 mb-1">Amount</p><p className="text-white font-medium">£{Number(match.agreed_price || 0).toFixed(2)}</p></div>
+                    <div><p className="text-white/60 mb-1">Travel Date</p><p className="text-white font-medium">{fmt(match.sender_trip?.travel_date)}</p></div>
+                    <div><p className="text-white/60 mb-1">Created</p><p className="text-white font-medium">{fmt(match.created_at)}</p></div>
                     <div>
                       <p className="text-white/60 mb-1">Confirmations</p>
-                      <p className="text-white font-medium">
-                        {match.booter_confirmed_delivery && match.hooper_confirmed_receipt ? (
-                          <span className="text-green-400 flex items-center gap-1">
-                            <CheckCircle className="w-4 h-4" />
-                            Both
-                          </span>
-                        ) : (
-                          <span className="text-yellow-400">Pending</span>
-                        )}
-                      </p>
+                      {match.booter_confirmed_delivery && match.hooper_confirmed_receipt ? (
+                        <span className="text-green-400 flex items-center gap-1 text-sm"><CheckCircle className="w-4 h-4" />Both</span>
+                      ) : (
+                        <span className="text-yellow-400 text-sm">Pending</span>
+                      )}
                     </div>
                   </div>
-
-                  <Link
-                    href={`/matches/${match.id}`}
-                    className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-500/50 transition-all"
-                  >
-                    <Eye className="w-5 h-5" />
-                    View Full Details
+                  <Link href={`/matches/${match.id}`} className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-500/50 transition-all">
+                    <Eye className="w-5 h-5" /> View Full Details
                   </Link>
                 </div>
               ))
@@ -633,7 +788,9 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
           </div>
         )}
 
-        {/* ESCROW TAB */}
+        {/* ══════════════════════════════════════════════════════════════════
+            ESCROW TAB
+        ══════════════════════════════════════════════════════════════════ */}
         {activeTab === 'escrow' && (
           <div className="space-y-4">
             {escrowPayments.length === 0 ? (
@@ -643,141 +800,69 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                 <p className="text-white/60">All payments have been released or no payments are pending</p>
               </div>
             ) : (
-              escrowPayments.map((payment) => (
-                <div
-                  key={payment.id}
-                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6"
-                >
+              escrowPayments.map(payment => (
+                <div key={payment.id} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <p className="text-white font-bold text-2xl mb-1">
-                        £{Number(payment.agreed_price).toFixed(2)}
-                      </p>
-                      <p className="text-white/60 text-sm">Match ID: {payment.id.slice(0, 12)}...</p>
+                      <p className="text-white font-bold text-2xl mb-1">£{Number(payment.agreed_price).toFixed(2)}</p>
+                      <p className="text-white/60 text-sm">Match ID: {payment.id?.slice(0, 12)}...</p>
                     </div>
                     <div className="px-5 py-3 bg-yellow-500/20 text-yellow-300 rounded-xl text-sm font-bold flex items-center gap-2 border border-yellow-400/30">
-                      <Shield className="w-5 h-5" />
-                      Escrowed
+                      <Shield className="w-5 h-5" /> Escrowed
                     </div>
                   </div>
-
-                                    <div className="grid md:grid-cols-2 gap-6 mb-6">
-                    {/* Booter Confirmation */}
-                    <div className={`p-4 rounded-xl border-2 ${
-                      payment.booter_confirmed_delivery 
-                        ? 'bg-green-500/10 border-green-400/50' 
-                        : 'bg-white/5 border-white/20'
-                    }`}>
-                      <div className="flex items-center gap-3 mb-2">
-                        {payment.booter_confirmed_delivery ? (
-                          <CheckCircle className="w-6 h-6 text-green-400" />
+                  <div className="grid md:grid-cols-2 gap-6 mb-6">
+                    {[
+                      { key: 'booter', label: 'Traveler (Booter)', confirmed: payment.booter_confirmed_delivery, at: payment.booter_confirmed_at, subLabel: 'Delivery confirmation' },
+                      { key: 'hooper', label: 'Sender (Hooper)',   confirmed: payment.hooper_confirmed_receipt, at: payment.hooper_confirmed_at, subLabel: 'Receipt confirmation' },
+                    ].map(side => (
+                      <div key={side.key} className={`p-4 rounded-xl border-2 ${side.confirmed ? 'bg-green-500/10 border-green-400/50' : 'bg-white/5 border-white/20'}`}>
+                        <div className="flex items-center gap-3 mb-2">
+                          {side.confirmed ? <CheckCircle className="w-6 h-6 text-green-400" /> : <Clock className="w-6 h-6 text-yellow-400" />}
+                          <div>
+                            <p className="font-semibold text-white">{side.label}</p>
+                            <p className="text-xs text-white/60">{side.subLabel}</p>
+                          </div>
+                        </div>
+                        {side.confirmed ? (
+                          <div className="text-sm">
+                            <p className="text-green-400 font-medium">✅ Confirmed</p>
+                            <p className="text-white/60 text-xs mt-1">{new Date(side.at).toLocaleString()}</p>
+                          </div>
                         ) : (
-                          <Clock className="w-6 h-6 text-yellow-400" />
+                          <p className="text-yellow-400 text-sm">⏳ Awaiting confirmation</p>
                         )}
-                        <div>
-                          <p className="font-semibold text-white">Traveler (Booter)</p>
-                          <p className="text-xs text-white/60">Delivery confirmation</p>
-                        </div>
                       </div>
-                      {payment.booter_confirmed_delivery ? (
-                        <div className="text-sm">
-                          <p className="text-green-400 font-medium">✅ Confirmed</p>
-                          <p className="text-white/60 text-xs mt-1">
-                            {new Date(payment.booter_confirmed_at).toLocaleString()}
-                          </p>
-                        </div>
-                      ) : (
-                        <p className="text-yellow-400 text-sm">⏳ Awaiting confirmation</p>
-                      )}
-                    </div>
-
-                    {/* Hooper Confirmation */}
-                    <div className={`p-4 rounded-xl border-2 ${
-                      payment.hooper_confirmed_receipt 
-                        ? 'bg-green-500/10 border-green-400/50' 
-                        : 'bg-white/5 border-white/20'
-                    }`}>
-                      <div className="flex items-center gap-3 mb-2">
-                        {payment.hooper_confirmed_receipt ? (
-                          <CheckCircle className="w-6 h-6 text-green-400" />
-                        ) : (
-                          <Clock className="w-6 h-6 text-yellow-400" />
-                        )}
-                        <div>
-                          <p className="font-semibold text-white">Sender (Hooper)</p>
-                          <p className="text-xs text-white/60">Receipt confirmation</p>
-                        </div>
-                      </div>
-                      {payment.hooper_confirmed_receipt ? (
-                        <div className="text-sm">
-                          <p className="text-green-400 font-medium">✅ Confirmed</p>
-                          <p className="text-white/60 text-xs mt-1">
-                            {new Date(payment.hooper_confirmed_at).toLocaleString()}
-                          </p>
-                        </div>
-                      ) : (
-                        <p className="text-yellow-400 text-sm">⏳ Awaiting confirmation</p>
-                      )}
-                    </div>
+                    ))}
                   </div>
-
-                  {/* Payment Breakdown */}
                   <div className="bg-white/5 rounded-xl p-4 mb-6">
-                    <h4 className="text-white font-semibold mb-3 flex items-center gap-2">
-                      <DollarSign className="w-5 h-5 text-green-400" />
-                      Payment Breakdown
-                    </h4>
+                    <h4 className="text-white font-semibold mb-3 flex items-center gap-2"><DollarSign className="w-5 h-5 text-green-400" />Payment Breakdown</h4>
                     <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-white/60">Agreed Price:</span>
-                        <span className="text-white font-semibold">£{Number(payment.agreed_price || 0).toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-white/60">Hooper Pays:</span>
-                        <span className="text-blue-400 font-semibold">£{Number(payment.hooper_pays || 0).toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-white/60">Booter Receives:</span>
-                        <span className="text-green-400 font-semibold">£{Number(payment.booter_receives || 0).toFixed(2)}</span>
-                      </div>
-                      <div className="border-t border-white/10 pt-2 flex justify-between">
-                        <span className="text-white/60">Platform Fee:</span>
-                        <span className="text-purple-400 font-semibold">
-                          £{(Number(payment.hooper_pays || 0) - Number(payment.booter_receives || 0)).toFixed(2)}
-                        </span>
-                      </div>
+                      {[
+                        { label: 'Agreed Price',    val: `£${Number(payment.agreed_price || 0).toFixed(2)}`,    color: 'text-white' },
+                        { label: 'Hooper Pays',     val: `£${Number(payment.hooper_pays || 0).toFixed(2)}`,     color: 'text-blue-400' },
+                        { label: 'Booter Receives', val: `£${Number(payment.booter_receives || 0).toFixed(2)}`, color: 'text-green-400' },
+                        { label: 'Platform Fee',    val: `£${(Number(payment.hooper_pays || 0) - Number(payment.booter_receives || 0)).toFixed(2)}`, color: 'text-purple-400', border: true },
+                      ].map(r => (
+                        <div key={r.label} className={`flex justify-between ${r.border ? 'border-t border-white/10 pt-2' : ''}`}>
+                          <span className="text-white/60">{r.label}:</span>
+                          <span className={`${r.color} font-semibold`}>{r.val}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-
-                  {/* Warning Box */}
                   <div className="bg-orange-500/10 border border-orange-400/30 rounded-xl p-4 mb-4">
                     <div className="flex items-start gap-3">
-                      <AlertTriangle className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-orange-200">
-                        <p className="font-semibold mb-1">⚠️ Admin Override Warning</p>
-                        <p className="text-orange-300/80">
-                          Manual release should only be used in exceptional cases after thorough investigation. 
-                          This bypasses the normal dual-confirmation process.
-                        </p>
-                      </div>
+                      <AlertTriangle className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
+                      <p className="text-orange-300/80 text-sm">Manual release bypasses dual-confirmation. Use only in exceptional, investigated cases.</p>
                     </div>
                   </div>
-
-                  {/* Action Buttons */}
                   <div className="flex gap-3">
-                    <Link
-                      href={`/matches/${payment.id}`}
-                      className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
-                    >
-                      <Eye className="w-5 h-5" />
-                      View Match Details
+                    <Link href={`/matches/${payment.id}`} className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
+                      <Eye className="w-5 h-5" /> View Match
                     </Link>
-                    <button
-                      onClick={() => releaseEscrow(payment.id)}
-                      className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-red-500/50 transition-all flex items-center justify-center gap-2"
-                    >
-                      <Shield className="w-5 h-5" />
-                      Manual Release Escrow
+                    <button onClick={() => releaseEscrow(payment.id)} className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-red-500/50 transition-all flex items-center justify-center gap-2">
+                      <Shield className="w-5 h-5" /> Manual Release
                     </button>
                   </div>
                 </div>
@@ -786,8 +871,9 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
           </div>
         )}
 
-
-        {/* DISPUTES TAB */}
+        {/* ══════════════════════════════════════════════════════════════════
+            DISPUTES TAB
+        ══════════════════════════════════════════════════════════════════ */}
         {activeTab === 'disputes' && (
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
             {disputes.length === 0 ? (
@@ -796,7 +882,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                   <AlertTriangle className="w-10 h-10 text-yellow-400" />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-3">No Disputes</h3>
-                <p className="text-white/60 mb-6">No disputes have been reported yet.</p>
+                <p className="text-white/60">No disputes have been reported yet.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -811,39 +897,31 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                     </tr>
                   </thead>
                   <tbody>
-                    {disputes.map((dispute) => (
+                    {disputes.map(dispute => (
                       <tr key={dispute.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                         <td className="px-6 py-4">
                           <p className="text-white font-medium">{dispute.reason || 'No reason given'}</p>
                           <p className="text-white/50 text-xs mt-0.5">ID: {dispute.id?.slice(0, 8)}...</p>
                         </td>
-                        <td className="px-6 py-4 text-white/70 text-sm font-mono">
-                          {dispute.match_id?.slice(0, 12)}...
-                        </td>
+                        <td className="px-6 py-4 text-white/70 text-sm font-mono">{dispute.match_id?.slice(0, 12)}...</td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2 text-white/70">
                             <Calendar className="w-4 h-4" />
-                            <span className="text-sm">{new Date(dispute.created_at).toLocaleDateString()}</span>
+                            <span className="text-sm">{fmt(dispute.created_at)}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold w-fit flex items-center gap-1 ${
-                            dispute.status === 'resolved'
-                              ? 'bg-green-500/20 text-green-300'
-                              : dispute.status === 'open' || dispute.status === 'pending'
-                              ? 'bg-red-500/20 text-red-300'
-                              : 'bg-yellow-500/20 text-yellow-300'
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            dispute.status === 'resolved'                                ? 'bg-green-500/20 text-green-300' :
+                            dispute.status === 'open' || dispute.status === 'pending'   ? 'bg-red-500/20 text-red-300' :
+                            'bg-yellow-500/20 text-yellow-300'
                           }`}>
                             {dispute.status || 'open'}
                           </span>
                         </td>
                         <td className="px-6 py-4">
-                          <Link
-                            href={`/matches/${dispute.match_id}`}
-                            className="px-4 py-2 bg-blue-600/80 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-all flex items-center gap-1 w-fit"
-                          >
-                            <Eye className="w-4 h-4" />
-                            View Match
+                          <Link href={`/matches/${dispute.match_id}`} className="px-4 py-2 bg-blue-600/80 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-all flex items-center gap-1 w-fit">
+                            <Eye className="w-4 h-4" /> View Match
                           </Link>
                         </td>
                       </tr>
@@ -855,14 +933,432 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
           </div>
         )}
 
-      </div>
+      </div>{/* end max-w-7xl */}
 
-      {/* HELP PANEL */}
+      {/* ══════════════════════════════════════════════════════════════════════
+          JOURNEY DETAIL DRAWER
+      ══════════════════════════════════════════════════════════════════════ */}
+      {selectedTrip && (
+        <div className="fixed inset-0 z-40 flex justify-end">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeTripDrawer} />
+          <div className="relative w-full max-w-lg h-full bg-gradient-to-b from-slate-900 to-slate-950 border-l border-white/10 shadow-2xl flex flex-col">
+
+            {/* drawer header */}
+            <div className="sticky top-0 bg-slate-900/95 backdrop-blur-sm border-b border-white/10 px-6 py-4 flex items-center justify-between z-10">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={`w-3 h-3 rounded-full shrink-0 ${
+                  selectedTrip.status === 'active'                                          ? 'bg-green-400 animate-pulse' :
+                  ['expired', 'cancelled', 'inactive'].includes(selectedTrip.status)        ? 'bg-red-400' :
+                  'bg-blue-400'
+                }`} />
+                <div className="min-w-0">
+                  <h2 className="text-white font-bold text-base truncate">{selectedTrip.from_city} → {selectedTrip.to_city}</h2>
+                  <p className="text-white/50 text-xs truncate">{selectedTrip.email}</p>
+                </div>
+              </div>
+              <button onClick={closeTripDrawer} className="p-1.5 hover:bg-white/10 rounded-lg transition-all shrink-0">
+                <X className="w-5 h-5 text-white/60" />
+              </button>
+            </div>
+
+            {/* scrollable body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+
+              {/* action result inside drawer */}
+              {actionResult && (
+                <div className={`px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-between ${
+                  actionResult.startsWith('✅') ? 'bg-green-500/20 text-green-300 border border-green-400/30' : 'bg-red-500/20 text-red-300 border border-red-400/30'
+                }`}>
+                  <span>{actionResult}</span>
+                  <button onClick={() => setActionResult(null)} className="text-white/40 hover:text-white ml-2"><X className="w-4 h-4" /></button>
+                </div>
+              )}
+
+              {/* journey details */}
+              <section>
+                <h3 className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">Journey Details</h3>
+                <div className="bg-white/5 rounded-xl border border-white/10 divide-y divide-white/5">
+                  {[
+                    { label: 'Email',       value: selectedTrip.email || '—' },
+                    { label: 'Type',        value: (selectedTrip.type === 'travel' || selectedTrip.type === 'traveller') ? '✈️ Traveller' : '📦 Sender' },
+                    { label: 'From',        value: selectedTrip.from_city || '—' },
+                    { label: 'To',          value: selectedTrip.to_city   || '—' },
+                    { label: 'Travel Date', value: fmt(selectedTrip.travel_date) },
+                    { label: 'Weight',      value: selectedTrip.weight ? `${selectedTrip.weight} kg` : '—' },
+                    { label: 'Price',       value: selectedTrip.price  ? `£${Number(selectedTrip.price).toFixed(2)}` : '—' },
+                    { label: 'Status',      value: selectedTrip.status || 'unknown' },
+                    { label: 'Created',     value: fmtLong(selectedTrip.created_at) },
+                  ].map(row => (
+                    <div key={row.label} className="flex items-center justify-between px-4 py-3">
+                      <span className="text-white/50 text-sm">{row.label}</span>
+                      <span className="text-white text-sm font-medium text-right max-w-[260px]">{row.value}</span>
+                    </div>
+                  ))}
+                  {/* any extra fields from select('*') */}
+                  {tripDetail?.trip && Object.entries(tripDetail.trip)
+                    .filter(([k]) => !['id','email','from_city','to_city','travel_date','weight','price','status','created_at','type','updated_at'].includes(k))
+                    .map(([k, v]) => (
+                      <div key={k} className="flex items-center justify-between px-4 py-3">
+                        <span className="text-white/40 text-sm capitalize">{k.replace(/_/g, ' ')}</span>
+                        <span className="text-white/70 text-sm text-right max-w-[260px] truncate">{String(v ?? '—')}</span>
+                      </div>
+                    ))
+                  }
+                </div>
+              </section>
+
+              {/* match history */}
+              <section>
+                <h3 className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">Match History</h3>
+                {detailLoading ? (
+                  <div className="text-center py-8 text-white/40 text-sm">
+                    <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
+                    Loading matches...
+                  </div>
+                ) : tripDetail?.matches?.length > 0 ? (
+                  <div className="space-y-3">
+                    {tripDetail.matches.map((m: any) => (
+                      <div key={m.id} className="bg-white/5 rounded-xl border border-white/10 p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            m.status === 'completed' ? 'bg-green-500/20 text-green-300' :
+                            m.status === 'cancelled' ? 'bg-red-500/20 text-red-300'    :
+                            'bg-blue-500/20 text-blue-300'
+                          }`}>{m.status}</span>
+                          <span className="text-white/40 text-xs">{fmt(m.created_at)}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm mb-2">
+                          <span className="text-white font-semibold">£{Number(m.agreed_price || 0).toFixed(2)}</span>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                            m.payment_status === 'released' ? 'bg-green-500/20 text-green-300' :
+                            m.payment_status === 'escrowed' ? 'bg-yellow-500/20 text-yellow-300' :
+                            'bg-white/10 text-white/50'
+                          }`}>{m.payment_status || 'pending'}</span>
+                        </div>
+                        {m.id && (
+                          <Link href={`/matches/${m.id}`} onClick={e => e.stopPropagation()} className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                            <Eye className="w-3 h-3" /> View full match
+                          </Link>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 bg-white/5 rounded-xl border border-white/10">
+                    <Package className="w-8 h-8 text-white/20 mx-auto mb-2" />
+                    <p className="text-white/40 text-sm">No matches for this journey yet</p>
+                  </div>
+                )}
+              </section>
+
+            </div>
+
+            {/* sticky action bar */}
+            {selectedTrip.status !== 'cancelled' && (
+              <div className="sticky bottom-0 bg-slate-900/95 backdrop-blur-sm border-t border-white/10 px-6 py-4 flex gap-3">
+                <button
+                  onClick={() => { setUpdateField('status'); setUpdateValue(''); setUpdateReason(''); setShowUpdateModal(true); }}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600/80 hover:bg-blue-600 text-white rounded-xl font-semibold transition-all text-sm"
+                >
+                  <Edit2 className="w-4 h-4" /> Update
+                </button>
+                <button
+                  onClick={() => { setDeleteReason(''); setShowDeleteModal(true); }}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-red-600/80 hover:bg-red-600 text-white rounded-xl font-semibold transition-all text-sm"
+                >
+                  <Trash2 className="w-4 h-4" /> Cancel Journey
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          DELETE MODAL
+      ══════════════════════════════════════════════════════════════════════ */}
+      {showDeleteModal && selectedTrip && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowDeleteModal(false)} />
+          <div className="relative w-full max-w-md bg-gradient-to-br from-slate-900 to-red-950/60 border border-red-400/30 rounded-3xl shadow-2xl overflow-hidden">
+            <div className="px-8 py-5 border-b border-white/10 flex items-center gap-3">
+              <div className="w-10 h-10 bg-red-500/20 rounded-xl flex items-center justify-center">
+                <Trash2 className="w-5 h-5 text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-lg">Cancel Journey</h3>
+                <p className="text-white/50 text-xs">{selectedTrip.from_city} → {selectedTrip.to_city}</p>
+              </div>
+            </div>
+            <div className="px-8 py-6 space-y-5">
+              <div className="bg-red-500/10 border border-red-400/30 rounded-xl p-4">
+                <p className="text-red-200 text-sm leading-relaxed">
+                  This will cancel the journey, cancel any linked active matches, and send notification emails to all involved parties. <strong className="text-red-300">This cannot be undone.</strong>
+                </p>
+              </div>
+              <div>
+                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">
+                  Reason for Cancellation <span className="text-red-400">*</span>
+                </label>
+                <textarea
+                  rows={4}
+                  value={deleteReason}
+                  onChange={e => setDeleteReason(e.target.value)}
+                  placeholder="Enter the reason (sent to all affected parties)..."
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400 resize-none text-sm leading-relaxed"
+                />
+                <p className={`text-xs mt-1.5 ${deleteReason.trim().length >= 10 ? 'text-green-400' : 'text-red-400'}`}>
+                  {deleteReason.trim().length} / 10 minimum characters
+                </p>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button onClick={() => setShowDeleteModal(false)} className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all">
+                  Back
+                </button>
+                <button
+                  onClick={handleDeleteTrip}
+                  disabled={deleteReason.trim().length < 10 || deleteBusy}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-red-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {deleteBusy ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                  {deleteBusy ? 'Cancelling...' : 'Confirm Cancel'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          UPDATE MODAL
+      ══════════════════════════════════════════════════════════════════════ */}
+      {showUpdateModal && selectedTrip && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowUpdateModal(false)} />
+          <div className="relative w-full max-w-md bg-gradient-to-br from-slate-900 to-blue-950/60 border border-blue-400/30 rounded-3xl shadow-2xl overflow-hidden">
+            <div className="px-8 py-5 border-b border-white/10 flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                <Edit2 className="w-5 h-5 text-blue-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-lg">Update Journey</h3>
+                <p className="text-white/50 text-xs">{selectedTrip.from_city} → {selectedTrip.to_city}</p>
+              </div>
+            </div>
+            <div className="px-8 py-6 space-y-5">
+              <div>
+                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">Field to Update</label>
+                <select
+                  value={updateField}
+                  onChange={e => { setUpdateField(e.target.value); setUpdateValue(''); }}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none cursor-pointer"
+                >
+                  <option value="status">Status</option>
+                  <option value="weight">Weight (kg)</option>
+                  <option value="price">Price (£)</option>
+                  <option value="travel_date">Travel Date</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">New Value</label>
+                {updateField === 'status' ? (
+                  <select
+                    value={updateValue}
+                    onChange={e => setUpdateValue(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none cursor-pointer"
+                  >
+                    <option value="">Select new status...</option>
+                    <option value="active">Active</option>
+                    <option value="matched">Matched</option>
+                    <option value="completed">Completed</option>
+                    <option value="expired">Expired</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                ) : updateField === 'travel_date' ? (
+                  <input
+                    type="date"
+                    value={updateValue}
+                    onChange={e => setUpdateValue(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  />
+                ) : (
+                  <input
+                    type="number"
+                    value={updateValue}
+                    onChange={e => setUpdateValue(e.target.value)}
+                    placeholder={updateField === 'weight' ? 'e.g. 10' : 'e.g. 80'}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  />
+                )}
+              </div>
+              <div>
+                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">
+                  Reason for Update <span className="text-red-400">*</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={updateReason}
+                  onChange={e => setUpdateReason(e.target.value)}
+                  placeholder="Why is this field being changed?..."
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none text-sm"
+                />
+                <p className={`text-xs mt-1.5 ${updateReason.trim().length >= 10 ? 'text-green-400' : 'text-red-400'}`}>
+                  {updateReason.trim().length} / 10 minimum characters
+                </p>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button onClick={() => setShowUpdateModal(false)} className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all">
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateTrip}
+                  disabled={!updateValue || updateReason.trim().length < 10 || updateBusy}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-blue-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {updateBusy ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                  {updateBusy ? 'Updating...' : 'Confirm Update'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          ADD JOURNEY MODAL
+      ══════════════════════════════════════════════════════════════════════ */}
+      {showAddJourney && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowAddJourney(false)} />
+          <div className="relative w-full max-w-lg bg-gradient-to-br from-slate-900 to-green-950/50 border border-green-400/30 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+            <div className="px-8 py-5 border-b border-white/10 flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
+                <Plus className="w-5 h-5 text-green-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-lg">Post Admin Journey</h3>
+                <p className="text-white/50 text-xs">As Künle A Aluko · Auto-verified · Goes active immediately</p>
+              </div>
+            </div>
+            <div className="px-8 py-6 space-y-5">
+              {/* type toggle */}
+              <div>
+                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">Journey Type</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { value: 'travel', label: '✈️ Traveller', sub: 'I am travelling' },
+                    { value: 'sender', label: '📦 Sender',    sub: 'I need delivery' },
+                  ].map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setAddForm(f => ({ ...f, type: opt.value }))}
+                      className={`p-3 rounded-xl border-2 transition-all text-left ${addForm.type === opt.value ? 'border-green-400 bg-green-500/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}
+                    >
+                      <div className="text-white font-semibold text-sm">{opt.label}</div>
+                      <div className="text-white/50 text-xs">{opt.sub}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* route */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">From City <span className="text-red-400">*</span></label>
+                  <input
+                    type="text"
+                    value={addForm.from_city}
+                    onChange={e => setAddForm(f => ({ ...f, from_city: e.target.value }))}
+                    placeholder="e.g. London"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">To City <span className="text-red-400">*</span></label>
+                  <input
+                    type="text"
+                    value={addForm.to_city}
+                    onChange={e => setAddForm(f => ({ ...f, to_city: e.target.value }))}
+                    placeholder="e.g. Lagos"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* date */}
+              <div>
+                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">Travel Date <span className="text-red-400">*</span></label>
+                <input
+                  type="date"
+                  value={addForm.travel_date}
+                  onChange={e => setAddForm(f => ({ ...f, travel_date: e.target.value }))}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 text-sm"
+                />
+              </div>
+
+              {/* weight & price */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">Weight (kg)</label>
+                  <input
+                    type="number"
+                    value={addForm.weight}
+                    onChange={e => setAddForm(f => ({ ...f, weight: e.target.value }))}
+                    placeholder="e.g. 10"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">Price (£)</label>
+                  <input
+                    type="number"
+                    value={addForm.price}
+                    onChange={e => setAddForm(f => ({ ...f, price: e.target.value }))}
+                    placeholder="e.g. 80"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* admin badge */}
+              <div className="bg-green-500/10 border border-green-400/20 rounded-xl px-4 py-3 flex items-center gap-3">
+                <Shield className="w-4 h-4 text-green-400 shrink-0" />
+                <div className="text-xs">
+                  <p className="text-green-300 font-semibold">Posting as Admin</p>
+                  <p className="text-green-400/60">Künle A Aluko · titobalo12@gmail.com · Auto-verified · No Stripe required</p>
+                </div>
+              </div>
+
+              {addError && (
+                <div className="bg-red-500/20 border border-red-400/30 rounded-xl px-4 py-3 text-red-300 text-sm">{addError}</div>
+              )}
+
+              <div className="flex gap-3 pt-1">
+                <button onClick={() => setShowAddJourney(false)} className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all">
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddJourney}
+                  disabled={addBusy || !addForm.from_city || !addForm.to_city || !addForm.travel_date}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-green-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {addBusy ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                  {addBusy ? 'Posting...' : 'Post Journey'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          HELP PANEL
+      ══════════════════════════════════════════════════════════════════════ */}
       {showHelp && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowHelp(false)} />
           <div className="relative w-full max-w-sm h-full bg-gradient-to-b from-slate-900 to-slate-950 border-l border-white/10 shadow-2xl overflow-y-auto">
-            {/* Header */}
             <div className="sticky top-0 bg-slate-900/95 backdrop-blur-sm border-b border-white/10 px-6 py-4 flex items-center justify-between z-10">
               <div className="flex items-center gap-3">
                 <HelpCircle className="w-5 h-5 text-blue-400" />
@@ -872,23 +1368,21 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                 <X className="w-5 h-5 text-white/60" />
               </button>
             </div>
-
             <div className="px-6 py-5 space-y-6">
-
-              {/* Navigation */}
               <section>
-                <h3 className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">Navigation</h3>
-                <div className="space-y-2.5 text-sm">
+                <h3 className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">Journey Tab</h3>
+                <div className="space-y-3 text-sm">
                   {[
-                    { icon: '←', label: 'Back button', desc: 'Returns to the previous page you were on.' },
-                    { icon: '🔄', label: 'Refresh', desc: 'Reloads all dashboard data from the database.' },
-                    { icon: '🚪', label: 'Exit', desc: 'Takes you back to your main user dashboard.' },
-                    { icon: 'Hub', label: 'Hub', desc: 'Africa-outbound match authorisation, payment confirmations, and dispute resolution.' },
-                    { icon: 'Customs', label: 'Customs', desc: 'AML review queue and duty/tax estimations for shipments.' },
-                    { icon: 'Business', label: 'Business', desc: 'Carrier job management — assign, track, and complete business deliveries.' },
+                    { icon: '🟢', label: 'Active journeys', desc: 'Pinned to the top with a green pulse. These are live and accepting matches.' },
+                    { icon: '🔴', label: 'Past journeys',   desc: 'Expired, completed, or cancelled — shown below active, tinted red.' },
+                    { icon: '▲▼', label: 'Sort headers',    desc: 'Click Route, Travel Date, or Status column headers to sort. Click again to reverse.' },
+                    { icon: '📋', label: 'Row click',       desc: 'Click any row to open the full detail drawer — all fields, match history, and action buttons.' },
+                    { icon: '✏️', label: 'Update',          desc: 'Change status, weight, price, or travel date. A reason is always required.' },
+                    { icon: '🗑️', label: 'Cancel Journey',  desc: 'Cancels the trip, cancels linked matches, and emails all affected parties. Reason is mandatory.' },
+                    { icon: '➕', label: 'Post as Admin',   desc: 'Post a journey as Künle A Aluko. Auto-verified, goes active instantly.' },
                   ].map(item => (
                     <div key={item.label} className="flex gap-3">
-                      <span className="shrink-0 w-14 text-xs bg-white/10 text-white/60 rounded-lg px-2 py-1 font-mono text-center leading-relaxed">{item.icon}</span>
+                      <span className="shrink-0 w-8 text-center text-base">{item.icon}</span>
                       <div>
                         <p className="text-white font-semibold">{item.label}</p>
                         <p className="text-white/50 text-xs mt-0.5">{item.desc}</p>
@@ -897,118 +1391,62 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                   ))}
                 </div>
               </section>
-
               <div className="border-t border-white/10" />
-
-              {/* Tabs */}
               <section>
-                <h3 className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">Dashboard Tabs</h3>
-                <div className="space-y-4 text-sm">
+                <h3 className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">Other Tabs</h3>
+                <div className="space-y-3 text-sm">
                   {[
-                    {
-                      icon: '✈️📦', label: 'Journeys',
-                      desc: 'Every active sender and traveller listing across the platform. Use checkboxes to select customers and send them messages.',
-                      tip: 'Filter by "Travellers only" or "Senders only" using the dropdown.',
-                    },
-                    {
-                      icon: '🔗', label: 'Matches',
-                      desc: 'Connections between a sender and a traveller that have been proposed or accepted.',
-                      tip: 'Click "View Full Details" to see the match page and timeline.',
-                    },
-                    {
-                      icon: '🔒', label: 'Escrow',
-                      desc: 'Payments held by BootHop until both parties confirm delivery. "Manual Release" bypasses the dual-confirmation — use with caution.',
-                      tip: 'Normal release happens automatically when both sides confirm.',
-                    },
-                    {
-                      icon: '⚠️', label: 'Disputes',
-                      desc: 'Issues raised by users during a match. Click "View Match" to investigate and resolve.',
-                      tip: '',
-                    },
-                  ].map(tab => (
-                    <div key={tab.label} className="bg-white/5 rounded-xl p-4 border border-white/10">
-                      <p className="text-white font-bold mb-1">{tab.icon} {tab.label}</p>
-                      <p className="text-white/60 text-xs leading-relaxed">{tab.desc}</p>
-                      {tab.tip && <p className="mt-2 text-blue-400 text-xs">💡 {tab.tip}</p>}
+                    { icon: '🔗', label: 'Matches',  desc: 'All sender-traveller connections. Click View Full Details to see the match page.' },
+                    { icon: '🔒', label: 'Escrow',   desc: 'Payments held pending dual confirmation. Manual Release bypasses this — use with caution.' },
+                    { icon: '⚠️', label: 'Disputes', desc: 'Issues raised by users. Click View Match to investigate.' },
+                    { icon: '⚡', label: 'Near-Miss', desc: 'Finds senders and travellers with same route but dates 1–2 days apart. Emails them asking for flexibility.' },
+                    { icon: '✉️', label: 'Compose',  desc: 'Select users via checkboxes in Journeys tab, then use the compose bar at the bottom.' },
+                  ].map(item => (
+                    <div key={item.label} className="flex gap-3">
+                      <span className="shrink-0 w-8 text-center text-base">{item.icon}</span>
+                      <div>
+                        <p className="text-white font-semibold">{item.label}</p>
+                        <p className="text-white/50 text-xs mt-0.5">{item.desc}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
               </section>
-
               <div className="border-t border-white/10" />
-
-              {/* Actions */}
-              <section>
-                <h3 className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">Admin Actions</h3>
-                <div className="space-y-4 text-sm">
-                  {[
-                    {
-                      icon: '⚡', label: 'Near-Miss Alerts',
-                      desc: 'Scans for senders and travellers with the same route but travel dates 1–2 days apart. Emails the sender asking if they can be flexible.',
-                      tip: 'Also runs automatically every day at 10:00 UTC.',
-                    },
-                    {
-                      icon: '✉️', label: 'Compose Message',
-                      desc: 'Tick one or more customers in the Journeys tab, then tap "Compose Message" in the bar that appears at the bottom. Choose a template or write your own.',
-                      tip: 'Emails are deduplicated — a customer with 3 listings only gets 1 email.',
-                    },
-                  ].map(action => (
-                    <div key={action.label} className="bg-white/5 rounded-xl p-4 border border-white/10">
-                      <p className="text-white font-bold mb-1">{action.icon} {action.label}</p>
-                      <p className="text-white/60 text-xs leading-relaxed">{action.desc}</p>
-                      {action.tip && <p className="mt-2 text-amber-400 text-xs">💡 {action.tip}</p>}
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <div className="border-t border-white/10" />
-
-              {/* Contact */}
               <section className="pb-6">
                 <h3 className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">Support</h3>
-                <p className="text-white/60 text-sm">For platform issues or questions, email <span className="text-blue-400">info@boothop.com</span></p>
+                <p className="text-white/60 text-sm">For platform issues email <span className="text-blue-400">info@boothop.com</span></p>
               </section>
             </div>
           </div>
         </div>
       )}
 
-      {/* STICKY SELECTION BAR */}
+      {/* ══════════════════════════════════════════════════════════════════════
+          STICKY SELECTION BAR
+      ══════════════════════════════════════════════════════════════════════ */}
       {selectedEmails.size > 0 && !showCompose && (
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-r from-blue-900/95 to-indigo-900/95 backdrop-blur-xl border-t border-blue-400/30 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                {selectedEmails.size}
-              </div>
-              <span className="text-white font-medium">
-                {selectedEmails.size} customer{selectedEmails.size !== 1 ? 's' : ''} selected
-              </span>
-              <button
-                onClick={() => setSelectedEmails(new Set())}
-                className="text-white/50 hover:text-white text-xs underline"
-              >
-                Clear
-              </button>
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">{selectedEmails.size}</div>
+              <span className="text-white font-medium">{selectedEmails.size} customer{selectedEmails.size !== 1 ? 's' : ''} selected</span>
+              <button onClick={() => setSelectedEmails(new Set())} className="text-white/50 hover:text-white text-xs underline">Clear</button>
             </div>
-            <button
-              onClick={openCompose}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-blue-500/50 transition-all"
-            >
-              <MessageSquare className="w-5 h-5" />
-              Compose Message
+            <button onClick={openCompose} className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-blue-500/50 transition-all">
+              <MessageSquare className="w-5 h-5" /> Compose Message
             </button>
           </div>
         </div>
       )}
 
-      {/* COMPOSE MODAL */}
+      {/* ══════════════════════════════════════════════════════════════════════
+          COMPOSE MODAL
+      ══════════════════════════════════════════════════════════════════════ */}
       {showCompose && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowCompose(false)} />
           <div className="relative w-full max-w-2xl bg-gradient-to-br from-slate-900 to-blue-950 border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
-            {/* Modal header */}
             <div className="flex items-center justify-between px-8 py-5 border-b border-white/10 bg-white/5">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
@@ -1023,9 +1461,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                 <X className="w-5 h-5 text-white/60" />
               </button>
             </div>
-
             <div className="px-8 py-6 space-y-5">
-              {/* Template picker */}
               <div>
                 <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">Template</label>
                 <div className="relative">
@@ -1043,8 +1479,6 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
                 </div>
               </div>
-
-              {/* Subject */}
               <div>
                 <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">Subject</label>
                 <input
@@ -1055,8 +1489,6 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
-
-              {/* Body */}
               <div>
                 <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">Message</label>
                 <textarea
@@ -1067,8 +1499,6 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none font-mono text-sm leading-relaxed"
                 />
               </div>
-
-              {/* Recipients preview */}
               <div className="bg-white/5 rounded-xl px-4 py-3 border border-white/10">
                 <p className="text-white/50 text-xs mb-1.5 font-semibold uppercase tracking-wide">Sending to</p>
                 <p className="text-white/80 text-sm leading-relaxed">
@@ -1076,8 +1506,6 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                   {selectedEmails.size > 5 && <span className="text-white/40"> +{selectedEmails.size - 5} more</span>}
                 </p>
               </div>
-
-              {/* Result */}
               {composeResult && (
                 <div className={`px-4 py-3 rounded-xl text-sm font-medium ${
                   composeResult.startsWith('✅') ? 'bg-green-500/20 text-green-300 border border-green-400/30' : 'bg-red-500/20 text-red-300 border border-red-400/30'
@@ -1085,13 +1513,8 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                   {composeResult}
                 </div>
               )}
-
-              {/* Actions */}
               <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => setShowCompose(false)}
-                  className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all"
-                >
+                <button onClick={() => setShowCompose(false)} className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all">
                   Cancel
                 </button>
                 <button
@@ -1099,11 +1522,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
                   disabled={composeSending || !composeSubject.trim() || !composeBody.trim()}
                   className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-blue-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {composeSending ? (
-                    <RefreshCw className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <Send className="w-5 h-5" />
-                  )}
+                  {composeSending ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                   {composeSending ? 'Sending...' : `Send to ${selectedEmails.size}`}
                 </button>
               </div>
@@ -1111,7 +1530,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
           </div>
         </div>
       )}
+
     </div>
   );
 }
-

@@ -11,7 +11,7 @@ export async function GET() {
   const [usersRes, matchesRes, escrowRes, disputesRes] = await Promise.all([
     supabase
       .from('trips')
-      .select('id, email, from_city, to_city, travel_date, type, status, created_at, weight, price')
+      .select('*')
       .order('created_at', { ascending: false }),
 
     supabase

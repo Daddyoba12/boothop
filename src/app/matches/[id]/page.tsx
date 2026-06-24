@@ -26,7 +26,8 @@ type Match = {
   hooper_confirmed_at: string | null;
   cancelled_by: string | null;
   cancellation_reason: string | null;
-  sender_trip: { from_city: string; to_city: string; travel_date: string } | null;
+  sender_trip: { from_city: string; to_city: string; travel_date: string; weight_capacity: number | null } | null;
+  traveler_trip: { weight_capacity: number | null } | null;
 };
 
 type PageData = {
@@ -302,6 +303,18 @@ export default function MatchPage() {
               <p className="text-white/40 text-xs mb-1">Delivery fee</p>
               <p className="text-white font-bold">£{(match.agreed_price ?? 0).toFixed(2)}</p>
             </div>
+            {match.sender_trip?.weight_capacity != null && (
+              <div className="rounded-xl bg-white/5 px-4 py-3">
+                <p className="text-white/40 text-xs mb-1">Item weight</p>
+                <p className="text-white font-semibold">{match.sender_trip.weight_capacity} kg</p>
+              </div>
+            )}
+            {match.traveler_trip?.weight_capacity != null && (
+              <div className="rounded-xl bg-white/5 px-4 py-3">
+                <p className="text-white/40 text-xs mb-1">Carrier capacity</p>
+                <p className="text-white font-semibold">{match.traveler_trip.weight_capacity} kg</p>
+              </div>
+            )}
           </div>
         </div>
 

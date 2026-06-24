@@ -10,12 +10,17 @@ const PILLARS = [
 ];
 
 const TEMPLATES = [
-  { value: 'documentary',     label: '🎬 Documentary'   },
-  { value: 'urgent_news',     label: '📡 Urgent News'   },
-  { value: 'travel_hack',     label: '🗺️ Travel Hack'   },
-  { value: 'supply_chain',    label: '🔗 Supply Chain'  },
-  { value: 'airport_mystery', label: '🛬 Airport Mystery'},
-  { value: 'boothop_cta',     label: '📦 BootHop CTA'   },
+  { value: 'documentary',        label: '🎬 Documentary'         },
+  { value: 'urgent_news',        label: '📡 Urgent News'         },
+  { value: 'travel_hack',        label: '🗺️ Travel Hack'         },
+  { value: 'supply_chain',       label: '🔗 Supply Chain'        },
+  { value: 'airport_mystery',    label: '🛬 Airport Mystery'     },
+  { value: 'boothop_cta',        label: '📦 BootHop CTA'         },
+  // Newspaper editorial formats
+  { value: 'nyt_feature',        label: '🗞️ NYT Feature'         },
+  { value: 'global_logistics',   label: '🌍 Global Logistics Times' },
+  { value: 'daily_mail_consumer',label: '📰 Daily Mail Consumer' },
+  { value: 'dlt_trade',          label: '📋 DLT Trade'           },
 ];
 
 const PLATFORMS = [
@@ -122,7 +127,12 @@ export default function GeneratePage() {
         <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Tone/Template</span>
           <select value={template} onChange={e => setTemplate(e.target.value)} style={selectStyle}>
-            {TEMPLATES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+            <optgroup label="── Video / Social">
+              {TEMPLATES.filter(t => !['nyt_feature','global_logistics','daily_mail_consumer','dlt_trade'].includes(t.value)).map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </optgroup>
+            <optgroup label="── Newspaper Editorial">
+              {TEMPLATES.filter(t => ['nyt_feature','global_logistics','daily_mail_consumer','dlt_trade'].includes(t.value)).map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </optgroup>
           </select>
         </label>
         <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>

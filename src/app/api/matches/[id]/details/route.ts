@@ -44,6 +44,10 @@ export async function GET(
           travel_date,
           weight_capacity,
           asking_price
+        ),
+        traveler_trip:traveler_trip_id(
+          id,
+          weight_capacity
         )
       `)
       .eq('id', matchId)

@@ -67,7 +67,9 @@
       "Bash(gh api:*)",
       "Bash(curl -s -H \"x-cron-secret: boothop-cron-secret-2024-x9k2p\" https://www.boothop.com/api/cron/auto-match)",
       "Bash(curl -s -H \"Authorization: Bearer boothop-cron-secret-2024-x9k2p\" https://boothop-3slsqlrpz-tunde-olufeks-projects.vercel.app/api/cron/auto-match)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:3000/promo\" -TimeoutSec 3 -UseBasicParsing; Write-Output \"RUNNING: $\\($r.StatusCode\\)\" } catch { Write-Output \"NOT_RUNNING\" })",
+      "PowerShell(Start-Sleep -Seconds 8; try { $r = Invoke-WebRequest -Uri \"http://localhost:3000\" -TimeoutSec 5 -UseBasicParsing; \"READY: $\\($r.StatusCode\\)\" } catch { \"NOT_READY_YET\" })"
     ]
   }
 }

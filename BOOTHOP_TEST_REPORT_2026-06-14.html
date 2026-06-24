@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BootHop — Test Phase Report · 14 June 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 13px;
+    color: #1a1a2e;
+    background: #ffffff;
+    line-height: 1.55;
+  }
+  @media print {
+    .no-print { display: none; }
+    body { font-size: 11px; }
+    h1 { font-size: 20px; }
+    h2 { font-size: 14px; }
+    h3 { font-size: 12px; }
+    .page-break { page-break-before: always; }
+  }
+
+  /* ── Cover ── */
+  .cover {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #16213e 100%);
+    color: #fff;
+    padding: 60px 48px 48px;
+    min-height: 180px;
+  }
+  .cover .logo { font-size: 28px; font-weight: 900; letter-spacing: -1px; color: #60a5fa; }
+  .cover h1 { font-size: 26px; font-weight: 700; margin: 12px 0 6px; }
+  .cover .subtitle { font-size: 14px; color: #93c5fd; }
+  .cover .meta { margin-top: 20px; display: flex; gap: 36px; font-size: 12px; color: #cbd5e1; }
+  .cover .meta span b { color: #e2e8f0; }
+
+  /* ── Layout ── */
+  .content { max-width: 960px; margin: 0 auto; padding: 32px 32px 64px; }
+
+  /* ── Section headers ── */
+  h2 {
+    font-size: 15px; font-weight: 700;
+    color: #1e3a5f;
+    border-bottom: 2px solid #3b82f6;
+    padding-bottom: 6px;
+    margin: 36px 0 16px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  h3 { font-size: 13px; font-weight: 600; color: #1e293b; margin: 20px 0 8px; }
+
+  /* ── Summary boxes ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin: 20px 0 8px;
+  }
+  .stat-box {
+    border-radius: 10px;
+    padding: 16px 14px 14px;
+    text-align: center;
+  }
+  .stat-box .num { font-size: 34px; font-weight: 800; line-height: 1; }
+  .stat-box .lbl { font-size: 11px; font-weight: 600; margin-top: 4px; text-transform: uppercase; letter-spacing: .4px; }
+  .red-box   { background: #fef2f2; color: #b91c1c; border: 1.5px solid #fca5a5; }
+  .amber-box { background: #fffbeb; color: #b45309; border: 1.5px solid #fcd34d; }
+  .green-box { background: #f0fdf4; color: #15803d; border: 1.5px solid #86efac; }
+  .blue-box  { background: #eff6ff; color: #1d4ed8; border: 1.5px solid #93c5fd; }
+
+  /* ── Bug table ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 12px;
+  }
+  thead th {
+    background: #1e3a5f;
+    color: #fff;
+    padding: 9px 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody tr:hover { background: #eff6ff; }
+  td { padding: 8px 10px; vertical-align: top; border-bottom: 1px solid #e2e8f0; }
+  td.sev-critical { font-weight: 700; color: #b91c1c; }
+  td.sev-high     { font-weight: 700; color: #d97706; }
+  td.sev-medium   { font-weight: 700; color: #2563eb; }
+  td.sev-low      { font-weight: 600; color: #6b7280; }
+  td.sev-ux       { font-weight: 600; color: #7c3aed; }
+  td.fixed        { color: #16a34a; font-weight: 700; }
+  td.noted        { color: #7c3aed; font-weight: 600; }
+  td code {
+    background: #f1f5f9; padding: 1px 5px; border-radius: 4px;
+    font-family: 'Consolas', monospace; font-size: 11px; color: #0f172a;
+  }
+
+  /* ── Commit pills ── */
+  .commit { display: inline-block; background: #1e3a5f; color: #93c5fd; font-family: monospace; font-size: 11px; padding: 2px 8px; border-radius: 4px; }
+
+  /* ── Fix list ── */
+  .fix-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    page-break-inside: avoid;
+  }
+  .fix-card .fix-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+  }
+  .fix-card .fix-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #3b82f6; color: #fff;
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .fix-card .fix-title { font-weight: 700; font-size: 13px; color: #0f172a; }
+  .fix-card .fix-body { font-size: 12px; color: #374151; }
+  .fix-card .fix-body p { margin-bottom: 5px; }
+  .fix-card .fix-body code { background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-family: monospace; font-size: 11px; }
+  .fix-card .fix-file { font-size: 11px; color: #6b7280; margin-top: 6px; font-family: monospace; }
+
+  /* ── Link audit ── */
+  .link-section { margin-bottom: 10px; }
+  .link-ok   { color: #16a34a; font-weight: 700; }
+  .link-warn { color: #b45309; font-weight: 700; }
+  .link-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+  .link-item {
+    display: flex; align-items: center; gap: 6px;
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 6px; padding: 6px 10px;
+    font-family: monospace; font-size: 11px;
+  }
+  .link-item.ok:before    { content: '✓'; color: #16a34a; font-weight: 900; }
+  .link-item.warn:before  { content: '⚠'; color: #d97706; }
+  .link-item.fixed:before { content: '✓'; color: #2563eb; font-weight: 900; }
+
+  /* ── Flow diagram ── */
+  .flow-box {
+    display: flex; flex-wrap: wrap; gap: 0; align-items: center;
+    margin: 12px 0; font-size: 11px;
+  }
+  .flow-step {
+    background: #eff6ff; border: 1.5px solid #93c5fd; border-radius: 6px;
+    padding: 6px 12px; font-weight: 600; color: #1d4ed8;
+  }
+  .flow-arrow { color: #94a3b8; padding: 0 6px; font-size: 14px; }
+
+  /* ── Footer ── */
+  .report-footer {
+    margin-top: 48px; padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 11px; color: #94a3b8;
+    display: flex; justify-content: space-between;
+  }
+
+  /* ── Print button ── */
+  .print-btn {
+    position: fixed; top: 20px; right: 20px;
+    background: #3b82f6; color: #fff;
+    border: none; border-radius: 8px;
+    padding: 10px 22px; font-size: 14px; font-weight: 600;
+    cursor: pointer; box-shadow: 0 4px 12px rgba(59,130,246,.4);
+    z-index: 999;
+  }
+  .print-btn:hover { background: #2563eb; }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: .3px; }
+  .badge-red    { background: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5; }
+  .badge-amber  { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
+  .badge-blue   { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+  .badge-purple { background: #faf5ff; color: #6d28d9; border: 1px solid #c4b5fd; }
+  .badge-green  { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">⬇ Save as PDF</button>
+
+<!-- ═══════════════════════════════ COVER ═══════════════════════════════ -->
+<div class="cover">
+  <div class="logo">BootHop</div>
+  <h1>Test Phase Report</h1>
+  <div class="subtitle">Deep Flow Audit · Business Dashboards · Link Check · Security Gaps</div>
+  <div class="meta">
+    <span><b>Date</b> 14 June 2026</span>
+    <span><b>Branch</b> main</span>
+    <span><b>Commits covered</b> 3ccc27f · 38e9411 · 0ce4d81</span>
+    <span><b>Prepared by</b> Claude Code / BootHop</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ CONTENT ═══════════════════════════════ -->
+<div class="content">
+
+  <!-- EXECUTIVE SUMMARY -->
+  <h2>Executive Summary</h2>
+  <div class="summary-grid">
+    <div class="stat-box red-box">
+      <div class="num">2</div>
+      <div class="lbl">Critical Bugs</div>
+    </div>
+    <div class="stat-box amber-box">
+      <div class="num">8</div>
+      <div class="lbl">High Severity</div>
+    </div>
+    <div class="stat-box blue-box">
+      <div class="num">3</div>
+      <div class="lbl">Broken Links</div>
+    </div>
+    <div class="stat-box green-box">
+      <div class="num">13</div>
+      <div class="lbl">Fixes Applied</div>
+    </div>
+  </div>
+  <p style="margin-top:14px; color:#374151;">
+    A deep flow audit was conducted covering: <b>user login → dashboard</b>, <b>15-minute match-check cron</b>,
+    <b>barcode scanning</b>, <b>messaging system</b>, and all three <b>business dashboards</b>
+    (Express Client, Priority Partner, Carrier). Link audits checked every nav, footer, and business navigation component.
+    All critical and high-severity bugs identified have been fixed and committed.
+  </p>
+
+  <!-- ─── SECTION 1: DEEP FLOW AUDIT ─── -->
+  <div class="page-break"></div>
+  <h2>Section 1 — Deep Flow Audit Findings</h2>
+
+  <h3>1.1 Login → Dashboard Flow</h3>
+  <div class="flow-box">
+    <div class="flow-step">/login</div><div class="flow-arrow">→</div>
+    <div class="flow-step">POST /api/auth/login</div><div class="flow-arrow">→</div>
+    <div class="flow-step">boothop_session cookie (7d)</div><div class="flow-arrow">→</div>
+    <div class="flow-step">/dashboard</div><div class="flow-arrow">→</div>
+    <div class="flow-step">GET /api/dashboard</div><div class="flow-arrow">→</div>
+    <div class="flow-step">matches + trips rendered</div>
+  </div>
+
+  <table>
+    <thead><tr><th>#</th><th>Area</th><th>Gap Found</th><th>Severity</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Session cookie</td>
+        <td>Custom JWT <code>boothop_session</code>; 7-day expiry confirmed. No gap found.</td>
+        <td class="sev-low">None</td>
+        <td>✓ OK</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td><code>/api/dashboard</code></td>
+        <td>Admin client bypasses RLS — correct. Queries correct tables (<code>matches</code>, <code>trips</code>). No gap.</td>
+        <td class="sev-low">None</td>
+        <td>✓ OK</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Dashboard display</td>
+        <td>Match status lifecycle fully modelled: <code>matched → agreed → committed → kyc_pending → kyc_complete → payment_processing → active → delivery_confirmed → completed</code>. Terminal: <code>cancelled / declined / blocked</code>.</td>
+        <td class="sev-low">None</td>
+        <td>✓ OK</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>Stripe card expiry</td>
+        <td>Default saved card checked for expiry before Stripe session creation. Blocks expired cards cleanly.</td>
+        <td class="sev-low">None</td>
+        <td>✓ OK</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>1.2 Match Expiry Cron</h3>
+  <div class="flow-box">
+    <div class="flow-step">Vercel cron</div><div class="flow-arrow">→</div>
+    <div class="flow-step">GET /api/cron/expire-matches</div><div class="flow-arrow">→</div>
+    <div class="flow-step">Check CRON_SECRET</div><div class="flow-arrow">→</div>
+    <div class="flow-step">Cancel stale matches</div><div class="flow-arrow">→</div>
+    <div class="flow-step">Restore trips / send emails</div>
+  </div>
+
+  <table>
+    <thead><tr><th>#</th><th>Gap Found</th><th>Severity</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>5</td>
+        <td>Cron ran <b>once daily at 03:00</b> — a 4-hour timeout could wait up to 23 hours to be processed.</td>
+        <td class="sev-high">HIGH</td>
+        <td class="fixed">FIXED — changed to every 6 hours (0 */6 * * *)</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td><b><code>awaiting_authorisation</code> status never expired.</b> Africa-outbound matches held by admin review had no time limit — trips could stay locked forever if admin never acted.</td>
+        <td class="sev-critical">CRITICAL</td>
+        <td class="fixed">FIXED — added 7-day expiry bucket in cron with appropriate cancel reason</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>Thresholds: <code>matched</code> = 4h, <code>agreed</code> = 12h, <code>kyc_pending/kyc_complete</code> = 72h, <code>awaiting_authorisation</code> = 7d. All correct and enforced.</td>
+        <td class="sev-low">None</td>
+        <td>✓ OK (after fix)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>1.3 Barcode System</h3>
+  <div class="flow-box">
+    <div class="flow-step">Match goes active</div><div class="flow-arrow">→</div>
+    <div class="flow-step">Barcodes generated<br><small>SEND-{8}-{6} / TRVL-{8}-{6}</small></div><div class="flow-arrow">→</div>
+    <div class="flow-step">Sender scans<br>/api/tracking/scan-sender-barcode</div><div class="flow-arrow">→</div>
+    <div class="flow-step">Traveller notified<br>long-poll scan</div>
+  </div>
+
+  <table>
+    <thead><tr><th>#</th><th>Gap Found</th><th>Severity</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>8</td>
+        <td><b>No match status guard on barcode scan.</b> Senders could request traveller location during <code>matched</code>, <code>agreed</code>, <code>kyc_pending</code> — before delivery was active. Could expose traveller location prematurely.</td>
+        <td class="sev-high">HIGH</td>
+        <td class="fixed">FIXED — added status check, only allows <code>active</code> or <code>delivery_confirmed</code></td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td><b>Null barcode crash.</b> If barcode not yet generated, the API would send push/email with URL containing <code>/track/null</code>.</td>
+        <td class="sev-high">HIGH</td>
+        <td class="fixed">FIXED — added null check returning 400 with clear error message</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td>Barcode format validation and long-polling on traveller side: correct. No gap.</td>
+        <td class="sev-low">None</td>
+        <td>✓ OK</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>1.4 Messaging System</h3>
+  <table>
+    <thead><tr><th>#</th><th>Gap Found</th><th>Severity</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>11</td>
+        <td><b>messages/page.tsx queried completely dead schema.</b> The messages inbox page used <code>delivery_matches</code> and <code>messages</code> tables from the old pre-P2P schema — these tables do not exist. The page was entirely broken and would show nothing.</td>
+        <td class="sev-critical">CRITICAL</td>
+        <td class="fixed">FIXED — complete rewrite using /api/auth/me + /api/dashboard, filters to messaging-eligible statuses</td>
+      </tr>
+      <tr>
+        <td>12</td>
+        <td>Messaging statuses for conversation list: <code>active</code>, <code>delivery_confirmed</code>, <code>disputed</code>. Chat page <code>/messages/[matchId]</code> was correct — only the inbox listing was broken.</td>
+        <td class="sev-low">None after fix</td>
+        <td>✓ OK (after fix)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ─── SECTION 2: BUSINESS DASHBOARDS ─── -->
+  <div class="page-break"></div>
+  <h2>Section 2 — Business Dashboard Audit</h2>
+
+  <h3>2.1 Express Client Dashboard (<code>/business/portal</code>)</h3>
+  <p style="margin-bottom:10px; color:#4b5563;">Colour theme: Emerald. Auth via OTP → <code>biz_session</code> JWT cookie.</p>
+  <table>
+    <thead><tr><th>#</th><th>Gap Found</th><th>Severity</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>13</td>
+        <td><b>Ghost <code>pending_payment</code> jobs in main job list.</b> Abandoned Stripe sessions appeared in the main job list with a "Payment pending" badge and no action buttons, confusing clients.</td>
+        <td class="sev-high">HIGH</td>
+        <td class="fixed">FIXED — separated into "Incomplete bookings" section with a "Resume / New booking" link</td>
+      </tr>
+      <tr>
+        <td>14</td>
+        <td><b>Priority partner redirect stripped Stripe return params.</b> When Stripe returned to <code>/business/portal?payment=success&amp;jobRef=X</code>, the dashboard detected partner status and immediately redirected to <code>/business/portal/priority</code> — dropping the query string. Success screen never showed.</td>
+        <td class="sev-high">HIGH</td>
+        <td class="fixed">FIXED — redirect now preserves query string: router.replace(`/business/portal/priority${qs}`)</td>
+      </tr>
+      <tr>
+        <td>15</td>
+        <td>Job lifecycle: <code>pending_payment → review → assigned → in_transit → delivered</code>. Status displayed correctly. No gap.</td>
+        <td class="sev-low">None</td>
+        <td>✓ OK</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>2.2 Priority Partner Dashboard (<code>/business/portal/priority</code>)</h3>
+  <p style="margin-bottom:10px; color:#4b5563;">Colour theme: Amber. Members have <code>priority_partners.status = 'active'</code>.</p>
+  <table>
+    <thead><tr><th>#</th><th>Gap Found</th><th>Severity</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>16</td>
+        <td><b>Wrong field name for discount badge.</b> <code>/api/auth/me</code> returns <code>partner_discount</code> but the dashboard read <code>d.discount</code>. The discount badge was never rendered — priority clients never saw their discount rate.</td>
+        <td class="sev-high">HIGH</td>
+        <td class="fixed">FIXED — corrected to <code>d.partner_discount</code></td>
+      </tr>
+      <tr>
+        <td>17</td>
+        <td><b>Stripe success state not handled in priority portal.</b> Since the redirect from (gap #14) dropped query params, the priority portal had no URL param handler. Payment success screen never showed. Fixed together with gap #14.</td>
+        <td class="sev-high">HIGH</td>
+        <td class="fixed">FIXED — added URL param check on mount; sets stage to 'success' if payment=success&amp;jobRef present</td>
+      </tr>
+      <tr>
+        <td>18</td>
+        <td>Ghost <code>pending_payment</code> jobs same issue as standard portal.</td>
+        <td class="sev-high">HIGH</td>
+        <td class="fixed">FIXED — "Incomplete bookings" section added, identical pattern to standard portal</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>2.3 Payment Confirmation Emails (Business)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Gap Found</th><th>Severity</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>19</td>
+        <td><b>No payment-confirmed email sent when Stripe payment actually landed.</b> The checkout-create route sent a "booking received" email before payment (correct), but the webhook handler sent no notification on <code>checkout.session.completed</code>. Clients and admin had no confirmation that money was received.</td>
+        <td class="sev-high">HIGH</td>
+        <td class="fixed">FIXED — webhook now sends <code>sendBusinessJobPaymentConfirmedEmail</code> to client + admin alert email</td>
+      </tr>
+      <tr>
+        <td>20</td>
+        <td>Email is priority-aware: subject and body differ for standard vs priority bookings. Admin email also includes route and price details.</td>
+        <td class="sev-low">Enhancement</td>
+        <td class="fixed">IMPLEMENTED — new function in sendBusinessEmail.ts</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ─── SECTION 3: PAYMENT SUCCESS PAGE ─── -->
+  <div class="page-break"></div>
+  <h2>Section 3 — Payment Success Page &amp; URL Bugs</h2>
+
+  <table>
+    <thead><tr><th>#</th><th>Gap Found</th><th>Severity</th><th>File</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>21</td>
+        <td><b>Folder typo: <code>payment/succes/</code></b> instead of <code>payment/success/</code>. The P2P checkout route had the same typo so they self-consistently reached the wrong folder — but the separate <code>/api/payment/create-checkout</code> used correct spelling and was broken.</td>
+        <td class="sev-high">HIGH</td>
+        <td><code>src/app/payment/succes/</code></td>
+        <td class="fixed">FIXED — folder renamed via PowerShell Rename-Item; .next/types cache cleared</td>
+      </tr>
+      <tr>
+        <td>22</td>
+        <td><b>Stale TypeScript build cache</b> after folder rename: <code>Cannot find module '../../src/app/payment/succes/page.js'</code>.</td>
+        <td class="sev-medium">MEDIUM</td>
+        <td><code>.next/types/</code></td>
+        <td class="fixed">FIXED — removed .next/types cache directory</td>
+      </tr>
+      <tr>
+        <td>23</td>
+        <td><b><code>checkout/[matchId]/page.tsx</code> had wrong return_url.</b> Was pointing to <code>/checkout/success?match=…</code> — a page that does not exist. Stripe would redirect users to a 404 after payment.</td>
+        <td class="sev-high">HIGH</td>
+        <td><code>src/app/checkout/[matchId]/page.tsx:48</code></td>
+        <td class="fixed">FIXED — corrected to <code>/payment/success?match_id=${matchId}</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ─── SECTION 4: LINK AUDIT ─── -->
+  <h2>Section 4 — Full Link Audit</h2>
+  <p style="margin-bottom:14px; color:#4b5563;">All navigational links across all 4 nav/footer components were checked against the filesystem. Results below.</p>
+
+  <h3>4.1 NavBar (<code>src/components/NavBar.tsx</code>)</h3>
+  <div class="link-grid">
+    <div class="link-item ok">/how-it-works</div>
+    <div class="link-item ok">/journeys</div>
+    <div class="link-item ok">/pricing</div>
+    <div class="link-item ok">/about</div>
+    <div class="link-item ok">/trust-safety</div>
+    <div class="link-item ok">/business</div>
+    <div class="link-item ok">/login</div>
+    <div class="link-item ok">/register</div>
+  </div>
+  <p style="margin-top:8px;" class="link-ok">8/8 links OK ✓</p>
+
+  <h3>4.2 Footer (<code>src/components/Footer.tsx</code>)</h3>
+  <div class="link-grid">
+    <div class="link-item ok">/how-it-works</div>
+    <div class="link-item ok">/pricing</div>
+    <div class="link-item ok">/journeys</div>
+    <div class="link-item ok">/about</div>
+    <div class="link-item ok">/help</div>
+    <div class="link-item ok">/contact</div>
+    <div class="link-item ok">/terms</div>
+    <div class="link-item ok">/privacy</div>
+    <div class="link-item ok">/cookie-policy</div>
+    <div class="link-item ok">/trust-safety</div>
+    <div class="link-item ok">/carrier-agreement</div>
+    <div class="link-item ok">/edi-policy</div>
+  </div>
+  <p style="margin-top:8px;">Socials (external — not filesystem-checked): Instagram, TikTok, Facebook, YouTube, LinkedIn</p>
+  <p style="margin-top:4px;" class="link-ok">12/12 internal links OK ✓</p>
+
+  <h3>4.3 Business Nav (<code>src/components/business/BusinessNav.tsx</code>)</h3>
+  <div class="link-grid">
+    <div class="link-item ok">/business</div>
+    <div class="link-item ok">/business/sign-in</div>
+    <div class="link-item ok">/business/carrier-sign-in</div>
+    <div class="link-item ok">/business/priority-partner</div>
+    <div class="link-item ok">/</div>
+    <div class="link-item ok">/business/how-it-works</div>
+    <div class="link-item ok">/business/contact</div>
+    <div class="link-item ok">/business/get-started</div>
+  </div>
+  <p style="margin-top:8px;" class="link-ok">8/8 links OK ✓</p>
+  <p style="margin-top:6px; color:#92400e;">
+    <span class="badge badge-purple">UX Note</span>
+    The "I'm a Priority Client" dropdown item in BusinessNav points to <code>/business/priority-partner</code>
+    (the marketing/sign-up page). Existing priority clients with accounts should use <code>/business/sign-in</code> instead.
+    The link is not broken but the flow is confusing for returning priority clients. Not yet fixed — needs design decision.
+  </p>
+
+  <h3>4.4 Business Footer (<code>src/components/business/BusinessFooter.tsx</code>)</h3>
+  <div class="link-grid">
+    <div class="link-item ok">/business/how-it-works</div>
+    <div class="link-item ok">/business/pricing</div>
+    <div class="link-item ok">/business/priority-partner</div>
+    <div class="link-item ok">/business/contact</div>
+    <div class="link-item ok">/</div>
+    <div class="link-item ok">/terms</div>
+    <div class="link-item ok">/privacy</div>
+    <div class="link-item ok">/cookie-policy</div>
+    <div class="link-item ok">/carrier-agreement</div>
+    <div class="link-item ok">/api/whatsapp</div>
+  </div>
+  <p style="margin-top:8px;" class="link-ok">10/10 links OK ✓ (including /api/whatsapp route confirmed present)</p>
+
+  <!-- ─── SECTION 5: ALL FIXES APPLIED ─── -->
+  <div class="page-break"></div>
+  <h2>Section 5 — All Fixes Applied</h2>
+  <p style="margin-bottom:16px; color:#4b5563;">13 fixes committed across 3 commits. Listed in commit order.</p>
+
+  <!-- Commit 1 -->
+  <h3>Commit <span class="commit">3ccc27f</span> — Core flow fixes (cron, barcode, messaging)</h3>
+
+  <div class="fix-card">
+    <div class="fix-header">
+      <div class="fix-num">1</div>
+      <div class="fix-title">Messages inbox — complete rewrite</div>
+      <span class="badge badge-red" style="margin-left:auto;">Critical</span>
+    </div>
+    <div class="fix-body">
+      <p><b>Problem:</b> The page queried <code>delivery_matches</code> and <code>messages</code> tables from a scrapped pre-P2P schema. These tables do not exist. The inbox showed nothing.</p>
+      <p><b>Fix:</b> Full rewrite. Now fetches <code>/api/auth/me</code> for user email, <code>/api/dashboard</code> for matches, filters to <code>MESSAGING_STATUSES = ['active', 'delivery_confirmed', 'disputed']</code>, renders conversation list linking to <code>/messages/[matchId]</code>.</p>
+    </div>
+    <div class="fix-file">src/app/messages/page.tsx</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="fix-header">
+      <div class="fix-num">2</div>
+      <div class="fix-title">Africa-outbound matches — 7-day expiry added to cron</div>
+      <span class="badge badge-red" style="margin-left:auto;">Critical</span>
+    </div>
+    <div class="fix-body">
+      <p><b>Problem:</b> <code>awaiting_authorisation</code> status was never included in the expire-matches cron. Africa-outbound trips were locked at <code>pending</code> forever if admin never acted.</p>
+      <p><b>Fix:</b> Added a 7-day cutoff bucket <code>cutoff7d</code> querying matches with <code>awaiting_authorisation</code> older than 168 hours. Included in <code>toCancel</code> array with custom <code>cancellation_reason</code>: <em>"Africa-outbound match expired — not authorised within 7 days."</em></p>
+    </div>
+    <div class="fix-file">src/app/api/cron/expire-matches/route.ts</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="fix-header">
+      <div class="fix-num">3</div>
+      <div class="fix-title">Cron schedule changed — daily → every 6 hours</div>
+      <span class="badge badge-amber" style="margin-left:auto;">High</span>
+    </div>
+    <div class="fix-body">
+      <p><b>Problem:</b> <code>0 3 * * *</code> — ran once per day at 03:00. A 4-hour timeout could wait up to 23 hours before being processed. Match participants stuck in limbo.</p>
+      <p><b>Fix:</b> Changed to <code>0 */6 * * *</code> — runs at 00:00, 06:00, 12:00, 18:00. Max wait for any threshold is now 6 hours.</p>
+    </div>
+    <div class="fix-file">vercel.json → crons[expire-matches].schedule</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="fix-header">
+      <div class="fix-num">4</div>
+      <div class="fix-title">Barcode scan — match status lifecycle guard</div>
+      <span class="badge badge-amber" style="margin-left:auto;">High</span>
+    </div>
+    <div class="fix-body">
+      <p><b>Problem:</b> No match status check in <code>scan-sender-barcode</code>. Senders could request traveller location before delivery was active (during <code>matched</code>, <code>agreed</code>, <code>kyc_pending</code>).</p>
+      <p><b>Fix:</b> Added guard — only processes scan if <code>match.status</code> is <code>active</code> or <code>delivery_confirmed</code>. Returns <code>{ error: 'Location tracking is only available once your delivery is active.', status: 'not_active' }</code> otherwise.</p>
+    </div>
+    <div class="fix-file">src/app/api/tracking/scan-sender-barcode/route.ts</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="fix-header">
+      <div class="fix-num">5</div>
+      <div class="fix-title">Barcode scan — null barcode guard</div>
+      <span class="badge badge-amber" style="margin-left:auto;">High</span>
+    </div>
+    <div class="fix-body">
+      <p><b>Problem:</b> If <code>traveller_barcode</code> was null (not yet generated), the response included a tracking URL with <code>/track/null</code> — breaking push notifications and emails.</p>
+      <p><b>Fix:</b> Added null check on <code>match.traveller_barcode</code> — returns 400 with message <em>"Traveller barcode not yet assigned for this delivery."</em></p>
+    </div>
+    <div class="fix-file">src/app/api/tracking/scan-sender-barcode/route.ts</div>
+  </div>
+
+  <!-- Commit 2 -->
+  <h3>Commit <span class="commit">38e9411</span> — Business dashboard fixes</h3>
+
+  <div class="fix-card">
+    <div class="fix-header">
+      <div class="fix-num">6</div>
+      <div class="fix-title">Priority dashboard — wrong field name for discount badge</div>
+      <span class="badge badge-amber" style="margin-left:auto;">High</span>
+    </div>
+    <div class="fix-body">
+      <p><b>Problem:</b> <code>/api/auth/me</code> returns <code>partner_discount</code> but dashboard read <code>d.discount</code>. Discount badge was always blank — priority clients never saw their rate.</p>
+      <p><b>Fix:</b> Corrected field reference to <code>d.partner_discount</code>.</p>
+    </div>
+    <div class="fix-file">src/app/business/portal/priority/page.tsx</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="fix-header">
+      <div class="fix-num">7</div>
+      <div class="fix-title">Standard portal — preserve Stripe redirect query string for priority partners</div>
+      <span class="badge badge-amber" style="margin-left:auto;">High</span>
+    </div>
+    <div class="fix-body">
+      <p><b>Problem:</b> Stripe returns to <code>/business/portal?payment=success&amp;jobRef=X</code>. Auth check detected priority partner and immediately redirected to <code>/business/portal/priority</code> — stripping the query string. Success screen never showed.</p>
+      <p><b>Fix:</b> <code>const qs = window.location.search; router.replace(`/business/portal/priority${qs}`);</code></p>
+    </div>
+    <div class="fix-file">src/app/business/portal/page.tsx</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="fix-header">
+      <div class="fix-num">8</div>
+      <div class="fix-title">Priority portal — add Stripe return URL param handler</div>
+      <span class="badge badge-amber" style="margin-left:auto;">High</span>
+    </div>
+    <div class="fix-body">
+      <p><b>Problem:</b> Priority portal had no handler for <code>?payment=success&amp;jobRef=</code> params. Even after fix #7, the priority dashboard would load the hub instead of the success screen.</p>
+      <p><b>Fix:</b> On mount, reads <code>URLSearchParams</code> and sets <code>isPaid=true, stage='success', jobRef</code> if payment=success; sets <code>stage='hub'</code> on cancelled. Success screen now shows "Payment received" when <code>isPaid=true</code>.</p>
+    </div>
+    <div class="fix-file">src/app/business/portal/priority/page.tsx</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="fix-header">
+      <div class="fix-num">9</div>
+      <div class="fix-title">Ghost pending_payment jobs — separated in both portals</div>
+      <span class="badge badge-amber" style="margin-left:auto;">High</span>
+    </div>
+    <div class="fix-body">
+      <p><b>Problem:</b> Abandoned Stripe sessions left jobs at <code>pending_payment</code> which appeared in the main job list with no action buttons and a confusing "Payment pending" badge.</p>
+      <p><b>Fix:</b> Added "Incomplete bookings" section in both standard and priority portals. Main list now filters: <code>myJobs.filter(j =&gt; j.status !== 'pending_payment')</code>. Incomplete section shows "Complete payment" or "New booking" link.</p>
+    </div>
+    <div class="fix-file">src/app/business/portal/page.tsx · src/app/business/portal/priority/page.tsx</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="fix-header">
+      <div class="fix-num">10</div>
+      <div class="fix-title">Business webhook — payment confirmed email on Stripe checkout.session.completed</div>
+      <span class="badge badge-amber" style="margin-left:auto;">High</span>
+    </div>
+    <div class="fix-body">
+      <p><b>Problem:</b> The webhook handler updated job status to <code>review</code> but sent no email. Clients and admin had no notification that payment actually landed.</p>
+      <p><b>Fix:</b> Fetched job row on webhook receipt; called <code>sendBusinessJobPaymentConfirmedEmail()</code> to client + admin alert via Resend. Both wrapped in <code>Promise.allSettled</code> so email failure doesn't break status update.</p>
+    </div>
+    <div class="fix-file">src/app/api/business/webhook/route.ts · src/lib/email/sendBusinessEmail.ts</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="fix-header">
+      <div class="fix-num">11</div>
+      <div class="fix-title">New email function — sendBusinessJobPaymentConfirmedEmail</div>
+      <span class="badge badge-blue" style="margin-left:auto;">Feature</span>
+    </div>
+    <div class="fix-body">
+      <p>Added priority-aware payment confirmation email. Standard booking: subject "Your booking is confirmed"; Priority: subject "Your BootHop Priority booking is confirmed — we'll be in touch shortly." Both include job ref, route, and price.</p>
+    </div>
+    <div class="fix-file">src/lib/email/sendBusinessEmail.ts</div>
+  </div>
+
+  <!-- Commit 3 -->
+  <h3>Commit <span class="commit">0ce4d81</span> — Payment success page URL fixes</h3>
+
+  <div class="fix-card">
+    <div class="fix-header">
+      <div class="fix-num">12</div>
+      <div class="fix-title">Rename payment folder — succes → success (typo fix)</div>
+      <span class="badge badge-amber" style="margin-left:auto;">High</span>
+    </div>
+    <div class="fix-body">
+      <p><b>Problem:</b> Folder was named <code>src/app/payment/succes/</code> (missing one 's'). The P2P checkout page had the same typo so they accidentally matched — but <code>/api/payment/create-checkout</code> used the correct spelling and was broken.</p>
+      <p><b>Fix:</b> Renamed via PowerShell <code>Rename-Item</code>. Cleared <code>.next/types</code> cache to remove stale TypeScript build artifact.</p>
+    </div>
+    <div class="fix-file">src/app/payment/success/ (renamed from succes/)</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="fix-header">
+      <div class="fix-num">13</div>
+      <div class="fix-title">checkout/[matchId] — wrong return_url after payment</div>
+      <span class="badge badge-amber" style="margin-left:auto;">High</span>
+    </div>
+    <div class="fix-body">
+      <p><b>Problem:</b> <code>return_url</code> was <code>/checkout/success?match=…</code> — a page that does not exist. Stripe would redirect users to a 404 after successful payment.</p>
+      <p><b>Fix:</b> Corrected to <code>/payment/success?match_id=${matchId}</code>.</p>
+    </div>
+    <div class="fix-file">src/app/checkout/[matchId]/page.tsx:48</div>
+  </div>
+
+  <!-- ─── SECTION 6: OUTSTANDING ITEM ─── -->
+  <h2>Section 6 — Outstanding Item (Not Yet Fixed)</h2>
+
+  <table>
+    <thead><tr><th>#</th><th>Issue</th><th>Type</th><th>Recommendation</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>UX-1</td>
+        <td>
+          <b>"I'm a Priority Client" in BusinessNav sign-in dropdown</b> links to
+          <code>/business/priority-partner</code> (the marketing &amp; sign-up page), not <code>/business/sign-in</code>.
+          Returning priority clients who already have an account are sent to the wrong page.
+        </td>
+        <td class="sev-ux">UX</td>
+        <td>
+          Option A — Change the dropdown label to "Register as Priority Client" and add a separate
+          "Priority Client Sign In" item pointing to <code>/business/sign-in</code>.<br />
+          Option B — The sign-in page already handles all business types via OTP — just update the label copy.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ─── SECTION 7: FINAL LINK VERIFICATION ─── -->
+  <h2>Section 7 — Final Filesystem Verification (Post-Fix)</h2>
+  <p style="margin-bottom:10px; color:#4b5563;">All pages referenced in any link confirmed to exist on disk at time of report generation.</p>
+
+  <table>
+    <thead><tr><th>Route</th><th>File Path</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>/how-it-works</td><td>src/app/how-it-works/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/journeys</td><td>src/app/journeys/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/pricing</td><td>src/app/pricing/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/about</td><td>src/app/about/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/trust-safety</td><td>src/app/trust-safety/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/help</td><td>src/app/help/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/contact</td><td>src/app/contact/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/terms</td><td>src/app/terms/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/privacy</td><td>src/app/privacy/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/cookie-policy</td><td>src/app/cookie-policy/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/carrier-agreement</td><td>src/app/carrier-agreement/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/edi-policy</td><td>src/app/edi-policy/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/login</td><td>src/app/login/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/register</td><td>src/app/register/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/business</td><td>src/app/business/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/business/sign-in</td><td>src/app/business/sign-in/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/business/carrier-sign-in</td><td>src/app/business/carrier-sign-in/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/business/priority-partner</td><td>src/app/business/priority-partner/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/business/how-it-works</td><td>src/app/business/how-it-works/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/business/contact</td><td>src/app/business/contact/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/business/get-started</td><td>src/app/business/get-started/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/business/pricing</td><td>src/app/business/pricing/page.tsx</td><td class="fixed">✓ Exists</td></tr>
+      <tr><td>/payment/success</td><td>src/app/payment/success/page.tsx</td><td class="fixed">✓ Exists (renamed from succes/)</td></tr>
+      <tr><td>/api/whatsapp</td><td>src/app/api/whatsapp/route.ts</td><td class="fixed">✓ Exists</td></tr>
+    </tbody>
+  </table>
+
+  <!-- FOOTER -->
+  <div class="report-footer">
+    <span>BootHop Test Report · 14 June 2026 · Branch: main</span>
+    <span>Generated by Claude Code · Commits: 3ccc27f · 38e9411 · 0ce4d81</span>
+  </div>
+
+</div>
+</body>
+</html>

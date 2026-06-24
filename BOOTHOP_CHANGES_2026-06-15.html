@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BootHop — All Changes · 15 June 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1a1a2e; background: #f8fafc; line-height: 1.6; }
+  @media print {
+    body { font-size: 11px; background: #fff; }
+    .no-print { display: none; }
+    .page-break { page-break-before: always; }
+  }
+
+  .cover { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #16213e 100%); color: #fff; padding: 48px; }
+  .cover .logo { font-size: 26px; font-weight: 900; color: #60a5fa; letter-spacing: -1px; }
+  .cover h1 { font-size: 24px; font-weight: 700; margin: 10px 0 4px; }
+  .cover .sub { font-size: 13px; color: #93c5fd; }
+  .cover .meta { margin-top: 18px; display: flex; gap: 32px; font-size: 12px; color: #cbd5e1; flex-wrap: wrap; }
+  .cover .meta b { color: #e2e8f0; }
+
+  .content { max-width: 980px; margin: 0 auto; padding: 32px 32px 64px; }
+
+  h2 { font-size: 14px; font-weight: 700; color: #1e3a5f; border-bottom: 2px solid #3b82f6; padding-bottom: 5px; margin: 36px 0 14px; text-transform: uppercase; letter-spacing: .5px; }
+  h3 { font-size: 13px; font-weight: 700; color: #0f172a; margin: 22px 0 8px; }
+  p { color: #374151; margin-bottom: 8px; }
+
+  /* verdict grid */
+  .grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin: 14px 0; }
+  .vbox { border-radius: 10px; padding: 14px; text-align: center; }
+  .vbox .n { font-size: 30px; font-weight: 900; line-height: 1; }
+  .vbox .l { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; margin-top: 4px; }
+  .v-yes  { background:#f0fdf4; color:#15803d; border:1.5px solid #86efac; }
+  .v-deb  { background:#fefce8; color:#854d0e; border:1.5px solid #fde047; }
+  .v-no   { background:#fef2f2; color:#b91c1c; border:1.5px solid #fca5a5; }
+
+  /* change cards */
+  .change-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:16px 18px; margin-bottom:12px; page-break-inside:avoid; }
+  .change-card .ch { display:flex; align-items:flex-start; gap:12px; }
+  .num { width:26px; height:26px; border-radius:50%; background:#3b82f6; color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .ch-body { flex:1; }
+  .ch-title { font-weight:700; font-size:13px; color:#0f172a; margin-bottom:4px; }
+  .ch-file { font-size:11px; font-family:monospace; color:#6b7280; margin-bottom:6px; }
+  .ch-desc { font-size:12px; color:#374151; }
+  .ch-desc p { margin-bottom:4px; }
+  .ch-desc code { background:#f1f5f9; padding:1px 5px; border-radius:3px; font-family:monospace; font-size:11px; color:#0f172a; }
+
+  /* verdict badge inline */
+  .verdict { margin-left:auto; flex-shrink:0; }
+  .badge { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:.3px; }
+  .b-critical { background:#fef2f2; color:#b91c1c; border:1px solid #fca5a5; }
+  .b-yes      { background:#f0fdf4; color:#15803d; border:1px solid #86efac; }
+  .b-debatable{ background:#fefce8; color:#854d0e; border:1px solid #fde047; }
+
+  /* necessity column */
+  .necessity { margin-top:10px; padding:10px 12px; border-radius:8px; font-size:12px; }
+  .n-critical { background:#fef2f2; border-left:3px solid #ef4444; }
+  .n-yes      { background:#f0fdf4; border-left:3px solid #22c55e; }
+  .n-debatable{ background:#fefce8; border-left:3px solid #eab308; }
+  .necessity strong { display:block; font-size:11px; text-transform:uppercase; letter-spacing:.3px; margin-bottom:3px; }
+  .n-critical strong { color:#b91c1c; }
+  .n-yes strong      { color:#15803d; }
+  .n-debatable strong{ color:#854d0e; }
+
+  /* section chips */
+  .chip { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; text-transform:uppercase; letter-spacing:.3px; margin-right:6px; }
+  .chip-blue   { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
+  .chip-amber  { background:#fffbeb; color:#92400e; border:1px solid #fcd34d; }
+  .chip-emerald{ background:#f0fdf4; color:#15803d; border:1px solid #86efac; }
+  .chip-purple { background:#faf5ff; color:#6d28d9; border:1px solid #c4b5fd; }
+
+  .commit { display:inline-block; background:#1e3a5f; color:#93c5fd; font-family:monospace; font-size:11px; padding:2px 8px; border-radius:4px; }
+  .uncommitted { display:inline-block; background:#292524; color:#d6d3d1; font-family:monospace; font-size:11px; padding:2px 8px; border-radius:4px; }
+
+  .divider { height:1px; background:#e2e8f0; margin:28px 0; }
+
+  .print-btn { position:fixed; top:16px; right:16px; background:#3b82f6; color:#fff; border:none; border-radius:8px; padding:9px 20px; font-size:13px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(59,130,246,.4); z-index:999; }
+  .print-btn:hover { background:#2563eb; }
+
+  .footer { margin-top:40px; padding-top:14px; border-top:1px solid #e2e8f0; font-size:11px; color:#94a3b8; display:flex; justify-content:space-between; }
+
+  .callout { border-radius:8px; padding:12px 16px; margin:16px 0; font-size:12px; }
+  .callout-red    { background:#fef2f2; border:1px solid #fca5a5; color:#7f1d1d; }
+  .callout-green  { background:#f0fdf4; border:1px solid #86efac; color:#14532d; }
+  .callout-yellow { background:#fefce8; border:1px solid #fde047; color:#713f12; }
+  .callout b { font-weight:700; }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">⬇ Save as PDF</button>
+
+<div class="cover">
+  <div class="logo">BootHop</div>
+  <h1>Full Change Log — Were They All Needed?</h1>
+  <div class="sub">Every change made this session · Honest necessity assessment</div>
+  <div class="meta">
+    <span><b>Date</b> 15 June 2026</span>
+    <span><b>Branch</b> main</span>
+    <span><b>Committed</b> 3ccc27f · 38e9411 · 0ce4d81</span>
+    <span><b>Uncommitted</b> 4 files + 1 new page</span>
+  </div>
+</div>
+
+<div class="content">
+
+  <h2>Necessity Summary</h2>
+  <div class="grid4">
+    <div class="vbox v-yes"><div class="n">16</div><div class="l">Definitely Needed</div></div>
+    <div class="vbox v-deb"><div class="n">2</div><div class="l">Debatable</div></div>
+    <div class="vbox v-no" style="background:#f0fdf4;color:#15803d;border-color:#86efac;"><div class="n">0</div><div class="l">Unnecessary</div></div>
+    <div class="vbox" style="background:#eff6ff;color:#1d4ed8;border:1.5px solid #93c5fd;"><div class="n">18</div><div class="l">Total Changes</div></div>
+  </div>
+  <p>16 changes were unambiguously needed — either login was broken, data was wrong, or users would hit a 404. 2 changes are debatable quality improvements. Zero changes were unnecessary.</p>
+
+  <!-- ═══ COMMITTED CHANGES ═══ -->
+  <div class="page-break"></div>
+  <h2>Committed Changes</h2>
+
+  <!-- COMMIT 1 -->
+  <h3><span class="commit">3ccc27f</span> &nbsp;Deep audit — 5 fixes</h3>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">1</div>
+      <div class="ch-body">
+        <div class="ch-title">Messages inbox — complete rewrite <span class="chip chip-blue">Critical</span></div>
+        <div class="ch-file">src/app/messages/page.tsx</div>
+        <div class="ch-desc">
+          <p>Page was querying <code>delivery_matches</code> and <code>messages</code> tables from a scrapped pre-P2P schema that no longer exists in the database. The inbox rendered nothing for all users.</p>
+          <p><b>Fix:</b> Rewrote to fetch <code>/api/auth/me</code> + <code>/api/dashboard</code>, filter to messaging-eligible statuses (<code>active</code>, <code>delivery_confirmed</code>, <code>disputed</code>), render conversation list.</p>
+        </div>
+        <div class="necessity n-critical"><strong>🔴 Was it needed?</strong> Yes — the entire inbox was broken. Zero messages were accessible. Would have blocked all in-app communication from day one.</div>
+      </div>
+      <div class="verdict"><span class="badge b-critical">Critical fix</span></div>
+    </div>
+  </div>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">2</div>
+      <div class="ch-body">
+        <div class="ch-title">Africa-outbound matches — 7-day expiry added to cron <span class="chip chip-blue">Critical</span></div>
+        <div class="ch-file">src/app/api/cron/expire-matches/route.ts</div>
+        <div class="ch-desc">
+          <p><code>awaiting_authorisation</code> status was never included in the expiry cron. If admin never approved/rejected, the match and both parties' trips would be locked permanently — sender couldn't rebook, traveller couldn't take new matches.</p>
+          <p><b>Fix:</b> Added 7-day cutoff bucket; cancelled matches restore trips and send emails with a clear reason.</p>
+        </div>
+        <div class="necessity n-critical"><strong>🔴 Was it needed?</strong> Yes — without this, every Africa-outbound match that admin ignored would lock two users' trips forever. No recovery path existed.</div>
+      </div>
+      <div class="verdict"><span class="badge b-critical">Critical fix</span></div>
+    </div>
+  </div>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">3</div>
+      <div class="ch-body">
+        <div class="ch-title">Cron schedule — daily 03:00 → every 6 hours</div>
+        <div class="ch-file">vercel.json</div>
+        <div class="ch-desc">
+          <p>The expire-matches cron ran once per day at 03:00 UTC. The system has a 4-hour timeout for <code>matched</code> status. A match that expired at 03:01 would wait nearly 24 hours before being cancelled and trips restored.</p>
+          <p><b>Fix:</b> Changed to <code>0 */6 * * *</code> — runs at 00:00, 06:00, 12:00, 18:00. Maximum wait for any timeout is now 6 hours.</p>
+        </div>
+        <div class="necessity n-yes"><strong>✅ Was it needed?</strong> Yes — the 4-hour and 12-hour thresholds existed precisely to enforce tight lifecycle windows. Running the cron daily made those thresholds meaningless.</div>
+      </div>
+      <div class="verdict"><span class="badge b-yes">Needed</span></div>
+    </div>
+  </div>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">4</div>
+      <div class="ch-body">
+        <div class="ch-title">Barcode scan — status guard added</div>
+        <div class="ch-file">src/app/api/tracking/scan-sender-barcode/route.ts</div>
+        <div class="ch-desc">
+          <p>No lifecycle check existed on the barcode scan endpoint. Senders could request the traveller's location during <code>matched</code>, <code>agreed</code>, or <code>kyc_pending</code> — before either party had committed to or paid for the delivery.</p>
+          <p><b>Fix:</b> Added guard — only processes scan when match status is <code>active</code> or <code>delivery_confirmed</code>.</p>
+        </div>
+        <div class="necessity n-yes"><strong>✅ Was it needed?</strong> Yes — location data is sensitive. Exposing traveller location before payment and KYC are complete is both a privacy risk and a logical error in the delivery lifecycle.</div>
+      </div>
+      <div class="verdict"><span class="badge b-yes">Needed</span></div>
+    </div>
+  </div>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">5</div>
+      <div class="ch-body">
+        <div class="ch-title">Barcode scan — null barcode guard</div>
+        <div class="ch-file">src/app/api/tracking/scan-sender-barcode/route.ts</div>
+        <div class="ch-desc">
+          <p>If <code>traveller_barcode</code> was null (not yet generated), the response would include a tracking URL containing <code>/track/null</code>. This URL would be sent in push notifications and emails.</p>
+          <p><b>Fix:</b> Added null check returning 400 with a clear error: "Traveller barcode not yet assigned for this delivery."</p>
+        </div>
+        <div class="necessity n-yes"><strong>✅ Was it needed?</strong> Yes — broken URLs in push notifications are unrecoverable. The user taps the notification and lands on a 404 with no context. Needed.</div>
+      </div>
+      <div class="verdict"><span class="badge b-yes">Needed</span></div>
+    </div>
+  </div>
+
+  <!-- COMMIT 2 -->
+  <h3><span class="commit">38e9411</span> &nbsp;Business dashboard — 5 fixes</h3>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">6</div>
+      <div class="ch-body">
+        <div class="ch-title">Priority dashboard — wrong field name on discount badge</div>
+        <div class="ch-file">src/app/business/portal/priority/page.tsx</div>
+        <div class="ch-desc">
+          <p><code>/api/business/auth/me</code> returns <code>partner_discount</code> but the dashboard read <code>d.discount</code>. The discount rate badge was permanently blank — priority clients never saw their negotiated rate.</p>
+          <p><b>Fix:</b> Corrected to <code>d.partner_discount</code>.</p>
+        </div>
+        <div class="necessity n-yes"><strong>✅ Was it needed?</strong> Yes — the discount badge is a core priority membership benefit. Partners with a 15% negotiated rate seeing a blank badge would rightly question whether their deal was honoured.</div>
+      </div>
+      <div class="verdict"><span class="badge b-yes">Needed</span></div>
+    </div>
+  </div>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">7</div>
+      <div class="ch-body">
+        <div class="ch-title">Priority portal — Stripe redirect strips query params</div>
+        <div class="ch-file">src/app/business/portal/page.tsx · priority/page.tsx</div>
+        <div class="ch-desc">
+          <p>Stripe returns to <code>/business/portal?payment=success&amp;jobRef=X</code>. The standard portal auth check detected <code>partner_status === 'active'</code> and immediately redirected to <code>/business/portal/priority</code> — but stripped the query string. The success screen never appeared.</p>
+          <p><b>Fix (part 1):</b> Standard portal preserves the query string in the redirect: <code>router.replace(`/business/portal/priority${qs}`)</code>.</p>
+          <p><b>Fix (part 2):</b> Priority portal reads URL params on mount and sets <code>stage='success'</code> when <code>payment=success</code> is present.</p>
+        </div>
+        <div class="necessity n-critical"><strong>🔴 Was it needed?</strong> Yes — priority partners paying for jobs via Stripe would never see a payment confirmation screen. They'd be left wondering if the payment went through.</div>
+      </div>
+      <div class="verdict"><span class="badge b-critical">Critical fix</span></div>
+    </div>
+  </div>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">8</div>
+      <div class="ch-body">
+        <div class="ch-title">Ghost pending_payment jobs — separated in both portals</div>
+        <div class="ch-file">src/app/business/portal/page.tsx · priority/page.tsx</div>
+        <div class="ch-desc">
+          <p>Abandoned Stripe sessions left jobs at <code>pending_payment</code> in the database. These appeared in the main job list with a "Payment pending" badge and no action buttons — confusing, and impossible to clear or complete from the UI.</p>
+          <p><b>Fix:</b> Separated into an "Incomplete bookings" section with a "New booking / Resume" link. Main job list filters them out.</p>
+        </div>
+        <div class="necessity n-yes"><strong>✅ Was it needed?</strong> Yes — ghost jobs in the active list with no action create support noise and erode trust. Clients would contact support unsure if their last booking was real.</div>
+      </div>
+      <div class="verdict"><span class="badge b-yes">Needed</span></div>
+    </div>
+  </div>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">9</div>
+      <div class="ch-body">
+        <div class="ch-title">Business webhook — payment confirmed email on checkout.session.completed</div>
+        <div class="ch-file">src/app/api/business/webhook/route.ts · sendBusinessEmail.ts</div>
+        <div class="ch-desc">
+          <p>The Stripe webhook updated the job to <code>review</code> status when payment landed but sent no notification. The business client had no confirmation that money left their account. No admin alert either.</p>
+          <p><b>Fix:</b> Webhook now fetches the job row and sends a priority-aware email to the client + an admin alert with route and price details.</p>
+        </div>
+        <div class="necessity n-yes"><strong>✅ Was it needed?</strong> Yes — for a payments product, sending no receipt after money is taken is a serious trust issue. Would generate immediate support requests and potential chargebacks.</div>
+      </div>
+      <div class="verdict"><span class="badge b-yes">Needed</span></div>
+    </div>
+  </div>
+
+  <!-- COMMIT 3 -->
+  <h3><span class="commit">0ce4d81</span> &nbsp;Link / URL fixes — 3 fixes</h3>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">10</div>
+      <div class="ch-body">
+        <div class="ch-title">payment/succes/ folder typo — renamed to payment/success/ <span class="chip chip-blue">Critical</span></div>
+        <div class="ch-file">src/app/payment/{succes → success}/page.tsx</div>
+        <div class="ch-desc">
+          <p>Folder was named <code>succes</code> (one 's'). The P2P checkout page had the same typo so they were accidentally self-consistent. But <code>/api/payment/create-checkout</code> used correct spelling and sent users to a Next.js 404 page after payment.</p>
+          <p><b>Fix:</b> Renamed folder. Cleared <code>.next/types</code> build cache to remove stale artifact.</p>
+        </div>
+        <div class="necessity n-critical"><strong>🔴 Was it needed?</strong> Yes — users who paid via the main create-checkout flow landed on a 404 after completing payment. No confirmation, just a broken page.</div>
+      </div>
+      <div class="verdict"><span class="badge b-critical">Critical fix</span></div>
+    </div>
+  </div>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">11</div>
+      <div class="ch-body">
+        <div class="ch-title">checkout/[matchId] — wrong return_url after Stripe payment</div>
+        <div class="ch-file">src/app/checkout/[matchId]/page.tsx:48</div>
+        <div class="ch-desc">
+          <p><code>return_url</code> pointed to <code>/checkout/success?match=…</code> — a page that has never existed. Users who completed payment via this flow were redirected to a 404.</p>
+          <p><b>Fix:</b> Corrected to <code>/payment/success?match_id=${matchId}</code>.</p>
+        </div>
+        <div class="necessity n-yes"><strong>✅ Was it needed?</strong> Yes — post-payment 404 is one of the worst possible outcomes in an e-commerce flow. Technically the page is legacy code (nothing links to it now), but the fix was still right to make.</div>
+      </div>
+      <div class="verdict"><span class="badge b-yes">Needed</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ UNCOMMITTED CHANGES ═══ -->
+  <div class="page-break"></div>
+  <h2>Tonight's Uncommitted Changes</h2>
+
+  <h3><span class="uncommitted">BusinessNav.tsx + new page</span> &nbsp;Priority Client sign-in</h3>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">12</div>
+      <div class="ch-body">
+        <div class="ch-title">BusinessNav — "I'm a Priority Client" pointed to marketing page</div>
+        <div class="ch-file">src/components/business/BusinessNav.tsx (sign-in dropdown + returning user banner)</div>
+        <div class="ch-desc">
+          <p>Both the dropdown and the returning user banner linked priority clients to <code>/business/priority-partner</code> — the sign-up / marketing page. Returning members had no way to reach their portal from the nav.</p>
+          <p><b>Fix:</b> Both links updated to <code>/business/priority-sign-in</code>.</p>
+        </div>
+        <div class="necessity n-yes"><strong>✅ Was it needed?</strong> Yes — returning priority clients clicking "I'm a Priority Client" in the nav would land on the marketing/sign-up page instead of a login form. A £10k+ member would not find that acceptable.</div>
+      </div>
+      <div class="verdict"><span class="badge b-yes">Needed</span></div>
+    </div>
+  </div>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">13</div>
+      <div class="ch-body">
+        <div class="ch-title">New page — /business/priority-sign-in</div>
+        <div class="ch-file">src/app/business/priority-sign-in/page.tsx (NEW)</div>
+        <div class="ch-desc">
+          <p>No dedicated sign-in page existed for priority clients. The existing <code>/business/sign-in</code> page works for Express clients and uses emerald/Express branding throughout. Priority clients landing there would feel like they're on the wrong page.</p>
+          <p><b>Fix:</b> Created a separate amber/gold branded sign-in page using the same OTP API. After verify, calls <code>/api/business/auth/me</code> to route correctly based on <code>partner_status</code>.</p>
+        </div>
+        <div class="necessity n-yes"><strong>✅ Was it needed?</strong> Yes — not strictly a bug, but a priority membership at £10k+ demands a polished experience. Sending those clients to a page that says "Express Delivery" and shows emerald branding is a significant UX mismatch.</div>
+      </div>
+      <div class="verdict"><span class="badge b-yes">Needed</span></div>
+    </div>
+  </div>
+
+  <h3><span class="uncommitted">sign-in pages</span> &nbsp;OTP + auth fixes (all 3 sign-in pages)</h3>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">14</div>
+      <div class="ch-body">
+        <div class="ch-title">OTP input completely broken — regex stripped the letter <span class="chip chip-blue">Critical</span></div>
+        <div class="ch-file">sign-in/page.tsx · priority-sign-in/page.tsx · carrier-sign-in/page.tsx</div>
+        <div class="ch-desc">
+          <p>The OTP format (from <code>src/lib/auth/code.ts</code>) is 4 digits + 1 letter = 5 chars (e.g. <code>4827A</code>). All three sign-in pages used <code>.replace(/\D/g, '')</code> which strips ALL non-digits — the letter was removed before the code could be submitted. Button was also <code>disabled={otp.length &lt; 6}</code> but the max possible length after stripping was 4. Login was impossible.</p>
+          <p><b>Fix:</b> Changed to <code>.replace(/[^A-Z0-9]/gi, '').toUpperCase()</code>. Fixed <code>maxLength</code> 6→5, <code>disabled</code> threshold 6→5, placeholder 6 blanks→5, description "6-digit"→"5-character". Added <code>uppercase</code> CSS class. Carrier: also fixed <code>inputMode="numeric"</code>→<code>"text"</code> (numeric keyboard on mobile has no letter key).</p>
+        </div>
+        <div class="necessity n-critical"><strong>🔴 Was it needed?</strong> Yes — this is the most critical fix of the session. Nobody could sign into any business account (Express, Priority, or Carrier) through the OTP flow. The login was 100% broken.</div>
+      </div>
+      <div class="verdict"><span class="badge b-critical">Critical fix</span></div>
+    </div>
+  </div>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">15</div>
+      <div class="ch-body">
+        <div class="ch-title">Priority sign-in — always routed to priority portal regardless of account type</div>
+        <div class="ch-file">src/app/business/priority-sign-in/page.tsx</div>
+        <div class="ch-desc">
+          <p>The new priority sign-in page originally hard-coded <code>router.push('/business/portal/priority')</code> after a successful OTP. An Express client who accidentally landed on the priority sign-in page would be pushed to the priority portal, which would then bounce them back to the Express portal. Two unnecessary redirects, with a brief flash of the wrong UI.</p>
+          <p><b>Fix:</b> After OTP verify and on <code>skipOtp</code>, calls <code>/api/business/auth/me</code> and routes based on <code>partner_status</code>. Express clients go to Express portal directly.</p>
+        </div>
+        <div class="necessity n-yes"><strong>✅ Was it needed?</strong> Yes — introduced by us when creating the page. Caught and fixed before committing. Correct routing matters: the priority portal is restricted and would have caused a visible redirect bounce for non-priority users.</div>
+      </div>
+      <div class="verdict"><span class="badge b-yes">Needed</span></div>
+    </div>
+  </div>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">16</div>
+      <div class="ch-body">
+        <div class="ch-title">Carrier sign-in — mobile keyboard locks out letter entry</div>
+        <div class="ch-file">src/app/business/carrier-sign-in/page.tsx</div>
+        <div class="ch-desc">
+          <p>The OTP input used <code>inputMode="numeric"</code>. On iOS and Android, this forces the numeric keyboard — which has no letter keys. Carrier users on mobile could type the 4 digits but had no way to enter the required letter. Even if they somehow did (e.g. switching keyboards), the old regex would strip it. Combined with the OTP bug (#14), carriers on mobile had zero path to login.</p>
+          <p><b>Fix:</b> Changed to <code>inputMode="text"</code>. Standard keyboard shows on mobile, allowing the full alphanumeric code.</p>
+        </div>
+        <div class="necessity n-critical"><strong>🔴 Was it needed?</strong> Yes — carriers are the most mobile-heavy user type (they're on the road). Making the login keyboard physically unable to enter the required character completely blocks their most common device type.</div>
+      </div>
+      <div class="verdict"><span class="badge b-critical">Critical fix</span></div>
+    </div>
+  </div>
+
+  <!-- DEBATABLE -->
+  <div class="page-break"></div>
+  <h2>Debatable Changes — Honest Assessment</h2>
+
+  <div class="callout callout-yellow">
+    <b>These 2 changes are improvements, not fixes.</b> The app would have worked without them. That said, both are low risk and the right call — just worth noting they weren't "must-do" items.
+  </div>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">17</div>
+      <div class="ch-body">
+        <div class="ch-title">Remove client-side personal email check (Express + Carrier sign-in)</div>
+        <div class="ch-file">src/app/business/sign-in/page.tsx · carrier-sign-in/page.tsx</div>
+        <div class="ch-desc">
+          <p>Both pages had a client-side <code>PERSONAL_DOMAINS</code> check using <code>email.includes('gmail.')</code> substring matching. The API (<code>send-otp</code>) already validates this using an accurate domain-split check and returns the same error message.</p>
+          <p>The client check was redundant. The substring approach (e.g. checking for <code>'gmail.'</code>) is also slightly less accurate than the API's <code>domain.split('@')[1]</code> approach.</p>
+          <p><b>Before:</b> Instant client-side error. <b>After:</b> One network round-trip (~150ms) then same error from API.</p>
+        </div>
+        <div class="necessity n-debatable"><strong>🟡 Was it needed?</strong> Debatable. The API already handled this correctly. The only real gain is removing a redundant code path and a mildly inaccurate substring check. The downside: 150ms slower error feedback. Low risk either way.</div>
+      </div>
+      <div class="verdict"><span class="badge b-debatable">Debatable</span></div>
+    </div>
+  </div>
+
+  <div class="change-card">
+    <div class="ch">
+      <div class="num">18</div>
+      <div class="ch-body">
+        <div class="ch-title">Auth check on mount — redirect if already signed in (all 3 pages)</div>
+        <div class="ch-file">sign-in/page.tsx · priority-sign-in/page.tsx · carrier-sign-in/page.tsx</div>
+        <div class="ch-desc">
+          <p>Added a <code>useEffect</code> on mount that calls <code>/api/business/auth/me</code>. If the user already has a valid <code>biz_session</code> cookie, they are redirected straight to their portal instead of seeing the sign-in form.</p>
+          <p><b>What this prevents:</b> A logged-in user navigating to <code>/business/sign-in</code> and seeing a sign-in form.</p>
+          <p><b>Trade-off:</b> Every page load of any business sign-in page now makes a <code>/me</code> API call. For unauthenticated users (the vast majority of sign-in page visitors) this returns 401 in ~100ms and <code>setChecking(false)</code> is called. A brief spinner is shown.</p>
+        </div>
+        <div class="necessity n-debatable"><strong>🟡 Was it needed?</strong> Debatable. A logged-in user landing on the sign-in form isn't broken — the form still works, they'd just enter their email and be redirected. The auth-on-mount check is a UX polish. Risk: if <code>/me</code> is slow, the spinner lingers. The catch block handles failure gracefully.</div>
+      </div>
+      <div class="verdict"><span class="badge b-debatable">Debatable</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ VERDICT ═══ -->
+  <h2>Overall Verdict</h2>
+
+  <div class="callout callout-red">
+    <b>4 changes were outright login/payment blockers:</b> The OTP input stripping the letter (all 3 business sign-ins), the mobile keyboard locking carriers out, the messages inbox querying dead tables, and the payment success page 404. Any one of these would have generated immediate critical support tickets on launch day.
+  </div>
+  <div class="callout callout-green" style="margin-top:10px;">
+    <b>12 changes fixed genuine bugs</b> that would have surfaced within the first week: broken discount badges, no payment emails, locked trips, ghost jobs, wrong portal branding for priority clients.
+  </div>
+  <div class="callout callout-yellow" style="margin-top:10px;">
+    <b>2 changes are quality improvements</b> (auth redirect on mount, remove redundant email check). They improve UX and code quality but would not have caused support tickets. Both are low-risk and the right call — just honest to label them as polish rather than fixes.
+  </div>
+
+  <!-- ═══ STILL TO DO ═══ -->
+  <h2>Still Open — Fix 5 (OTP Expired UX)</h2>
+  <p>Intentionally deferred. When a user submits an expired OTP, they currently see the error <em>"Verification code has expired. Please request a new one."</em> and must manually click "Use a different email" to reset. The better approach — to be discussed separately — is to make that error message itself actionable (e.g. a link/button that resets to the email stage) rather than auto-resetting based on string matching in the error message.</p>
+
+  <div class="footer">
+    <span>BootHop Change Log · 15 June 2026 · Branch: main</span>
+    <span>18 changes total · 16 needed · 2 debatable · 0 unnecessary</span>
+  </div>
+
+</div>
+</body>
+</html>

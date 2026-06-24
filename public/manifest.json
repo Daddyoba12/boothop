@@ -13,6 +13,9 @@
   "dir": "ltr",
   "categories": ["travel", "shopping", "logistics", "business"],
   "iarc_rating_id": "",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "related_applications": [],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-96x96.png",
@@ -66,13 +69,23 @@
       "src": "/images/boothop-screenshot-narrow.png",
       "sizes": "1080x1920",
       "type": "image/png",
+      "platform": "ios",
       "form_factor": "narrow",
       "label": "BootHop — Send anything, anywhere"
+    },
+    {
+      "src": "/images/boothop-screenshot-narrow.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "platform": "android",
+      "form_factor": "narrow",
+      "label": "BootHop — Peer-to-peer delivery"
     },
     {
       "src": "/images/boothop-screenshot-wide.png",
       "sizes": "2848x1600",
       "type": "image/png",
+      "platform": "windows",
       "form_factor": "wide",
       "label": "BootHop homepage"
     }
