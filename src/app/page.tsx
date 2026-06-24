@@ -1113,57 +1113,48 @@ function HomePageContent() {
 
           {!routesLoaded ? (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map(i => (
+              {[1, 2, 3, 4, 5, 6].map(i => (
                 <div key={i} className="rounded-2xl border border-white/10 bg-white/[0.03] h-28 animate-pulse" />
               ))}
             </div>
-          ) : (() => {
-            const liveRoutes = featuredRoutes.filter(r => (routeCounts[`${r.from}→${r.to}`] ?? 0) > 0);
-            if (liveRoutes.length === 0) {
-              return (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-10 text-center">
-                  <p className="text-white/40 text-sm mb-4">No active corridors right now — post your delivery and we&apos;ll match you when a traveller registers.</p>
-                  <Link href="#booking-form"
-                    onClick={(e) => { e.preventDefault(); document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' }); }}
-                    className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors font-medium">
-                    Post a delivery <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-              );
-            }
-            return (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {liveRoutes.map((route) => {
-                  const liveCount = routeCounts[`${route.from}→${route.to}`] ?? 0;
-                  return (
-                    <div key={`${route.from}-${route.to}`}
-                      onClick={() => router.push(`/journeys?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`)}
-                      className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${route.color} ${route.border} p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer`}>
-                      <div className="mb-3 flex items-center justify-between">
-                        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${route.badge}`}>{route.tag}</span>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {featuredRoutes.map((route) => {
+                const liveCount = routeCounts[`${route.from}→${route.to}`] ?? 0;
+                const displayCount = liveCount > 0 ? liveCount : route.travellers;
+                const isLive = liveCount > 0;
+                return (
+                  <div key={`${route.from}-${route.to}`}
+                    onClick={() => router.push(`/journeys?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`)}
+                    className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${route.color} ${route.border} p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer`}>
+                    <div className="mb-3 flex items-center justify-between">
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${route.badge}`}>{route.tag}</span>
+                      {isLive ? (
                         <div className="flex items-center gap-1.5">
                           <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
                           <span className="text-[10px] text-green-400 font-semibold">Live</span>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-base font-semibold text-white">{route.from}</span>
-                        <ArrowRight className="h-4 w-4 text-white/30" />
-                        <span className="text-base font-semibold text-white">{route.to}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <p className="flex items-center gap-1 text-xs text-white/40">
-                          <Users className="h-3 w-3" />
-                          {`${liveCount} traveller${liveCount !== 1 ? 's' : ''} available`}
-                        </p>
-                        <span className="text-xs text-white/25 group-hover:text-white/60 transition-colors">Book →</span>
-                      </div>
+                      ) : (
+                        <span className="text-[10px] text-white/30 font-medium">{route.departs}</span>
+                      )}
                     </div>
-                  );
-                })}
-              </div>
-            );
-          })()}
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-base font-semibold text-white">{route.from}</span>
+                      <ArrowRight className="h-4 w-4 text-white/30" />
+                      <span className="text-base font-semibold text-white">{route.to}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="flex items-center gap-1 text-xs text-white/40">
+                        <Users className="h-3 w-3" />
+                        {`${displayCount} traveller${displayCount !== 1 ? 's' : ''} available`}
+                      </p>
+                      <span className="text-xs text-white/25 group-hover:text-white/60 transition-colors">Book →</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
