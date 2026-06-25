@@ -6,6 +6,14 @@ const protectedPagePaths = ['/dashboard', '/journeys/create', '/profile', '/admi
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // ── Commander subdomain → Oracle proxy ────────────────────────────────────
+  const host = request.headers.get('host') ?? '';
+  if (host.startsWith('commander.')) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/pipeline/commander${pathname === '/' ? '' : pathname}`;
+    return NextResponse.rewrite(url);
+  }
+
   // ── Mobile Bearer token → cookie injection ─────────────────────────────────
   // Mobile clients send "Authorization: Bearer <jwt>" instead of a cookie.
   // Middleware runs on Edge Runtime (no jsonwebtoken), so we can't verify here.
@@ -48,5 +56,12 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/api/:path*', '/admin/:path*', '/dashboard/:path*', '/journeys/create/:path*', '/profile/:path*'],
+  matcher: [
+    '/api/:path*',
+    '/admin/:path*',
+    '/dashboard/:path*',
+    '/journeys/create/:path*',
+    '/profile/:path*',
+    '/((?!_next/static|_next/image|favicon.ico).*)',  // commander subdomain needs all non-static paths
+  ],
 };
