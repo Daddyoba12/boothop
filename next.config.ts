@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const ORACLE_HOST = 'http://140.238.73.32:1030';
+const ORACLE_HOST = 'http://140.238.73.32';
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
@@ -14,12 +14,24 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
-      // Commander dashboard — all routes proxied to Oracle
+      // OTB Dashboard — onboarding & admin
+      {
+        source: '/onboard',
+        destination: `${ORACLE_HOST}/onboard`,
+      },
+      {
+        source: '/client-onboarding',
+        destination: `${ORACLE_HOST}/client-onboarding`,
+      },
+      {
+        source: '/admin/:path*',
+        destination: `${ORACLE_HOST}/admin/:path*`,
+      },
+      // Commander dashboard — all routes proxied to Oracle (legacy)
       {
         source: '/pipeline/commander/:path*',
         destination: `${ORACLE_HOST}/:path*`,
       },
-      // Onboarding form
       {
         source: '/pipeline/onboard',
         destination: `${ORACLE_HOST}/onboard`,
