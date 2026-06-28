@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const protectedPagePaths = ['/dashboard', '/journeys/create', '/profile', '/admin'];
+const protectedPagePaths = ['/dashboard', '/journeys/create', '/profile', '/admin', '/bfi'];
+// /flights is public — no protection needed
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
