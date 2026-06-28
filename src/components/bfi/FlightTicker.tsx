@@ -16,9 +16,12 @@ function Stars({ rating }: { rating: number }) {
 function TickerCard({ entry }: { entry: TickerEntry }) {
   const isGood    = entry.opportunityScore >= 65;
   const routeSlug = `${entry.origin}-${entry.destination}`.toLowerCase();
+  const href      = entry.bookingUrl ?? `/flights/${routeSlug}`;
   return (
     <a
-      href={`/flights/${routeSlug}`}
+      href={href}
+      target={entry.bookingUrl ? '_blank' : undefined}
+      rel={entry.bookingUrl ? 'noopener noreferrer' : undefined}
       className="inline-flex items-center gap-3 bg-white/5 hover:bg-white/12 border border-white/10 hover:border-white/20 rounded-xl px-4 py-2.5 min-w-[200px] transition-all duration-200 group"
     >
       <div>
@@ -31,9 +34,9 @@ function TickerCard({ entry }: { entry: TickerEntry }) {
       <div className="text-right shrink-0">
         <Stars rating={entry.rating} />
         <p className={`text-[10px] font-semibold mt-0.5 ${isGood ? 'text-green-400' : 'text-amber-400'}`}>
-          {entry.recommendation}
+          {entry.recommendation.startsWith('From') ? entry.recommendation : entry.recommendation}
         </p>
-        <p className="text-[9px] text-blue-400 group-hover:text-blue-300 transition-colors mt-0.5 font-medium">
+        <p className="text-[9px] bg-blue-600 group-hover:bg-blue-500 text-white transition-colors mt-1 font-bold px-2 py-0.5 rounded-full">
           Book →
         </p>
       </div>

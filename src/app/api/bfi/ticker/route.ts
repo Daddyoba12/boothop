@@ -1,14 +1,41 @@
 import { NextResponse } from 'next/server';
-import { bfiDb, getLatestSummaries, getAllRouteStats, getAllRoutes } from '@/lib/bfi/db';
 import type { TickerEntry } from '@/lib/bfi/types';
 
 export const revalidate = 3600;
 
-// Fetch cheapest fare per route directly from TravelPayouts Data API
-async function fetchTpCheapest(
-  origin: string,
-  destination: string,
-): Promise<{ priceGbp: number; airlineName: string } | null> {
+const MARKER = process.env.TRAVELPAYOUTS_MARKER ?? '544322';
+
+// These routes are always shown — TravelPayouts live price is tried first,
+// then the hardcoded estimate is used so the ticker is never empty.
+const FEATURED_ROUTES = [
+  { origin: 'LHR', destination: 'LOS', originCity: 'London',      destinationCity: 'Lagos',        fallbackPrice: 320, fallbackAirline: 'Air Peace' },
+  { origin: 'LHR', destination: 'ACC', originCity: 'London',      destinationCity: 'Accra',        fallbackPrice: 380, fallbackAirline: 'British Airways' },
+  { origin: 'LHR', destination: 'ABV', originCity: 'London',      destinationCity: 'Abuja',        fallbackPrice: 355, fallbackAirline: 'Turkish Airlines' },
+  { origin: 'LHR', destination: 'KGL', originCity: 'London',      destinationCity: 'Kigali',       fallbackPrice: 445, fallbackAirline: 'RwandAir' },
+  { origin: 'LHR', destination: 'NBO', originCity: 'London',      destinationCity: 'Nairobi',      fallbackPrice: 420, fallbackAirline: 'Kenya Airways' },
+  { origin: 'LHR', destination: 'CMN', originCity: 'London',      destinationCity: 'Casablanca',   fallbackPrice: 175, fallbackAirline: 'Royal Air Maroc' },
+  { origin: 'LGW', destination: 'DXB', originCity: 'London',      destinationCity: 'Dubai',        fallbackPrice: 265, fallbackAirline: 'Emirates' },
+  { origin: 'LHR', destination: 'JNB', originCity: 'London',      destinationCity: 'Johannesburg', fallbackPrice: 475, fallbackAirline: 'British Airways' },
+  { origin: 'MAN', destination: 'LOS', originCity: 'Manchester',  destinationCity: 'Lagos',        fallbackPrice: 340, fallbackAirline: 'Air Peace' },
+  { origin: 'LHR', destination: 'CAI', originCity: 'London',      destinationCity: 'Cairo',        fallbackPrice: 210, fallbackAirline: 'EgyptAir' },
+];
+
+const AIRLINE_NAMES: Record<string, string> = {
+  AP: 'Air Peace', WB: 'RwandAir', AT: 'Royal Air Maroc', TK: 'Turkish Airlines',
+  ET: 'Ethiopian Airlines', BA: 'British Airways', VS: 'Virgin Atlantic',
+  KQ: 'Kenya Airways', MS: 'EgyptAir', LH: 'Lufthansa', AF: 'Air France',
+  KL: 'KLM', QR: 'Qatar Airways', EK: 'Emirates', EY: 'Etihad Airways',
+  FR: 'Ryanair', U2: 'easyJet', W6: 'Wizz Air',
+};
+
+function aviasalesUrl(origin: string, destination: string, daysAhead = 14): string {
+  const d    = new Date(Date.now() + daysAhead * 86_400_000);
+  const day  = String(d.getDate()).padStart(2, '0');
+  const mon  = String(d.getMonth() + 1).padStart(2, '0');
+  return `https://www.aviasales.com/search/${origin.toUpperCase()}${day}${mon}${destination.toUpperCase()}1?marker=${MARKER}`;
+}
+
+async function fetchTpPrice(origin: string, destination: string): Promise<{ price: number; airline: string } | null> {
   const token = process.env.TRAVELPAYOUTS_TOKEN;
   if (!token) return null;
 
@@ -30,13 +57,6 @@ async function fetchTpCheapest(
     let cheapestPrice   = Infinity;
     let cheapestAirline = '';
 
-    const AIRLINE_NAMES: Record<string, string> = {
-      AP: 'Air Peace', WB: 'RwandAir', AT: 'Royal Air Maroc', TK: 'Turkish Airlines',
-      ET: 'Ethiopian Airlines', BA: 'British Airways', VS: 'Virgin Atlantic',
-      KQ: 'Kenya Airways', MS: 'EgyptAir', LH: 'Lufthansa', AF: 'Air France',
-      KL: 'KLM', QR: 'Qatar Airways', EK: 'Emirates', EY: 'Etihad Airways',
-    };
-
     for (const [code, flight] of Object.entries(data) as [string, any][]) {
       const price = Math.round(flight.price ?? 0);
       if (price > 0 && price < cheapestPrice) {
@@ -45,87 +65,40 @@ async function fetchTpCheapest(
       }
     }
 
-    if (cheapestPrice === Infinity) return null;
-
-    return { priceGbp: cheapestPrice, airlineName: cheapestAirline };
+    return cheapestPrice < Infinity ? { price: cheapestPrice, airline: cheapestAirline } : null;
   } catch {
     return null;
   }
 }
 
 export async function GET() {
-  const [summaries, stats, routes] = await Promise.all([
-    getLatestSummaries(),
-    getAllRouteStats(),
-    getAllRoutes(),
-  ]);
+  // Fetch live TP prices for all featured routes in parallel
+  const results = await Promise.allSettled(
+    FEATURED_ROUTES.map(r => fetchTpPrice(r.origin, r.destination))
+  );
 
-  const db = bfiDb();
-  const { data: airports } = await db.from('bfi_airports').select('code, city');
-  const airportMap: Record<string, string> = {};
-  for (const a of airports ?? []) airportMap[a.code] = a.city;
+  const now = new Date().toISOString();
 
-  const statsMap: Record<string, typeof stats[0]>         = {};
-  const summaryMap: Record<string, typeof summaries[0]>   = {};
-  for (const s of stats)     statsMap[s.route_id]    = s;
-  for (const s of summaries) summaryMap[s.route_id]  = s;
+  const entries: TickerEntry[] = FEATURED_ROUTES.map((r, i) => {
+    const live        = results[i].status === 'fulfilled' ? results[i].value : null;
+    const priceGbp    = live?.price    ?? r.fallbackPrice;
+    const airlineName = live?.airline  ?? r.fallbackAirline;
+    const isLive      = live !== null && live.price > 0;
 
-  const enabledRoutes = routes.filter(r => r.enabled);
+    return {
+      origin:          r.origin,
+      destination:     r.destination,
+      originCity:      r.originCity,
+      destinationCity: r.destinationCity,
+      priceGbp,
+      airlineName,
+      rating:          4.2,
+      recommendation:  isLive ? 'Live Price' : 'From ~£' + priceGbp,
+      opportunityScore: isLive ? 65 : 50,
+      updatedAt:       now,
+      bookingUrl:      aviasalesUrl(r.origin, r.destination),
+    };
+  });
 
-  // ── Build entries from DB scan data ──────────────────────────────────────
-  let entries: TickerEntry[] = enabledRoutes
-    .map(r => {
-      const s  = summaryMap[r.id];
-      const st = statsMap[r.id];
-      if (!s?.cheapest_price_gbp) return null;
-
-      const score = st?.opportunity_score ?? 50;
-      return {
-        origin:          r.origin,
-        destination:     r.destination,
-        originCity:      airportMap[r.origin]      ?? r.origin,
-        destinationCity: airportMap[r.destination] ?? r.destination,
-        priceGbp:        s.cheapest_price_gbp,
-        airlineName:     s.cheapest_airline_name ?? '',
-        rating:          4.0,
-        recommendation:  score >= 72 ? 'Excellent Deal' : score >= 55 ? 'Good Price' : score < 35 ? 'Prices High' : 'Fair Price',
-        opportunityScore: score,
-        updatedAt:       s.created_at,
-      } satisfies TickerEntry;
-    })
-    .filter((e): e is TickerEntry => e !== null)
-    .sort((a, b) => b.opportunityScore - a.opportunityScore);
-
-  // ── Fallback: use TravelPayouts live data when DB has no scan data ────────
-  if (entries.length < 2 && process.env.TRAVELPAYOUTS_TOKEN) {
-    const tpResults = await Promise.allSettled(
-      enabledRoutes.map(async r => {
-        const tp = await fetchTpCheapest(r.origin, r.destination);
-        if (!tp) return null;
-        const st    = statsMap[r.id];
-        const score = st?.opportunity_score ?? 55;
-        return {
-          origin:          r.origin,
-          destination:     r.destination,
-          originCity:      airportMap[r.origin]      ?? r.origin,
-          destinationCity: airportMap[r.destination] ?? r.destination,
-          priceGbp:        tp.priceGbp,
-          airlineName:     tp.airlineName,
-          rating:          4.0,
-          recommendation:  'Live Price',
-          opportunityScore: score,
-          updatedAt:       new Date().toISOString(),
-        } satisfies TickerEntry;
-      })
-    );
-
-    const tpEntries = tpResults
-      .filter((r): r is PromiseFulfilledResult<TickerEntry | null> => r.status === 'fulfilled')
-      .map(r => r.value)
-      .filter((e): e is TickerEntry => e !== null && e.priceGbp > 0);
-
-    if (tpEntries.length > 0) entries = tpEntries;
-  }
-
-  return NextResponse.json({ entries, updatedAt: new Date().toISOString() });
+  return NextResponse.json({ entries, updatedAt: now });
 }

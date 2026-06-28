@@ -174,4 +174,5 @@ export interface TickerEntry {
   recommendation: string;
   opportunityScore: number;
   updatedAt: string;
+  bookingUrl?: string;
 }
