@@ -7,6 +7,7 @@ import PWAInstallBanner from '@/components/PWAInstallBanner';
 import DeviceFingerprint from '@/components/DeviceFingerprint';
 import WorldCupWidget from '@/components/WorldCupWidget';
 import GATracker from '@/components/GATracker';
+import { TikTokPageTracker } from '@/components/TikTokTracker';
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
@@ -266,6 +267,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
 
+        {/* TravelPayouts Drive — affiliate click tracking, marker 544322 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var s=document.createElement("script");s.async=1;s.src="https://emrldtp.com/NTQ0MzIy.js?t=544322";document.head.appendChild(s);})();`,
+          }}
+        />
+
         {/* TikTok Pixel */}
         {TTOK_ID && (
           <script
@@ -314,6 +322,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 min-h-screen`}>
         {children}
+        <TikTokPageTracker />
         <DeviceFingerprint />
         <PWAInstallBanner />
         <WorldCupWidget />
