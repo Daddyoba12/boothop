@@ -11,10 +11,13 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import dynamic from 'next/dynamic';
 import BootHopLogo from '@/components/BootHopLogo';
 import Footer from '@/components/Footer';
 import RoleToggle from '@/components/RoleToggle';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
+
+const FlightTicker = dynamic(() => import('@/components/bfi/FlightTicker'), { ssr: false });
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
@@ -424,7 +427,7 @@ function HomePageContent() {
   const inputClass = "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/45 focus:outline-none focus:ring-2 focus:ring-blue-400/70 focus:border-blue-400/50 backdrop-blur-xl transition-all duration-200 hover:bg-white/15 hover:border-white/30 text-sm shadow-inner shadow-black/10";
 
   return (
-    <div className="min-h-screen bg-[#07111f] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#07111f] text-white overflow-x-hidden pb-14">
 
       {/* ── ANNOUNCEMENT BANNER ── */}
       {showBanner && (
@@ -516,6 +519,7 @@ function HomePageContent() {
               {/* CTAs */}
               <div className="mb-3">
                 <Link href="/register"
+                  onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'hero_cta' })}
                   className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.45)] shadow-lg shadow-amber-500/30">
                   🎁 Send a Package — Claim £20 Free
                   <ArrowRight className="h-4 w-4" />
@@ -673,6 +677,7 @@ function HomePageContent() {
 
           <div className="text-center">
             <Link href="/register"
+              onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'comparison_cta' })}
               className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-8 py-3.5 rounded-full font-bold text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(245,158,11,0.4)]">
               🎁 Try it free — Claim £20 credit <ArrowRight className="h-4 w-4" />
             </Link>
@@ -746,6 +751,7 @@ function HomePageContent() {
                   {/* CTA button */}
                   <Link
                     href="/register"
+                    onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'credit_cta' })}
                     className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold px-7 py-3.5 text-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_44px_rgba(245,158,11,0.45)] active:scale-[0.98] shadow-[0_6px_24px_rgba(245,158,11,0.25)]"
                   >
                     Claim £20 &amp; send your first package
@@ -931,56 +937,6 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* ── BUSINESS SECTION — "Built for teams that move fast" ── */}
-      <section className="py-24 md:py-32 bg-[#030A15] border-t border-white/[0.05]">
-        <div className="max-w-7xl mx-auto px-6 md:px-8">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="mb-6">
-                <span className="text-6xl md:text-7xl font-black text-white/10 leading-none select-none">2h</span>
-                <p className="text-white/40 text-xs -mt-2 ml-1">average domestic delivery</p>
-              </div>
-              <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight mb-5">
-                Built for teams<br />that move fast
-              </h2>
-              <p className="text-white/55 text-base leading-relaxed mb-8">
-                When your business needs something moved today — not in three days — BootHop connects you with verified carriers already heading in the right direction.
-              </p>
-              <ul className="space-y-4 mb-8">
-                {[
-                  { icon: '📋', text: 'Compliance-screened carriers — customs declarations, GDPR, chain of custody' },
-                  { icon: '⚡', text: 'Same-day and next-flight delivery for critical items' },
-                  { icon: '🔒', text: 'Escrow-secured payments — funds held until confirmed delivery' },
-                  { icon: '🌍', text: 'UK domestic and cross-border EU corridors' },
-                  { icon: '📊', text: 'Audit trail and delivery confirmation for every shipment' },
-                ].map(({ icon, text }) => (
-                  <li key={text} className="flex items-start gap-3 text-sm text-white/65 list-none">
-                    <span className="text-lg shrink-0 mt-0.5">{icon}</span>
-                    <span>{text}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/business" className="inline-flex items-center gap-2 bg-blue-500 text-white px-7 py-3.5 rounded-full text-sm font-semibold hover:bg-blue-400 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.35)]">
-                Explore Business Portal <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: '✈️', title: 'Aerospace & Aviation', body: 'Aircraft parts, AOGs, critical spares' },
-                { icon: '⚖️', title: 'Legal & Finance', body: 'Signed documents, contracts, evidence bundles' },
-                { icon: '💊', title: 'Medical & Pharma', body: 'Clinical samples, temperature-sensitive cargo' },
-                { icon: '💎', title: 'Luxury Retail', body: 'High-value goods with verified chain of custody' },
-              ].map(({ icon, title, body }) => (
-                <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 hover:border-white/20 hover:bg-white/[0.06] transition-all">
-                  <span className="text-2xl mb-3 block">{icon}</span>
-                  <p className="text-white font-semibold text-sm mb-1">{title}</p>
-                  <p className="text-white/40 text-xs leading-relaxed">{body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ── HOW BOOTHOP WORKS ── */}
       <section className="py-24 md:py-32 bg-[#050D1A]">
@@ -1219,6 +1175,7 @@ function HomePageContent() {
           </p>
           <div className="mb-5">
             <Link href="/register"
+              onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'footer_cta' })}
               className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-8 py-4 rounded-full font-bold text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.45)] shadow-lg shadow-amber-500/30">
               🎁 Send My First Package — Claim £20 Free <ArrowRight className="h-4 w-4" />
             </Link>
@@ -1254,6 +1211,9 @@ function HomePageContent() {
         <RegisteredRedirect loadTrips={loadTrips} />
       </Suspense>
       <Footer />
+
+      {/* ── FLIGHT TICKER — fixed news-flash bar at the bottom ── */}
+      <FlightTicker fixed />
     </div>
   );
 }
