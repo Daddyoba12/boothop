@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
         destination: `${ORACLE_HOST}/client-onboarding`,
       },
       {
-        source: '/admin/:path*',
+        source: '/onboard/admin/:path*',
         destination: `${ORACLE_HOST}/admin/:path*`,
       },
       // Commander dashboard — all routes proxied to Oracle (legacy)
