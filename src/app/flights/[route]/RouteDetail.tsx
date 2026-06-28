@@ -6,10 +6,11 @@ import type { BFIFlightOffer, BFIRoute, BFIRouteStats } from '@/lib/bfi/types';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-interface AirportInfo { name: string; city: string; country: string }
-interface PricePoint  { date: string; cheapest_price_gbp: number; cheapest_airline: string | null }
-interface CalendarDay { departure_date: string; price_gbp: number; airline_name: string }
-interface MatchData   { travelers: number; senders: number; hasActivity: boolean }
+interface AirportInfo  { name: string; city: string; country: string }
+interface PricePoint   { date: string; cheapest_price_gbp: number; cheapest_airline: string | null }
+interface CalendarDay  { departure_date: string; price_gbp: number; airline_name: string }
+interface MatchData    { travelers: number; senders: number; hasActivity: boolean }
+interface MonthPrice   { month: string; price: number; currency: string }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -336,24 +337,82 @@ function AirlinesTab({ offers, origin, destination }: { offers: BFIFlightOffer[]
   );
 }
 
+// ── Best Months Panel ─────────────────────────────────────────────────────────
+
+function BestMonthsPanel({ months, originCity, destCity }: {
+  months:     MonthPrice[];
+  originCity: string;
+  destCity:   string;
+}) {
+  if (!months.length) return null;
+  const top    = months.slice(0, 6);
+  const lowest = top[0];
+
+  return (
+    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div>
+          <h3 className="text-white font-semibold">Best months to fly</h3>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {originCity} → {destCity} · Ranked cheapest to most expensive
+          </p>
+        </div>
+        <div className="bg-green-900/50 border border-green-700/50 rounded-xl px-4 py-2 text-center">
+          <p className="text-[10px] text-green-400 font-semibold uppercase tracking-wide">Best month</p>
+          <p className="text-lg font-bold text-white">
+            {new Date(lowest.month + '-01').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
+          </p>
+          <p className="text-green-400 font-bold">From £{lowest.price}</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {top.map((m, i) => (
+          <div
+            key={m.month}
+            className={`rounded-xl border p-3 text-center ${
+              i === 0
+                ? 'bg-green-900/40 border-green-700/50'
+                : 'bg-gray-800/50 border-gray-700/50'
+            }`}
+          >
+            {i === 0 && (
+              <p className="text-[9px] text-green-400 font-bold uppercase tracking-widest mb-0.5">Cheapest</p>
+            )}
+            <p className="text-sm font-semibold text-white">
+              {new Date(m.month + '-01').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
+            </p>
+            <p className={`text-base font-bold mt-0.5 ${i === 0 ? 'text-green-400' : 'text-white'}`}>
+              £{m.price}
+            </p>
+          </div>
+        ))}
+      </div>
+      <p className="text-[10px] text-gray-600 mt-3 text-center">
+        Source: TravelPayouts live data · Prices are lowest fares found per month
+      </p>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 type TabId = 'today' | 'calendar' | 'history' | 'airlines';
 
 export default function RouteDetail({
   route, origin, destination, offers, cheapest, stats,
-  todayViews, todayClicks, priceHistory, fareCalendar,
+  todayViews, todayClicks, priceHistory, fareCalendar, cheapestMonths,
 }: {
-  route:        BFIRoute;
-  origin:       AirportInfo;
-  destination:  AirportInfo;
-  offers:       BFIFlightOffer[];
-  cheapest:     BFIFlightOffer | null;
-  stats:        BFIRouteStats | null;
-  todayViews:   number;
-  todayClicks:  number;
-  priceHistory: PricePoint[];
-  fareCalendar: CalendarDay[];
+  route:          BFIRoute;
+  origin:         AirportInfo;
+  destination:    AirportInfo;
+  offers:         BFIFlightOffer[];
+  cheapest:       BFIFlightOffer | null;
+  stats:          BFIRouteStats | null;
+  todayViews:     number;
+  todayClicks:    number;
+  priceHistory:   PricePoint[];
+  fareCalendar:   CalendarDay[];
+  cheapestMonths: MonthPrice[];
 }) {
   const [activeTab, setActiveTab] = useState<TabId>('today');
 
@@ -469,6 +528,15 @@ export default function RouteDetail({
               </div>
             ))}
           </div>
+        )}
+
+        {/* Best months to fly — powered by TravelPayouts live data */}
+        {cheapestMonths.length > 0 && (
+          <BestMonthsPanel
+            months={cheapestMonths}
+            originCity={origin.city}
+            destCity={destination.city}
+          />
         )}
 
         {/* Tabs */}

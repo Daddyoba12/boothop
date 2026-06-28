@@ -1,8 +1,9 @@
 import type { BFIProvider } from './interface';
 import type { RawFlightOffer, SearchParams } from '../types';
-import { KiwiProvider }    from './kiwi';
-import { AmadeusProvider } from './amadeus';
-import { MockProvider }    from './mock';
+import { KiwiProvider }                from './kiwi';
+import { AmadeusProvider }             from './amadeus';
+import { MockProvider }                from './mock';
+import { TravelPayoutsDataProvider }   from './travelpayouts';
 
 // Returns which providers are active based on environment variables
 export function getActiveProviders(): BFIProvider[] {
@@ -14,6 +15,10 @@ export function getActiveProviders(): BFIProvider[] {
 
   if (process.env.AMADEUS_CLIENT_ID && process.env.AMADEUS_CLIENT_SECRET) {
     providers.push(new AmadeusProvider());
+  }
+
+  if (process.env.TRAVELPAYOUTS_TOKEN) {
+    providers.push(new TravelPayoutsDataProvider());
   }
 
   // Fall back to mock only when no real providers are configured

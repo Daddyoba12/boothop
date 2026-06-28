@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getTodayOffers, getRouteStats, getPriceHistory, getFareCalendar } from '@/lib/bfi/db';
+import { getTpPriceCalendar, getTpCheapestMonths } from '@/lib/bfi/providers/travelpayouts';
 import { recordView } from '@/lib/bfi/clicks';
 import RouteDetail from './RouteDetail';
 
@@ -33,13 +34,33 @@ export default async function FlightRoutePage({
 
   if (!routeRow) notFound();
 
-  const [offers, stats, { data: airports }, priceHistory, fareCalendar] = await Promise.all([
+  const thisMonth = new Date().toISOString().slice(0, 7);
+  const nextMonth = new Date(Date.now() + 32 * 86_400_000).toISOString().slice(0, 7);
+
+  const [
+    offers, stats, { data: airports }, priceHistory, dbFareCalendar,
+    tpCalendarThis, tpCalendarNext, cheapestMonths,
+  ] = await Promise.all([
     getTodayOffers(routeRow.id),
     getRouteStats(routeRow.id),
     db.from('bfi_airports').select('code, name, city, country'),
     getPriceHistory(routeRow.id, 30),
     getFareCalendar(routeRow.id, 30),
+    getTpPriceCalendar(origin, destination, thisMonth).catch(() => null),
+    getTpPriceCalendar(origin, destination, nextMonth).catch(() => null),
+    getTpCheapestMonths(origin, destination).catch(() => []),
   ]);
+
+  // Merge TravelPayouts calendar data into day-by-price format
+  const tpDays: { departure_date: string; price_gbp: number; airline_name: string }[] = [];
+  for (const cal of [tpCalendarThis, tpCalendarNext]) {
+    if (!cal) continue;
+    for (const [date, price] of Object.entries(cal.calendar)) {
+      tpDays.push({ departure_date: date, price_gbp: price, airline_name: 'TravelPayouts' });
+    }
+  }
+  // Prefer TravelPayouts calendar (more data) over DB-only when available
+  const fareCalendar = tpDays.length > 0 ? tpDays.sort((a, b) => a.departure_date.localeCompare(b.departure_date)) : dbFareCalendar;
 
   const airportMap: Record<string, { name: string; city: string; country: string }> = {};
   for (const a of airports ?? []) airportMap[a.code] = { name: a.name, city: a.city, country: a.country };
@@ -61,7 +82,7 @@ export default async function FlightRoutePage({
   return (
     <RouteDetail
       route={routeRow}
-      origin={airportMap[origin]       ?? { name: origin,      city: origin,      country: '' }}
+      origin={airportMap[origin]           ?? { name: origin,      city: origin,      country: '' }}
       destination={airportMap[destination] ?? { name: destination, city: destination, country: '' }}
       offers={sorted}
       cheapest={cheapest}
@@ -70,6 +91,7 @@ export default async function FlightRoutePage({
       todayClicks={clickCount ?? 0}
       priceHistory={priceHistory}
       fareCalendar={fareCalendar}
+      cheapestMonths={cheapestMonths}
     />
   );
 }
