@@ -1,12 +1,11 @@
 import { notFound } from 'next/navigation';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { getTodayOffers, getRouteStats } from '@/lib/bfi/db';
+import { getTodayOffers, getRouteStats, getPriceHistory, getFareCalendar } from '@/lib/bfi/db';
 import { recordView } from '@/lib/bfi/clicks';
 import RouteDetail from './RouteDetail';
 
 export const dynamic = 'force-dynamic';
 
-// route param format: "lhr-los" → origin=LHR, destination=LOS
 function parseRoute(slug: string): { origin: string; destination: string } | null {
   const parts = slug.toUpperCase().split('-');
   if (parts.length !== 2) return null;
@@ -23,10 +22,8 @@ export default async function FlightRoutePage({
   if (!parsed) notFound();
 
   const { origin, destination } = parsed;
-
   const db = createSupabaseAdminClient();
 
-  // Look up the route record
   const { data: routeRow } = await db
     .from('bfi_routes')
     .select('*')
@@ -36,23 +33,22 @@ export default async function FlightRoutePage({
 
   if (!routeRow) notFound();
 
-  const [offers, stats, { data: airports }] = await Promise.all([
+  const [offers, stats, { data: airports }, priceHistory, fareCalendar] = await Promise.all([
     getTodayOffers(routeRow.id),
     getRouteStats(routeRow.id),
     db.from('bfi_airports').select('code, name, city, country'),
+    getPriceHistory(routeRow.id, 30),
+    getFareCalendar(routeRow.id, 30),
   ]);
 
   const airportMap: Record<string, { name: string; city: string; country: string }> = {};
   for (const a of airports ?? []) airportMap[a.code] = { name: a.name, city: a.city, country: a.country };
 
-  // Log the page view (fire-and-forget)
   recordView(routeRow.id, origin, destination).catch(() => {});
 
-  // Get today's cheapest and cheapest of next 14 days
-  const sorted = [...offers].sort((a, b) => a.price_gbp - b.price_gbp);
+  const sorted   = [...offers].sort((a, b) => a.price_gbp - b.price_gbp);
   const cheapest = sorted[0] ?? null;
 
-  // Count today's clicks and views for social proof
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const [{ count: viewCount }, { count: clickCount }] = await Promise.all([
@@ -65,13 +61,15 @@ export default async function FlightRoutePage({
   return (
     <RouteDetail
       route={routeRow}
-      origin={airportMap[origin] ?? { name: origin, city: origin, country: '' }}
+      origin={airportMap[origin]       ?? { name: origin,      city: origin,      country: '' }}
       destination={airportMap[destination] ?? { name: destination, city: destination, country: '' }}
       offers={sorted}
       cheapest={cheapest}
       stats={stats}
-      todayViews={viewCount ?? 0}
+      todayViews={viewCount   ?? 0}
       todayClicks={clickCount ?? 0}
+      priceHistory={priceHistory}
+      fareCalendar={fareCalendar}
     />
   );
 }

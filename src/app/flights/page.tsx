@@ -190,6 +190,31 @@ export default function FlightsPage() {
         )}
       </div>
 
+      {/* Airport hubs */}
+      <div className="mx-auto max-w-6xl px-4 pb-10">
+        <h2 className="text-lg font-bold mb-4 text-white">Explore Airport Hubs</h2>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { code: 'LHR', city: 'London Heathrow' },
+            { code: 'LGW', city: 'London Gatwick'  },
+            { code: 'LOS', city: 'Lagos'            },
+            { code: 'KGL', city: 'Kigali'           },
+            { code: 'ACC', city: 'Accra'            },
+            { code: 'ABV', city: 'Abuja'            },
+          ].map(a => (
+            <Link
+              key={a.code}
+              href={`/flights/airports/${a.code.toLowerCase()}`}
+              className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 border border-gray-800 hover:border-gray-700 rounded-xl px-4 py-2.5 text-sm transition-all"
+            >
+              <span className="text-gray-400 font-mono text-xs">{a.code}</span>
+              <span className="text-white">{a.city}</span>
+              <span className="text-blue-400">→</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+
       {/* How it works */}
       <div className="border-t border-gray-800 bg-gray-900/30 py-14 px-4">
         <div className="mx-auto max-w-4xl">
