@@ -14,22 +14,20 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
-      // OTB Dashboard — onboarding & admin
+      // Intercept Oracle's onboard API call — saves to Supabase then forwards to Oracle
       {
-        source: '/onboard',
-        destination: `${ORACLE_HOST}/onboard`,
+        source: '/api/onboard',
+        destination: '/api/pipeline/onboard',
       },
+      // /client-onboarding page served by Oracle (their multi-step form)
       {
         source: '/client-onboarding',
         destination: `${ORACLE_HOST}/client-onboarding`,
       },
+      // /onboard/admin/* → Oracle admin (when Oracle builds it)
       {
         source: '/onboard/admin/:path*',
         destination: `${ORACLE_HOST}/admin/:path*`,
-      },
-      {
-        source: '/pipeline/onboard',
-        destination: `${ORACLE_HOST}/onboard`,
       },
     ];
   },
@@ -42,7 +40,7 @@ const nextConfig: NextConfig = {
         destination: 'https://www.boothop.com/:path*',
         permanent: true,
       },
-      // /pipeline/commander/* → commander.boothop.com (subdomain is the real entry point)
+      // /pipeline/commander/* → commander.boothop.com
       {
         source: '/pipeline/commander',
         destination: 'https://commander.boothop.com',
@@ -51,6 +49,17 @@ const nextConfig: NextConfig = {
       {
         source: '/pipeline/commander/:path*',
         destination: 'https://commander.boothop.com/:path*',
+        permanent: false,
+      },
+      // /onboard → /client-onboarding (client-onboarding is the canonical URL)
+      {
+        source: '/onboard',
+        destination: '/client-onboarding',
+        permanent: false,
+      },
+      {
+        source: '/pipeline/onboard',
+        destination: '/client-onboarding',
         permanent: false,
       },
     ];
