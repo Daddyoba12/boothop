@@ -22,23 +22,24 @@ function TickerCard({ entry }: { entry: TickerEntry }) {
       href={href}
       target={entry.bookingUrl ? '_blank' : undefined}
       rel={entry.bookingUrl ? 'noopener noreferrer' : undefined}
-      className="inline-flex items-center gap-3 bg-white/5 hover:bg-white/12 border border-white/10 hover:border-white/20 rounded-xl px-4 py-2.5 min-w-[200px] transition-all duration-200 group"
+      className="inline-flex items-center gap-2.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-blue-500/40 rounded-xl px-3.5 py-2 min-w-[195px] transition-all duration-200 group"
     >
-      <div>
-        <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">
+      {/* Left: route + price + airline */}
+      <div className="min-w-0">
+        <p className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider leading-none mb-0.5">
           {entry.originCity} → {entry.destinationCity}
         </p>
-        <p className="text-lg font-bold text-white leading-tight">£{entry.priceGbp.toFixed(0)}</p>
-        <p className="text-[10px] text-gray-500 truncate max-w-[120px]">{entry.airlineName}</p>
+        <p className="text-base font-extrabold text-white leading-tight">£{entry.priceGbp.toFixed(0)}</p>
+        <p className="text-[9px] text-gray-500 truncate max-w-[110px] leading-none mt-0.5">{entry.airlineName}</p>
       </div>
-      <div className="text-right shrink-0">
-        <Stars rating={entry.rating} />
-        <p className={`text-[10px] font-semibold mt-0.5 ${isGood ? 'text-green-400' : 'text-amber-400'}`}>
-          {entry.recommendation.startsWith('From') ? entry.recommendation : entry.recommendation}
-        </p>
-        <p className="text-[9px] bg-blue-600 group-hover:bg-blue-500 text-white transition-colors mt-1 font-bold px-2 py-0.5 rounded-full">
-          Book →
-        </p>
+      {/* Right: depart date + Book button */}
+      <div className="text-right shrink-0 flex flex-col items-end gap-1">
+        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${isGood ? 'bg-green-500/15 text-green-400' : 'bg-amber-500/15 text-amber-400'}`}>
+          {entry.recommendation}
+        </span>
+        <span className="text-[9px] bg-blue-600 group-hover:bg-blue-500 text-white transition-colors font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
+          Book now →
+        </span>
       </div>
     </a>
   );

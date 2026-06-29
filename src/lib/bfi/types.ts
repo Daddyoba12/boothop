@@ -175,4 +175,5 @@ export interface TickerEntry {
   opportunityScore: number;
   updatedAt: string;
   bookingUrl?: string;
+  departureDate?: string; // ISO date, e.g. "2026-07-02"
 }
