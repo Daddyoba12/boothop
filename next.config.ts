@@ -27,16 +27,6 @@ const nextConfig: NextConfig = {
         source: '/onboard/admin/:path*',
         destination: `${ORACLE_HOST}/admin/:path*`,
       },
-      // Commander dashboard — proxied to Oracle.
-      // Base path must explicitly go to /login (Oracle root redirects to /onboard otherwise).
-      {
-        source: '/pipeline/commander',
-        destination: `${ORACLE_HOST}/login`,
-      },
-      {
-        source: '/pipeline/commander/:path*',
-        destination: `${ORACLE_HOST}/:path*`,
-      },
       {
         source: '/pipeline/onboard',
         destination: `${ORACLE_HOST}/onboard`,
@@ -45,11 +35,23 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Redirect bare boothop.com to www
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'boothop.com' }],
         destination: 'https://www.boothop.com/:path*',
         permanent: true,
+      },
+      // /pipeline/commander/* → commander.boothop.com (subdomain is the real entry point)
+      {
+        source: '/pipeline/commander',
+        destination: 'https://commander.boothop.com',
+        permanent: false,
+      },
+      {
+        source: '/pipeline/commander/:path*',
+        destination: 'https://commander.boothop.com/:path*',
+        permanent: false,
       },
     ];
   },
