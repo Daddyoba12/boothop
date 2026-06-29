@@ -27,7 +27,12 @@ const nextConfig: NextConfig = {
         source: '/onboard/admin/:path*',
         destination: `${ORACLE_HOST}/admin/:path*`,
       },
-      // Commander dashboard — all routes proxied to Oracle (legacy)
+      // Commander dashboard — proxied to Oracle.
+      // Base path must explicitly go to /login (Oracle root redirects to /onboard otherwise).
+      {
+        source: '/pipeline/commander',
+        destination: `${ORACLE_HOST}/login`,
+      },
       {
         source: '/pipeline/commander/:path*',
         destination: `${ORACLE_HOST}/:path*`,
