@@ -54,7 +54,7 @@ export default function NavBar() {
             Log in
           </Link>
           <Link
-            href="/register"
+            href="/start"
             className="text-sm font-bold bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-5 py-2 rounded-xl hover:shadow-lg hover:shadow-blue-500/40 hover:scale-105 active:scale-[0.97] transition-all duration-200"
           >
             Get Started
@@ -95,7 +95,7 @@ export default function NavBar() {
             <Link href="/login" onClick={() => setOpen(false)} className="px-4 py-3 rounded-xl text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200">
               Log in
             </Link>
-            <Link href="/register" onClick={() => setOpen(false)} className="px-4 py-3 rounded-xl text-sm font-bold text-center bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-blue-500/40 transition-all duration-200">
+            <Link href="/start" onClick={() => setOpen(false)} className="px-4 py-3 rounded-xl text-sm font-bold text-center bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-blue-500/40 transition-all duration-200">
               Get Started
             </Link>
           </div>

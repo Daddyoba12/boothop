@@ -9,6 +9,25 @@ import {
   ArrowRight, Shield, AlertCircle, FileEdit, Rocket, Trash2, PlusCircle, ThumbsUp, ThumbsDown,
 } from 'lucide-react';
 
+interface PendingJourney {
+  role: 'sender' | 'traveller';
+  from: string;
+  to: string;
+  size: string;
+  date: string;
+}
+
+const SIZE_TO_KG: Record<string, number> = {
+  letter: 0.5, small: 3, medium: 10, large: 25,
+};
+
+const SIZE_LABEL: Record<string, string> = {
+  letter: 'Letter / document',
+  small: 'Small parcel',
+  medium: 'Medium parcel',
+  large: 'Large item',
+};
+
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
@@ -21,11 +40,28 @@ export default function DashboardPage() {
   const [credit, setCredit] = useState<{ amount_pence: number; redeemed: boolean } | null>(null);
   const [respondingMatch, setRespondingMatch] = useState<string | null>(null);
 
+  // Pending journey from /start flow
+  const [pendingJourney, setPendingJourney] = useState<PendingJourney | null>(null);
+  const [pendingPrice, setPendingPrice] = useState('');
+  const [pendingPriceError, setPendingPriceError] = useState('');
+  const [publishingPending, setPublishingPending] = useState(false);
+  const [justPublished, setJustPublished] = useState(false);
+
   useEffect(() => {
     loadDashboard();
-    // Poll every 30s so match status updates from the other party appear without a manual refresh
     const interval = setInterval(loadDashboard, 30_000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Read pending journey from localStorage (set by /start flow)
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('boothop_pending_journey');
+      if (raw) {
+        const parsed = JSON.parse(raw) as PendingJourney;
+        if (parsed.from && parsed.to && parsed.date) setPendingJourney(parsed);
+      }
+    } catch { /* private browsing or corrupt data */ }
   }, []);
 
   const loadDashboard = async () => {
@@ -125,6 +161,44 @@ export default function DashboardPage() {
     }
   };
 
+  const publishPendingJourney = async () => {
+    if (!pendingJourney) return;
+    const price = parseFloat(pendingPrice.replace(/[^0-9.]/g, ''));
+    if (!price || price <= 0) { setPendingPriceError('Please enter a budget greater than £0.'); return; }
+    setPendingPriceError('');
+    setPublishingPending(true);
+    try {
+      const res = await fetch('/api/trips/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          from:   pendingJourney.from,
+          to:     pendingJourney.to,
+          date:   pendingJourney.date,
+          weight: SIZE_TO_KG[pendingJourney.size] ?? 5,
+          price:  String(price),
+          mode:   pendingJourney.role === 'sender' ? 'send' : 'travel',
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setPendingPriceError(data.error || 'Could not publish. Please try again.'); return; }
+      localStorage.removeItem('boothop_pending_journey');
+      setPendingJourney(null);
+      setPendingPrice('');
+      setJustPublished(true);
+      loadDashboard();
+    } finally {
+      setPublishingPending(false);
+    }
+  };
+
+  // Derive role: pending journey → existing trips → default sender
+  const role: 'sender' | 'traveller' = pendingJourney?.role
+    ?? (trips.some(t => t.type === 'travel') ? 'traveller'
+      : trips.some(t => t.type === 'send') ? 'sender'
+      : 'sender');
+
   const today = new Date().toISOString().split('T')[0];
 
   const getMatchStatus = (match: any) => {
@@ -208,22 +282,100 @@ export default function DashboardPage() {
                 </p>
                 <p className="text-white/40 text-xs">Automatically applied on your first delivery payment. No action needed.</p>
               </div>
-              <Link href="/register" className="shrink-0 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 text-xs transition-all hover:shadow-[0_8px_24px_rgba(245,158,11,0.35)]">
+              <Link href="/start?role=sender" className="shrink-0 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 text-xs transition-all hover:shadow-[0_8px_24px_rgba(245,158,11,0.35)]">
                 Send now →
               </Link>
             </div>
           )}
 
+        {/* ── PENDING JOURNEY CARD ── */}
+        {pendingJourney && !justPublished && (
+          <div className="relative overflow-hidden rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-950/70 to-[#0c1e3d]/80 backdrop-blur-xl p-6 shadow-[0_0_60px_rgba(59,130,246,0.10)]">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-lg">{pendingJourney.role === 'sender' ? '📦' : '✈️'}</span>
+              <p className="text-white font-bold text-base">One last step — set your budget to go live</p>
+            </div>
+
+            {/* Journey summary */}
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-white font-semibold text-lg">{pendingJourney.from.split(',')[0]}</span>
+              <ArrowRight className="h-4 w-4 text-white/30 shrink-0" />
+              <span className="text-white font-semibold text-lg">{pendingJourney.to.split(',')[0]}</span>
+            </div>
+            <p className="text-white/45 text-sm mb-5">
+              {new Date(pendingJourney.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+              {pendingJourney.size && <> · {SIZE_LABEL[pendingJourney.size] ?? pendingJourney.size}</>}
+            </p>
+
+            {/* Price input */}
+            <div className="flex gap-3 items-start">
+              <div className="flex-1">
+                <label className="block text-xs text-white/40 mb-1.5">
+                  {pendingJourney.role === 'sender' ? 'Your budget (£) — what you\'re willing to pay' : 'Your price (£) — what you charge to carry'}
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-semibold">£</span>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="e.g. 40"
+                    value={pendingPrice}
+                    onChange={e => { setPendingPrice(e.target.value); setPendingPriceError(''); }}
+                    onKeyDown={e => e.key === 'Enter' && publishPendingJourney()}
+                    className="w-full rounded-xl border border-white/15 bg-white/[0.06] pl-8 pr-4 py-3 text-white text-base placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                  />
+                </div>
+                {pendingPriceError && <p className="mt-1 text-xs text-red-400">{pendingPriceError}</p>}
+              </div>
+              <button
+                onClick={publishPendingJourney}
+                disabled={publishingPending}
+                className="mt-6 shrink-0 flex items-center gap-2 rounded-xl bg-blue-500 hover:bg-blue-400 disabled:opacity-60 text-white font-bold px-5 py-3 text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(59,130,246,0.4)]"
+              >
+                {publishingPending ? 'Publishing...' : <><Rocket className="w-4 h-4" /> Publish now</>}
+              </button>
+            </div>
+
+            <button
+              onClick={() => { localStorage.removeItem('boothop_pending_journey'); setPendingJourney(null); }}
+              className="mt-4 text-xs text-white/25 hover:text-white/45 transition-colors"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
+        {/* ── JUST PUBLISHED SUCCESS ── */}
+        {justPublished && (
+          <div className="rounded-2xl border border-green-500/30 bg-green-950/40 p-5 flex items-center gap-4">
+            <CheckCircle className="w-6 h-6 text-green-400 shrink-0" />
+            <div>
+              <p className="text-white font-semibold text-sm">
+                {role === 'sender' ? 'Your request is live.' : 'Your trip is live.'}
+              </p>
+              <p className="text-white/40 text-xs mt-0.5">
+                {role === 'sender'
+                  ? 'We\'re matching you with verified travellers heading that way.'
+                  : 'We\'ll notify you as soon as senders match your journey.'}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* PAGE HEADER */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-black text-white">My Portal</h1>
-            <p className="text-slate-500 text-sm mt-0.5">Your listings and matches</p>
+            <h1 className="text-2xl font-black text-white">
+              {role === 'sender' ? 'My Packages' : 'My Trips'}
+            </h1>
+            <p className="text-slate-500 text-sm mt-0.5">
+              {role === 'sender' ? 'Your delivery requests and matches' : 'Your journeys and parcel requests'}
+            </p>
           </div>
           <div className="flex gap-2">
-            <Link href="/register?type=travel"
+            <Link href={role === 'sender' ? '/start?role=sender' : '/start?role=traveller'}
               className="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all">
-              <PlusCircle className="w-4 h-4" /> New listing
+              <PlusCircle className="w-4 h-4" /> {role === 'sender' ? 'New package' : 'New trip'}
             </Link>
           </div>
         </div>
@@ -269,18 +421,22 @@ export default function DashboardPage() {
           {trips.length === 0 && drafts.length === 0 ? (
             <div className="bg-white/4 border border-white/8 rounded-2xl p-10 text-center">
               <div className="w-14 h-14 rounded-2xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center mx-auto mb-4">
-                <Package className="w-7 h-7 text-blue-400" />
+                {role === 'sender' ? <Package className="w-7 h-7 text-blue-400" /> : <Plane className="w-7 h-7 text-blue-400" />}
               </div>
-              <h3 className="text-white font-semibold mb-1">No listings yet</h3>
-              <p className="text-slate-500 text-sm mb-5">Create a listing to get matched with senders or travellers.</p>
-              <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                <Link href="/register?type=travel" className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all">
-                  <Plane className="w-4 h-4" /> I&apos;m Travelling
-                </Link>
-                <Link href="/register?type=send" className="flex items-center justify-center gap-2 border border-white/12 hover:bg-white/5 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all">
-                  <Package className="w-4 h-4" /> I Want to Send
-                </Link>
-              </div>
+              <h3 className="text-white font-semibold mb-1">
+                {role === 'sender' ? 'No packages yet' : 'No trips yet'}
+              </h3>
+              <p className="text-slate-500 text-sm mb-5">
+                {role === 'sender'
+                  ? 'Post your first delivery request to get matched with a verified traveller.'
+                  : 'Post your first trip to start receiving parcel requests from senders.'}
+              </p>
+              <Link
+                href={role === 'sender' ? '/start?role=sender' : '/start?role=traveller'}
+                className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-all"
+              >
+                {role === 'sender' ? <><Package className="w-4 h-4" /> Post a delivery request</> : <><Plane className="w-4 h-4" /> Post my trip</>}
+              </Link>
             </div>
           ) : (
             <div className="space-y-2">

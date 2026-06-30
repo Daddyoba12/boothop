@@ -93,7 +93,7 @@ export default function AboutPage() {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Link href="/register"
+              <Link href="/start"
                 className="inline-flex items-center gap-2 rounded-full bg-white text-black font-bold px-7 py-3.5 text-sm hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(255,255,255,0.18)] transition-all">
                 Start sending <ArrowRight className="h-4 w-4" />
               </Link>
@@ -255,7 +255,7 @@ export default function AboutPage() {
             Register your trip or delivery in under 2 minutes. Free to join — no subscription.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/register"
+            <Link href="/start"
               className="inline-flex items-center gap-2 bg-white text-black px-8 py-4 rounded-full font-extrabold text-sm hover:bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(255,255,255,0.18)]">
               Get Started Free <ArrowRight className="h-4 w-4" />
             </Link>

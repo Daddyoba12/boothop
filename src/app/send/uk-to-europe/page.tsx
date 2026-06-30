@@ -85,7 +85,7 @@ export default function UKToEuropePage() {
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            href="/register"
+            href="/start"
             className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-full text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)]"
           >
             Send to Europe Today <ArrowRight className="h-4 w-4" />
@@ -202,7 +202,7 @@ export default function UKToEuropePage() {
             Post your UK to Europe delivery in under 2 minutes. Matched with a verified traveller on today's flights.
           </p>
           <Link
-            href="/register"
+            href="/start"
             className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-full text-base transition-all hover:-translate-y-0.5"
           >
             Send to Europe Today <ArrowRight className="h-4 w-4" />

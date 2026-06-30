@@ -434,7 +434,7 @@ function HomePageContent() {
         <div className="fixed top-0 left-0 right-0 z-[70] h-10 flex items-center justify-center gap-3 bg-amber-500/15 border-b border-amber-500/25 backdrop-blur-md px-4">
           <span className="text-amber-300 text-xs font-semibold hidden sm:inline">🎁 New members get £20 delivery credit — first 500 only · No subscription needed</span>
           <span className="text-amber-300 text-xs font-semibold sm:hidden">🎁 Get £20 delivery credit — first 500 members</span>
-          <Link href="/register" className="rounded-full bg-amber-500 text-black text-xs font-bold px-3 py-1 hover:bg-amber-400 transition-colors whitespace-nowrap">
+          <Link href="/start" className="rounded-full bg-amber-500 text-black text-xs font-bold px-3 py-1 hover:bg-amber-400 transition-colors whitespace-nowrap">
             Claim yours →
           </Link>
           <button onClick={dismissBanner} className="ml-1 text-amber-400/60 hover:text-amber-300 transition-colors" aria-label="Dismiss">
@@ -461,7 +461,7 @@ function HomePageContent() {
 
           <div className="hidden items-center gap-3 md:flex">
             <Link href="/login" className="rounded-lg px-4 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/8 transition-all duration-200">Log in</Link>
-            <Link href="/register" className="rounded-full bg-blue-500 px-5 py-2 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(59,130,246,0.4)]">Get Started</Link>
+            <Link href="/start" className="rounded-full bg-blue-500 px-5 py-2 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(59,130,246,0.4)]">Get Started</Link>
           </div>
 
           <button className="rounded-lg p-2 md:hidden text-white/70 hover:text-white hover:bg-white/8 transition-all"
@@ -479,7 +479,7 @@ function HomePageContent() {
               ))}
               <div className="flex flex-col gap-2 pt-3">
                 <Link href="/login" className="block rounded-xl border border-white/12 py-3 text-center text-sm font-medium text-white/65 hover:text-white hover:bg-white/8 transition-all">Log in</Link>
-                <Link href="/register" className="block rounded-xl bg-blue-500 py-3 text-center text-sm font-semibold text-white">Get Started</Link>
+                <Link href="/start" className="block rounded-xl bg-blue-500 py-3 text-center text-sm font-semibold text-white">Get Started</Link>
               </div>
             </div>
           </div>
@@ -516,25 +516,25 @@ function HomePageContent() {
                 <Link href="/trust-safety" className="underline underline-offset-2 hover:text-white/80 transition-colors">What can I send? →</Link>
               </p>
 
-              {/* CTAs */}
-              <div className="mb-3">
-                <Link href="/register"
-                  onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'hero_cta' })}
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.45)] shadow-lg shadow-amber-500/30">
-                  🎁 Send a Package — Claim £20 Free
+              {/* CTAs — two equal options */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-3">
+                <Link href="/start?role=sender"
+                  onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'hero_sender_cta' })}
+                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.45)] shadow-lg shadow-amber-500/30">
+                  📦 Start Sending
                   <ArrowRight className="h-4 w-4" />
                 </Link>
+                <Link href="/start?role=traveller"
+                  onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'hero_traveller_cta' })}
+                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full border border-white/20 bg-white/8 hover:bg-white/12 hover:border-white/35 text-white font-bold text-base transition-all hover:-translate-y-0.5">
+                  ✈️ Earn While Travelling
+                </Link>
               </div>
-              <p className="text-white/55 text-sm mb-5">
-                Most deliveries cost <span className="text-white font-semibold">£30–£120</span>. You set the price.
+              <p className="text-white/45 text-sm mb-7">
+                🎁 New members receive <span className="text-white font-semibold">£20</span> delivery credit ·{' '}
+                <span className="text-white/30">Most deliveries £30–£120</span>
               </p>
               <div className="flex flex-col gap-1.5 mb-7">
-                <p className="text-sm text-white/45">
-                  Are you a traveller?{' '}
-                  <Link href="/register?type=booter" className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300 transition-colors font-medium">
-                    Earn from your empty luggage →
-                  </Link>
-                </p>
                 <p className="text-xs text-white/30">
                   Using BootHop for business?{' '}
                   <Link href="/business" className="underline underline-offset-2 hover:text-white/50 transition-colors">
@@ -676,7 +676,7 @@ function HomePageContent() {
           </div>
 
           <div className="text-center">
-            <Link href="/register"
+            <Link href="/start"
               onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'comparison_cta' })}
               className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-8 py-3.5 rounded-full font-bold text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(245,158,11,0.4)]">
               🎁 Try it free — Claim £20 credit <ArrowRight className="h-4 w-4" />
@@ -750,7 +750,7 @@ function HomePageContent() {
 
                   {/* CTA button */}
                   <Link
-                    href="/register"
+                    href="/start?role=sender"
                     onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'credit_cta' })}
                     className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold px-7 py-3.5 text-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_44px_rgba(245,158,11,0.45)] active:scale-[0.98] shadow-[0_6px_24px_rgba(245,158,11,0.25)]"
                   >
@@ -1173,11 +1173,16 @@ function HomePageContent() {
           <p className="text-white/50 text-base mb-10 max-w-sm mx-auto leading-relaxed">
             Post in 30 seconds. Match with a verified traveller on their way now.
           </p>
-          <div className="mb-5">
-            <Link href="/register"
-              onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'footer_cta' })}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-5">
+            <Link href="/start?role=sender"
+              onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'footer_sender_cta' })}
               className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-8 py-4 rounded-full font-bold text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.45)] shadow-lg shadow-amber-500/30">
-              🎁 Send My First Package — Claim £20 Free <ArrowRight className="h-4 w-4" />
+              📦 Start Sending <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/start?role=traveller"
+              onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'footer_traveller_cta' })}
+              className="inline-flex items-center gap-2 border border-white/20 bg-white/8 hover:bg-white/12 text-white px-8 py-4 rounded-full font-bold text-base transition-all hover:-translate-y-0.5">
+              ✈️ Earn While Travelling
             </Link>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
@@ -1185,12 +1190,6 @@ function HomePageContent() {
               Browse live routes →
             </Link>
           </div>
-          <p className="mt-4 text-xs text-white/35">
-            Are you a traveller?{' '}
-            <Link href="/register?type=booter" className="underline underline-offset-2 hover:text-white/55 transition-colors">
-              Start earning from your empty luggage →
-            </Link>
-          </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <p className="text-xs text-white/25">Free to join · No subscription · Cancel anytime</p>
             <span className="text-white/15">·</span>

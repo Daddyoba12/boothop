@@ -75,7 +75,7 @@ export default function StudentDeliveryPage() {
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            href="/register"
+            href="/start"
             className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-full text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)]"
           >
             Send Something Today <ArrowRight className="h-4 w-4" />
@@ -165,7 +165,7 @@ export default function StudentDeliveryPage() {
             Home-cooked food, forgotten medication, a new laptop charger. You don't need to wait for a visit. BootHop gets it there today.
           </p>
           <Link
-            href="/register"
+            href="/start"
             className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold px-6 py-3 rounded-full text-sm transition-all"
           >
             Send a Care Package <ArrowRight className="h-4 w-4" />
@@ -181,7 +181,7 @@ export default function StudentDeliveryPage() {
             Your first £20 of deliveries is on us. Post your route and get matched with a verified traveller in minutes.
           </p>
           <Link
-            href="/register"
+            href="/start"
             className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-full text-base transition-all hover:-translate-y-0.5"
           >
             Claim Your £20 Credit <ArrowRight className="h-4 w-4" />

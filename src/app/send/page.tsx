@@ -91,7 +91,7 @@ export default function SendPage() {
             🎁 Get £20 free — first 500 members
           </span>
           <Link
-            href="/register"
+            href="/start?role=sender"
             onClick={() => track('InitiateCheckout', { description: 'banner_cta' })}
             className="rounded-full bg-amber-500 text-black text-xs font-bold px-3 py-1 hover:bg-amber-400 transition-colors whitespace-nowrap"
           >
@@ -139,7 +139,7 @@ export default function SendPage() {
         </p>
 
         <Link
-          href="/register"
+          href="/start?role=sender"
           onClick={() => track('InitiateCheckout', { description: 'hero_cta' })}
           className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-lg px-10 py-4 rounded-full transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.45)] shadow-lg shadow-amber-500/30"
         >
@@ -238,7 +238,7 @@ export default function SendPage() {
 
         <div className="text-center">
           <Link
-            href="/register"
+            href="/start?role=sender"
             onClick={() => track('InitiateCheckout', { description: 'comparison_cta' })}
             className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-bold px-8 py-3.5 rounded-full text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(245,158,11,0.4)]"
           >
@@ -295,7 +295,7 @@ export default function SendPage() {
             </p>
           </div>
           <Link
-            href="/register"
+            href="/start?role=sender"
             onClick={() => track('InitiateCheckout', { description: 'corridor_cta' })}
             className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-6 py-2.5 rounded-full text-sm transition-all whitespace-nowrap"
           >
@@ -388,7 +388,7 @@ export default function SendPage() {
         </p>
 
         <Link
-          href="/register"
+          href="/start?role=sender"
           onClick={() => track('InitiateCheckout', { description: 'final_cta' })}
           className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-lg px-10 py-4 rounded-full transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.45)] shadow-lg shadow-amber-500/30"
         >
@@ -401,7 +401,7 @@ export default function SendPage() {
             Browse live routes →
           </Link>
           <span className="text-white/15">·</span>
-          <Link href="/register?type=booter" className="hover:text-white/65 underline underline-offset-2 transition-colors">
+          <Link href="/start?role=traveller" className="hover:text-white/65 underline underline-offset-2 transition-colors">
             Are you a traveller? Start earning →
           </Link>
         </div>

@@ -68,7 +68,7 @@ export default function WorkingAwayPage() {
         <p className="text-slate-400 mb-10 text-sm">No fixed address required. No account needed to browse routes.</p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            href="/register"
+            href="/start"
             className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-full text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)]"
           >
             Send Something Today <ArrowRight className="h-4 w-4" />
@@ -163,7 +163,7 @@ export default function WorkingAwayPage() {
             Post your delivery in 2 minutes. First £20 on us. Verified traveller, same-day UK delivery.
           </p>
           <Link
-            href="/register"
+            href="/start"
             className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-full text-base transition-all hover:-translate-y-0.5"
           >
             Get It Delivered Today <ArrowRight className="h-4 w-4" />
