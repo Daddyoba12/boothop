@@ -23,7 +23,7 @@ interface Props {
 type Tab = 'library' | 'youtube' | 'assigned';
 type YtResult = { id: string; title: string; channel: string; thumbnail: string };
 
-export default function MusicManager({ clientId, library, assignedTrackIds: initial }: Props) {
+export default function MusicManager({ clientId: _clientId, library, assignedTrackIds: initial }: Props) {
   const [tab, setTab]           = useState<Tab>('library');
   const [assigned, setAssigned] = useState(new Set(initial));
   const [busy, setBusy]         = useState<string | null>(null);
@@ -66,7 +66,7 @@ export default function MusicManager({ clientId, library, assignedTrackIds: init
     if (!res.ok) { setMsg(data.error ?? 'Failed'); return; }
     setAssigned(prev => {
       const next = new Set(prev);
-      isAssigned ? next.delete(trackId) : next.add(trackId);
+      if (isAssigned) next.delete(trackId); else next.add(trackId);
       return next;
     });
     setMsg(isAssigned ? 'Track removed.' : 'Track added to your list.');

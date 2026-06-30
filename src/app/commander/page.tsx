@@ -188,7 +188,7 @@ export default function CommanderPage() {
           {tab === 'reset' && (
             <form onSubmit={handleReset} className="space-y-4">
               <p className="text-sm text-white/45 mb-2">
-                Enter the email address on your account and we'll send a password reset link.
+                Enter the email address on your account and we&apos;ll send a password reset link.
               </p>
               <div>
                 <label className={label}>Email Address</label>

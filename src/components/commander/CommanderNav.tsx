@@ -31,6 +31,7 @@ export default function CommanderNav({ company, slug }: Props) {
         {/* Brand */}
         <div className="flex items-center gap-3">
           <Link href="/commander/dashboard" className="flex items-center gap-2 group">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/boothop-icon-512.png" alt="" className="h-7 w-auto rounded-lg" style={{ mixBlendMode: 'screen' }} />
             <div className="hidden sm:block leading-tight">
               <p className="text-[10px] font-bold text-white/25 uppercase tracking-[0.12em]">Pipeline</p>
