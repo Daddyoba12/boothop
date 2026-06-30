@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import BootHopLogo from '@/components/BootHopLogo';
 
-export default function CommanderResetConfirmPage() {
+function CommanderResetContent() {
   const params  = useSearchParams();
   const router  = useRouter();
   const token   = params.get('token') ?? '';
@@ -95,5 +95,13 @@ export default function CommanderResetConfirmPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function CommanderResetConfirmPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#07111f]" />}>
+      <CommanderResetContent />
+    </Suspense>
   );
 }
