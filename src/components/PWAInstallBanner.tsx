@@ -15,7 +15,16 @@ export default function PWAInstallBanner() {
   useEffect(() => {
     // Register service worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
+      navigator.serviceWorker.register('/sw.js').then(async (reg) => {
+        // Register periodic background sync (checks for new matches ~every 6h)
+        if ('periodicSync' in reg) {
+          try {
+            await (reg as any).periodicSync.register('boothop-check-updates', {
+              minInterval: 6 * 60 * 60 * 1000,
+            });
+          } catch { /* browser may deny if permission not granted */ }
+        }
+      }).catch(() => {});
 
       // When a new SW takes over (after a Vercel deploy), reload so users
       // always get the latest version without needing to reinstall the PWA.

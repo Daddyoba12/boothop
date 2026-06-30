@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { trackEvent } from '@/lib/analytics';
+import PushPermissionBanner from '@/components/PushPermissionBanner';
 import {
   Package, Plane, CheckCircle, Clock, XCircle,
   ArrowRight, Shield, AlertCircle, FileEdit, Rocket, Trash2, PlusCircle, ThumbsUp, ThumbsDown,
@@ -250,6 +251,8 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-[#0c1e3d] to-slate-950">
+
+      <PushPermissionBanner />
 
       {/* NAV */}
       <nav className="bg-white/5 backdrop-blur-xl border-b border-white/8 sticky top-0 z-20">

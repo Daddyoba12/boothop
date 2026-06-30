@@ -1,4 +1,4 @@
-const CACHE_NAME = 'boothop-v1781922057407';
+const CACHE_NAME = 'boothop-v1782857459936';
 
 // Pre-cache these on install so key pages and branding assets work offline
 const STATIC_ASSETS = [
@@ -90,3 +90,121 @@ self.addEventListener('fetch', (event) => {
       .catch(() => caches.match(event.request))
   );
 });
+
+// ── Push Notifications ────────────────────────────────────────────────────────
+
+self.addEventListener('push', (event) => {
+  let payload = { title: 'BootHop', body: 'You have a new update.', url: '/dashboard' };
+  try {
+    const data = event.data?.json();
+    if (data) payload = { ...payload, ...data };
+  } catch { /* use defaults */ }
+
+  event.waitUntil(
+    self.registration.showNotification(payload.title, {
+      body: payload.body,
+      icon: '/icon-192x192.png',
+      badge: '/icon-96x96.png',
+      data: { url: payload.url },
+      vibrate: [100, 50, 100],
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url ?? '/dashboard';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(url);
+          return client.focus();
+        }
+      }
+      return clients.openWindow(url);
+    })
+  );
+});
+
+// ── Background Sync ───────────────────────────────────────────────────────────
+// Queued POST requests (e.g. trip actions with poor airport WiFi) are replayed
+// when connectivity is restored.
+
+const DB_NAME = 'boothop-sync-queue';
+const STORE_NAME = 'requests';
+
+function openSyncDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(STORE_NAME, { autoIncrement: true });
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'boothop-retry-requests') {
+    event.waitUntil(replayQueuedRequests());
+  }
+});
+
+async function replayQueuedRequests() {
+  const db = await openSyncDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const all = store.getAll();
+    all.onsuccess = async () => {
+      const entries = all.result;
+      const keys = store.getAllKeys();
+      keys.onsuccess = async () => {
+        const keyList = keys.result;
+        await Promise.allSettled(
+          entries.map(async (entry, i) => {
+            try {
+              const res = await fetch(entry.url, {
+                method: entry.method,
+                headers: entry.headers,
+                body: entry.body,
+              });
+              if (res.ok) {
+                const delTx = db.transaction(STORE_NAME, 'readwrite');
+                delTx.objectStore(STORE_NAME).delete(keyList[i]);
+              }
+            } catch { /* will retry next sync */ }
+          })
+        );
+        resolve();
+      };
+    };
+    all.onerror = () => reject(all.error);
+  });
+}
+
+// ── Periodic Background Sync ──────────────────────────────────────────────────
+// Checks for new matches / updates in background without the app open.
+
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === 'boothop-check-updates') {
+    event.waitUntil(checkForUpdates());
+  }
+});
+
+async function checkForUpdates() {
+  try {
+    const res = await fetch('/api/dashboard?background=1');
+    if (!res.ok) return;
+    const data = await res.json();
+
+    // Only notify if there are new unread matches
+    if (data.newMatchCount && data.newMatchCount > 0) {
+      await self.registration.showNotification('BootHop', {
+        body: `You have ${data.newMatchCount} new match${data.newMatchCount > 1 ? 'es' : ''}.`,
+        icon: '/icon-192x192.png',
+        badge: '/icon-96x96.png',
+        data: { url: '/dashboard' },
+      });
+    }
+  } catch { /* graceful */ }
+}

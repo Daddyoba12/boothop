@@ -8,7 +8,7 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
  * Returns the authenticated user's trips and matches using the admin client
  * so RLS never blocks the response.
  */
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const cookieStore = await cookies();
     const session = getAppSession(cookieStore);
@@ -49,14 +49,25 @@ export async function GET() {
 
     if (matchesError) console.error('dashboard matches query error', matchesError);
 
+    const allMatches = matches || [];
+    const activeMatches = allMatches.filter(
+      (m) => !['cancelled', 'declined', 'completed'].includes(m.status)
+    );
+
+    // For periodic background sync — count matches in 'matched' state (new, unactioned)
+    const isBackground = new URL(req.url).searchParams.get('background') === '1';
+    if (isBackground) {
+      return NextResponse.json({
+        newMatchCount: allMatches.filter((m) => m.status === 'matched').length,
+      });
+    }
+
     return NextResponse.json({
       trips: trips || [],
       activeTrips,
-      matches: matches || [],
+      matches: allMatches,
       hasActiveListings: activeTrips.length > 0,
-      hasActiveMatches: (matches || []).some(
-        (m) => !['cancelled', 'declined', 'completed'].includes(m.status)
-      ),
+      hasActiveMatches: activeMatches.length > 0,
     });
   } catch (error) {
     console.error('dashboard API error', error);
