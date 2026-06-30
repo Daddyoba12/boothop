@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'i.imgur.com' },
       { protocol: 'https', hostname: '**.blogspot.com' },
       { protocol: 'https', hostname: 'blogger.googleusercontent.com' },
+      { protocol: 'https', hostname: 'i.ytimg.com' },
     ],
   },
   async rewrites() {
@@ -40,15 +41,22 @@ const nextConfig: NextConfig = {
         destination: 'https://www.boothop.com/:path*',
         permanent: true,
       },
-      // /pipeline/commander/* → commander.boothop.com
+      // /pipeline/commander → /commander (Commander is now native in Next.js)
       {
         source: '/pipeline/commander',
-        destination: 'https://commander.boothop.com',
+        destination: '/commander',
         permanent: false,
       },
       {
         source: '/pipeline/commander/:path*',
-        destination: 'https://commander.boothop.com/:path*',
+        destination: '/commander/:path*',
+        permanent: false,
+      },
+      // commander.boothop.com → /commander (subdomain alias)
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'commander.boothop.com' }],
+        destination: 'https://www.boothop.com/commander/:path*',
         permanent: false,
       },
       // /onboard → /client-onboarding (client-onboarding is the canonical URL)

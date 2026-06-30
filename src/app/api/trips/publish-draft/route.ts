@@ -28,6 +28,12 @@ export async function POST(request: Request) {
 
     if (!draft) return NextResponse.json({ error: 'Draft not found' }, { status: 404 });
 
+    if (!draft.from_city || !draft.to_city || !draft.weight || !draft.price) {
+      return NextResponse.json({
+        error: 'From location, to location, weight and price are all required before publishing. Please edit your listing to add missing details.',
+      }, { status: 400 });
+    }
+
     // Look up the user_id from auth (needed for trips table)
     let userId = draft.user_id;
     if (!userId) {

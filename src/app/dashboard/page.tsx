@@ -356,8 +356,8 @@ export default function DashboardPage() {
                         </p>
                         <p className="text-slate-500 text-xs mt-0.5">
                           {tripDate ? new Date(tripDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
-                          {match.agreed_price ? ` · £${Number(match.agreed_price).toFixed(2)}` : ''}
-                          {senderTrip?.weight_capacity ? ` · ${senderTrip.weight_capacity} kg` : ''}
+                          {(match.agreed_price ?? match.offered_price) ? ` · £${Number(match.agreed_price ?? match.offered_price).toFixed(2)}` : ''}
+                          {senderTrip?.weight ? ` · ${senderTrip.weight} kg` : ''}
                         </p>
                       </div>
                       <div className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border shrink-0 ${

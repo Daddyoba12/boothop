@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CheckCircle, ArrowRight } from 'lucide-react';
+import { TikTokViewContent } from '@/components/TikTokTracker';
 
 const CITY_PAIRS: Record<string, { from: string; to: string; time: string; price: string; region: string }> = {
   // ── UK routes ───────────────────────────────────────────────
@@ -98,6 +99,7 @@ export default async function CityRoutePage(
 
   return (
     <main className="min-h-screen bg-[#0a0f1e] text-white">
+      <TikTokViewContent contentName={`Send ${pair.from} to ${pair.to}`} contentType="delivery_route" />
 
       {/* Hero */}
       <section className="px-6 py-20 text-center max-w-3xl mx-auto">

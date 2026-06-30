@@ -16,8 +16,15 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { from, to, date, weight, price, mode, route_type } = body;
 
-    if (!from || !to || !date || !weight || !mode) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    if (!from || !to || !date || !weight || !price || !mode) {
+      return NextResponse.json({
+        error: 'From location, to location, date, weight and price are all required to create a listing.',
+      }, { status: 400 });
+    }
+
+    const priceNum = parseFloat(String(price).replace(/[^0-9.]/g, ''));
+    if (!priceNum || priceNum <= 0) {
+      return NextResponse.json({ error: 'A valid price greater than £0 is required.' }, { status: 400 });
     }
 
     // Enforce minimum tomorrow — no same-day or past bookings
@@ -31,8 +38,6 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    const priceNum = parseFloat(String(price || '0').replace(/[^0-9.]/g, '')) || null;
 
     // Auto-translate from/to if non-English (best-effort — never blocks trip creation)
     const translation = await translateTripCities(from, to).catch(() => ({
@@ -49,7 +54,7 @@ export async function POST(request: Request) {
       from_city:   from,
       to_city:     to,
       travel_date: date,
-      weight:      weight ?? null,
+      weight:      Number(weight),
       price:       priceNum,
       status:      'active',
     };

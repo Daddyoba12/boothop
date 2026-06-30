@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, Zap, Plane, Scale, TrendingUp, Trophy, Building, Clock, Shield } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import { TikTokViewContent } from '@/components/TikTokTracker';
 
 export const metadata: Metadata = {
   title: 'Urgent Business Delivery UK – Same-Day for Finance, Law, Aerospace & Sport | BootHop',
@@ -92,6 +93,7 @@ export default function BusinessUrgentPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <TikTokViewContent contentName="Business Urgent Delivery" contentType="delivery_service" />
       <NavBar />
 
       {/* Hero */}

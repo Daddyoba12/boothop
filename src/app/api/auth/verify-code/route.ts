@@ -87,7 +87,17 @@ export async function POST(request: Request) {
     let hasDraft = false;
     if (record.journey_payload) {
       const p = record.journey_payload as any;
-      const priceNum = parseFloat(String(p.price || '0').replace(/[^0-9.]/g, '')) || null;
+
+      // Hard block — all four fields are mandatory
+      if (!p.from || !p.to || !p.weight || !p.price) {
+        return NextResponse.json({
+          error: 'From location, to location, weight and price are all required to create a listing.',
+        }, { status: 400 });
+      }
+      const priceNum = parseFloat(String(p.price).replace(/[^0-9.]/g, ''));
+      if (!priceNum || priceNum <= 0) {
+        return NextResponse.json({ error: 'A valid price greater than £0 is required.' }, { status: 400 });
+      }
 
       // Custom OTP users are not in Supabase Auth — user_id is nullable
       const userId = null;
@@ -115,10 +125,10 @@ export async function POST(request: Request) {
         email,
         user_id:     userId,
         type:        p.mode || 'send',
-        from_city:   p.from || '',
-        to_city:     p.to  || '',
+        from_city:   p.from,
+        to_city:     p.to,
         travel_date: p.date,
-        weight:      p.weight || null,
+        weight:      Number(p.weight),
         price:       priceNum,
         status:      'active',
       });

@@ -219,3 +219,79 @@ export async function sendMatchConfirmedEmail(params: {
     text: `We found a match for your ${params.fromCity} → ${params.toCity} trip. Agreed price: £${params.price}.\n\nAccept: ${acceptUrl}\nDecline: ${declineUrl}\n\nLinks expire in 72 hours.`,
   });
 }
+
+export async function sendAlternativeJourneysEmail(params: {
+  toEmail: string;
+  fromCity: string;
+  toCity: string;
+  travelDate: string;
+  alternatives: Array<{ fromCity: string; toCity: string; travelDate: string; price: number | null }>;
+}) {
+  const dateStr = params.travelDate
+    ? new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '';
+
+  const altRows = params.alternatives.map((a) => {
+    const aDate = a.travelDate
+      ? new Date(a.travelDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+      : '—';
+    return `
+      <tr>
+        <td style="padding:12px 16px;border-bottom:1px solid #1e293b;">
+          <p style="margin:0;font-size:14px;font-weight:600;color:#f1f5f9;">${a.fromCity} → ${a.toCity}</p>
+          <p style="margin:2px 0 0;font-size:12px;color:#64748b;">${aDate}</p>
+        </td>
+        <td style="padding:12px 16px;border-bottom:1px solid #1e293b;text-align:right;">
+          <span style="font-size:15px;font-weight:700;color:#38bdf8;">${a.price ? `£${Number(a.price).toFixed(2)}` : '—'}</span>
+        </td>
+        <td style="padding:12px 16px;border-bottom:1px solid #1e293b;text-align:right;">
+          <a href="${appUrl}/dashboard" style="display:inline-block;background:#2563eb;color:#fff;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;text-decoration:none;">Connect →</a>
+        </td>
+      </tr>`;
+  }).join('');
+
+  const noAltText = params.alternatives.length === 0
+    ? `<p style="color:#64748b;font-size:14px;margin:0 0 24px;">We're still searching for travellers on your route — we'll notify you as soon as we find a new match.</p>`
+    : '';
+
+  await sendResendEmail({
+    from,
+    to: params.toEmail,
+    subject: `Your match wasn't confirmed — here are alternatives for ${params.fromCity} → ${params.toCity}`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;background:#0f172a;color:#f8fafc;border-radius:16px;overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#1e3a5f,#0f172a);padding:28px 36px;text-align:center;border-bottom:2px solid #1e40af;">
+          <div style="font-size:26px;font-weight:900;color:#fff;">Boot<span style="color:#38bdf8;">Hop</span></div>
+          <div style="color:#7dd3fc;font-size:11px;margin-top:4px;letter-spacing:1.5px;text-transform:uppercase;">Match Update</div>
+        </div>
+        <div style="padding:32px 36px;">
+          <h2 style="color:#f1f5f9;font-size:18px;font-weight:700;margin:0 0 8px;">Your match wasn't confirmed in time</h2>
+          <p style="color:#94a3b8;font-size:14px;margin:0 0 24px;">
+            The traveller for your <strong style="color:#f1f5f9;">${params.fromCity} → ${params.toCity}</strong>${dateStr ? ` trip on <strong style="color:#f1f5f9;">${dateStr}</strong>` : ' trip'} didn't respond. We've automatically cancelled the match and freed up your listing.
+          </p>
+          ${noAltText}
+          ${params.alternatives.length > 0 ? `
+          <p style="color:#94a3b8;font-size:13px;font-weight:600;margin:0 0 12px;text-transform:uppercase;letter-spacing:0.08em;">Alternative travellers nearby</p>
+          <table style="width:100%;border-collapse:collapse;background:#1e293b;border-radius:12px;overflow:hidden;margin:0 0 24px;">
+            <thead>
+              <tr style="background:#0f172a;">
+                <th style="padding:10px 16px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Route &amp; Date</th>
+                <th style="padding:10px 16px;text-align:right;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Price</th>
+                <th style="padding:10px 16px;text-align:right;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;"></th>
+              </tr>
+            </thead>
+            <tbody>${altRows}</tbody>
+          </table>
+          ` : ''}
+          <a href="${appUrl}/dashboard" style="display:block;background:#2563eb;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-weight:700;font-size:15px;text-align:center;">
+            Go to your dashboard →
+          </a>
+        </div>
+        <div style="background:#0f172a;border-top:1px solid #1e293b;padding:16px 36px;text-align:center;">
+          <p style="color:#334155;font-size:11px;margin:0;">© BootHop · <a href="${appUrl}" style="color:#38bdf8;text-decoration:none;">boothop.com</a></p>
+        </div>
+      </div>
+    `,
+    text: `Your match for ${params.fromCity} → ${params.toCity}${dateStr ? ` on ${dateStr}` : ''} was not confirmed and has been cancelled.\n\n${params.alternatives.length > 0 ? `Alternative travellers:\n${params.alternatives.map(a => `- ${a.fromCity} → ${a.toCity} | ${a.travelDate} | ${a.price ? `£${a.price}` : '—'}`).join('\n')}\n\n` : ''}Visit your dashboard: ${appUrl}/dashboard`,
+  });
+}

@@ -69,7 +69,28 @@
       "Bash(curl -s -H \"Authorization: Bearer boothop-cron-secret-2024-x9k2p\" https://boothop-3slsqlrpz-tunde-olufeks-projects.vercel.app/api/cron/auto-match)",
       "Bash(curl:*)",
       "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:3000/promo\" -TimeoutSec 3 -UseBasicParsing; Write-Output \"RUNNING: $\\($r.StatusCode\\)\" } catch { Write-Output \"NOT_RUNNING\" })",
-      "PowerShell(Start-Sleep -Seconds 8; try { $r = Invoke-WebRequest -Uri \"http://localhost:3000\" -TimeoutSec 5 -UseBasicParsing; \"READY: $\\($r.StatusCode\\)\" } catch { \"NOT_READY_YET\" })"
+      "PowerShell(Start-Sleep -Seconds 8; try { $r = Invoke-WebRequest -Uri \"http://localhost:3000\" -TimeoutSec 5 -UseBasicParsing; \"READY: $\\($r.StatusCode\\)\" } catch { \"NOT_READY_YET\" })",
+      "Bash(grep -rn \"[0-9]\\\\{1,3\\\\}\\\\.[0-9]\\\\{1,3\\\\}\\\\.[0-9]\\\\{1,3\\\\}\\\\.[0-9]\\\\{1,3\\\\}\" \"C:\\\\users\\\\babso\\\\desktop\\\\BootHopPipeline\" --include=\"*.txt\" --include=\"*.md\" --include=\"*.json\" --include=\"*.env\" --include=\"*.sh\" --include=\"*.ps1\")",
+      "PowerShell(ssh -i C:\\\\Users\\\\babso\\\\.ssh\\\\oracle_boothop.pem -o StrictHostKeyChecking=no ubuntu@140.238.73.32 \"sudo apt install nginx -y 2>&1 | tail -5\")",
+      "PowerShell(ssh -i C:\\\\Users\\\\babso\\\\.ssh\\\\oracle_boothop.pem -o StrictHostKeyChecking=no ubuntu@140.238.73.32 \"sudo iptables -I INPUT -p tcp --dport 80 -j ACCEPT && echo 'Port 80 open'\")",
+      "PowerShell(ssh -i C:\\\\Users\\\\babso\\\\.ssh\\\\oracle_boothop.pem -o StrictHostKeyChecking=no ubuntu@140.238.73.32 \"sudo apt install certbot python3-certbot-nginx -y 2>&1 | tail -3\")",
+      "PowerShell(ssh -i C:\\\\Users\\\\babso\\\\.ssh\\\\oracle_boothop.pem -o StrictHostKeyChecking=no ubuntu@140.238.73.32 \"sudo certbot --nginx -d commander.boothop.com --non-interactive --agree-tos -m daddyoba12@gmail.com 2>&1\")",
+      "PowerShell(ssh -i C:\\\\Users\\\\babso\\\\.ssh\\\\oracle_boothop.pem -o StrictHostKeyChecking=no ubuntu@140.238.73.32 \"sudo systemctl status boothop-commander 2>&1 | head -20 && echo '---' && sudo netstat -tlnp | grep 1030\")",
+      "PowerShell(ssh -i C:\\\\Users\\\\babso\\\\.ssh\\\\oracle_boothop.pem -o StrictHostKeyChecking=no ubuntu@140.238.73.32 \"sudo ss -tlnp | grep 1030 && echo '---' && ps aux | grep -E 'uvicorn|main.py' | grep -v grep\")",
+      "PowerShell(nslookup *)",
+      "PowerShell(ssh -i C:\\\\Users\\\\babso\\\\.ssh\\\\oracle_boothop.pem -o StrictHostKeyChecking=no ubuntu@140.238.73.32 \"sudo iptables -L INPUT -n | grep -E '80|443' && echo '---' && sudo systemctl status nginx | grep Active\")",
+      "PowerShell(ssh -i C:\\\\Users\\\\babso\\\\.ssh\\\\oracle_boothop.pem -o StrictHostKeyChecking=no ubuntu@140.238.73.32 \"sudo iptables -I INPUT -p tcp --dport 443 -j ACCEPT && echo 'Port 443 open'\")",
+      "PowerShell(curl *)",
+      "PowerShell(Invoke-WebRequest -Uri \"https://commander.boothop.com\" -TimeoutSec 10 -UseBasicParsing | Select-Object StatusCode, StatusDescription)",
+      "PowerShell(ssh -i C:\\\\Users\\\\babso\\\\.ssh\\\\oracle_boothop.pem -o StrictHostKeyChecking=no ubuntu@140.238.73.32 \"curl -s -o /dev/null -w '%{http_code}' http://localhost:80 && echo '' && sudo ss -tlnp | grep -E '80|443|1030'\")",
+      "PowerShell(New-Item *)",
+      "Bash(mkdir -p \"C:/users/babso/desktop/boothop/boothop/src/app/flights/airlines/[code]\")",
+      "Bash(mkdir -p \"C:/users/babso/desktop/boothop/boothop/src/app/flights/airports/[code]\")",
+      "Bash(start *)",
+      "PowerShell(vercel domains *)",
+      "PowerShell(vercel projects *)",
+      "Bash(nslookup *)",
+      "PowerShell(cd \"C:\\\\users\\\\babso\\\\desktop\\\\OTB_Pipeline\"; git status --short | Where-Object { $_ -match \"^\\\\?\\\\?\" })"
     ]
   }
 }

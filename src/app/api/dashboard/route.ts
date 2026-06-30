@@ -35,17 +35,19 @@ export async function GET() {
 
     // Fetch matches where user is sender or traveler.
     // Exclude awaiting_authorisation — admin-only status users shouldn't see.
-    const { data: matches } = await supabase
+    const { data: matches, error: matchesError } = await supabase
       .from('matches')
       .select(`
-        id, status, agreed_price, proposed_price, negotiation_status, created_at,
+        id, status, agreed_price, offered_price, proposed_price, negotiation_status, created_at,
         sender_email, traveler_email,
-        sender_trip:sender_trip_id(from_city, to_city, travel_date, price, weight_capacity, auto_created),
-        traveler_trip:traveler_trip_id(from_city, to_city, travel_date, price, weight_capacity, auto_created)
+        sender_trip:sender_trip_id(from_city, to_city, travel_date, price, weight, auto_created),
+        traveler_trip:traveler_trip_id(from_city, to_city, travel_date, price, weight, auto_created)
       `)
       .or(`sender_email.eq.${email},traveler_email.eq.${email}`)
       .neq('status', 'awaiting_authorisation')
       .order('created_at', { ascending: false });
+
+    if (matchesError) console.error('dashboard matches query error', matchesError);
 
     return NextResponse.json({
       trips: trips || [],

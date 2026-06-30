@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, GraduationCap, Home, Package, Clock, Shirt, BookOpen } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import { TikTokViewContent } from '@/components/TikTokTracker';
 
 export const metadata: Metadata = {
   title: 'Student Delivery UK – Send Stuff to University or Back Home | BootHop',
@@ -54,6 +55,7 @@ export default function StudentDeliveryPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <TikTokViewContent contentName="Student Delivery" contentType="delivery_service" />
       <NavBar />
 
       {/* Hero */}

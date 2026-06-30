@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, Briefcase, Home, Clock, Package, Wrench, MapPin } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import { TikTokViewContent } from '@/components/TikTokTracker';
 
 export const metadata: Metadata = {
   title: 'Working Away from Home? Get Packages Delivered to You | BootHop',
@@ -49,6 +50,7 @@ export default function WorkingAwayPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <TikTokViewContent contentName="Working Away Delivery" contentType="delivery_service" />
       <NavBar />
 
       {/* Hero */}

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, Clock, MapPin, Shield, Zap, CheckCircle, Package } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import { TikTokViewContent } from '@/components/TikTokTracker';
 
 export const metadata: Metadata = {
   title: 'Same-Day Delivery Anywhere in the UK | BootHop',
@@ -58,6 +59,7 @@ export default function UKSameDayPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <TikTokViewContent contentName="UK Same-Day Delivery" contentType="delivery_service" />
       <NavBar />
 
       {/* Hero */}
