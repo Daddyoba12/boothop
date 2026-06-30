@@ -4,7 +4,10 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import BootHopLogo from '@/components/BootHopLogo';
+
+const FlightTicker = dynamic(() => import('@/components/bfi/FlightTicker'), { ssr: false });
 
 type Role = 'sender' | 'traveller';
 
@@ -440,6 +443,8 @@ function StartContent() {
 
         </div>
       </div>
+
+      <FlightTicker fixed />
     </div>
   );
 }
