@@ -94,9 +94,9 @@
       "label": "BootHop — Peer-to-peer delivery"
     },
     {
-      "src": "/images/boothop-screenshot-wide.png",
+      "src": "/images/boothop-screenshot-wide.jpg",
       "sizes": "2848x1600",
-      "type": "image/png",
+      "type": "image/jpeg",
       "platform": "windows",
       "form_factor": "wide",
       "label": "BootHop homepage"
