@@ -14,21 +14,29 @@ function Stars({ rating }: { rating: number }) {
 }
 
 function TickerCard({ entry }: { entry: TickerEntry }) {
+  const isGood    = entry.opportunityScore >= 65;
   const routeSlug = `${entry.origin}-${entry.destination}`.toLowerCase();
   return (
     <a
       href={`/flights/${routeSlug}`}
-      className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-blue-500/40 rounded-xl px-3.5 py-2 min-w-[210px] transition-all duration-200 cursor-pointer"
+      className="inline-flex items-center gap-2.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-blue-500/40 rounded-xl px-3.5 py-2 min-w-[195px] transition-all duration-200 group"
     >
+      {/* Left: route + price + airline */}
       <div className="min-w-0">
-        <p className="text-[9px] text-blue-400 font-bold uppercase tracking-wider leading-none mb-0.5">
-          ✈ {entry.originCity} → {entry.destinationCity}
+        <p className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider leading-none mb-0.5">
+          {entry.originCity} → {entry.destinationCity}
         </p>
-        <p className="text-sm font-extrabold text-white leading-tight">
-          £{entry.priceGbp.toFixed(0)}
-          <span className="text-[9px] font-normal text-gray-400 ml-1">{entry.airlineName}</span>
-        </p>
-        <p className="text-[9px] text-gray-500 leading-none mt-0.5">{entry.recommendation}</p>
+        <p className="text-base font-extrabold text-white leading-tight">£{entry.priceGbp.toFixed(0)}</p>
+        <p className="text-[9px] text-gray-500 truncate max-w-[110px] leading-none mt-0.5">{entry.airlineName}</p>
+      </div>
+      {/* Right: depart label + View button */}
+      <div className="text-right shrink-0 flex flex-col items-end gap-1">
+        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${isGood ? 'bg-green-500/15 text-green-400' : 'bg-amber-500/15 text-amber-400'}`}>
+          {entry.recommendation}
+        </span>
+        <span className="text-[9px] bg-blue-600 group-hover:bg-blue-500 text-white transition-colors font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
+          View →
+        </span>
       </div>
     </a>
   );
