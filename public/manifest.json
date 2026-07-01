@@ -13,7 +13,7 @@
   "dir": "ltr",
   "categories": ["travel", "shopping", "logistics", "business"],
   "iarc_rating_id": "",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui", "browser"],
+  "display_override": ["tabbed", "window-controls-overlay", "standalone", "minimal-ui", "browser"],
   "related_applications": [
     {
       "platform": "play",

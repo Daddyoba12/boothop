@@ -53,15 +53,9 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       // commander.boothop.com → /commander (subdomain alias)
-      // Exclude .well-known so web-app-origin-association is served directly
+      // .well-known is excluded so Vercel serves it as a static file directly
       {
-        source: '/.well-known/:path*',
-        has: [{ type: 'host', value: 'commander.boothop.com' }],
-        destination: '/.well-known/:path*',
-        permanent: false,
-      },
-      {
-        source: '/:path*',
+        source: '/:path((?!\\.well-known).*)',
         has: [{ type: 'host', value: 'commander.boothop.com' }],
         destination: 'https://www.boothop.com/commander/:path*',
         permanent: false,
