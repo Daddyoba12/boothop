@@ -267,12 +267,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
 
-        {/* TravelPayouts Drive — affiliate click tracking, marker 544322 */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var s=document.createElement("script");s.async=1;s.src="https://emrldtp.com/NTQ0MzIy.js?t=544322";document.head.appendChild(s);})();`,
-          }}
-        />
 
         {/* TikTok Pixel */}
         {TTOK_ID && (
@@ -319,6 +313,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             />
           </>
         )}
+        {/* Service Worker — registered inline so scanners (PWABuilder) detect it before React hydrates */}
+        <script dangerouslySetInnerHTML={{ __html: `if('serviceWorker'in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}` }} />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 min-h-screen`}>
         {children}
