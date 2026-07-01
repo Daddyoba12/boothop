@@ -13,8 +13,14 @@
   "dir": "ltr",
   "categories": ["travel", "shopping", "logistics", "business"],
   "iarc_rating_id": "",
-  "display_override": ["standalone", "minimal-ui", "browser"],
-  "related_applications": [],
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui", "browser"],
+  "related_applications": [
+    {
+      "platform": "play",
+      "id": "com.boothop.app",
+      "url": "https://play.google.com/store/apps/details?id=com.boothop.app"
+    }
+  ],
   "prefer_related_applications": false,
   "launch_handler": {
     "client_mode": "navigate-existing"
@@ -27,6 +33,25 @@
       "text": "text",
       "url": "url"
     }
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+boothop",
+      "url": "/open?target=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/open-file",
+      "accept": {
+        "application/pdf": [".pdf"],
+        "image/png": [".png"],
+        "image/jpeg": [".jpg", ".jpeg"]
+      }
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 320
   },
   "icons": [
     {
@@ -65,14 +90,14 @@
       "name": "Send a Package",
       "short_name": "Send",
       "description": "Post a delivery request",
-      "url": "/intent",
+      "url": "/start?role=sender",
       "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "I'm Travelling",
       "short_name": "Travel",
       "description": "Post your trip and earn",
-      "url": "/intent",
+      "url": "/start?role=traveller",
       "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
     }
   ],
@@ -81,23 +106,13 @@
       "src": "/images/boothop-screenshot-narrow.png",
       "sizes": "1080x1920",
       "type": "image/png",
-      "platform": "ios",
       "form_factor": "narrow",
       "label": "BootHop — Send anything, anywhere"
-    },
-    {
-      "src": "/images/boothop-screenshot-narrow.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "platform": "android",
-      "form_factor": "narrow",
-      "label": "BootHop — Peer-to-peer delivery"
     },
     {
       "src": "/images/boothop-screenshot-wide.jpg",
       "sizes": "2848x1600",
       "type": "image/jpeg",
-      "platform": "windows",
       "form_factor": "wide",
       "label": "BootHop homepage"
     }
