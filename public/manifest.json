@@ -56,6 +56,21 @@
   "scope_extensions": [
     { "origin": "https://commander.boothop.com" }
   ],
+  "widgets": [
+    {
+      "name": "Shipment Status",
+      "short_name": "Track",
+      "description": "Live tracking status for your BootHop delivery",
+      "tag": "boothop-tracker",
+      "ms_ac_template": "/widgets/tracker.json",
+      "data": "/api/dashboard?background=1",
+      "type": "application/json",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }],
+      "screenshots": [{ "src": "/images/boothop-screenshot-narrow.png", "sizes": "1080x1920" }],
+      "auth": true,
+      "update": 3600
+    }
+  ],
   "icons": [
     {
       "src": "/icon-96x96.png",
