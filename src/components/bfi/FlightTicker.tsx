@@ -13,42 +13,24 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-function trackFlightClick(entry: TickerEntry) {
-  try {
-    fetch('/api/bfi/track-click', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ origin: entry.origin, destination: entry.destination, priceGbp: entry.priceGbp }),
-    }).catch(() => {});
-  } catch { /* non-blocking */ }
-}
-
 function TickerCard({ entry }: { entry: TickerEntry }) {
   const routeSlug = `${entry.origin}-${entry.destination}`.toLowerCase();
-  const href      = entry.bookingUrl ?? `/flights/${routeSlug}`;
   return (
-    <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 min-w-[240px]">
-      {/* Route + price */}
-      <div className="min-w-0 flex-1">
+    <a
+      href={`/flights/${routeSlug}`}
+      className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-blue-500/40 rounded-xl px-3.5 py-2 min-w-[210px] transition-all duration-200 cursor-pointer"
+    >
+      <div className="min-w-0">
         <p className="text-[9px] text-blue-400 font-bold uppercase tracking-wider leading-none mb-0.5">
-          ✈ Cheap flight
+          ✈ {entry.originCity} → {entry.destinationCity}
         </p>
-        <p className="text-[11px] text-white font-semibold leading-snug">
-          {entry.originCity} → {entry.destinationCity} · <span className="text-green-400 font-bold">£{entry.priceGbp.toFixed(0)}</span>
+        <p className="text-sm font-extrabold text-white leading-tight">
+          £{entry.priceGbp.toFixed(0)}
+          <span className="text-[9px] font-normal text-gray-400 ml-1">{entry.airlineName}</span>
         </p>
-        <p className="text-[9px] text-gray-500 leading-none mt-0.5">{entry.airlineName} · {entry.recommendation}</p>
+        <p className="text-[9px] text-gray-500 leading-none mt-0.5">{entry.recommendation}</p>
       </div>
-      {/* CTA */}
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={() => trackFlightClick(entry)}
-        className="shrink-0 text-[9px] font-bold text-white bg-blue-600 hover:bg-blue-500 transition-colors px-2.5 py-1.5 rounded-lg whitespace-nowrap"
-      >
-        Check available tickets
-      </a>
-    </div>
+    </a>
   );
 }
 
