@@ -53,6 +53,13 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       // commander.boothop.com → /commander (subdomain alias)
+      // Exclude .well-known so web-app-origin-association is served directly
+      {
+        source: '/.well-known/:path*',
+        has: [{ type: 'host', value: 'commander.boothop.com' }],
+        destination: '/.well-known/:path*',
+        permanent: false,
+      },
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'commander.boothop.com' }],
