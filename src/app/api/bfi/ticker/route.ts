@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import type { TickerEntry } from '@/lib/bfi/types';
 
 export const revalidate = 1800; // refresh every 30 min
@@ -130,11 +131,21 @@ const ROUTES = [
 export async function GET() {
   const now = new Date().toISOString();
 
+  // Only show routes that exist in bfi_routes so ticker links never 404
+  const db = createSupabaseAdminClient();
+  const { data: dbRoutes } = await db
+    .from('bfi_routes')
+    .select('origin, destination')
+    .eq('enabled', true);
+
+  const existingSet = new Set((dbRoutes ?? []).map(r => `${r.origin}-${r.destination}`));
+  const activeRoutes = ROUTES.filter(r => existingSet.has(`${r.origin}-${r.destination}`));
+
   const results = await Promise.allSettled(
-    ROUTES.map(r => cheapestThisWeek(r.origin, r.destination, 7))
+    activeRoutes.map(r => cheapestThisWeek(r.origin, r.destination, 7))
   );
 
-  const entries: TickerEntry[] = ROUTES.map((r, i) => {
+  const entries: TickerEntry[] = activeRoutes.map((r, i) => {
     const live = results[i].status === 'fulfilled' ? results[i].value : null;
 
     const priceGbp    = live?.priceGbp   ?? r.fallbackPrice;
