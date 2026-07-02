@@ -116,61 +116,50 @@ async function fetchCheap(
   }
 }
 
-// Routes to feature in the ticker — London↔Lagos are first and most prominent
-const ROUTES = [
-  { origin: 'LHR', destination: 'LOS', originCity: 'London',     destinationCity: 'Lagos',        fallbackPrice: 318, fallbackAirline: 'Air Peace' },
-  { origin: 'LOS', destination: 'LHR', originCity: 'Lagos',      destinationCity: 'London',       fallbackPrice: 295, fallbackAirline: 'Air Peace' },
-  { origin: 'LHR', destination: 'ACC', originCity: 'London',     destinationCity: 'Accra',        fallbackPrice: 374, fallbackAirline: 'British Airways' },
-  { origin: 'LHR', destination: 'ABV', originCity: 'London',     destinationCity: 'Abuja',        fallbackPrice: 348, fallbackAirline: 'Turkish Airlines' },
-  { origin: 'LHR', destination: 'KGL', originCity: 'London',     destinationCity: 'Kigali',       fallbackPrice: 442, fallbackAirline: 'RwandAir' },
-  { origin: 'LHR', destination: 'NBO', originCity: 'London',     destinationCity: 'Nairobi',      fallbackPrice: 418, fallbackAirline: 'Kenya Airways' },
-  { origin: 'LGW', destination: 'DXB', originCity: 'London',     destinationCity: 'Dubai',        fallbackPrice: 262, fallbackAirline: 'Emirates' },
-  { origin: 'MAN', destination: 'LOS', originCity: 'Manchester', destinationCity: 'Lagos',        fallbackPrice: 336, fallbackAirline: 'Air Peace' },
-];
-
 export async function GET() {
   const now = new Date().toISOString();
+  const db  = createSupabaseAdminClient();
 
-  // Only show routes that exist in bfi_routes so ticker links never 404
-  const db = createSupabaseAdminClient();
-  const { data: dbRoutes } = await db
-    .from('bfi_routes')
-    .select('origin, destination')
-    .eq('enabled', true);
+  // Pull enabled routes and airport names straight from the DB — no hardcoding
+  const [{ data: dbRoutes }, { data: airports }] = await Promise.all([
+    db.from('bfi_routes').select('origin, destination').eq('enabled', true).order('priority', { ascending: false }),
+    db.from('bfi_airports').select('code, city'),
+  ]);
 
-  const existingSet = new Set((dbRoutes ?? []).map(r => `${r.origin}-${r.destination}`));
-  const activeRoutes = ROUTES.filter(r => existingSet.has(`${r.origin}-${r.destination}`));
+  const routes = dbRoutes ?? [];
+  if (!routes.length) return NextResponse.json({ entries: [], updatedAt: now });
 
+  const cityMap: Record<string, string> = {};
+  for (const a of airports ?? []) cityMap[a.code] = a.city;
+
+  // Fetch live prices for all DB routes in parallel
   const results = await Promise.allSettled(
-    activeRoutes.map(r => cheapestThisWeek(r.origin, r.destination, 7))
+    routes.map(r => cheapestThisWeek(r.origin, r.destination, 7))
   );
 
-  const entries: TickerEntry[] = activeRoutes.map((r, i) => {
-    const live = results[i].status === 'fulfilled' ? results[i].value : null;
+  const entries: TickerEntry[] = routes
+    .flatMap((r, i) => {
+      const live = results[i].status === 'fulfilled' ? results[i].value : null;
+      if (!live) return []; // skip routes with no live price data
 
-    const priceGbp    = live?.priceGbp   ?? r.fallbackPrice;
-    const airlineN    = live?.airline    ?? r.fallbackAirline;
-    const depDateStr  = live?.depDateStr ?? '';
-    const depDate     = live?.depDate    ?? new Date(Date.now() + 3 * 86_400_000);
-    const isLive      = !!live;
+      const label: string = live.depDateStr ? formatDate(live.depDateStr) : 'This week';
 
-    const label = depDateStr ? formatDate(depDateStr) : 'This week';
-
-    return {
-      origin:          r.origin,
-      destination:     r.destination,
-      originCity:      r.originCity,
-      destinationCity: r.destinationCity,
-      priceGbp,
-      airlineName:     airlineN,
-      rating:          4.2,
-      recommendation:  label,
-      opportunityScore: isLive ? 68 : 50,
-      updatedAt:       now,
-      bookingUrl:      aviasalesUrl(r.origin, r.destination, depDate),
-      departureDate:   depDateStr || undefined,
-    };
-  });
+      const entry: TickerEntry = {
+        origin:           r.origin,
+        destination:      r.destination,
+        originCity:       cityMap[r.origin]      ?? r.origin,
+        destinationCity:  cityMap[r.destination] ?? r.destination,
+        priceGbp:         live.priceGbp,
+        airlineName:      live.airline,
+        rating:           4.2,
+        recommendation:   label,
+        opportunityScore: 68,
+        updatedAt:        now,
+        bookingUrl:       aviasalesUrl(r.origin, r.destination, live.depDate),
+        departureDate:    live.depDateStr || undefined,
+      };
+      return [entry];
+    });
 
   return NextResponse.json({ entries, updatedAt: now });
 }
