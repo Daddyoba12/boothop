@@ -25,12 +25,22 @@ export default async function FlightRoutePage({
   const { origin, destination } = parsed;
   const db = createSupabaseAdminClient();
 
-  const { data: routeRow } = await db
+  let { data: routeRow } = await db
     .from('bfi_routes')
     .select('*')
     .eq('origin', origin)
     .eq('destination', destination)
     .single();
+
+  // Auto-create the route on first visit so ticker links never 404
+  if (!routeRow) {
+    const { data: inserted } = await db
+      .from('bfi_routes')
+      .insert({ origin, destination, enabled: true, priority: 0, scan_frequency_hours: 24, tags: [] })
+      .select('*')
+      .single();
+    routeRow = inserted;
+  }
 
   if (!routeRow) notFound();
 
