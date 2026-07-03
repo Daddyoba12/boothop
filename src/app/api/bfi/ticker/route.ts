@@ -132,34 +132,55 @@ export async function GET() {
   const cityMap: Record<string, string> = {};
   for (const a of airports ?? []) cityMap[a.code] = a.city;
 
-  // Fetch live prices for all DB routes in parallel
-  const results = await Promise.allSettled(
-    routes.map(r => cheapestThisWeek(r.origin, r.destination, 7))
-  );
+  // Fetch live TravelPayouts prices + most recent DB offer prices in parallel
+  const [liveResults, { data: recentOffers }] = await Promise.all([
+    Promise.allSettled(routes.map(r => cheapestThisWeek(r.origin, r.destination, 7))),
+    db.from('bfi_flight_offers')
+      .select('origin, destination, price_gbp, airline_name, scanned_at')
+      .in('origin',      routes.map(r => r.origin))
+      .in('destination', routes.map(r => r.destination))
+      .order('scanned_at', { ascending: false })
+      .limit(100),
+  ]);
 
-  const entries: TickerEntry[] = routes
-    .flatMap((r, i) => {
-      const live = results[i].status === 'fulfilled' ? results[i].value : null;
-      if (!live) return []; // skip routes with no live price data
+  // Build a fallback price map from the most recent DB offer per route
+  const fallbackMap: Record<string, { price: number; airline: string }> = {};
+  for (const o of recentOffers ?? []) {
+    const key = `${o.origin}-${o.destination}`;
+    if (!fallbackMap[key]) fallbackMap[key] = { price: o.price_gbp, airline: o.airline_name };
+  }
 
-      const label: string = live.depDateStr ? formatDate(live.depDateStr) : 'This week';
+  const defaultDep = new Date(Date.now() + 3 * 86_400_000);
 
-      const entry: TickerEntry = {
-        origin:           r.origin,
-        destination:      r.destination,
-        originCity:       cityMap[r.origin]      ?? r.origin,
-        destinationCity:  cityMap[r.destination] ?? r.destination,
-        priceGbp:         live.priceGbp,
-        airlineName:      live.airline,
-        rating:           4.2,
-        recommendation:   label,
-        opportunityScore: 68,
-        updatedAt:        now,
-        bookingUrl:       aviasalesUrl(r.origin, r.destination, live.depDate),
-        departureDate:    live.depDateStr || undefined,
-      };
-      return [entry];
-    });
+  const entries: TickerEntry[] = routes.flatMap((r, i) => {
+    const live     = liveResults[i].status === 'fulfilled' ? liveResults[i].value : null;
+    const fallback = fallbackMap[`${r.origin}-${r.destination}`];
+
+    // Need at least one price source to show the card
+    const priceGbp   = live?.priceGbp   ?? fallback?.price;
+    const airlineN   = live?.airline     ?? fallback?.airline ?? r.destination;
+    if (!priceGbp) return [];
+
+    const depDate    = live?.depDate    ?? defaultDep;
+    const depDateStr = live?.depDateStr ?? '';
+    const label      = depDateStr ? formatDate(depDateStr) : 'This week';
+
+    const entry: TickerEntry = {
+      origin:           r.origin,
+      destination:      r.destination,
+      originCity:       cityMap[r.origin]      ?? r.origin,
+      destinationCity:  cityMap[r.destination] ?? r.destination,
+      priceGbp,
+      airlineName:      airlineN,
+      rating:           4.2,
+      recommendation:   label,
+      opportunityScore: live ? 68 : 50,
+      updatedAt:        now,
+      bookingUrl:       aviasalesUrl(r.origin, r.destination, depDate),
+      departureDate:    depDateStr || undefined,
+    };
+    return [entry];
+  });
 
   return NextResponse.json({ entries, updatedAt: now });
 }
