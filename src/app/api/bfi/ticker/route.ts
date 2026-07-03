@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import type { TickerEntry } from '@/lib/bfi/types';
 
 export const revalidate = 1800; // refresh every 30 min
@@ -55,7 +54,6 @@ async function cheapestThisWeek(
   const thisMonth = today.toISOString().slice(0, 7);
   const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1).toISOString().slice(0, 7);
 
-  // Fetch current month + next month in parallel so early searches next month are covered
   const [r1, r2] = await Promise.all([
     fetchCheap(origin, destination, thisMonth, token),
     fetchCheap(origin, destination, nextMonth, token),
@@ -103,7 +101,7 @@ async function fetchCheap(
 
     const flights: BestFlight[] = [];
     for (const [code, f] of Object.entries(data)) {
-      const price  = Math.round(f.price ?? 0);
+      const price   = Math.round(f.price ?? 0);
       const rawDate = f.depart_date ?? f.departure_at ?? '';
       if (!price || !rawDate) continue;
       const depDate = new Date(rawDate.slice(0, 10) + 'T12:00:00Z');
@@ -116,70 +114,52 @@ async function fetchCheap(
   }
 }
 
+// Routes to feature in the ticker — London↔Lagos are first and most prominent
+const ROUTES = [
+  { origin: 'LHR', destination: 'LOS', originCity: 'London',     destinationCity: 'Lagos',        fallbackPrice: 318, fallbackAirline: 'Air Peace' },
+  { origin: 'LOS', destination: 'LHR', originCity: 'Lagos',      destinationCity: 'London',       fallbackPrice: 295, fallbackAirline: 'Air Peace' },
+  { origin: 'LHR', destination: 'ACC', originCity: 'London',     destinationCity: 'Accra',        fallbackPrice: 374, fallbackAirline: 'British Airways' },
+  { origin: 'LHR', destination: 'ABV', originCity: 'London',     destinationCity: 'Abuja',        fallbackPrice: 348, fallbackAirline: 'Turkish Airlines' },
+  { origin: 'LHR', destination: 'KGL', originCity: 'London',     destinationCity: 'Kigali',       fallbackPrice: 442, fallbackAirline: 'RwandAir' },
+  { origin: 'LHR', destination: 'NBO', originCity: 'London',     destinationCity: 'Nairobi',      fallbackPrice: 418, fallbackAirline: 'Kenya Airways' },
+  { origin: 'LGW', destination: 'DXB', originCity: 'London',     destinationCity: 'Dubai',        fallbackPrice: 262, fallbackAirline: 'Emirates' },
+  { origin: 'MAN', destination: 'LOS', originCity: 'Manchester', destinationCity: 'Lagos',        fallbackPrice: 336, fallbackAirline: 'Air Peace' },
+  { origin: 'LHR', destination: 'JNB', originCity: 'London',     destinationCity: 'Johannesburg', fallbackPrice: 475, fallbackAirline: 'British Airways' },
+  { origin: 'LHR', destination: 'CMN', originCity: 'London',     destinationCity: 'Casablanca',   fallbackPrice: 175, fallbackAirline: 'Royal Air Maroc' },
+];
+
 export async function GET() {
   const now = new Date().toISOString();
-  const db  = createSupabaseAdminClient();
 
-  // Pull enabled routes and airport names straight from the DB — no hardcoding
-  const [{ data: dbRoutes }, { data: airports }] = await Promise.all([
-    db.from('bfi_routes').select('origin, destination').eq('enabled', true).order('priority', { ascending: false }),
-    db.from('bfi_airports').select('code, city'),
-  ]);
+  const results = await Promise.allSettled(
+    ROUTES.map(r => cheapestThisWeek(r.origin, r.destination, 7))
+  );
 
-  const routes = dbRoutes ?? [];
-  if (!routes.length) return NextResponse.json({ entries: [], updatedAt: now });
+  const entries: TickerEntry[] = ROUTES.map((r, i) => {
+    const live = results[i].status === 'fulfilled' ? results[i].value : null;
 
-  const cityMap: Record<string, string> = {};
-  for (const a of airports ?? []) cityMap[a.code] = a.city;
-
-  // Fetch live TravelPayouts prices + most recent DB offer prices in parallel
-  const [liveResults, { data: recentOffers }] = await Promise.all([
-    Promise.allSettled(routes.map(r => cheapestThisWeek(r.origin, r.destination, 7))),
-    db.from('bfi_flight_offers')
-      .select('origin, destination, price_gbp, airline_name, scanned_at')
-      .in('origin',      routes.map(r => r.origin))
-      .in('destination', routes.map(r => r.destination))
-      .order('scanned_at', { ascending: false })
-      .limit(100),
-  ]);
-
-  // Build a fallback price map from the most recent DB offer per route
-  const fallbackMap: Record<string, { price: number; airline: string }> = {};
-  for (const o of recentOffers ?? []) {
-    const key = `${o.origin}-${o.destination}`;
-    if (!fallbackMap[key]) fallbackMap[key] = { price: o.price_gbp, airline: o.airline_name };
-  }
-
-  const defaultDep = new Date(Date.now() + 3 * 86_400_000);
-
-  const entries: TickerEntry[] = routes.flatMap((r, i) => {
-    const live     = liveResults[i].status === 'fulfilled' ? liveResults[i].value : null;
-    const fallback = fallbackMap[`${r.origin}-${r.destination}`];
-
-    // Need at least one price source to show the card
-    const priceGbp   = live?.priceGbp   ?? fallback?.price;
-    const airlineN   = live?.airline     ?? fallback?.airline ?? r.destination;
-    if (!priceGbp) return [];
-
-    const depDate    = live?.depDate    ?? defaultDep;
+    const priceGbp   = live?.priceGbp   ?? r.fallbackPrice;
+    const airlineN   = live?.airline    ?? r.fallbackAirline;
     const depDateStr = live?.depDateStr ?? '';
-    const label      = depDateStr ? formatDate(depDateStr) : 'This week';
+    const depDate    = live?.depDate    ?? new Date(Date.now() + 3 * 86_400_000);
+    const isLive     = !!live;
 
-    const entry: TickerEntry = {
+    const label = depDateStr ? formatDate(depDateStr) : 'This week';
+
+    return {
       origin:           r.origin,
       destination:      r.destination,
-      originCity:       cityMap[r.origin]      ?? r.origin,
-      destinationCity:  cityMap[r.destination] ?? r.destination,
+      originCity:       r.originCity,
+      destinationCity:  r.destinationCity,
       priceGbp,
       airlineName:      airlineN,
       rating:           4.2,
       recommendation:   label,
-      opportunityScore: live ? 68 : 50,
+      opportunityScore: isLive ? 68 : 50,
       updatedAt:        now,
       bookingUrl:       aviasalesUrl(r.origin, r.destination, depDate),
       departureDate:    depDateStr || undefined,
     };
-    return [entry];
   });
 
   return NextResponse.json({ entries, updatedAt: now });

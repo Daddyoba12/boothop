@@ -16,9 +16,12 @@ function Stars({ rating }: { rating: number }) {
 function TickerCard({ entry }: { entry: TickerEntry }) {
   const isGood    = entry.opportunityScore >= 65;
   const routeSlug = `${entry.origin}-${entry.destination}`.toLowerCase();
+  const href      = entry.bookingUrl ?? `/flights/${routeSlug}`;
   return (
     <a
-      href={`/flights/${routeSlug}`}
+      href={href}
+      target={entry.bookingUrl ? '_blank' : undefined}
+      rel={entry.bookingUrl ? 'noopener noreferrer' : undefined}
       className="inline-flex items-center gap-2.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-blue-500/40 rounded-xl px-3.5 py-2 min-w-[195px] transition-all duration-200 group"
     >
       {/* Left: route + price + airline */}
@@ -29,13 +32,13 @@ function TickerCard({ entry }: { entry: TickerEntry }) {
         <p className="text-base font-extrabold text-white leading-tight">£{entry.priceGbp.toFixed(0)}</p>
         <p className="text-[9px] text-gray-500 truncate max-w-[110px] leading-none mt-0.5">{entry.airlineName}</p>
       </div>
-      {/* Right: depart label + View button */}
+      {/* Right: depart date badge + Book now button */}
       <div className="text-right shrink-0 flex flex-col items-end gap-1">
         <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${isGood ? 'bg-green-500/15 text-green-400' : 'bg-amber-500/15 text-amber-400'}`}>
           {entry.recommendation}
         </span>
         <span className="text-[9px] bg-blue-600 group-hover:bg-blue-500 text-white transition-colors font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
-          View →
+          Book now →
         </span>
       </div>
     </a>
