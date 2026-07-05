@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import {
   CheckCircle, XCircle, AlertTriangle, Clock,
-  Loader2, RefreshCw, DollarSign, Truck, Scale, Globe,
+  Loader2, RefreshCw, DollarSign, Truck, Scale, Globe, Zap,
 } from 'lucide-react';
 
 type Match = {
@@ -55,6 +55,29 @@ export default function AdminHubClient() {
   const [resolutionVal, setResolutionVal] = useState('pay_carrier');
   const [noteVal,       setNoteVal]       = useState('');
   const [feedback,      setFeedback]      = useState<string | null>(null);
+  const [matchRunning,  setMatchRunning]  = useState(false);
+  const [matchResult,   setMatchResult]   = useState<string | null>(null);
+
+  const runMatch = async () => {
+    setMatchRunning(true);
+    setMatchResult(null);
+    try {
+      const res  = await fetch('/api/cron/auto-match', { method: 'POST' });
+      const json = await res.json();
+      if (res.ok) {
+        const created = json.matched ?? json.matches_created ?? 0;
+        setMatchResult(created > 0
+          ? `Match run complete — ${created} new match${created !== 1 ? 'es' : ''} created. Emails sent.`
+          : 'Match run complete — no new matches found right now.');
+        if (created > 0) load();
+      } else {
+        setMatchResult(`Error: ${json.error ?? 'Match run failed'}`);
+      }
+    } catch (e) {
+      setMatchResult('Network error — match run failed.');
+    }
+    setMatchRunning(false);
+  };
 
   const load = async () => {
     setLoading(true);
@@ -128,15 +151,34 @@ export default function AdminHubClient() {
           <span className="text-xl font-bold">Boot<span className="text-blue-400">Hop</span></span>
           <span className="text-xs bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-full font-semibold uppercase tracking-wide">Admin Hub</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={runMatch}
+            disabled={matchRunning}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all"
+          >
+            {matchRunning ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+            {matchRunning ? 'Running…' : 'Run Match Now'}
+          </button>
           <a href="/admin" className="text-white/40 hover:text-white text-xs transition-colors">← Admin</a>
-          <button onClick={load} className="text-white/40 hover:text-white transition-colors ml-2">
+          <button onClick={load} className="text-white/40 hover:text-white transition-colors">
             <RefreshCw className="h-4 w-4" />
           </button>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
+
+        {matchResult && (
+          <div className={`mb-4 rounded-xl border px-5 py-3 text-sm flex items-center justify-between ${
+            matchResult.startsWith('Error') || matchResult.startsWith('Network')
+              ? 'bg-red-500/20 border-red-500/30 text-red-300'
+              : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
+          }`}>
+            <span><Zap className="h-4 w-4 inline mr-2 opacity-70" />{matchResult}</span>
+            <button onClick={() => setMatchResult(null)} className="ml-4 opacity-60 hover:opacity-100">✕</button>
+          </div>
+        )}
 
         {feedback && (
           <div className="mb-6 rounded-xl bg-green-500/20 border border-green-500/30 px-5 py-3 text-green-300 text-sm flex items-center justify-between">
