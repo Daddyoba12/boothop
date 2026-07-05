@@ -32,8 +32,7 @@ export default function JourneyDetail({
   const [actionResult, setActionResult] = useState<string | null>(null);
 
   const [showUpdate, setShowUpdate]     = useState(false);
-  const [updateField, setUpdateField]   = useState('status');
-  const [updateValue, setUpdateValue]   = useState('');
+  const [editForm, setEditForm]         = useState<Record<string, string>>({});
   const [updateReason, setUpdateReason] = useState('');
   const [updateBusy, setUpdateBusy]     = useState(false);
 
@@ -49,21 +48,53 @@ export default function JourneyDetail({
 
   const isTraveller = trip.type === 'travel' || trip.type === 'traveller';
 
+  const openUpdate = () => {
+    setEditForm({
+      status:          trip.status          ?? '',
+      type:            trip.type            ?? '',
+      email:           trip.email           ?? '',
+      from_city:       trip.from_city       ?? '',
+      to_city:         trip.to_city         ?? '',
+      from_city_en:    trip.from_city_en    ?? '',
+      to_city_en:      trip.to_city_en      ?? '',
+      travel_date:     trip.travel_date ? (trip.travel_date as string).split('T')[0] : '',
+      weight:          trip.weight          != null ? String(trip.weight)          : '',
+      weight_capacity: trip.weight_capacity != null ? String(trip.weight_capacity) : '',
+      price:           trip.price           != null ? String(trip.price)           : '',
+      asking_price:    trip.asking_price    != null ? String(trip.asking_price)    : '',
+    });
+    setUpdateReason('');
+    setShowUpdate(true);
+  };
+
   const handleUpdate = async () => {
-    if (!updateValue || updateReason.trim().length < 10) return;
+    if (updateReason.trim().length < 10) return;
     setUpdateBusy(true);
     try {
-      const res  = await fetch(`/api/admin/journeys/${trip.id}/update`, {
+      const changed: Record<string, string | null> = {};
+      for (const [k, v] of Object.entries(editForm)) {
+        const orig = k === 'travel_date' && trip[k]
+          ? String(trip[k]).split('T')[0]
+          : String(trip[k] ?? '');
+        if (v !== orig) changed[k] = v === '' ? null : v;
+      }
+      if (Object.keys(changed).length === 0) {
+        setShowUpdate(false);
+        setActionResult('No changes detected.');
+        setUpdateBusy(false);
+        return;
+      }
+      const res = await fetch(`/api/admin/journeys/${trip.id}/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ field: updateField, value: updateValue, reason: updateReason }),
+        body: JSON.stringify({ fields: changed, reason: updateReason }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      setTrip((prev: any) => ({ ...prev, [updateField]: updateValue }));
+      setTrip((prev: any) => ({ ...prev, ...changed }));
       setShowUpdate(false);
       setUpdateReason('');
-      setUpdateValue('');
+      setEditForm({});
       setActionResult('✅ Journey updated successfully.');
     } catch (err: any) {
       setShowUpdate(false);
@@ -312,10 +343,10 @@ export default function JourneyDetail({
         <div className="sticky bottom-0 z-20 bg-slate-900/95 backdrop-blur-xl border-t border-white/10">
           <div className="max-w-5xl mx-auto px-4 md:px-6 py-4 flex gap-3">
             <button
-              onClick={() => { setUpdateField('status'); setUpdateValue(''); setUpdateReason(''); setShowUpdate(true); }}
+              onClick={openUpdate}
               className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-blue-600/80 hover:bg-blue-600 text-white rounded-xl font-semibold transition-all"
             >
-              <Edit2 className="w-4 h-4" /> Update Journey
+              <Edit2 className="w-4 h-4" /> Edit Journey
             </button>
             <button
               onClick={() => { setDeleteReason(''); setShowDelete(true); }}
@@ -328,98 +359,163 @@ export default function JourneyDetail({
       )}
 
       {/* ══════════════════════════════════════════════════════════════════
-          UPDATE MODAL
+          EDIT MODAL — all fields
       ══════════════════════════════════════════════════════════════════ */}
       {showUpdate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowUpdate(false)} />
-          <div className="relative w-full max-w-md bg-gradient-to-br from-slate-900 to-blue-950/60 border border-blue-400/30 rounded-3xl shadow-2xl overflow-hidden">
-            <div className="px-8 py-5 border-b border-white/10 flex items-center gap-3">
+          <div className="relative w-full max-w-lg bg-gradient-to-br from-slate-900 to-blue-950/60 border border-blue-400/30 rounded-3xl shadow-2xl flex flex-col max-h-[90vh]">
+
+            {/* header */}
+            <div className="px-8 py-5 border-b border-white/10 flex items-center gap-3 shrink-0">
               <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
                 <Edit2 className="w-5 h-5 text-blue-400" />
               </div>
               <div>
-                <h3 className="text-white font-bold text-lg">Update Journey</h3>
+                <h3 className="text-white font-bold text-lg">Edit Journey</h3>
                 <p className="text-white/50 text-xs">{trip.from_city} → {trip.to_city}</p>
               </div>
               <button onClick={() => setShowUpdate(false)} className="ml-auto p-1.5 hover:bg-white/10 rounded-lg">
                 <X className="w-5 h-5 text-white/50" />
               </button>
             </div>
-            <div className="px-8 py-6 space-y-5">
-              <div>
-                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">Field to Update</label>
-                <select
-                  value={updateField}
-                  onChange={e => { setUpdateField(e.target.value); setUpdateValue(''); }}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none cursor-pointer"
-                >
-                  <option value="status">Status</option>
-                  <option value="weight">Weight (kg)</option>
-                  <option value="price">Price (£)</option>
-                  <option value="travel_date">Travel Date</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">New Value</label>
-                {updateField === 'status' ? (
-                  <select
-                    value={updateValue}
-                    onChange={e => setUpdateValue(e.target.value)}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none cursor-pointer"
-                  >
-                    <option value="">Select status...</option>
+
+            {/* scrollable body */}
+            <div className="flex-1 overflow-y-auto px-8 py-6 space-y-4">
+
+              {/* Status + Type */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Status</label>
+                  <select value={editForm.status ?? ''} onChange={e => setEditForm(f => ({ ...f, status: e.target.value }))}
+                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm appearance-none cursor-pointer">
                     <option value="active">Active</option>
                     <option value="matched">Matched</option>
+                    <option value="awaiting_authorisation">Awaiting Authorisation</option>
                     <option value="completed">Completed</option>
                     <option value="expired">Expired</option>
                     <option value="cancelled">Cancelled</option>
+                    <option value="inactive">Inactive</option>
                   </select>
-                ) : updateField === 'travel_date' ? (
-                  <input
-                    type="date"
-                    value={updateValue}
-                    onChange={e => setUpdateValue(e.target.value)}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  />
-                ) : (
-                  <input
-                    type="number"
-                    value={updateValue}
-                    onChange={e => setUpdateValue(e.target.value)}
-                    placeholder={updateField === 'weight' ? 'e.g. 10' : 'e.g. 80'}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  />
-                )}
+                </div>
+                <div>
+                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Type</label>
+                  <select value={editForm.type ?? ''} onChange={e => setEditForm(f => ({ ...f, type: e.target.value }))}
+                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm appearance-none cursor-pointer">
+                    <option value="travel">Traveller</option>
+                    <option value="traveller">Traveller (alt)</option>
+                    <option value="send">Sender</option>
+                  </select>
+                </div>
               </div>
+
+              {/* Email */}
               <div>
-                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">
-                  Reason <span className="text-red-400">*</span>
+                <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Email</label>
+                <input type="email" value={editForm.email ?? ''} onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))}
+                  className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+              </div>
+
+              {/* From + To City */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">From City</label>
+                  <input type="text" value={editForm.from_city ?? ''} onChange={e => setEditForm(f => ({ ...f, from_city: e.target.value }))}
+                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                </div>
+                <div>
+                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">To City</label>
+                  <input type="text" value={editForm.to_city ?? ''} onChange={e => setEditForm(f => ({ ...f, to_city: e.target.value }))}
+                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                </div>
+              </div>
+
+              {/* From + To City (English) */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">From (English)</label>
+                  <input type="text" value={editForm.from_city_en ?? ''} onChange={e => setEditForm(f => ({ ...f, from_city_en: e.target.value }))}
+                    placeholder="English name"
+                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                </div>
+                <div>
+                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">To (English)</label>
+                  <input type="text" value={editForm.to_city_en ?? ''} onChange={e => setEditForm(f => ({ ...f, to_city_en: e.target.value }))}
+                    placeholder="English name"
+                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                </div>
+              </div>
+
+              {/* Travel Date */}
+              <div>
+                <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Travel Date</label>
+                <input type="date" value={editForm.travel_date ?? ''} onChange={e => setEditForm(f => ({ ...f, travel_date: e.target.value }))}
+                  className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+              </div>
+
+              {/* Weight + Capacity */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Weight (kg)</label>
+                  <input type="number" min="0" step="0.1" value={editForm.weight ?? ''} onChange={e => setEditForm(f => ({ ...f, weight: e.target.value }))}
+                    placeholder="0"
+                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                </div>
+                <div>
+                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Capacity (kg)</label>
+                  <input type="number" min="0" step="0.1" value={editForm.weight_capacity ?? ''} onChange={e => setEditForm(f => ({ ...f, weight_capacity: e.target.value }))}
+                    placeholder="0"
+                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                </div>
+              </div>
+
+              {/* Price + Asking Price */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Price (£)</label>
+                  <input type="number" min="0" step="0.01" value={editForm.price ?? ''} onChange={e => setEditForm(f => ({ ...f, price: e.target.value }))}
+                    placeholder="0.00"
+                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                </div>
+                <div>
+                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Asking Price (£)</label>
+                  <input type="number" min="0" step="0.01" value={editForm.asking_price ?? ''} onChange={e => setEditForm(f => ({ ...f, asking_price: e.target.value }))}
+                    placeholder="0.00"
+                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                </div>
+              </div>
+
+              {/* Reason */}
+              <div>
+                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-1.5">
+                  Reason for change <span className="text-red-400">*</span>
                 </label>
                 <textarea
-                  rows={3}
+                  rows={2}
                   value={updateReason}
                   onChange={e => setUpdateReason(e.target.value)}
                   placeholder="Why is this being changed?..."
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none text-sm"
                 />
-                <p className={`text-xs mt-1.5 ${updateReason.trim().length >= 10 ? 'text-green-400' : 'text-red-400'}`}>
+                <p className={`text-xs mt-1 ${updateReason.trim().length >= 10 ? 'text-green-400' : 'text-red-400'}`}>
                   {updateReason.trim().length} / 10 min characters
                 </p>
               </div>
-              <div className="flex gap-3 pt-1">
-                <button onClick={() => setShowUpdate(false)} className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all">
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUpdate}
-                  disabled={!updateValue || updateReason.trim().length < 10 || updateBusy}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-blue-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {updateBusy ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                  {updateBusy ? 'Updating...' : 'Confirm Update'}
-                </button>
-              </div>
+            </div>
+
+            {/* footer */}
+            <div className="px-8 py-4 border-t border-white/10 flex gap-3 shrink-0">
+              <button onClick={() => setShowUpdate(false)} className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all">
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdate}
+                disabled={updateReason.trim().length < 10 || updateBusy}
+                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-blue-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {updateBusy ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                {updateBusy ? 'Saving...' : 'Save Changes'}
+              </button>
             </div>
           </div>
         </div>
