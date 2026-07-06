@@ -27,7 +27,7 @@ export default async function MusicPage() {
 
   return (
     <div className="min-h-screen bg-[#07111f] text-white">
-      <CommanderNav company={session.company} slug={session.slug} />
+      <CommanderNav company={session.company} slug={session.slug} isSuper={session.isSuper} />
       <MusicManager
         clientId={session.clientId}
         library={library ?? []}
