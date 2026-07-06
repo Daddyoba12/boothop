@@ -46,7 +46,7 @@ function Badge({ status }: { status: string }) {
 }
 
 export default function AdminHubClient() {
-  const [tab,           setTab]           = useState<'africa_auth' | 'payments' | 'disputes' | 'refunds'>('africa_auth');
+  const [tab,           setTab]           = useState<'africa_auth' | 'payments' | 'disputes' | 'refunds' | 'commander'>('africa_auth');
   const [matches,       setMatches]       = useState<Match[]>([]);
   const [disputes,      setDisputes]      = useState<Dispute[]>([]);
   const [loading,       setLoading]       = useState(true);
@@ -57,6 +57,42 @@ export default function AdminHubClient() {
   const [feedback,      setFeedback]      = useState<string | null>(null);
   const [matchRunning,  setMatchRunning]  = useState(false);
   const [matchResult,   setMatchResult]   = useState<string | null>(null);
+
+  // Commander account creation
+  const [cmdCompany,    setCmdCompany]    = useState('');
+  const [cmdSlug,       setCmdSlug]       = useState('');
+  const [cmdEmail,      setCmdEmail]      = useState('');
+  const [cmdPassword,   setCmdPassword]   = useState('');
+  const [cmdPlan,       setCmdPlan]       = useState('basic');
+  const [cmdBusy,       setCmdBusy]       = useState(false);
+  const [cmdResult,     setCmdResult]     = useState<string | null>(null);
+  const [cmdClients,    setCmdClients]    = useState<{ id: string; slug: string; company: string; email: string; plan: string; status: string; created_at: string }[]>([]);
+
+  const loadCmdClients = async () => {
+    const res = await fetch('/api/admin/commander/clients');
+    if (res.ok) setCmdClients((await res.json()).clients ?? []);
+  };
+
+  const createCmdAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (cmdPassword.length < 8) { setCmdResult('❌ Password must be at least 8 characters.'); return; }
+    setCmdBusy(true); setCmdResult(null);
+    try {
+      const res = await fetch('/api/commander/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-key': 'Devastation3241@@' },
+        body: JSON.stringify({ company: cmdCompany, slug: cmdSlug, email: cmdEmail, password: cmdPassword, plan: cmdPlan }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? 'Failed');
+      setCmdResult(`✅ Account created — Company ID: ${cmdSlug}`);
+      setCmdCompany(''); setCmdSlug(''); setCmdEmail(''); setCmdPassword('');
+      loadCmdClients();
+    } catch (err: any) {
+      setCmdResult(`❌ ${err.message}`);
+    }
+    setCmdBusy(false);
+  };
 
   const runMatch = async () => {
     setMatchRunning(true);
@@ -93,6 +129,7 @@ export default function AdminHubClient() {
   };
 
   useEffect(() => { load(); }, []);
+  useEffect(() => { if (tab === 'commander') loadCmdClients(); }, [tab]);
 
   const confirmPayment = async (matchId: string) => {
     setActionLoading(matchId);
@@ -211,6 +248,7 @@ export default function AdminHubClient() {
             ['payments',    'Payments'],
             ['disputes',    'Disputes'],
             ['refunds',     'Refunds'],
+            ['commander',   'Commander'],
           ] as const).map(([key, label]) => (
             <button
               key={key}
@@ -420,6 +458,86 @@ export default function AdminHubClient() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+            {/* ── COMMANDER TAB ── */}
+            {tab === 'commander' && (
+              <div className="space-y-8">
+                {/* Create account form */}
+                <div className="rounded-2xl border border-orange-500/20 bg-orange-500/5 p-6">
+                  <h2 className="text-white font-bold text-sm uppercase tracking-wide mb-1">Create Commander Account</h2>
+                  <p className="text-white/40 text-xs mb-5">Accounts are invite-only. Fill this form to provision access for a client.</p>
+                  {cmdResult && (
+                    <div className={`mb-4 rounded-xl border px-4 py-3 text-sm ${cmdResult.startsWith('✅') ? 'bg-green-500/10 border-green-500/20 text-green-300' : 'bg-red-500/10 border-red-500/20 text-red-300'}`}>
+                      {cmdResult}
+                    </div>
+                  )}
+                  <form onSubmit={createCmdAccount} className="grid grid-cols-2 gap-4">
+                    <div className="col-span-2">
+                      <label className="block text-white/50 text-xs font-semibold uppercase tracking-wide mb-1.5">Company Name *</label>
+                      <input type="text" value={cmdCompany} required onChange={e => {
+                        setCmdCompany(e.target.value);
+                        if (!cmdSlug) setCmdSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
+                      }} placeholder="Acme Media"
+                        className="w-full px-3 py-2.5 bg-white/5 border border-white/10 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-white/50 text-xs font-semibold uppercase tracking-wide mb-1.5">Company ID (slug) *</label>
+                      <input type="text" value={cmdSlug} required onChange={e => setCmdSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                        placeholder="acme-media"
+                        className="w-full px-3 py-2.5 bg-white/5 border border-white/10 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm" />
+                      <p className="text-white/25 text-[10px] mt-1">This is their login username — cannot be changed.</p>
+                    </div>
+                    <div>
+                      <label className="block text-white/50 text-xs font-semibold uppercase tracking-wide mb-1.5">Email</label>
+                      <input type="email" value={cmdEmail} onChange={e => setCmdEmail(e.target.value)} placeholder="john@acme.com"
+                        className="w-full px-3 py-2.5 bg-white/5 border border-white/10 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-white/50 text-xs font-semibold uppercase tracking-wide mb-1.5">Password *</label>
+                      <input type="text" value={cmdPassword} required onChange={e => setCmdPassword(e.target.value)} placeholder="Min 8 characters"
+                        className="w-full px-3 py-2.5 bg-white/5 border border-white/10 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-white/50 text-xs font-semibold uppercase tracking-wide mb-1.5">Plan</label>
+                      <select value={cmdPlan} onChange={e => setCmdPlan(e.target.value)}
+                        className="w-full px-3 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm appearance-none cursor-pointer">
+                        <option value="basic" className="bg-slate-900">Basic</option>
+                        <option value="pro" className="bg-slate-900">Pro</option>
+                      </select>
+                    </div>
+                    <div className="col-span-2">
+                      <button type="submit" disabled={cmdBusy}
+                        className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-black font-bold rounded-xl text-sm disabled:opacity-60 transition-all hover:shadow-lg">
+                        {cmdBusy ? 'Creating…' : 'Create Commander Account →'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* Existing accounts */}
+                <div>
+                  <h2 className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-3">Existing Accounts ({cmdClients.length})</h2>
+                  {cmdClients.length === 0
+                    ? <p className="text-white/30 text-sm text-center py-8">No Commander accounts yet.</p>
+                    : (
+                      <div className="space-y-3">
+                        {cmdClients.map(c => (
+                          <div key={c.id} className="rounded-xl border border-white/10 bg-white/5 px-5 py-4 flex items-center justify-between">
+                            <div>
+                              <p className="text-white font-semibold text-sm">{c.company}</p>
+                              <p className="text-white/40 text-xs mt-0.5">slug: <span className="text-orange-400 font-mono">{c.slug}</span> · {c.email || 'no email'}</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${c.plan === 'pro' ? 'bg-orange-500/20 text-orange-400' : 'bg-white/10 text-white/40'}`}>{c.plan}</span>
+                              <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${c.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>{c.status}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  }
+                </div>
               </div>
             )}
           </>

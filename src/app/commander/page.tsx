@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import BootHopLogo from '@/components/BootHopLogo';
 
-type Tab = 'login' | 'register' | 'reset';
+type Tab = 'login' | 'reset';
 
 export default function CommanderPage() {
   const router    = useRouter();
@@ -17,15 +17,6 @@ export default function CommanderPage() {
   // Login state
   const [slug, setSlug]         = useState('');
   const [password, setPassword] = useState('');
-
-  // Register state
-  const [company, setCompany]         = useState('');
-  const [regSlug, setRegSlug]         = useState('');
-  const [regEmail, setRegEmail]       = useState('');
-  const [contactName, setContactName] = useState('');
-  const [regPassword, setRegPassword] = useState('');
-  const [regPassword2, setRegPassword2] = useState('');
-  const [plan, setPlan]               = useState('basic');
 
   // Reset state
   const [resetEmail, setResetEmail] = useState('');
@@ -43,24 +34,6 @@ export default function CommanderPage() {
     const data = await res.json();
     setLoading(false);
     if (!res.ok) { setError(data.error ?? 'Login failed'); return; }
-    router.push('/commander/dashboard');
-  }
-
-  async function handleRegister(e: React.FormEvent) {
-    e.preventDefault();
-    if (regPassword !== regPassword2) { setError('Passwords do not match'); return; }
-    setError(''); setLoading(true);
-    const res = await fetch('/api/commander/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        company, slug: regSlug, email: regEmail,
-        contact_name: contactName, password: regPassword, plan,
-      }),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) { setError(data.error ?? 'Registration failed'); return; }
     router.push('/commander/dashboard');
   }
 
@@ -98,12 +71,12 @@ export default function CommanderPage() {
 
         {/* Tab bar */}
         <div className="flex bg-white/[0.04] border border-white/8 rounded-xl p-1 mb-6">
-          {(['login', 'register', 'reset'] as Tab[]).map(t => (
+          {(['login', 'reset'] as Tab[]).map(t => (
             <button key={t} onClick={() => switchTab(t)}
               className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all capitalize ${
                 tab === t ? 'bg-orange-500 text-black shadow-md' : 'text-white/35 hover:text-white/60'
               }`}>
-              {t === 'reset' ? 'Reset Password' : t === 'register' ? 'Create Account' : 'Sign In'}
+              {t === 'reset' ? 'Reset Password' : 'Sign In'}
             </button>
           ))}
         </div>
@@ -127,59 +100,6 @@ export default function CommanderPage() {
               <button type="submit" disabled={loading}
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-black font-bold text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(249,115,22,0.4)] disabled:opacity-60">
                 {loading ? 'Signing in…' : 'Sign in →'}
-              </button>
-            </form>
-          )}
-
-          {/* ── REGISTER ── */}
-          {tab === 'register' && (
-            <form onSubmit={handleRegister} className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="col-span-2">
-                  <label className={label}>Company / Business Name *</label>
-                  <input type="text" value={company} onChange={e => {
-                    setCompany(e.target.value);
-                    if (!regSlug) setRegSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
-                  }} placeholder="Acme Media" className={input} required />
-                </div>
-                <div className="col-span-2">
-                  <label className={label}>Company ID (your login username) *</label>
-                  <input type="text" value={regSlug} onChange={e => setRegSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                    placeholder="acme-media" autoComplete="username" className={input} required />
-                  <p className="text-[10px] text-white/25 mt-1">Letters, numbers and hyphens only. Cannot be changed.</p>
-                </div>
-                <div>
-                  <label className={label}>Contact Name</label>
-                  <input type="text" value={contactName} onChange={e => setContactName(e.target.value)}
-                    placeholder="John Smith" className={input} />
-                </div>
-                <div>
-                  <label className={label}>Email</label>
-                  <input type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)}
-                    placeholder="john@acme.com" autoComplete="email" className={input} />
-                </div>
-                <div>
-                  <label className={label}>Password *</label>
-                  <input type="password" value={regPassword} onChange={e => setRegPassword(e.target.value)}
-                    placeholder="Min 8 characters" autoComplete="new-password" className={input} required />
-                </div>
-                <div>
-                  <label className={label}>Confirm Password *</label>
-                  <input type="password" value={regPassword2} onChange={e => setRegPassword2(e.target.value)}
-                    placeholder="Repeat password" autoComplete="new-password" className={input} required />
-                </div>
-                <div className="col-span-2">
-                  <label className={label}>Plan</label>
-                  <select value={plan} onChange={e => setPlan(e.target.value)} className={input}>
-                    <option value="basic" className="bg-slate-900">Basic</option>
-                    <option value="pro" className="bg-slate-900">Pro</option>
-                  </select>
-                </div>
-              </div>
-              {error && <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{error}</p>}
-              <button type="submit" disabled={loading}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-black font-bold text-sm transition-all hover:-translate-y-0.5 disabled:opacity-60">
-                {loading ? 'Creating account…' : 'Create Account →'}
               </button>
             </form>
           )}

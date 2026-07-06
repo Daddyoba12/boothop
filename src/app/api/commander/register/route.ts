@@ -3,6 +3,12 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { hashPassword, signCommanderSession, getCommanderCookieName } from '@/lib/auth/commander';
 
 export async function POST(req: NextRequest) {
+  // Only BootHop admins can create Commander accounts
+  const adminKey = req.headers.get('x-admin-key') ?? req.nextUrl.searchParams.get('adminKey');
+  if (!adminKey || adminKey !== process.env.ADMIN_SECRET) {
+    return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
+  }
+
   const { company, slug, email, contact_name, password, plan } = await req.json();
 
   if (!company || !slug || !password)
