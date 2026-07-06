@@ -90,7 +90,9 @@
       "PowerShell(vercel domains *)",
       "PowerShell(vercel projects *)",
       "Bash(nslookup *)",
-      "PowerShell(cd \"C:\\\\users\\\\babso\\\\desktop\\\\OTB_Pipeline\"; git status --short | Where-Object { $_ -match \"^\\\\?\\\\?\" })"
+      "PowerShell(cd \"C:\\\\users\\\\babso\\\\desktop\\\\OTB_Pipeline\"; git status --short | Where-Object { $_ -match \"^\\\\?\\\\?\" })",
+      "PowerShell(npm list *)",
+      "PowerShell(npm run *)"
     ]
   }
 }
