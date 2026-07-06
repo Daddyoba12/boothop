@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const db = createSupabaseAdminClient();
   const { data: client } = await db
     .from('pipeline_clients')
-    .select('id, slug, company, email, password_hash, status')
+    .select('id, slug, company, email, password_hash, status, is_super_admin')
     .eq('slug', slug.trim().toLowerCase())
     .single();
 
@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
     slug:     client.slug,
     company:  client.company,
     email:    client.email ?? '',
+    isSuper:  client.is_super_admin ?? false,
   });
 
   const res = NextResponse.json({ ok: true, redirectTo: '/commander/dashboard' });

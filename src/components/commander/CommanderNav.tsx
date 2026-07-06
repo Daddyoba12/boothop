@@ -7,9 +7,10 @@ import { useState } from 'react';
 interface Props {
   company: string;
   slug:    string;
+  isSuper: boolean;
 }
 
-export default function CommanderNav({ company, slug }: Props) {
+export default function CommanderNav({ company, slug, isSuper }: Props) {
   const pathname = usePathname();
   const router   = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -21,7 +22,7 @@ export default function CommanderNav({ company, slug }: Props) {
   }
 
   const links = [
-    { href: '/commander/dashboard', label: 'Dashboard' },
+    { href: '/commander/dashboard', label: isSuper ? 'All Clients' : 'Dashboard' },
     { href: '/commander/music',     label: 'Music' },
   ];
 
@@ -40,6 +41,9 @@ export default function CommanderNav({ company, slug }: Props) {
           </Link>
           <span className="hidden sm:block text-white/15 text-sm">/</span>
           <span className="hidden sm:block text-xs font-semibold text-white/50 truncate max-w-[140px]">{company}</span>
+          {isSuper && (
+            <span className="hidden sm:block text-[9px] font-bold px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 uppercase tracking-wider">Admin</span>
+          )}
         </div>
 
         {/* Nav links */}

@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- boothop-card-final-front.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1050" height="650" viewBox="0 0 1050 650" role="img" aria-label="BootHop business card front">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#071426"/>
+      <stop offset="1" stop-color="#0B2530"/>
+    </linearGradient>
+    <style>
+      .bg { fill: url(#g); }
+      .accent { fill:#FFCC33; }
+      .logoTxt { font-family: Inter, Arial, Helvetica, sans-serif; font-weight:800; font-size:34px; fill:#ffffff; }
+      .logoBlue { fill:#1FB0E0; }
+      .name { font-family: 'Georgia', serif; font-weight:700; font-size:46px; fill:#ffffff; }
+      .title { font-family: Inter, Arial; font-size:14px; fill:#FFCC33; letter-spacing:2px; }
+      .contactLabel { font-family: Inter, Arial; font-size:13px; fill:#CFEAF6; opacity:0.95; }
+      .contactVal { font-family: Inter, Arial; font-size:14px; fill:#FFFFFF; opacity:0.95; }
+      .smallNote { font-family: Inter, Arial; font-size:12px; fill:#CFEAF6; opacity:0.9; }
+      .qrLabel { font-family: Inter, Arial; font-size:13px; fill:#FFCC33; font-weight:700; }
+      .divider { fill:#FFD36C; opacity:0.95; }
+    </style>
+  </defs>
+
+  <rect width="100%" height="100%" class="bg" rx="10" ry="10"/>
+
+  <rect x="40" y="28" width="460" height="6" rx="3" fill="#ffffff" opacity="0.08"/>
+  <g transform="translate(60,40)">
+    <g transform="translate(0,0) scale(0.7)">
+      <circle cx="12" cy="12" r="4" fill="#ffffff"/>
+      <rect x="6" y="18" width="12" height="8" rx="2" fill="#ffffff"/>
+      <rect x="2" y="26" width="20" height="10" rx="2" fill="#ffffff" opacity="0.9"/>
+    </g>
+    <text x="70" y="28" class="logoTxt">Boot<tspan class="logoBlue">Hop</tspan></text>
+  </g>
+
+  <rect x="60" y="110" width="930" height="4" rx="2" class="divider"/>
+
+  <g transform="translate(70,150)">
+    <text class="name">Titi Olufeko</text>
+    <text x="0" y="55" class="title">FOUNDER &amp; CEO</text>
+  </g>
+
+  <g transform="translate(70,250)">
+    <text x="0" y="0" class="contactLabel">M</text>
+    <text x="28" y="0" class="contactVal">+44 7506 553 755</text>
+
+    <text x="0" y="30" class="contactLabel">O</text>
+    <text x="28" y="30" class="contactVal">+44 115 661 2825</text>
+
+    <text x="0" y="60" class="contactLabel">E</text>
+    <text x="28" y="60" class="contactVal">titi.olufeko@boothop.com</text>
+
+    <text x="0" y="90" class="contactLabel">LinkedIn</text>
+    <text x="80" y="90" class="contactVal">Titi Olufeko</text>
+  </g>
+
+  <text x="62" y="600" class="smallNote">boothop.com/business</text>
+
+  <g transform="translate(820,360)">
+    <rect x="-8" y="-8" width="220" height="220" rx="18" fill="#ffffff"/>
+    <image x="0" y="0" width="204" height="204" href="./boothop-qr-titi.png" />
+    <text x="0" y="222" class="qrLabel">Watch 20s demo</text>
+  </g>
+</svg>
+

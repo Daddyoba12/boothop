@@ -8,6 +8,7 @@ export interface CommanderSession {
   slug:     string;
   company:  string;
   email:    string;
+  isSuper:  boolean;
 }
 
 // ── Password hashing ──────────────────────────────────────────────────────────
@@ -49,7 +50,7 @@ export function verifyCommanderSession(token: string): CommanderSession | null {
       issuer:   'boothop',
       audience: 'boothop-commander',
     }) as CommanderSession & { commander: true };
-    return { clientId: p.clientId, slug: p.slug, company: p.company, email: p.email };
+    return { clientId: p.clientId, slug: p.slug, company: p.company, email: p.email, isSuper: p.isSuper ?? false };
   } catch {
     return null;
   }

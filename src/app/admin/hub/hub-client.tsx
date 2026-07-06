@@ -98,7 +98,7 @@ export default function AdminHubClient() {
     setMatchRunning(true);
     setMatchResult(null);
     try {
-      const res  = await fetch('/api/cron/auto-match', { method: 'POST' });
+      const res  = await fetch('/api/cron/auto-match', { method: 'POST', headers: { 'x-admin-key': 'Devastation3241@@' } });
       const json = await res.json();
       if (res.ok) {
         const created = json.matched ?? json.matches_created ?? 0;

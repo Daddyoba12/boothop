@@ -3,12 +3,6 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { hashPassword, signCommanderSession, getCommanderCookieName } from '@/lib/auth/commander';
 
 export async function POST(req: NextRequest) {
-  // Only BootHop admins can create Commander accounts
-  const adminKey = req.headers.get('x-admin-key') ?? req.nextUrl.searchParams.get('adminKey');
-  if (!adminKey || adminKey !== process.env.ADMIN_SECRET) {
-    return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
-  }
-
   const { company, slug, email, contact_name, password, plan } = await req.json();
 
   if (!company || !slug || !password)
@@ -18,6 +12,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 });
 
   const cleanSlug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+
+  if (!cleanSlug)
+    return NextResponse.json({ error: 'Company ID is invalid' }, { status: 400 });
 
   const db = createSupabaseAdminClient();
 
@@ -53,6 +50,7 @@ export async function POST(req: NextRequest) {
     slug:     client.slug,
     company:  client.company,
     email:    client.email ?? '',
+    isSuper:  false,
   });
 
   const res = NextResponse.json({ ok: true, redirectTo: '/commander/dashboard' });

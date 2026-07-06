@@ -89,29 +89,29 @@ function isAuthorized(request: Request): boolean {
   );
 }
 
-/* POST — manual trigger via admin key (for testing) */
+/* POST — manual trigger via admin key */
 export async function POST(request: Request) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  return runAutoMatch();
+  // Admin-triggered: include today's trips
+  return runAutoMatch({ includeTodayTrips: true });
 }
 
 export async function GET(request: Request) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  return runAutoMatch();
+  return runAutoMatch({ includeTodayTrips: false });
 }
 
-async function runAutoMatch() {
+async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?: boolean } = {}) {
 
   const supabase = createSupabaseAdminClient();
 
-  // Only match trips from tomorrow onwards — same-day bookings give zero time to coordinate
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowStr = tomorrow.toISOString().split('T')[0];
+  const cutoff = new Date();
+  if (!includeTodayTrips) cutoff.setDate(cutoff.getDate() + 1);
+  const tomorrowStr = cutoff.toISOString().split('T')[0];
 
   /* Fetch all future trips — active or NULL status (old trips before status field existed).
      .not('in') silently drops NULLs in PostgreSQL so we use .or() instead. */
@@ -163,15 +163,11 @@ async function runAutoMatch() {
         continue;
       }
 
-      const agreedPrice = (send.price && travel.price)
+      const rawPrice = (send.price && travel.price)
         ? Math.round(((send.price + travel.price) / 2) * 100) / 100
         : send.price ?? travel.price ?? null;
-
-      // Africa-outbound trips require manual admin authorisation before the
-      // match is surfaced to either party.
-      const originCity      = cityEn(send, 'from_city');
-      const isAfricaOutbound = isAfricanCity(originCity);
-      const initialStatus   = isAfricaOutbound ? 'awaiting_authorisation' : 'matched';
+      // Never store null — default to 0 so emails always show a real number
+      const agreedPrice = rawPrice ?? 0;
 
       const { data: matchRecord, error: matchErr } = await supabase
         .from('matches')
@@ -182,7 +178,7 @@ async function runAutoMatch() {
           traveler_email:   travel.email  ?? null,
           sender_user_id:   send.user_id  ?? null,
           traveler_user_id: travel.user_id ?? null,
-          status:           initialStatus,
+          status:           'matched',
           agreed_price:     agreedPrice,
           interest_type:    'full_price',
         })
@@ -197,37 +193,51 @@ async function runAutoMatch() {
       created.push(matchRecord.id);
       alreadyMatched.add(pairKey);
 
-      // Lock both trips so no one else can match with them while this is pending
+      // Lock both trips so no one else can match with them
       await Promise.all([
         supabase.from('trips').update({ status: 'pending' }).eq('id', send.id),
         supabase.from('trips').update({ status: 'pending' }).eq('id', travel.id),
       ]);
 
-      if (isAfricaOutbound) {
-        // ── Africa-outbound: email admin only, hold match for authorisation ──
+      // Notify both parties immediately
+      const emailPromises = [];
+      for (const [email, role] of [[send.email, 'sender'], [travel.email, 'traveler']] as [string, string][]) {
+        if (!email) continue;
+        const [acceptToken, declineToken] = await Promise.all([
+          createActionToken(supabase, email, 'confirm_match', matchRecord.id, { role }),
+          createActionToken(supabase, email, 'decline_match', matchRecord.id, { role }),
+        ]);
+        emailPromises.push(
+          sendMatchConfirmedEmail({
+            toEmail:    email,
+            fromCity:   send.from_city,
+            toCity:     send.to_city,
+            travelDate: send.travel_date,
+            price:      agreedPrice ?? 0,
+            matchId:    matchRecord.id,
+            acceptToken,
+            declineToken,
+          }),
+        );
+      }
+      await Promise.allSettled(emailPromises);
+
+      // Admin FYI for Africa-outbound matches
+      const originCity = cityEn(send, 'from_city');
+      if (isAfricanCity(originCity)) {
         const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
         const appUrl     = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
-
-        // Use single-use action tokens instead of exposing ADMIN_SECRET in emails
-        const tokenExpiry = new Date(Date.now() + 7 * 24 * 3_600_000).toISOString();
-        const [approveTokenRow, rejectTokenRow] = await Promise.all([
-          supabase.from('action_tokens').insert({ email: adminEmail, action_type: 'admin_approve_match', entity_id: matchRecord.id, payload: { action: 'approve' }, expires_at: tokenExpiry }).select('token').single(),
-          supabase.from('action_tokens').insert({ email: adminEmail, action_type: 'admin_reject_match',  entity_id: matchRecord.id, payload: { action: 'reject'  }, expires_at: tokenExpiry }).select('token').single(),
-        ]);
-        const approveUrl = `${appUrl}/api/admin/authorise-match?matchId=${matchRecord.id}&action=approve&token=${approveTokenRow.data?.token ?? ''}`;
-        const rejectUrl  = `${appUrl}/api/admin/authorise-match?matchId=${matchRecord.id}&action=reject&token=${rejectTokenRow.data?.token ?? ''}`;
-
-        await sendResendEmail({
+        sendResendEmail({
           from:    process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>',
           to:      adminEmail,
-          subject: `[Auth required] Africa-outbound match — ${send.from_city} → ${send.to_city}`,
+          subject: `[FYI] Africa-outbound match created — ${send.from_city} → ${send.to_city}`,
           html: `
             <div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;padding:32px 24px;color:#0f172a;">
               <div style="margin-bottom:20px;">
                 <span style="font-size:22px;font-weight:900;color:#1e3a8a;">Boot</span><span style="font-size:22px;font-weight:900;color:#2563eb;">Hop</span>
               </div>
-              <h2 style="margin:0 0 6px;font-size:20px;font-weight:700;">🌍 Africa-outbound match pending authorisation</h2>
-              <p style="font-size:14px;color:#64748b;margin:0 0 20px;">A new match has been found for a trip originating in Africa. Review the details below and approve or reject before the parties are notified.</p>
+              <h2 style="margin:0 0 6px;font-size:20px;font-weight:700;">🌍 Africa-outbound match created</h2>
+              <p style="font-size:14px;color:#64748b;margin:0 0 20px;">Both parties have been notified. This is for your awareness only — no action required.</p>
               <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:24px;">
                 <tr><td style="padding:8px 0;color:#64748b;width:40%;">Match ID</td><td style="padding:8px 0;color:#0f172a;font-weight:600;">${matchRecord.id}</td></tr>
                 <tr><td style="padding:8px 0;color:#64748b;">Route</td><td style="padding:8px 0;color:#0f172a;font-weight:600;">${send.from_city} → ${send.to_city}</td></tr>
@@ -237,44 +247,13 @@ async function runAutoMatch() {
                 <tr><td style="padding:8px 0;color:#64748b;">Agreed price</td><td style="padding:8px 0;color:#0f172a;font-weight:600;">£${agreedPrice ?? '—'}</td></tr>
                 <tr><td style="padding:8px 0;color:#64748b;">Match score</td><td style="padding:8px 0;color:#0f172a;">${score}</td></tr>
               </table>
-              <div style="display:flex;gap:12px;">
-                <a href="${approveUrl}" style="display:inline-block;background:#16a34a;color:#fff;font-weight:700;font-size:15px;padding:14px 28px;border-radius:12px;text-decoration:none;margin-right:12px;">
-                  ✅ Approve match
-                </a>
-                <a href="${rejectUrl}" style="display:inline-block;background:#dc2626;color:#fff;font-weight:700;font-size:15px;padding:14px 28px;border-radius:12px;text-decoration:none;">
-                  ❌ Reject match
-                </a>
-              </div>
-              <p style="font-size:12px;color:#94a3b8;margin-top:20px;">Neither party has been notified yet. They will only receive an email after you approve.</p>
+              <a href="${appUrl}/admin/hub" style="display:inline-block;background:#2563eb;color:#fff;font-weight:700;font-size:15px;padding:14px 28px;border-radius:12px;text-decoration:none;">
+                View in Admin Hub
+              </a>
             </div>
           `,
-          text: `Africa-outbound match pending authorisation.\nRoute: ${send.from_city} → ${send.to_city}\nDate: ${send.travel_date}\nSender: ${send.email}\nCarrier: ${travel.email}\nPrice: £${agreedPrice}\n\nApprove: ${approveUrl}\nReject: ${rejectUrl}`,
-        }).catch(e => console.error('auto-match admin auth email failed', e));
-
-      } else {
-        // ── Standard match: notify both parties immediately ──
-        const emailPromises = [];
-        for (const [email, role] of [[send.email, 'sender'], [travel.email, 'traveler']] as [string, string][]) {
-          if (!email) continue;
-          const [acceptToken, declineToken] = await Promise.all([
-            createActionToken(supabase, email, 'confirm_match', matchRecord.id, { role }),
-            createActionToken(supabase, email, 'decline_match', matchRecord.id, { role }),
-          ]);
-          emailPromises.push(
-            sendMatchConfirmedEmail({
-              toEmail:    email,
-              fromCity:   send.from_city,
-              toCity:     send.to_city,
-              travelDate: send.travel_date,
-              price:      agreedPrice ?? 0,
-              matchId:    matchRecord.id,
-              acceptToken,
-              declineToken,
-            }),
-          );
-        }
-        await Promise.allSettled(emailPromises);
-      }
+          text: `Africa-outbound match created (FYI).\nRoute: ${send.from_city} → ${send.to_city}\nDate: ${send.travel_date}\nSender: ${send.email}\nCarrier: ${travel.email}\nPrice: £${agreedPrice}\n\nView: ${appUrl}/admin/hub`,
+        }).catch(e => console.error('auto-match admin fyi email failed', e));
     }
   }
 
@@ -329,18 +308,10 @@ async function runAutoMatch() {
     notified.push(orphan.id);
   }
 
-  // Split created into normal vs awaiting_authorisation for summary
-  const { data: createdMatches } = await supabase
-    .from('matches').select('id, status').in('id', created);
-  const awaitingAuth = (createdMatches ?? []).filter(m => m.status === 'awaiting_authorisation').map(m => m.id);
-  const normalMatched = created.filter(id => !awaitingAuth.includes(id));
-
   return NextResponse.json({
     ok: true,
-    matched: normalMatched.length,
-    awaiting_authorisation: awaitingAuth.length,
-    matchIds: normalMatched,
-    awaitingIds: awaitingAuth,
+    matched: created.length,
+    matchIds: created,
     notified,
     skipped,
     debug: {

@@ -1,12 +1,15 @@
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { requireAdminPage } from '@/lib/auth/admin';
+import { getCommanderSession } from '@/lib/auth/commander';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import PipelineAdminClient from './PipelineAdminClient';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PipelineAdminPage() {
-  await requireAdminPage();
+  const cookieStore = await cookies();
+  const session = getCommanderSession(cookieStore);
+  if (!session || session.slug !== 'boothop') redirect('/commander');
 
   const db = createSupabaseAdminClient();
   const { data: clients, error } = await db

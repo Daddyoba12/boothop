@@ -14,16 +14,112 @@ export default async function CommanderDashboard() {
 
   const db = createSupabaseAdminClient();
 
+  if (session.isSuper) {
+    return <SuperAdminDashboard session={session} db={db} />;
+  }
+
+  return <ClientDashboard session={session} db={db} />;
+}
+
+// ── Superadmin view ───────────────────────────────────────────────────────────
+
+async function SuperAdminDashboard({ session, db }: { session: any; db: any }) {
+  const { data: allClients } = await db
+    .from('pipeline_clients')
+    .select('id, slug, company, email, contact_name, plan, status, created_at, is_super_admin')
+    .order('created_at', { ascending: false });
+
+  const planBadge: Record<string, string> = {
+    basic: 'bg-slate-700 text-slate-200',
+    pro:   'bg-amber-500/20 text-amber-300',
+  };
+
+  return (
+    <div className="min-h-screen bg-[#07111f] text-white">
+      <CommanderNav company={session.company} slug={session.slug} isSuper={true} />
+
+      <main className="max-w-5xl mx-auto px-4 py-10 space-y-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white">All Clients</h1>
+            <p className="text-sm text-white/40 mt-0.5">
+              Superadmin view &mdash; {allClients?.length ?? 0} accounts
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold px-3 py-1 rounded-full bg-violet-500/20 text-violet-300 uppercase tracking-wider">
+            Superadmin
+          </span>
+        </div>
+
+        {/* Clients table */}
+        <div className="rounded-2xl border border-white/8 bg-white/[0.03] overflow-hidden">
+          <div className="px-6 py-4 border-b border-white/8">
+            <h2 className="text-sm font-bold text-white">Pipeline Clients</h2>
+          </div>
+          <div className="divide-y divide-white/5">
+            {(!allClients || allClients.length === 0) && (
+              <p className="text-center py-12 text-white/25 text-sm">No clients yet.</p>
+            )}
+            {allClients?.map((c: any) => (
+              <div key={c.id} className="px-6 py-4 flex items-center gap-4 hover:bg-white/[0.02] transition-colors">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-semibold text-white">{c.company}</p>
+                    {c.is_super_admin && (
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 uppercase tracking-wider">Admin</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-white/35 font-mono mt-0.5">{c.slug}</p>
+                  {c.email && <p className="text-xs text-white/25 mt-0.5 truncate">{c.email}</p>}
+                </div>
+                <div className="shrink-0 flex items-center gap-2">
+                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${planBadge[c.plan ?? 'basic'] ?? planBadge.basic}`}>
+                    {c.plan ?? 'basic'}
+                  </span>
+                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${c.status === 'active' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'}`}>
+                    {c.status ?? 'active'}
+                  </span>
+                  <span className="hidden sm:block text-[10px] text-white/20">
+                    {c.created_at ? new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : ''}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick links */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {[
+            { href: '/commander/music', label: 'Music Library', desc: 'Manage shared track library' },
+            { href: '/client-onboarding', label: 'Pipeline Onboarding', desc: 'Oracle onboarding portal' },
+          ].map(({ href, label, desc }) => (
+            <Link key={href} href={href}
+              className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 hover:border-orange-500/30 hover:bg-white/[0.05] transition-all group">
+              <p className="text-sm font-bold text-white group-hover:text-orange-300 transition-colors">{label}</p>
+              <p className="text-xs text-white/30 mt-1">{desc}</p>
+            </Link>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+// ── Regular client view ───────────────────────────────────────────────────────
+
+async function ClientDashboard({ session, db }: { session: any; db: any }) {
   const [{ data: client }, { data: tracks }] = await Promise.all([
     db.from('pipeline_clients')
       .select('id, slug, company, email, contact_name, plan, status, created_at, platforms')
       .eq('id', session.clientId)
       .single(),
     db.from('client_music')
-      .select('id, track_id, assigned_at, music_tracks(id, title, artist, genre, duration_seconds, source)')
+      .select('id, track_id, assigned_at, music_tracks(id, title, artist, genre, duration_seconds, source, youtube_id)')
       .eq('client_id', session.clientId)
       .order('assigned_at', { ascending: false })
-      .limit(20),
+      .limit(10),
   ]);
 
   const planBadge: Record<string, string> = {
@@ -33,7 +129,7 @@ export default async function CommanderDashboard() {
 
   return (
     <div className="min-h-screen bg-[#07111f] text-white">
-      <CommanderNav company={session.company} slug={session.slug} />
+      <CommanderNav company={session.company} slug={session.slug} isSuper={false} />
 
       <main className="max-w-5xl mx-auto px-4 py-10 space-y-8">
         {/* Header */}
@@ -84,7 +180,7 @@ export default async function CommanderDashboard() {
             </div>
           ) : (
             <div className="space-y-2">
-              {tracks.map((row) => {
+              {tracks.map((row: any) => {
                 const t = Array.isArray(row.music_tracks) ? row.music_tracks[0] : row.music_tracks;
                 if (!t) return null;
                 const mins = Math.floor((t.duration_seconds ?? 0) / 60);
@@ -95,9 +191,16 @@ export default async function CommanderDashboard() {
                       <p className="text-sm font-semibold text-white truncate">{t.title}</p>
                       <p className="text-xs text-white/40">{t.artist} · {t.genre}</p>
                     </div>
-                    <div className="text-right shrink-0">
+                    <div className="text-right shrink-0 flex flex-col items-end gap-0.5">
                       <p className="text-xs font-mono text-white/30">{mins}:{secs}</p>
-                      <p className="text-[10px] text-white/20">{t.source}</p>
+                      {t.youtube_id ? (
+                        <a href={`https://www.youtube.com/watch?v=${t.youtube_id}`} target="_blank" rel="noreferrer"
+                          className="text-[10px] text-orange-400/60 hover:text-orange-400 transition-colors">
+                          ▶ YouTube
+                        </a>
+                      ) : (
+                        <p className="text-[10px] text-white/20">{t.source}</p>
+                      )}
                     </div>
                   </div>
                 );
@@ -111,7 +214,6 @@ export default async function CommanderDashboard() {
           {[
             { href: '/commander/music', label: 'Music Library', desc: 'Browse, add, replace tracks' },
             { href: '/client-onboarding', label: 'Pipeline Onboarding', desc: 'Oracle onboarding portal' },
-            { href: '/onboard/admin', label: 'Admin Panel', desc: 'All pipeline clients (admin only)' },
           ].map(({ href, label, desc }) => (
             <Link key={href} href={href}
               className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 hover:border-orange-500/30 hover:bg-white/[0.05] transition-all group">
