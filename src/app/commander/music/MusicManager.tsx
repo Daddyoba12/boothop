@@ -160,6 +160,7 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                   <div key={t.id} className="flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.02] hover:bg-white/[0.04] px-5 py-4 transition-all">
                     {t.youtube_id && (
                       <img src={`https://i.ytimg.com/vi/${t.youtube_id}/mqdefault.jpg`} alt=""
+                        width="64" height="40"
                         className="h-10 w-16 object-cover rounded-lg shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
@@ -231,7 +232,7 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
             <div className="space-y-3">
               {ytResults.map(v => (
                 <div key={v.id} className="flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.02] px-5 py-4">
-                  <img src={v.thumbnail} alt="" className="h-12 w-20 object-cover rounded-lg shrink-0" />
+                  <img src={v.thumbnail} alt="" width="80" height="48" className="h-12 w-20 object-cover rounded-lg shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-white truncate">{v.title}</p>
                     <p className="text-xs text-white/40">{v.channel}</p>
@@ -268,6 +269,7 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                 <div key={t.id} className="flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.02] px-5 py-4">
                   {t.youtube_id && (
                     <img src={`https://i.ytimg.com/vi/${t.youtube_id}/mqdefault.jpg`} alt=""
+                      width="64" height="40"
                       className="h-10 w-16 object-cover rounded-lg shrink-0" />
                   )}
                   <div className="flex-1 min-w-0">
