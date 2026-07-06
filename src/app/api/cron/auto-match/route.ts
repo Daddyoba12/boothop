@@ -254,6 +254,7 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
           `,
           text: `Africa-outbound match created (FYI).\nRoute: ${send.from_city} → ${send.to_city}\nDate: ${send.travel_date}\nSender: ${send.email}\nCarrier: ${travel.email}\nPrice: £${agreedPrice}\n\nView: ${appUrl}/admin/hub`,
         }).catch(e => console.error('auto-match admin fyi email failed', e));
+      }
     }
   }
 
