@@ -151,7 +151,10 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
             </select>
           </div>
           {filtered.length === 0 ? (
-            <div className="text-center py-16 text-white/25 text-sm">No tracks found.</div>
+            <div className="text-center py-16 text-white/25 text-sm">
+              No tracks in the library yet.<br />
+              <span className="text-white/15 text-xs">Ask your admin to run the music sync to populate the library.</span>
+            </div>
           ) : (
             <div className="space-y-2">
               {filtered.map(t => {
@@ -197,6 +200,7 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                 {ytLoading ? '…' : 'Search'}
               </button>
             </div>
+            <p className="text-[10px] text-white/20 mt-2">Keyword search requires a YouTube Data API key. If it fails, paste a YouTube link below instead.</p>
           </div>
 
           {/* Divider */}

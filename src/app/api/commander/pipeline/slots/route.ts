@@ -13,7 +13,7 @@ export async function GET() {
   const db = createSupabaseAdminClient();
   const { data } = await db
     .from('otb_pipeline_state')
-    .select('slot, hook, problem, stakes, resolution, lesson, caption_tiktok, caption_instagram, v1_url, v2_url, pending_approval, rendered_at')
+    .select('slot, hook, hook_v2, problem, stakes, resolution, lesson, lesson_v2, caption_tiktok, caption_instagram, v1_url, v2_url, pending_approval, rendered_at')
     .eq('company_slug', session.slug)
     .in('slot', [1, 2, 3, 4]);
 
@@ -21,10 +21,12 @@ export async function GET() {
   for (const row of data ?? []) {
     result[String(row.slot)] = {
       hook:              row.hook              || '',
+      hook_v2:           row.hook_v2           || '',
       problem:           row.problem           || '',
       stakes:            row.stakes            || '',
       resolution:        row.resolution        || '',
       lesson:            row.lesson            || '',
+      lesson_v2:         row.lesson_v2         || '',
       caption_tiktok:    row.caption_tiktok    || '',
       caption_instagram: row.caption_instagram || '',
       v1:                row.v1_url            || '',

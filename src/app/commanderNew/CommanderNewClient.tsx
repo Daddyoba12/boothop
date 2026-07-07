@@ -146,7 +146,8 @@ main{max-width:1200px;margin:0 auto;padding:32px 24px}
 const SLOT_TIMES: Record<number, string> = { 1: '07:00', 2: '12:00', 3: '17:30', 4: '20:30' };
 
 interface Slot {
-  hook?: string; problem?: string; stakes?: string; resolution?: string; lesson?: string;
+  hook?: string; hook_v2?: string; problem?: string; stakes?: string;
+  resolution?: string; lesson?: string; lesson_v2?: string;
   caption_tiktok?: string; caption_instagram?: string;
   v1?: string; v2?: string; pending_approval?: boolean; rendered_at?: string;
 }
@@ -188,16 +189,20 @@ export default function CommanderNewClient({
   const [reportBody,  setReportBody]  = useState('Click Refresh to load.');
   const [clientRows,  setClientRows]  = useState<any[]>([]);
   const [bakeRows,    setBakeRows]    = useState<any[]>([]);
-  const [baking,      setBaking]      = useState(false);
-  const [bakeReady,   setBakeReady]   = useState<{ id: number } | null>(null);
-  const [vidPreview,  setVidPreview]  = useState('');
-  const [vidNameStr,  setVidNameStr]  = useState('');
-  const [voiceReady,  setVoiceReady]  = useState('');
-  const [recState,    setRecState]    = useState<'idle' | 'recording'>('idle');
-  const [recSecs,     setRecSecs]     = useState(0);
-  const [ytStatus,    setYtStatus]    = useState('');
-  const [musicTracks, setMusicTracks] = useState<{ label: string; path: string }[]>([]);
-  const [ncPlan,      setNcPlan]      = useState('basic');
+  const [baking,          setBaking]          = useState(false);
+  const [bakeReady,       setBakeReady]       = useState<{ id: number } | null>(null);
+  const [vidPreview,      setVidPreview]      = useState('');
+  const [vidNameStr,      setVidNameStr]      = useState('');
+  const [voiceReady,      setVoiceReady]      = useState('');
+  const [voicePlayUrl,    setVoicePlayUrl]    = useState('');
+  const [recState,        setRecState]        = useState<'idle' | 'recording'>('idle');
+  const [recSecs,         setRecSecs]         = useState(0);
+  const [ytStatus,        setYtStatus]        = useState('');
+  const [musicTracks,     setMusicTracks]     = useState<{ label: string; path: string }[]>([]);
+  const [ncPlan,          setNcPlan]          = useState('basic');
+  const [revoiceScript,   setRevoiceScript]   = useState('');
+  const [revoiceSlotNum,  setRevoiceSlotNum]  = useState<number | null>(null);
+  const [postHistory,     setPostHistory]     = useState<any[]>([]);
 
   const pollRef      = useRef<ReturnType<typeof setInterval> | null>(null);
   const toastTimer   = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -262,7 +267,7 @@ export default function CommanderNewClient({
   function switchTab(name: string) {
     setActiveTab(name);
     if (name === 'pipeline') {
-      if (!pollRef.current) { loadStatus(); loadSlots(); pollRef.current = setInterval(() => { loadStatus(); loadSlots(); }, 12000); }
+      if (!pollRef.current) { loadStatus(); loadSlots(); loadPostHistory(); pollRef.current = setInterval(() => { loadStatus(); loadSlots(); }, 12000); }
     } else { stopPoll(); }
     if (name === 'revoice') { loadBakeHistory(); loadMusicTracks(); }
     if (name === 'clients') { loadClients(); }
@@ -384,6 +389,27 @@ export default function CommanderNewClient({
     catch (e: any) { showToast(e.message, 'err'); }
   }
 
+  function revoiceSlot(n: number) {
+    const s = slots[String(n)] || {};
+    const url = s.v1 ? vidUrl(s.v1) : '';
+    vidPathRef.current = s.v1 || '';
+    setVidPreview(url);
+    setVidNameStr(`Pipeline Slot ${n}`);
+    const script = [s.hook, s.problem, s.stakes, s.resolution, s.lesson]
+      .filter(Boolean).join('\n\n');
+    setRevoiceScript(script);
+    setRevoiceSlotNum(n);
+    switchTab('revoice');
+    showToast(`Slot ${n} loaded into Revoice Studio`);
+  }
+
+  async function loadPostHistory() {
+    try {
+      const rows = await api('GET', '/api/commander/pipeline/history');
+      setPostHistory(Array.isArray(rows) ? rows : []);
+    } catch { /* silent */ }
+  }
+
   async function loadReport() {
     try {
       const r = await api('GET', '/api/commander/pipeline/report');
@@ -438,6 +464,7 @@ export default function CommanderNewClient({
         rec.onstop = () => {
           voiceBlobRef.current = new Blob(recChunks.current, { type: 'audio/webm' });
           voiceFileRef.current = null;
+          setVoicePlayUrl(URL.createObjectURL(voiceBlobRef.current));
           setVoiceReady(`✅ Recording ready (${(voiceBlobRef.current.size / 1024).toFixed(0)} KB)`);
           stream.getTracks().forEach(t => t.stop());
         };
@@ -539,13 +566,15 @@ export default function CommanderNewClient({
   // ── Slot card ────────────────────────────────────────────────────────────────
 
   function SlotCard({ n }: { n: number }) {
-    const s  = slots[String(n)] || {};
-    const ip = !!s.pending_approval;
-    const v1 = s.v1 ? vidUrl(s.v1) : '';
-    const v2 = s.v2 ? vidUrl(s.v2) : '';
-    const ts = s.rendered_at ? new Date(s.rendered_at).toLocaleString() : '';
-    const cap = s.caption_tiktok || '';
+    const s      = slots[String(n)] || {};
+    const ip     = !!s.pending_approval;
+    const v1     = s.v1 ? vidUrl(s.v1) : '';
+    const v2     = s.v2 ? vidUrl(s.v2) : '';
+    const ts     = s.rendered_at ? new Date(s.rendered_at).toLocaleString() : '';
     const showV2 = v2Active[n] || false;
+    const displayHook = showV2 ? (s.hook_v2 || s.hook || '') : (s.hook || '');
+    const cap         = s.caption_tiktok || '';
+    const currentSrc  = showV2 ? v2 : v1;
     return (
       <div className={`slot-card${ip ? ' pending' : ''}`}>
         <div className="slot-header">
@@ -556,22 +585,23 @@ export default function CommanderNewClient({
           {ip && <span className="slot-badge">Awaiting</span>}
         </div>
         <div className="slot-video">
-          {(showV2 ? v2 : v1)
-            ? <video id={`sv${n}`} src={showV2 ? v2 : v1} controls playsInline />
+          {currentSrc
+            ? <video id={`sv${n}`} src={currentSrc} controls playsInline />
             : <div className="no-video"><span style={{ fontSize: '2rem' }}>📭</span><span>No video yet</span></div>}
         </div>
         <div className="slot-body">
-          {v2 && <button className="v2-toggle" onClick={() => setV2Active(p => ({ ...p, [n]: !p[n] }))}>{showV2 ? 'Show V1' : 'Show V2'}</button>}
-          {s.hook && <div className="slot-hook">{s.hook}</div>}
+          {(v1 && v2) && <button className="v2-toggle" onClick={() => setV2Active(p => ({ ...p, [n]: !p[n] }))}>{showV2 ? 'Show V1' : 'Show V2'}</button>}
+          {displayHook && <div className="slot-hook">{displayHook}</div>}
           {cap && <div className="slot-caption"><strong>TK:</strong> {cap.slice(0, 90)}{cap.length > 90 ? '…' : ''}</div>}
           {ts && <div className="slot-ts">{ts}</div>}
           <div className="slot-actions">
             {ip && <>
-              <button className="btn btn-success" onClick={() => approve(n, 'post')}>✅ Post</button>
-              <button className="btn btn-danger"  onClick={() => approve(n, 'skip')}>Skip</button>
+              <button className="btn btn-success"   onClick={() => approve(n, 'post')}>✅ Post</button>
+              <button className="btn btn-danger"    onClick={() => approve(n, 'skip')}>Skip</button>
               <button className="btn btn-secondary" onClick={() => approve(n, 'regen')}>🔄 Regen</button>
             </>}
-            {v1 && <button className="btn btn-secondary" onClick={() => openEdit(n)}>✏️</button>}
+            <button className="btn btn-secondary" onClick={() => openEdit(n)}>✏️ Edit</button>
+            <button className="btn btn-secondary" onClick={() => revoiceSlot(n)}>🎙 Revoice</button>
           </div>
         </div>
       </div>
@@ -679,6 +709,37 @@ export default function CommanderNewClient({
             </div>
             <div id="report-body">{reportBody}</div>
           </div>
+
+          {postHistory.length > 0 && (
+            <div className="mt24">
+              <div className="section-title">Last 14 Days <small>Click Revoice to re-use any post</small></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {postHistory.map((p: any, i: number) => (
+                  <div key={i} style={{ background: '#0f0f1c', border: '1px solid #1a1a28', borderRadius: '12px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '0.78rem', color: '#888', marginBottom: '3px' }}>
+                        {p.date} · {p.platform} · Slot {p.slot}
+                      </div>
+                      <div style={{ fontSize: '0.85rem', color: '#e4e4e8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {p.hook || '—'}
+                      </div>
+                    </div>
+                    {p.video_url && (
+                      <button className="btn btn-secondary btn-sm" onClick={() => {
+                        vidPathRef.current = p.video_url;
+                        setVidPreview(p.video_url.startsWith('http') ? p.video_url : '');
+                        setVidNameStr(`${p.date} Slot ${p.slot}`);
+                        setRevoiceScript(p.hook || '');
+                        setRevoiceSlotNum(null);
+                        switchTab('revoice');
+                        showToast('Post loaded into Revoice Studio');
+                      }}>🎙 Revoice</button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── REVOICE TAB ─────────────────────────────────────────────────────── */}
@@ -712,6 +773,12 @@ export default function CommanderNewClient({
                 </div>
                 <input type="file" id="cn-voice-in" accept="audio/*,video/webm" style={{ display: 'none' }} onChange={voiceFileChosen} />
                 {voiceReady && <p className="voice-ready" style={{ display: 'block' }}>{voiceReady}</p>}
+                {voicePlayUrl && (
+                  <div style={{ marginTop: '8px' }}>
+                    <p style={{ fontSize: '0.72rem', color: '#555', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Playback</p>
+                    <audio src={voicePlayUrl} controls style={{ width: '100%' }} />
+                  </div>
+                )}
               </div>
 
               <div className="rv-card mt12">
@@ -743,6 +810,13 @@ export default function CommanderNewClient({
                   </div>
                 )}
               </div>
+
+              {revoiceScript && (
+                <div className="rv-card mt12">
+                  <h3>Script {revoiceSlotNum ? `— Slot ${revoiceSlotNum}` : ''}</h3>
+                  <p style={{ fontSize: '0.85rem', color: '#aaa', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{revoiceScript}</p>
+                </div>
+              )}
 
               <div className="rv-card mt12">
                 <h3>Bake History</h3>
