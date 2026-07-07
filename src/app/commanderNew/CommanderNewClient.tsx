@@ -199,6 +199,7 @@ export default function CommanderNewClient({
   const [recSecs,         setRecSecs]         = useState(0);
   const [ytStatus,        setYtStatus]        = useState('');
   const [musicTracks,     setMusicTracks]     = useState<{ label: string; path: string }[]>([]);
+  const [selectedMusic,   setSelectedMusic]   = useState('');
   const [ncPlan,          setNcPlan]          = useState('basic');
   const [revoiceScript,   setRevoiceScript]   = useState('');
   const [revoiceSlotNum,  setRevoiceSlotNum]  = useState<number | null>(null);
@@ -807,11 +808,16 @@ export default function CommanderNewClient({
 
               <div className="rv-card mt12">
                 <h3>3 — Music (optional)</h3>
-                <select className="music-sel" ref={musicSelRef}>
+                <select className="music-sel" ref={musicSelRef}
+                  onChange={e => setSelectedMusic(e.target.value)}>
                   <option value="">No background music</option>
                   {musicTracks.map((t, i) => <option key={i} value={t.path}>{t.label}</option>)}
                 </select>
-                <button className="btn btn-secondary btn-sm" onClick={refreshTracks}>Refresh tracks</button>
+                {selectedMusic && selectedMusic.startsWith('https://') && (
+                  <audio key={selectedMusic} src={selectedMusic} controls
+                    style={{ width: '100%', marginTop: '8px', height: '36px' }} />
+                )}
+                <button className="btn btn-secondary btn-sm" onClick={refreshTracks} style={{ marginTop: '8px' }}>Refresh tracks</button>
                 <p className="or-sep mt8">— add from YouTube —</p>
                 <div className="yt-row">
                   <input type="text" ref={ytQueryRef} placeholder="YouTube URL or title (e.g. afrobeats chill)" />

@@ -21,6 +21,16 @@ interface Props {
 }
 
 type Tab = 'library' | 'youtube' | 'assigned';
+
+const SB_MUSIC_BASE = 'https://zwgngbzbdvnrdnanjded.supabase.co/storage/v1/object/public/music-files';
+const FOLDER: Record<string, string> = { archive: 'archive', daily: 'daily', clip: 'clips', clips: 'clips', yt_download: 'yt_downloads', yt_downloads: 'yt_downloads' };
+
+function audioUrl(t: Track): string | null {
+  if (t.youtube_id) return null;
+  const folder = FOLDER[t.source];
+  if (!folder) return null;
+  return `${SB_MUSIC_BASE}/${folder}/${encodeURIComponent(t.title)}.mp3`;
+}
 type YtResult = { id: string; title: string; channel: string; thumbnail: string };
 
 export default function MusicManager({ clientId: _clientId, library, assignedTrackIds: initial }: Props) {
@@ -44,6 +54,7 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
   // Library filter
   const [search, setSearch]         = useState('');
   const [genreFilter, setGenreFilter] = useState('');
+  const [playingId, setPlayingId]   = useState<string | null>(null);
 
   const genres = [...new Set(library.map(t => t.genre).filter(Boolean))].sort();
 
@@ -162,22 +173,41 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
             <div className="space-y-2">
               {filtered.map(t => {
                 const isOn = assigned.has(t.id);
+                const aUrl = audioUrl(t);
+                const isPlaying = playingId === t.id;
                 return (
-                  <div key={t.id} className="flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.02] hover:bg-white/[0.04] px-5 py-4 transition-all">
-                    {t.youtube_id && (
-                      <img src={`https://i.ytimg.com/vi/${t.youtube_id}/mqdefault.jpg`} alt=""
-                        width="64" height="40"
-                        className="h-10 w-16 object-cover rounded-lg shrink-0" />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-white truncate">{t.title}</p>
-                      <p className="text-xs text-white/40">{t.artist} · {t.genre} · {fmtDuration(t.duration_seconds)}</p>
+                  <div key={t.id} className="rounded-2xl border border-white/8 bg-white/[0.02] hover:bg-white/[0.04] px-5 py-4 transition-all">
+                    <div className="flex items-center gap-4">
+                      {t.youtube_id && (
+                        <img src={`https://i.ytimg.com/vi/${t.youtube_id}/mqdefault.jpg`} alt=""
+                          width="64" height="40"
+                          className="h-10 w-16 object-cover rounded-lg shrink-0" />
+                      )}
+                      {aUrl && !t.youtube_id && (
+                        <button onClick={() => setPlayingId(isPlaying ? null : t.id)}
+                          className="shrink-0 w-10 h-10 rounded-lg bg-white/8 hover:bg-orange-500/20 text-white/60 hover:text-orange-400 text-base transition-all flex items-center justify-center">
+                          {isPlaying ? '⏸' : '▶'}
+                        </button>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">{t.title}</p>
+                        <p className="text-xs text-white/40">{t.artist} · {t.genre} · {fmtDuration(t.duration_seconds)}</p>
+                      </div>
+                      <span className="text-[10px] text-white/20 shrink-0">{t.source}</span>
+                      {t.youtube_id && (
+                        <a href={`https://www.youtube.com/watch?v=${t.youtube_id}`} target="_blank" rel="noreferrer"
+                          className="text-xs text-white/25 hover:text-orange-400 transition-colors shrink-0">▶ YT</a>
+                      )}
+                      <button onClick={() => toggleAssign(t.id)} disabled={busy === t.id}
+                        className={`shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${isOn ? 'bg-red-500/20 text-red-300 hover:bg-red-500/30' : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30'}`}>
+                        {busy === t.id ? '…' : isOn ? 'Remove' : '+ Add'}
+                      </button>
                     </div>
-                    <span className="text-[10px] text-white/20 shrink-0">{t.source}</span>
-                    <button onClick={() => toggleAssign(t.id)} disabled={busy === t.id}
-                      className={`shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${isOn ? 'bg-red-500/20 text-red-300 hover:bg-red-500/30' : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30'}`}>
-                      {busy === t.id ? '…' : isOn ? 'Remove' : '+ Add'}
-                    </button>
+                    {isPlaying && aUrl && (
+                      <audio key={aUrl} src={aUrl} controls autoPlay
+                        style={{ width: '100%', marginTop: '10px', height: '36px' }}
+                        onEnded={() => setPlayingId(null)} />
+                    )}
                   </div>
                 );
               })}
@@ -273,29 +303,44 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
             </div>
           ) : (
             <div className="space-y-2">
-              {library.filter(t => assigned.has(t.id)).map(t => (
-                <div key={t.id} className="flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.02] px-5 py-4">
-                  {t.youtube_id && (
-                    <img src={`https://i.ytimg.com/vi/${t.youtube_id}/mqdefault.jpg`} alt=""
-                      width="64" height="40"
-                      className="h-10 w-16 object-cover rounded-lg shrink-0" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">{t.title}</p>
-                    <p className="text-xs text-white/40">{t.artist} · {t.genre} · {fmtDuration(t.duration_seconds)}</p>
+              {library.filter(t => assigned.has(t.id)).map(t => {
+                const aUrl = audioUrl(t);
+                const isPlaying = playingId === t.id;
+                return (
+                  <div key={t.id} className="rounded-2xl border border-white/8 bg-white/[0.02] px-5 py-4">
+                    <div className="flex items-center gap-4">
+                      {t.youtube_id && (
+                        <img src={`https://i.ytimg.com/vi/${t.youtube_id}/mqdefault.jpg`} alt=""
+                          width="64" height="40"
+                          className="h-10 w-16 object-cover rounded-lg shrink-0" />
+                      )}
+                      {aUrl && !t.youtube_id && (
+                        <button onClick={() => setPlayingId(isPlaying ? null : t.id)}
+                          className="shrink-0 w-10 h-10 rounded-lg bg-white/8 hover:bg-orange-500/20 text-white/60 hover:text-orange-400 text-base transition-all flex items-center justify-center">
+                          {isPlaying ? '⏸' : '▶'}
+                        </button>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">{t.title}</p>
+                        <p className="text-xs text-white/40">{t.artist} · {t.genre} · {fmtDuration(t.duration_seconds)}</p>
+                      </div>
+                      {t.youtube_id && (
+                        <a href={`https://www.youtube.com/watch?v=${t.youtube_id}`} target="_blank" rel="noreferrer"
+                          className="text-xs text-white/25 hover:text-white/50 transition-colors shrink-0">▶ YT</a>
+                      )}
+                      <button onClick={() => toggleAssign(t.id)} disabled={busy === t.id}
+                        className="shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all disabled:opacity-50">
+                        {busy === t.id ? '…' : 'Remove'}
+                      </button>
+                    </div>
+                    {isPlaying && aUrl && (
+                      <audio key={aUrl} src={aUrl} controls autoPlay
+                        style={{ width: '100%', marginTop: '10px', height: '36px' }}
+                        onEnded={() => setPlayingId(null)} />
+                    )}
                   </div>
-                  {t.youtube_id && (
-                    <a href={`https://www.youtube.com/watch?v=${t.youtube_id}`} target="_blank" rel="noreferrer"
-                      className="text-xs text-white/25 hover:text-white/50 transition-colors shrink-0">
-                      ▶ Preview
-                    </a>
-                  )}
-                  <button onClick={() => toggleAssign(t.id)} disabled={busy === t.id}
-                    className="shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all disabled:opacity-50">
-                    {busy === t.id ? '…' : 'Remove'}
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
