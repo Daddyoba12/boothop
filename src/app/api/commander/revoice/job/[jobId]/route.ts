@@ -13,7 +13,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ jobI
   if (!base) return NextResponse.json({ status: 'failed', error: 'Pipeline not configured' });
 
   const { jobId } = await params;
-  const res  = await fetch(`${base}/api/job/${jobId}`, { headers: { 'x-commander-slug': session.slug } });
+  const secret = process.env.PIPELINE_SECRET ?? '';
+  const res  = await fetch(`${base}/commander/api/job/${jobId}`, { headers: { 'x-commander-slug': session.slug, 'x-pipeline-secret': secret } });
   const data = await res.json().catch(() => ({ status: 'failed' }));
   return NextResponse.json(data);
 }

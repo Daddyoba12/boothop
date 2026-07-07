@@ -13,9 +13,10 @@ export async function POST(req: NextRequest) {
   const body = await req.arrayBuffer();
   const ct   = req.headers.get('content-type') || '';
 
-  const res = await fetch(`${base}/api/upload-video`, {
+  const secret = process.env.PIPELINE_SECRET ?? '';
+  const res = await fetch(`${base}/commander/api/upload-video`, {
     method:  'POST',
-    headers: { 'content-type': ct, 'x-commander-slug': session.slug },
+    headers: { 'content-type': ct, 'x-commander-slug': session.slug, 'x-pipeline-secret': secret },
     body,
   });
 

@@ -370,14 +370,10 @@ export default function CommanderNewClient({
     ];
     try {
       for (const { field, value } of fields) {
-        if (value.trim()) {
-          const fd = new FormData(); fd.append('slot', String(editSlotNum)); fd.append('field', field); fd.append('value', value);
-          await api('POST', '/api/commander/pipeline/edit-field', fd);
-        }
+        const fd = new FormData(); fd.append('slot', String(editSlotNum)); fd.append('field', field); fd.append('value', value);
+        await api('POST', '/api/commander/pipeline/edit-field', fd);
       }
-      const fd = new FormData(); fd.append('slot', String(editSlotNum));
-      await api('POST', '/api/commander/pipeline/submit-edit', fd);
-      showToast(`✅ Slot ${editSlotNum} edits submitted`); setEditOpen(false); setTimeout(loadSlots, 1500);
+      showToast(`✅ Slot ${editSlotNum} saved`); setEditOpen(false); setTimeout(loadSlots, 800);
     } catch (e: any) { showToast('Edit failed: ' + e.message, 'err'); }
   }
 

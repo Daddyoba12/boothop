@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getCommanderSession } from '@/lib/auth/commander';
-import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,16 +9,20 @@ export async function GET() {
   const session = getCommanderSession(store);
   if (!session) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
 
-  const db  = createSupabaseAdminClient();
-  const ago = new Date(Date.now() - 14 * 86_400_000).toISOString().split('T')[0];
+  const pipelineBase = process.env.PIPELINE_BASE_URL;
+  if (!pipelineBase) return NextResponse.json([]);
 
-  const { data } = await db
-    .from('post_history')
-    .select('id, date, slot, platform, hook, media_id, posted_at')
-    .eq('company_id', session.clientId)
-    .gte('date', ago)
-    .order('posted_at', { ascending: false })
-    .limit(50);
+  const secret = process.env.PIPELINE_SECRET ?? '';
 
-  return NextResponse.json(data ?? []);
+  try {
+    const r = await fetch(`${pipelineBase}/api/post-log?days=14`, {
+      headers: { 'x-pipeline-secret': secret, 'x-commander-slug': session.slug },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!r.ok) return NextResponse.json([]);
+    const data = await r.json();
+    return NextResponse.json(Array.isArray(data) ? data : []);
+  } catch {
+    return NextResponse.json([]);
+  }
 }

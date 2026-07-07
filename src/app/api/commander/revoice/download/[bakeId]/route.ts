@@ -13,7 +13,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ bake
   if (!base) return NextResponse.json({ error: 'Pipeline not configured' }, { status: 503 });
 
   const { bakeId } = await params;
-  const res = await fetch(`${base}/api/download-bake/${bakeId}`, { headers: { 'x-commander-slug': session.slug } });
+  const secret = process.env.PIPELINE_SECRET ?? '';
+  const res = await fetch(`${base}/commander/api/download-bake/${bakeId}`, { headers: { 'x-commander-slug': session.slug, 'x-pipeline-secret': secret } });
   if (!res.ok) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const blob = await res.blob();
