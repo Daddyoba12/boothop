@@ -24,7 +24,7 @@ type Tab = 'library' | 'youtube' | 'assigned';
 type YtResult = { id: string; title: string; channel: string; thumbnail: string };
 
 export default function MusicManager({ clientId: _clientId, library, assignedTrackIds: initial }: Props) {
-  const [tab, setTab]           = useState<Tab>('library');
+  const [tab, setTab]           = useState<Tab>(library.length === 0 ? 'youtube' : 'library');
   const [assigned, setAssigned] = useState(new Set(initial));
   const [busy, setBusy]         = useState<string | null>(null);
   const [msg, setMsg]           = useState('');
@@ -153,7 +153,10 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
           {filtered.length === 0 ? (
             <div className="text-center py-16 text-white/25 text-sm">
               No tracks in the library yet.<br />
-              <span className="text-white/15 text-xs">Ask your admin to run the music sync to populate the library.</span>
+              <span className="text-white/15 text-xs">
+                Use the &ldquo;Add from YouTube&rdquo; tab to add tracks via YouTube URL.<br />
+                Admin can run a music sync to import the archive of ~120 tracks.
+              </span>
             </div>
           ) : (
             <div className="space-y-2">
@@ -186,6 +189,30 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
       {/* ── YOUTUBE TAB ── */}
       {tab === 'youtube' && (
         <div>
+          {/* URL paste — primary method (no API key needed) */}
+          <div className="mb-6">
+            <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider mb-2">Paste a YouTube link (recommended)</p>
+            <div className="flex gap-3">
+              <input value={ytUrl}
+                onChange={e => { setYtUrl(e.target.value); setYtResults([]); setYtError(''); }}
+                onKeyDown={e => e.key === 'Enter' && lookupByUrl()}
+                placeholder="https://youtube.com/watch?v=… or dQw4w9WgXcQ"
+                className={`flex-1 font-mono ${inputCls}`} />
+              <button onClick={lookupByUrl} disabled={ytLoading || !ytUrl.trim()}
+                className="px-5 py-2.5 rounded-xl bg-orange-500 text-black text-sm font-bold disabled:opacity-40 hover:bg-orange-400 transition-all">
+                {ytLoading ? '…' : 'Look up'}
+              </button>
+            </div>
+            <p className="text-[10px] text-white/20 mt-2">Open YouTube, copy the link and paste it here — works without any API key.</p>
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-px bg-white/8" />
+            <span className="text-[10px] text-white/25 font-semibold uppercase tracking-wider">or search by keyword</span>
+            <div className="flex-1 h-px bg-white/8" />
+          </div>
+
           {/* Keyword search */}
           <div className="mb-6">
             <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider mb-2">Search by artist or title</p>
@@ -196,34 +223,11 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                 placeholder="e.g. Burna Boy afrobeats 2025"
                 className={`flex-1 ${inputCls}`} />
               <button onClick={searchByKeyword} disabled={ytLoading || !ytQuery.trim()}
-                className="px-5 py-2.5 rounded-xl bg-orange-500 text-black text-sm font-bold disabled:opacity-40 hover:bg-orange-400 transition-all">
+                className="px-5 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold disabled:opacity-40 hover:bg-white/15 transition-all">
                 {ytLoading ? '…' : 'Search'}
               </button>
             </div>
-            <p className="text-[10px] text-white/20 mt-2">Keyword search requires a YouTube Data API key. If it fails, paste a YouTube link below instead.</p>
-          </div>
-
-          {/* Divider */}
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-white/8" />
-            <span className="text-[10px] text-white/25 font-semibold uppercase tracking-wider">or paste a link</span>
-            <div className="flex-1 h-px bg-white/8" />
-          </div>
-
-          {/* URL paste */}
-          <div className="mb-6">
-            <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider mb-2">YouTube URL or video ID</p>
-            <div className="flex gap-3">
-              <input value={ytUrl}
-                onChange={e => { setYtUrl(e.target.value); setYtResults([]); setYtError(''); }}
-                onKeyDown={e => e.key === 'Enter' && lookupByUrl()}
-                placeholder="https://youtube.com/watch?v=… or dQw4w9WgXcQ"
-                className={`flex-1 font-mono ${inputCls}`} />
-              <button onClick={lookupByUrl} disabled={ytLoading || !ytUrl.trim()}
-                className="px-5 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold disabled:opacity-40 hover:bg-white/15 transition-all">
-                {ytLoading ? '…' : 'Look up'}
-              </button>
-            </div>
+            <p className="text-[10px] text-white/20 mt-2">Keyword search requires a YouTube Data API key to be configured — paste a link above if this fails.</p>
           </div>
 
           {/* Error */}

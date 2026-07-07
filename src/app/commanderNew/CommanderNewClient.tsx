@@ -385,18 +385,22 @@ export default function CommanderNewClient({
     catch (e: any) { showToast(e.message, 'err'); }
   }
 
-  function revoiceSlot(n: number) {
+  function revoiceSlot(n: number, useV2?: boolean) {
     const s = slots[String(n)] || {};
-    const url = s.v1 ? vidUrl(s.v1) : '';
-    vidPathRef.current = s.v1 || '';
+    const isV2 = useV2 ?? v2Active[n] ?? false;
+    const videoSrc = isV2 ? (s.v2 || s.v1) : (s.v1 || '');
+    const url = videoSrc ? vidUrl(videoSrc) : '';
+    vidPathRef.current = videoSrc || '';
     setVidPreview(url);
-    setVidNameStr(`Pipeline Slot ${n}`);
-    const script = [s.hook, s.problem, s.stakes, s.resolution, s.lesson]
+    setVidNameStr(`Pipeline Slot ${n}${isV2 ? ' — V2' : ' — V1'}`);
+    const hook    = isV2 ? (s.hook_v2   || s.hook   || '') : (s.hook   || '');
+    const lesson  = isV2 ? (s.lesson_v2 || s.lesson || '') : (s.lesson || '');
+    const script = [hook, s.problem, s.stakes, s.resolution, lesson]
       .filter(Boolean).join('\n\n');
     setRevoiceScript(script);
     setRevoiceSlotNum(n);
     switchTab('revoice');
-    showToast(`Slot ${n} loaded into Revoice Studio`);
+    showToast(`Slot ${n} ${isV2 ? '(V2)' : '(V1)'} loaded into Revoice Studio`);
   }
 
   async function loadPostHistory() {
@@ -418,7 +422,13 @@ export default function CommanderNewClient({
   // ── Revoice ──────────────────────────────────────────────────────────────────
 
   async function loadMusicTracks() {
-    try { const t = await api('GET', '/api/commander/music-tracks'); setMusicTracks(Array.isArray(t) ? t : []); } catch { /* silent */ }
+    // Prefer local pipeline tracks (resolved on Oracle), fall back to Supabase library
+    try {
+      const pl = await api('GET', '/api/commander/pipeline/music-list').catch(() => []);
+      const sb = await api('GET', '/api/commander/music-tracks').catch(() => []);
+      const combined = [...(Array.isArray(pl) ? pl : []), ...(Array.isArray(sb) ? sb : [])];
+      setMusicTracks(combined);
+    } catch { /* silent */ }
   }
 
   async function loadBakeHistory() {
@@ -426,8 +436,13 @@ export default function CommanderNewClient({
   }
 
   async function refreshTracks() {
-    try { const t = await api('GET', '/api/commander/music-tracks'); setMusicTracks(Array.isArray(t) ? t : []); showToast('Tracks refreshed'); }
-    catch (e: any) { showToast(e.message, 'err'); }
+    try {
+      const pl = await api('GET', '/api/commander/pipeline/music-list').catch(() => []);
+      const sb = await api('GET', '/api/commander/music-tracks').catch(() => []);
+      const combined = [...(Array.isArray(pl) ? pl : []), ...(Array.isArray(sb) ? sb : [])];
+      setMusicTracks(combined);
+      showToast(`${combined.length} tracks loaded`);
+    } catch (e: any) { showToast(e.message, 'err'); }
   }
 
   function dzOver(e: React.DragEvent) { e.preventDefault(); (e.currentTarget as HTMLElement).classList.add('dragover'); }
@@ -508,17 +523,27 @@ export default function CommanderNewClient({
 
   async function addYT() {
     const q = ytQueryRef.current?.value.trim() || '';
-    if (!q) { showToast('Enter a search term or URL', 'err'); return; }
-    setYtStatus('Downloading… (~20 seconds)');
+    if (!q) { showToast('Enter a YouTube URL or search term', 'err'); return; }
+    setYtStatus('⏳ Downloading via yt-dlp on Oracle… (~30 seconds)');
     const fd = new FormData(); fd.append('query', q);
     try {
       const r = await fetch('/api/commander/revoice/youtube-music', { method: 'POST', body: fd });
-      if (!r.ok) throw new Error(await r.text());
+      if (!r.ok) {
+        const errText = await r.text().catch(() => 'Unknown error');
+        setYtStatus(`❌ Failed: ${errText.slice(0, 120)}`);
+        return;
+      }
       const d = await r.json();
-      setMusicTracks(prev => [...prev, { label: d.label, path: d.path }]);
-      setYtStatus('Added: ' + d.label);
+      setMusicTracks(prev => {
+        const already = prev.some(t => t.path === d.path);
+        return already ? prev : [...prev, { label: d.label, path: d.path }];
+      });
+      if (musicSelRef.current) {
+        musicSelRef.current.value = d.path;
+      }
+      setYtStatus(`✅ Added: ${d.label}`);
       if (ytQueryRef.current) ytQueryRef.current.value = '';
-    } catch (e: any) { setYtStatus('Failed: ' + (e as any).message); }
+    } catch (e: any) { setYtStatus(`❌ ${(e as any).message}`); }
   }
 
   // ── Clients ──────────────────────────────────────────────────────────────────
@@ -564,13 +589,15 @@ export default function CommanderNewClient({
   function SlotCard({ n }: { n: number }) {
     const s      = slots[String(n)] || {};
     const ip     = !!s.pending_approval;
+    const hasVid = !!(s.v1 || s.v2);
     const v1     = s.v1 ? vidUrl(s.v1) : '';
     const v2     = s.v2 ? vidUrl(s.v2) : '';
     const ts     = s.rendered_at ? new Date(s.rendered_at).toLocaleString() : '';
     const showV2 = v2Active[n] || false;
     const displayHook = showV2 ? (s.hook_v2 || s.hook || '') : (s.hook || '');
+    const v2SameText  = showV2 && !s.hook_v2 && !!s.hook;
     const cap         = s.caption_tiktok || '';
-    const currentSrc  = showV2 ? v2 : v1;
+    const currentSrc  = showV2 ? (v2 || v1) : v1;
     return (
       <div className={`slot-card${ip ? ' pending' : ''}`}>
         <div className="slot-header">
@@ -586,18 +613,19 @@ export default function CommanderNewClient({
             : <div className="no-video"><span style={{ fontSize: '2rem' }}>📭</span><span>No video yet</span></div>}
         </div>
         <div className="slot-body">
-          {(v1 && v2) && <button className="v2-toggle" onClick={() => setV2Active(p => ({ ...p, [n]: !p[n] }))}>{showV2 ? 'Show V1' : 'Show V2'}</button>}
-          {displayHook && <div className="slot-hook">{displayHook}</div>}
+          {(v1 && v2) && <button className="v2-toggle" onClick={() => setV2Active(p => ({ ...p, [n]: !p[n] }))}>{showV2 ? '← V1' : 'V2 →'}</button>}
+          {displayHook && <div className="slot-hook">{displayHook}{v2SameText && <span style={{ color: '#444', fontSize: '0.65rem' }}> (same text as V1)</span>}</div>}
           {cap && <div className="slot-caption"><strong>TK:</strong> {cap.slice(0, 90)}{cap.length > 90 ? '…' : ''}</div>}
           {ts && <div className="slot-ts">{ts}</div>}
           <div className="slot-actions">
-            {ip && <>
-              <button className="btn btn-success"   onClick={() => approve(n, 'post')}>✅ Post</button>
-              <button className="btn btn-danger"    onClick={() => approve(n, 'skip')}>Skip</button>
-              <button className="btn btn-secondary" onClick={() => approve(n, 'regen')}>🔄 Regen</button>
-            </>}
+            <button className={`btn ${ip ? 'btn-success' : 'btn-secondary'}`}
+              onClick={() => approve(n, 'post')} disabled={!hasVid} title={ip ? 'Approve & post now' : 'Force post'}>✅ Post</button>
+            <button className="btn btn-skip"
+              onClick={() => approve(n, 'skip')} disabled={!hasVid} title="Skip this slot">Skip</button>
+            <button className="btn btn-secondary"
+              onClick={() => approve(n, 'regen')} title="Regenerate content">🔄 Regen</button>
             <button className="btn btn-secondary" onClick={() => openEdit(n)}>✏️ Edit</button>
-            <button className="btn btn-secondary" onClick={() => revoiceSlot(n)}>🎙 Revoice</button>
+            <button className="btn btn-secondary" onClick={() => revoiceSlot(n, showV2)}>🎙 Revoice</button>
           </div>
         </div>
       </div>
@@ -786,10 +814,11 @@ export default function CommanderNewClient({
                 <button className="btn btn-secondary btn-sm" onClick={refreshTracks}>Refresh tracks</button>
                 <p className="or-sep mt8">— add from YouTube —</p>
                 <div className="yt-row">
-                  <input type="text" ref={ytQueryRef} placeholder="Search YouTube (e.g. afrobeats chill)" />
+                  <input type="text" ref={ytQueryRef} placeholder="YouTube URL or title (e.g. afrobeats chill)" />
                   <button className="btn btn-secondary btn-sm" onClick={addYT}>Get</button>
                 </div>
-                {ytStatus && <div className="txt-xs" style={{ marginTop: '6px' }}>{ytStatus}</div>}
+                <div className="txt-xs txt-muted" style={{ marginTop: '4px' }}>Paste a YouTube link or enter a search term — downloads via Oracle</div>
+                {ytStatus && <div className="txt-xs" style={{ marginTop: '6px', color: ytStatus.startsWith('✅') ? '#4ade80' : ytStatus.startsWith('❌') ? '#fca5a5' : '#fbbf24' }}>{ytStatus}</div>}
               </div>
             </div>
 
