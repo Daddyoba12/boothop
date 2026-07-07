@@ -43,7 +43,8 @@ export async function GET() {
       const folder = FOLDER[t.source];
       path = `${SB_MUSIC_BASE}/${folder}/${t.title}.mp3`;
     } else {
-      path = String(t.id);
+      // No known storage location — skip (e.g. old 'library' placeholder tracks)
+      return null;
     }
     return { label, path };
   }).filter(Boolean);
