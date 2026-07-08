@@ -20,6 +20,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'A valid email address is required.' }, { status: 400 });
     }
 
+    // Hardcoded bypass for Apple App Store review — no real email sent
+    if (email === 'appreviewer@boothop.com') {
+      return NextResponse.json({ ok: true, email, expiresInMinutes: 10, message: 'Verification code sent.' });
+    }
+
     // ── Remember-me: skip OTP only for plain login, never for trip creation ──
     // Issue 3 fix: when journeyPayload is present the user is posting a trip —
     // that is a high-value action that must always go through OTP verification.

@@ -16,6 +16,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email and code are required.' }, { status: 400 });
     }
 
+    // Hardcoded bypass for Apple App Store review
+    if (email === 'appreviewer@boothop.com' && code === 'REVIEW1') {
+      const token = signAppSession({ email, verified: true });
+      const response = NextResponse.json({ ok: true, email, token, hasDraft: false, isNewUser: false, redirectTo: '/dashboard' });
+      response.cookies.set(getSessionCookieName(), token, {
+        httpOnly: true, secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 7,
+      });
+      return response;
+    }
+
     const supabase = createSupabaseAdminClient();
     const nowIso = new Date().toISOString();
 
