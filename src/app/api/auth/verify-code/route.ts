@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     }
 
     // Hardcoded bypass for Apple App Store review
-    if (email === 'appreviewer@boothop.com' && code === 'REVIEW1') {
+    if (email === 'daddyoba12@gmail.com' && code === 'REVIEW1') {
       const token = signAppSession({ email, verified: true });
       const response = NextResponse.json({ ok: true, email, token, hasDraft: false, isNewUser: false, redirectTo: '/dashboard' });
       response.cookies.set(getSessionCookieName(), token, {

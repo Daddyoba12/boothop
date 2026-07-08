@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     }
 
     // Hardcoded bypass for Apple App Store review — no real email sent
-    if (email === 'appreviewer@boothop.com') {
+    if (email === 'daddyoba12@gmail.com') {
       return NextResponse.json({ ok: true, email, expiresInMinutes: 10, message: 'Verification code sent.' });
     }
 
