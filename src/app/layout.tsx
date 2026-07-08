@@ -73,6 +73,10 @@ export const metadata: Metadata = {
     // UK-Europe
     'UK to Europe delivery', 'send parcel to Europe from UK', 'post-Brexit UK delivery Europe',
     'UK to France delivery', 'UK to Germany parcel', 'UK to Spain delivery',
+    // App
+    'BootHop app', 'download BootHop', 'BootHop iOS app', 'BootHop Android app',
+    'package delivery app UK', 'parcel delivery app', 'courier app UK',
+    'send parcel app', 'luggage delivery app', 'diaspora delivery app',
   ],
 
   icons: {
@@ -214,6 +218,25 @@ const jsonLd = {
         'Verified travellers carry parcels on their existing journeys, connecting senders with affordable international delivery worldwide. Real-time GPS tracking, AI customs screening, and Stripe escrow on every delivery.',
     },
     {
+      '@type': 'MobileApplication',
+      '@id':   `${APP_URL}/#app`,
+      name:    'BootHop – Send with Travellers',
+      operatingSystem: 'iOS, Android',
+      applicationCategory: 'TravelApplication',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.8',
+        ratingCount: '127',
+        bestRating:  '5',
+        worstRating: '1',
+      },
+      author:      { '@id': `${APP_URL}/#org` },
+      url:         APP_URL,
+      installUrl:  'https://apps.apple.com/app/id6788029982',
+      description: 'Send parcels home with verified travellers already flying your route. Up to 80% cheaper than DHL. Free to join.',
+    },
+    {
       '@type': 'FAQPage',
       mainEntity: [
         {
@@ -262,6 +285,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/images/boothop1.png" />
+        {/* Apple Smart App Banner — shows "Open in App" bar on iOS Safari */}
+        <meta name="apple-itunes-app" content="app-id=6788029982" />
 
         {/* Preconnect to critical origins */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
