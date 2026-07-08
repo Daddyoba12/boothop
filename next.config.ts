@@ -30,6 +30,16 @@ const nextConfig: NextConfig = {
         source: '/onboard/admin/:path*',
         destination: `${ORACLE_HOST}/admin/:path*`,
       },
+      // /videoEditor → OTB Pipeline Dashboard (FastAPI on Oracle:8080)
+      // Proxied with BASE_PATH=/videoEditor so all internal links/API calls stay within /videoEditor/
+      {
+        source: '/videoEditor',
+        destination: `${ORACLE_HOST}:8080/login`,
+      },
+      {
+        source: '/videoEditor/:path*',
+        destination: `${ORACLE_HOST}:8080/:path*`,
+      },
     ];
   },
   async redirects() {
