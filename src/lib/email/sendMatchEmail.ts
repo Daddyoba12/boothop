@@ -220,6 +220,102 @@ export async function sendMatchConfirmedEmail(params: {
   });
 }
 
+export async function sendMatchReminderEmail(params: {
+  toEmail:       string;
+  fromCity:      string;
+  toCity:        string;
+  travelDate:    string;
+  price:         number;
+  matchId:       string;
+  acceptToken?:  string;
+  declineToken?: string;
+  hoursUntilTravel: number | null;
+}) {
+  const acceptUrl  = params.acceptToken  ? `${appUrl}/confirm?token=${params.acceptToken}`  : `${appUrl}/dashboard`;
+  const declineUrl = params.declineToken ? `${appUrl}/confirm?token=${params.declineToken}` : `${appUrl}/dashboard`;
+  const dateStr    = new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const urgencyNote = params.hoursUntilTravel !== null && params.hoursUntilTravel <= 48
+    ? `<div style="background:#7f1d1d;border:1px solid #ef4444;border-radius:12px;padding:12px 16px;margin:0 0 20px;">
+        <p style="margin:0;font-size:13px;color:#fecaca;font-weight:700;">
+          ⚠️ Urgent: Your travel date is in ${Math.round(params.hoursUntilTravel)} hours. Please respond now or the match will be released.
+        </p>
+      </div>`
+    : params.hoursUntilTravel !== null
+    ? `<div style="background:#1c1917;border:1px solid #f59e0b;border-radius:12px;padding:12px 16px;margin:0 0 20px;">
+        <p style="margin:0;font-size:13px;color:#fde68a;">
+          📅 Your travel date is <strong>${dateStr}</strong> — approximately ${Math.round(params.hoursUntilTravel / 24)} day${Math.round(params.hoursUntilTravel / 24) === 1 ? '' : 's'} away. Please respond before then.
+        </p>
+      </div>`
+    : '';
+
+  await sendResendEmail({
+    from,
+    to: params.toEmail,
+    subject: `⏰ Reminder: Your BootHop match is waiting — ${params.fromCity} → ${params.toCity}`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;background:#0f172a;color:#f8fafc;border-radius:16px;overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#451a03,#0f172a);padding:28px 36px;text-align:center;border-bottom:2px solid #f59e0b;">
+          <div style="font-size:26px;font-weight:900;color:#fff;">Boot<span style="color:#38bdf8;">Hop</span></div>
+          <div style="color:#fde68a;font-size:11px;margin-top:4px;letter-spacing:1.5px;text-transform:uppercase;">⏰ Action Required — Reminder</div>
+        </div>
+        <div style="padding:32px 36px;">
+          <h2 style="color:#f1f5f9;font-size:20px;font-weight:700;margin:0 0 6px;">
+            You haven't responded to your match yet
+          </h2>
+          <p style="color:#94a3b8;font-size:14px;margin:0 0 20px;">
+            We found you a match for your <strong style="color:#f1f5f9;">${params.fromCity} → ${params.toCity}</strong> trip on <strong style="color:#f1f5f9;">${dateStr}</strong>,
+            but we're still waiting for your response. Both you and the other party must accept for the match to be confirmed.
+          </p>
+
+          ${urgencyNote}
+
+          <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:18px 22px;margin:0 0 24px;">
+            <p style="margin:0 0 4px;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;">Agreed Price</p>
+            <p style="margin:0;font-size:32px;font-weight:900;color:#38bdf8;">£${params.price}</p>
+          </div>
+
+          <p style="color:#cbd5e1;font-size:14px;margin:0 0 8px;font-weight:600;">What happens next?</p>
+          <ul style="color:#94a3b8;font-size:13px;margin:0 0 24px;padding-left:20px;line-height:1.8;">
+            <li>Click <strong style="color:#f1f5f9;">Accept Match</strong> to confirm you're happy to proceed at £${params.price}</li>
+            <li>Both parties must accept — you'll then move to the agreement stage</li>
+            <li>Click <strong style="color:#f1f5f9;">Decline</strong> if you no longer wish to proceed — your trip will remain active and we'll keep looking</li>
+            <li>If neither party responds before the travel date, the match will be automatically cancelled</li>
+          </ul>
+
+          <div style="margin:0 0 24px;">
+            <a href="${acceptUrl}" style="display:inline-block;background:#16a34a;color:#ffffff;font-weight:700;font-size:15px;padding:14px 28px;border-radius:12px;text-decoration:none;margin-right:12px;">
+              ✅ Accept Match
+            </a>
+            <a href="${declineUrl}" style="display:inline-block;background:#b91c1c;color:#ffffff;font-weight:700;font-size:15px;padding:14px 28px;border-radius:12px;text-decoration:none;">
+              ✗ Decline
+            </a>
+          </div>
+
+          <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px 20px;margin:0 0 20px;">
+            <p style="margin:0 0 6px;font-size:12px;color:#64748b;font-weight:600;text-transform:uppercase;">Need help?</p>
+            <p style="margin:0;font-size:13px;color:#94a3b8;">
+              If you have questions about this match or need to speak to someone, visit your
+              <a href="${appUrl}/dashboard" style="color:#38bdf8;text-decoration:none;">dashboard</a>
+              or reply to this email and our team will help.
+            </p>
+          </div>
+
+          <p style="color:#475569;font-size:11px;margin:0;">
+            You are receiving this reminder because you haven't yet responded to your match.
+            Reminders are sent every 4 hours until you accept, decline, or your travel date arrives.
+            The link above will expire on your travel date (${dateStr}).
+          </p>
+        </div>
+        <div style="background:#0f172a;border-top:1px solid #1e293b;padding:16px 36px;text-align:center;">
+          <p style="color:#334155;font-size:11px;margin:0;">© BootHop · <a href="${appUrl}" style="color:#38bdf8;text-decoration:none;">boothop.com</a></p>
+        </div>
+      </div>
+    `,
+    text: `REMINDER: You haven't responded to your BootHop match yet.\n\nRoute: ${params.fromCity} → ${params.toCity}\nTravel date: ${dateStr}\nAgreed price: £${params.price}\n\nWhat to do:\n- Accept: ${acceptUrl}\n- Decline: ${declineUrl}\n\nBoth parties must accept for the match to proceed. If nobody responds before the travel date, the match will be cancelled automatically.\n\nQuestions? Visit your dashboard: ${appUrl}/dashboard`,
+  });
+}
+
 export async function sendAlternativeJourneysEmail(params: {
   toEmail: string;
   fromCity: string;

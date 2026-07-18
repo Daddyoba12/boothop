@@ -5,25 +5,48 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 export default function PushPermissionBanner() {
   const { permission, subscribed, subscribe } = usePushNotifications();
-  const [dismissed, setDismissed] = useState(true); // start hidden to avoid flash
+  const [dismissed, setDismissed]   = useState(true);
+  const [loading,   setLoading]     = useState(false);
+  const [error,     setError]       = useState('');
 
   useEffect(() => {
-    // Only show after a small delay, once we know the state
-    if (permission === 'default' && !subscribed) {
-      const alreadyDismissed = localStorage.getItem('boothop_push_dismissed');
-      if (!alreadyDismissed) {
-        const t = setTimeout(() => setDismissed(false), 2000);
-        return () => clearTimeout(t);
-      }
+    if (typeof localStorage === 'undefined') return;
+    const alreadyDismissed = localStorage.getItem('boothop_push_dismissed');
+    if (alreadyDismissed) return;
+
+    // Show banner if permission not yet decided, or if denied (so we can guide them)
+    if (!subscribed && permission !== 'granted') {
+      const t = setTimeout(() => setDismissed(false), 1500);
+      return () => clearTimeout(t);
     }
   }, [permission, subscribed]);
 
-  if (dismissed || permission === 'denied' || subscribed) return null;
+  if (dismissed || subscribed) return null;
 
-  function handleEnable() {
-    subscribe().then(ok => {
-      if (ok) setDismissed(true);
-    });
+  async function handleEnable() {
+    setLoading(true);
+    setError('');
+    const result = await subscribe();
+    setLoading(false);
+
+    if (result.ok) {
+      setDismissed(true);
+      return;
+    }
+
+    switch (result.reason) {
+      case 'denied':
+        setError('Blocked by browser. Open Settings → Notifications → boothop.com and allow.');
+        break;
+      case 'unsupported':
+        setError('Your browser does not support push notifications.');
+        break;
+      case 'sw_timeout':
+        setError('Page not fully loaded yet — refresh and try again.');
+        break;
+      default:
+        setError('Could not enable notifications. Try refreshing the page.');
+    }
   }
 
   function handleDismiss() {
@@ -41,12 +64,24 @@ export default function PushPermissionBanner() {
             <p className="text-white/50 text-xs mt-0.5 leading-relaxed">
               Get notified when a match is found, payment confirmed, or your package is delivered.
             </p>
+
+            {error && (
+              <p className="text-orange-400 text-xs mt-2 leading-snug">{error}</p>
+            )}
+
+            {permission === 'denied' && !error && (
+              <p className="text-orange-400 text-xs mt-2 leading-snug">
+                Notifications are blocked. Open your browser settings to allow them for this site.
+              </p>
+            )}
+
             <div className="flex gap-2 mt-3">
               <button
                 onClick={handleEnable}
-                className="flex-1 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-black font-bold text-xs"
+                disabled={loading}
+                className="flex-1 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-black font-bold text-xs disabled:opacity-60"
               >
-                Enable
+                {loading ? 'Enabling…' : permission === 'denied' ? 'Open Settings' : 'Enable'}
               </button>
               <button
                 onClick={handleDismiss}

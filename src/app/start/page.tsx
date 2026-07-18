@@ -16,6 +16,7 @@ interface Journey {
   to: string;
   size: string;
   date: string;
+  price: string;
 }
 
 const SENDER_SIZES = [
@@ -31,19 +32,28 @@ const TRAVELLER_LUGGAGE = [
   { value: 'large',  label: 'Large',  sub: '15 – 32 kg spare'  },
 ];
 
-// sender steps:    from → to → size → date
-// traveller steps: from → to → date → size
-const SENDER_STEPS    = ['from', 'to', 'size', 'date'] as const;
-const TRAVELLER_STEPS = ['from', 'to', 'date', 'size'] as const;
+const SIZE_TO_KG: Record<string, number> = { letter: 0.5, small: 3, medium: 10, large: 25 };
+
+// Logged-in users get a price step; guests go through the email gate instead
+const SENDER_STEPS_AUTH    = ['from', 'to', 'size', 'date', 'price'] as const;
+const TRAVELLER_STEPS_AUTH = ['from', 'to', 'date', 'size', 'price'] as const;
+const SENDER_STEPS_GUEST   = ['from', 'to', 'size', 'date'] as const;
+const TRAVELLER_STEPS_GUEST= ['from', 'to', 'date', 'size'] as const;
 
 function StartContent() {
-  const router      = useRouter();
+  const router       = useRouter();
   const searchParams = useSearchParams();
 
   const [role, setRole]       = useState<Role | null>(null);
   const [step, setStep]       = useState(0);
-  const [journey, setJourney] = useState<Journey>({ from: '', to: '', size: '', date: '' });
+  const [journey, setJourney] = useState<Journey>({ from: '', to: '', size: '', date: '', price: '' });
   const [fieldError, setFieldError] = useState('');
+
+  // Auth state — checked once on mount
+  const [authenticated, setAuthenticated] = useState(false);
+  const [authChecked,   setAuthChecked]   = useState(false);
+  const [posting,       setPosting]       = useState(false);
+  const [postError,     setPostError]     = useState('');
 
   // City autocomplete
   const [fromQuery, setFromQuery]           = useState('');
@@ -55,7 +65,7 @@ function StartContent() {
   const [mapsReady, setMapsReady]           = useState(false);
   const [sessionToken, setSessionToken]     = useState<any>(null);
 
-  // Auth state
+  // Guest auth state (email/OTP gate)
   const [email, setEmail]         = useState('');
   const [emailSent, setEmailSent] = useState(false);
   const [otp, setOtp]             = useState('');
@@ -63,14 +73,26 @@ function StartContent() {
   const [emailError, setEmailError] = useState('');
   const [otpError, setOtpError]   = useState('');
 
-  // Pre-select role from ?role= param
+  // Check if already logged in
   useEffect(() => {
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        setAuthenticated(!!(d?.authenticated && d?.user?.email));
+        setAuthChecked(true);
+      })
+      .catch(() => setAuthChecked(true));
+  }, []);
+
+  // Pre-select role from ?role= param (only once auth is known)
+  useEffect(() => {
+    if (!authChecked) return;
     const r = searchParams.get('role') as Role | null;
     if (r === 'sender' || r === 'traveller') {
       setRole(r);
       setStep(1);
     }
-  }, [searchParams]);
+  }, [searchParams, authChecked]);
 
   // Google Maps Places
   useEffect(() => {
@@ -107,29 +129,73 @@ function StartContent() {
     return () => clearTimeout(t);
   }, [toQuery, toLocked, mapsReady, sessionToken]);
 
-  const STEPS = role === 'sender' ? SENDER_STEPS : TRAVELLER_STEPS;
-  const TOTAL  = 4;
-  const isGate = step > TOTAL;
+  const STEPS = role === 'sender'
+    ? (authenticated ? SENDER_STEPS_AUTH    : SENDER_STEPS_GUEST)
+    : (authenticated ? TRAVELLER_STEPS_AUTH : TRAVELLER_STEPS_GUEST);
+  const TOTAL   = STEPS.length;
+  const isGate  = step > TOTAL;
   const currentKey = (!isGate && step > 0) ? STEPS[step - 1] : null;
 
-  // Progress: each question = 20% increments up to 80%; gate = 90%
   const progressPct = step === 0 ? 0 : isGate ? 90 : Math.round((step / TOTAL) * 80);
 
   const chooseRole = (r: Role) => { setRole(r); setStep(1); setFieldError(''); };
 
   const back = () => {
     setFieldError('');
+    setPostError('');
     if (step <= 1) { setStep(0); setRole(null); } else setStep(s => s - 1);
   };
 
   const advance = () => {
     if (!currentKey) return;
     const val = journey[currentKey as keyof Journey];
-    if (!val || !val.trim()) { setFieldError('Please answer this question to continue.'); return; }
-    if (currentKey === 'from' && !fromLocked) { setFieldError('Please select a city from the dropdown.'); return; }
-    if (currentKey === 'to'   && !toLocked)   { setFieldError('Please select a city from the dropdown.'); return; }
+
+    if (currentKey === 'price') {
+      const n = parseFloat(val.replace(/[^0-9.]/g, ''));
+      if (!n || n <= 0) { setFieldError('Please enter an amount greater than £0.'); return; }
+    } else {
+      if (!val || !val.trim()) { setFieldError('Please answer this question to continue.'); return; }
+      if (currentKey === 'from' && !fromLocked) { setFieldError('Please select a city from the dropdown.'); return; }
+      if (currentKey === 'to'   && !toLocked)   { setFieldError('Please select a city from the dropdown.'); return; }
+    }
+
     setFieldError('');
+
+    // Logged-in user finishing last step → post trip directly
+    if (authenticated && step === TOTAL) {
+      postTrip();
+      return;
+    }
+
     setStep(s => s >= TOTAL ? TOTAL + 1 : s + 1);
+  };
+
+  const postTrip = async () => {
+    setPosting(true);
+    setPostError('');
+    try {
+      const price = parseFloat(journey.price.replace(/[^0-9.]/g, ''));
+      const res = await fetch('/api/trips/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          from:   journey.from,
+          to:     journey.to,
+          date:   journey.date,
+          weight: SIZE_TO_KG[journey.size] ?? 5,
+          price:  String(price),
+          mode:   role === 'sender' ? 'send' : 'travel',
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setPostError(data.error || 'Could not publish. Please try again.'); return; }
+      router.push('/dashboard');
+    } catch {
+      setPostError('Network error — please try again.');
+    } finally {
+      setPosting(false);
+    }
   };
 
   const minDate = (() => {
@@ -144,6 +210,7 @@ function StartContent() {
   const sizeLabel = (role === 'sender' ? SENDER_SIZES : TRAVELLER_LUGGAGE)
     .find(o => o.value === journey.size)?.label ?? journey.size;
 
+  // Guest: save journey to localStorage then request OTP
   const sendCode = async () => {
     if (!email || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
       setEmailError('Please enter a valid email address.');
@@ -152,7 +219,6 @@ function StartContent() {
     setEmailError('');
     setSubmitting(true);
 
-    // Store journey in localStorage — dashboard picks it up after login
     try {
       localStorage.setItem('boothop_pending_journey', JSON.stringify({
         role, from: journey.from, to: journey.to, size: journey.size, date: journey.date,
@@ -187,13 +253,16 @@ function StartContent() {
     setSubmitting(false);
     if (!res.ok) { setOtpError(data.error || 'Invalid code. Try again.'); return; }
 
-    // CompleteRegistration fires here — after OTP verified, not on form submit
     (window as any).ttq?.track('CompleteRegistration', { description: `start_${role}` });
-
     router.push('/dashboard');
   };
 
   const inputCls = 'w-full rounded-xl border border-white/15 bg-white/[0.06] px-5 py-4 text-white text-base placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all';
+
+  // Show a spinner while we confirm auth status (avoids flicker)
+  if (!authChecked) {
+    return <div className="min-h-screen bg-[#07111f]" />;
+  }
 
   return (
     <div className="min-h-screen bg-[#07111f] text-white flex flex-col">
@@ -201,7 +270,10 @@ function StartContent() {
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-lg mx-auto w-full">
         <Link href="/"><BootHopLogo size="sm" /></Link>
-        <Link href="/login" className="text-sm text-white/40 hover:text-white/70 transition-colors">Log in</Link>
+        {authenticated
+          ? <Link href="/dashboard" className="text-sm text-white/40 hover:text-white/70 transition-colors">Dashboard</Link>
+          : <Link href="/login"     className="text-sm text-white/40 hover:text-white/70 transition-colors">Log in</Link>
+        }
       </nav>
 
       {/* Progress bar */}
@@ -217,18 +289,20 @@ function StartContent() {
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         <div className="w-full max-w-lg">
 
-          {/* ── STEP 0 — Decision ── */}
+          {/* ── STEP 0 — Role picker ── */}
           {step === 0 && (
             <>
               <div className="text-center mb-10">
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Welcome to BootHop</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+                  {authenticated ? 'Add a new listing' : 'Welcome to BootHop'}
+                </h1>
                 <p className="text-white/45 text-base">How can we help you today?</p>
               </div>
 
               <div className="space-y-4">
                 {([
-                  { r: 'sender'   as Role, emoji: '📦', title: 'Send a Package',  sub: 'Find someone already travelling your route' },
-                  { r: 'traveller'as Role, emoji: '✈️', title: "I'm Travelling", sub: 'Earn money from your spare luggage space'    },
+                  { r: 'sender'    as Role, emoji: '📦', title: 'Send a Package',  sub: 'Find someone already travelling your route' },
+                  { r: 'traveller' as Role, emoji: '✈️', title: "I'm Travelling",  sub: 'Earn money from your spare luggage space'    },
                 ] as const).map(({ r, emoji, title, sub }) => (
                   <button key={r} onClick={() => chooseRole(r)}
                     className="w-full rounded-2xl border border-white/12 bg-white/[0.03] hover:border-blue-500/35 hover:bg-blue-500/5 transition-all duration-200 p-6 text-left group">
@@ -244,14 +318,16 @@ function StartContent() {
                 ))}
               </div>
 
-              <p className="text-center text-xs text-white/25 mt-8">
-                Already have an account?{' '}
-                <Link href="/login" className="text-white/45 underline underline-offset-2 hover:text-white/65 transition-colors">Log in</Link>
-              </p>
+              {!authenticated && (
+                <p className="text-center text-xs text-white/25 mt-8">
+                  Already have an account?{' '}
+                  <Link href="/login" className="text-white/45 underline underline-offset-2 hover:text-white/65 transition-colors">Log in</Link>
+                </p>
+              )}
             </>
           )}
 
-          {/* ── STEPS 1–4 — Questions ── */}
+          {/* ── STEPS 1–N — Questions ── */}
           {step > 0 && !isGate && currentKey && (
             <>
               <button onClick={back} className="flex items-center gap-1.5 text-white/35 hover:text-white/65 text-sm mb-10 transition-colors">
@@ -263,13 +339,14 @@ function StartContent() {
               </p>
 
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-8 leading-snug">
-                {currentKey === 'from' && (role === 'sender' ? 'Where are you sending from?' : 'Where are you travelling from?')}
-                {currentKey === 'to'   && (role === 'sender' ? 'Where is it going?'          : 'Where are you going?')}
-                {currentKey === 'size' && (role === 'sender' ? 'Package size?'               : 'How much luggage space do you have spare?')}
-                {currentKey === 'date' && (role === 'sender' ? 'Preferred delivery date?'    : 'When are you travelling?')}
+                {currentKey === 'from'  && (role === 'sender' ? 'Where are you sending from?'             : 'Where are you travelling from?')}
+                {currentKey === 'to'    && (role === 'sender' ? 'Where is it going?'                      : 'Where are you going?')}
+                {currentKey === 'size'  && (role === 'sender' ? 'Package size?'                           : 'How much luggage space do you have spare?')}
+                {currentKey === 'date'  && (role === 'sender' ? 'Preferred delivery date?'               : 'When are you travelling?')}
+                {currentKey === 'price' && (role === 'sender' ? 'What\'s your budget?'                   : 'How much do you want to charge?')}
               </h2>
 
-              {/* From — city autocomplete */}
+              {/* From */}
               {currentKey === 'from' && (
                 <div className="relative">
                   <input type="text" placeholder="e.g. London" value={fromQuery} autoFocus
@@ -289,7 +366,7 @@ function StartContent() {
                 </div>
               )}
 
-              {/* To — city autocomplete */}
+              {/* To */}
               {currentKey === 'to' && (
                 <div className="relative">
                   <input type="text" placeholder="e.g. Lagos" value={toQuery} autoFocus
@@ -309,7 +386,7 @@ function StartContent() {
                 </div>
               )}
 
-              {/* Size — option cards (auto-advance on select) */}
+              {/* Size */}
               {currentKey === 'size' && (
                 <div className="space-y-3">
                   {(role === 'sender' ? SENDER_SIZES : TRAVELLER_LUGGAGE).map(opt => (
@@ -335,22 +412,41 @@ function StartContent() {
                 />
               )}
 
-              {fieldError && <p className="mt-3 text-sm text-red-400">{fieldError}</p>}
+              {/* Price — logged-in users only */}
+              {currentKey === 'price' && (
+                <div className="relative">
+                  <span className="absolute left-5 top-1/2 -translate-y-1/2 text-white/40 font-semibold text-base">£</span>
+                  <input
+                    type="number" min="1" placeholder="e.g. 40" autoFocus
+                    value={journey.price}
+                    onChange={e => { setJourney(j => ({ ...j, price: e.target.value })); setFieldError(''); setPostError(''); }}
+                    onKeyDown={e => e.key === 'Enter' && advance()}
+                    className={`${inputCls} pl-10`}
+                  />
+                </div>
+              )}
 
-              {/* Continue — hidden for size until something selected */}
+              {fieldError && <p className="mt-3 text-sm text-red-400">{fieldError}</p>}
+              {postError  && <p className="mt-3 text-sm text-red-400">{postError}</p>}
+
+              {/* Continue button — hidden for size until something selected */}
               {(currentKey !== 'size' || journey.size) && (
-                <button onClick={advance}
-                  className="mt-6 w-full flex items-center justify-center gap-2 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)]">
-                  Continue <ArrowRight className="h-4 w-4" />
+                <button onClick={advance} disabled={posting}
+                  className="mt-6 w-full flex items-center justify-center gap-2 rounded-xl bg-blue-500 hover:bg-blue-400 disabled:opacity-60 text-white font-bold py-4 text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)]">
+                  {posting
+                    ? 'Publishing…'
+                    : (authenticated && step === TOTAL)
+                      ? <>Publish now <ArrowRight className="h-4 w-4" /></>
+                      : <>Continue <ArrowRight className="h-4 w-4" /></>
+                  }
                 </button>
               )}
             </>
           )}
 
-          {/* ── GATE — Step 5 ── */}
-          {isGate && (
+          {/* ── GATE — guest only (step > TOTAL when not authenticated) ── */}
+          {isGate && !authenticated && (
             <>
-              {/* Progress */}
               <div className="flex justify-between text-xs text-white/35 mb-2">
                 <span>Almost there</span>
                 <span className="font-semibold text-white/55">90% complete</span>
@@ -375,7 +471,6 @@ function StartContent() {
                 </div>
               </div>
 
-              {/* Headline */}
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
                 {role === 'sender' ? 'Your request is ready to publish.' : 'Your trip is ready to publish.'}
               </h2>
@@ -384,14 +479,8 @@ function StartContent() {
                 {role === 'sender' ? 'travellers' : 'senders'}.
               </p>
 
-              {/* Trust signals */}
               <div className="grid grid-cols-2 gap-y-2.5 gap-x-4 mb-8">
-                {[
-                  'Less than 30 seconds',
-                  '£20 welcome credit',
-                  'ID verified community',
-                  'Escrow protected',
-                ].map(t => (
+                {['Less than 30 seconds', '£20 welcome credit', 'ID verified community', 'Escrow protected'].map(t => (
                   <div key={t} className="flex items-center gap-2 text-sm text-white/50">
                     <CheckCircle className="h-3.5 w-3.5 text-green-400 shrink-0" />
                     {t}
@@ -399,7 +488,6 @@ function StartContent() {
                 ))}
               </div>
 
-              {/* Email → OTP */}
               {!emailSent ? (
                 <>
                   <input type="email" placeholder="Your email address" value={email} autoFocus

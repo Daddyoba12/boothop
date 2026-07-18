@@ -1,15 +1,13 @@
 import { sendResendEmail } from '@/lib/resend-client';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
 
-// ── Push (web-push) ──────────────────────────────────────────────────────────
+// ── Push (web-push + Expo) ────────────────────────────────────────────────────
 
 export async function sendPushToEmail(
   supabase: any,
   email: string,
   payload: { title: string; body: string; url?: string }
 ): Promise<void> {
-  if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) return;
-
   const { data } = await supabase
     .from('push_subscriptions')
     .select('subscription')
@@ -18,6 +16,33 @@ export async function sendPushToEmail(
 
   if (!data?.subscription) return;
 
+  const sub = data.subscription;
+
+  // Expo push (React Native / mobile app)
+  if (sub?.type === 'expo' && sub?.token) {
+    try {
+      await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Accept-Encoding': 'gzip, deflate',
+        },
+        body: JSON.stringify({
+          to: sub.token,
+          title: payload.title,
+          body: payload.body,
+          data: payload.url ? { url: payload.url } : undefined,
+          sound: 'default',
+          priority: 'high',
+        }),
+      });
+    } catch { /* graceful */ }
+    return;
+  }
+
+  // Web Push (VAPID)
+  if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) return;
   try {
     const webpush = (await import('web-push')).default;
     webpush.setVapidDetails(
@@ -25,7 +50,7 @@ export async function sendPushToEmail(
       process.env.VAPID_PUBLIC_KEY,
       process.env.VAPID_PRIVATE_KEY
     );
-    await webpush.sendNotification(data.subscription, JSON.stringify(payload));
+    await webpush.sendNotification(sub, JSON.stringify(payload));
   } catch { /* graceful */ }
 }
 

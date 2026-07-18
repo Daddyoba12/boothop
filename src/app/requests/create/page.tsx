@@ -19,11 +19,23 @@ export default function CreateRequestPage() {
 
   const [formData, setFormData] = useState({
     itemName: '', itemDescription: '', itemCategory: 'personal_effects',
+    parcelSize: '' as '' | 'small' | 'medium' | 'large',
     itemWeight: '', itemDimensions: '', itemValue: '',
     pickupCity: '', pickupCountry: '', deliveryCity: '', deliveryCountry: '',
     preferredPickupDate: '', flexibleUntil: '', specialInstructions: '',
     offeredPrice: '', urgency: 'normal' as 'normal' | 'urgent',
   });
+
+  const PARCEL_SIZES = [
+    { id: 'small'  as const, label: 'Small',  sub: 'Up to 5 kg',  maxKg: 5,  icon: '📦' },
+    { id: 'medium' as const, label: 'Medium', sub: 'Up to 15 kg', maxKg: 15, icon: '🧳' },
+    { id: 'large'  as const, label: 'Large',  sub: 'Up to 23 kg', maxKg: 23, icon: '📫' },
+  ];
+
+  function selectSize(id: 'small' | 'medium' | 'large') {
+    const sz = PARCEL_SIZES.find(s => s.id === id)!;
+    setFormData(p => ({ ...p, parcelSize: id, itemWeight: String(sz.maxKg) }));
+  }
 
   const countries = [
     'United Kingdom', 'United States', 'Canada', 'Australia', 'Germany', 'France',
@@ -49,11 +61,19 @@ export default function CreateRequestPage() {
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/login'); return; }
+      const sessionRes = await fetch('/api/auth/me');
+      if (!sessionRes.ok) { router.push('/login'); return; }
+      const { user: session } = await sessionRes.json();
+
+      const { data: profile, error: profileErr } = await supabase
+        .from('profiles').select('id').eq('email', session.email).single();
+      if (profileErr || !profile) { router.push('/login'); return; }
+      const userId = profile.id;
 
       if (!formData.itemName || !formData.itemDescription)
         throw new Error('Please provide item name and description.');
+      if (!formData.itemWeight || Number(formData.itemWeight) <= 0)
+        throw new Error('Weight is required. Please select a parcel size or enter the weight manually.');
       if (!formData.pickupCity || !formData.pickupCountry || !formData.deliveryCity || !formData.deliveryCountry)
         throw new Error('Please fill in all location fields.');
       if (!formData.preferredPickupDate || !formData.flexibleUntil)
@@ -83,7 +103,7 @@ export default function CreateRequestPage() {
       const { data: request, error: reqErr } = await supabase
         .from('delivery_requests')
         .insert({
-          hooper_id:            user.id,
+          hooper_id:            userId,
           item_name:            formData.itemName,
           item_description:     formData.itemDescription,
           item_category:        formData.itemCategory,
@@ -184,10 +204,38 @@ export default function CreateRequestPage() {
                   {categories.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
               </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">Parcel Size *</label>
+                <div className="grid grid-cols-3 gap-3">
+                  {PARCEL_SIZES.map(sz => (
+                    <button key={sz.id} type="button" onClick={() => selectSize(sz.id)}
+                      className={`flex flex-col items-center gap-1 py-3 px-2 rounded-xl border-2 transition text-center ${
+                        formData.parcelSize === sz.id
+                          ? 'border-blue-600 bg-blue-50'
+                          : 'border-slate-200 hover:border-slate-300'
+                      }`}>
+                      <span className="text-2xl">{sz.icon}</span>
+                      <span className={`text-sm font-semibold ${formData.parcelSize === sz.id ? 'text-blue-700' : 'text-slate-700'}`}>
+                        {sz.label}
+                      </span>
+                      <span className="text-xs text-slate-500">{sz.sub}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Weight (kg)</label>
-                <input type="number" step="0.1" min="0" value={formData.itemWeight} onChange={set('itemWeight')}
-                  placeholder="e.g. 0.5" className={inputCls} />
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Weight (kg) *</label>
+                <input type="number" step="0.1" min="0.1" required
+                  value={formData.itemWeight} onChange={set('itemWeight')}
+                  placeholder="e.g. 2.5" className={inputCls} />
+                {formData.parcelSize && (
+                  <p className="text-xs text-blue-600 mt-1.5 font-medium">
+                    ✓ Defaulted to {PARCEL_SIZES.find(s => s.id === formData.parcelSize)!.maxKg} kg
+                    (max for {formData.parcelSize}). Reduce if your item weighs less.
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Dimensions (L×W×H cm)</label>

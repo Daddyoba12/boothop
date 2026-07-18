@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  Package, 
+import {
+  Package,
   User,
   Mail,
   Phone,
@@ -12,7 +12,8 @@ import {
   Star,
   Shield,
   CheckCircle,
-  Camera
+  Camera,
+  Trash2,
 } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
 import type { Profile, Rating } from '@/lib/supabase';
@@ -32,7 +33,9 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -45,18 +48,14 @@ export default function ProfilePage() {
 
   const fetchProfile = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        router.push('/login');
-        return;
-      }
+      const sessionRes = await fetch('/api/auth/me');
+      if (!sessionRes.ok) { router.push('/login'); return; }
+      const { user: session } = await sessionRes.json();
 
-      // Fetch profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('email', session.email)
         .single();
 
       if (profileError) throw profileError;
@@ -68,7 +67,6 @@ export default function ProfilePage() {
         bio: profileData.bio || '',
       });
 
-      // Fetch ratings
       const { data: ratingsData } = await supabase
         .from('ratings')
         .select(`
@@ -77,7 +75,7 @@ export default function ProfilePage() {
             full_name
           )
         `)
-        .eq('reviewee_id', user.id)
+        .eq('reviewee_id', profileData.id)
         .order('created_at', { ascending: false });
 
       setRatings(ratingsData as RatingWithReviewer[] || []);
@@ -92,9 +90,7 @@ export default function ProfilePage() {
     setSaving(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) throw new Error('Not authenticated');
+      if (!profile) throw new Error('Not authenticated');
 
       const { error } = await supabase
         .from('profiles')
@@ -103,7 +99,7 @@ export default function ProfilePage() {
           phone: formData.phone || null,
           bio: formData.bio || null,
         })
-        .eq('id', user.id);
+        .eq('id', profile.id);
 
       if (error) throw error;
 
@@ -115,6 +111,19 @@ export default function ProfilePage() {
       alert('Failed to update profile: ' + error.message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const res = await fetch('/api/auth/delete-account', { method: 'POST' });
+      if (!res.ok) throw new Error('Deletion failed');
+      router.push('/');
+    } catch {
+      alert('Account deletion failed. Please try again or contact support.');
+      setDeleting(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -356,6 +365,48 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
+
+        {/* Delete Account */}
+        <div className="bg-white rounded-xl shadow-sm border border-red-100 p-6 mb-6">
+          <div className="flex items-start gap-3">
+            <Trash2 className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="font-bold text-gray-900 mb-1">Delete Account</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                Permanently delete your account and all associated data. This action cannot be undone.
+              </p>
+              {!showDeleteConfirm ? (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition text-sm font-medium"
+                >
+                  Delete My Account
+                </button>
+              ) : (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <p className="text-sm font-semibold text-red-800 mb-3">
+                    Are you sure? All your requests, matches, and personal data will be permanently deleted.
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={deleting}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold disabled:opacity-50"
+                    >
+                      {deleting ? 'Deleting…' : 'Yes, Delete My Account'}
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteConfirm(false)}
+                      className="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
         {/* Reviews */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">

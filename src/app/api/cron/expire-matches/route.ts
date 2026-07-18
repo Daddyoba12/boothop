@@ -35,19 +35,23 @@ export async function GET(request: Request) {
 
   try {
     const supabase  = createSupabaseAdminClient();
-    const cutoff3h  = new Date(Date.now() -   3 * 3_600_000).toISOString();
+    const today     = new Date().toISOString().split('T')[0];
     const cutoff12h = new Date(Date.now() -  12 * 3_600_000).toISOString();
     const cutoff72h = new Date(Date.now() -  72 * 3_600_000).toISOString();
     const cutoff7d  = new Date(Date.now() - 168 * 3_600_000).toISOString();
 
-    // Matches awaiting owner response for over 3 hours — release the route
-    const { data: stuckMatched } = await supabase
+    // Matches still awaiting acceptance whose travel date has now passed — release the route
+    const { data: allMatchedMatches } = await supabase
       .from('matches')
       .select(`id, status, sender_email, traveler_email, sender_trip_id, traveler_trip_id,
         sender_trip:sender_trip_id(from_city, to_city, travel_date, price, auto_created),
         traveler_trip:traveler_trip_id(auto_created)`)
-      .eq('status', 'matched')
-      .lt('created_at', cutoff3h);
+      .eq('status', 'matched');
+
+    const stuckMatched = (allMatchedMatches ?? []).filter((m: any) => {
+      const trip = Array.isArray(m.sender_trip) ? m.sender_trip[0] : m.sender_trip;
+      return trip?.travel_date && trip.travel_date < today;
+    });
 
     // Matches stuck at 'agreed' or 'committed' for over 12 hours
     const { data: stuckMatches } = await supabase
@@ -86,8 +90,9 @@ export async function GET(request: Request) {
 
     // ── Matched cancellations: sender gets alternatives email, traveller gets nothing (ghost) ──
     for (const match of matchedToCancel) {
+      const senderTripForReason = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
       await supabase.from('matches')
-        .update({ status: 'cancelled', cancelled_at: nowIso, cancellation_reason: 'Traveller did not respond within 3 hours.' })
+        .update({ status: 'cancelled', cancelled_at: nowIso, cancellation_reason: `Match expired — travel date (${senderTripForReason?.travel_date ?? 'unknown'}) has passed with no response from either party.` })
         .eq('id', match.id);
 
       const senderTrip   = Array.isArray(match.sender_trip)   ? match.sender_trip[0]   : match.sender_trip;

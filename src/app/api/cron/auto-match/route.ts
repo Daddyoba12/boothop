@@ -271,14 +271,17 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
   const notified: string[] = [];
 
   for (const orphan of orphans ?? []) {
-    // Check if action tokens already exist for this match
-    const { data: tokens } = await supabase
+    // Skip if valid (unused, non-expired) tokens already exist for this match
+    const nowCheck = new Date().toISOString();
+    const { data: validTokens } = await supabase
       .from('action_tokens')
       .select('id')
       .eq('entity_id', orphan.id)
+      .eq('used', false)
+      .gte('expires_at', nowCheck)
       .limit(1);
 
-    if (tokens?.length) continue; // already has tokens, skip
+    if (validTokens?.length) continue; // valid tokens exist — reminder cron will handle re-sending
 
     const senderTrip   = Array.isArray(orphan.sender_trip)   ? orphan.sender_trip[0]   : orphan.sender_trip;
     const travelerTrip = Array.isArray(orphan.traveler_trip) ? orphan.traveler_trip[0] : orphan.traveler_trip;

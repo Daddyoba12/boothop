@@ -69,6 +69,29 @@ export async function POST(request: Request) {
       const matchId = entity_id;
       redirectTo = `/matches/${matchId}`;
 
+      // Guard: ensure the match is still awaiting a response
+      const { data: matchCheck } = await supabase
+        .from('matches')
+        .select('status')
+        .eq('id', matchId)
+        .single();
+
+      if (!matchCheck || matchCheck.status === 'cancelled') {
+        return NextResponse.json({
+          error: 'This match has already been cancelled or has expired. Don\'t worry — your trip is still active on BootHop and we\'re looking for a new match for you. Head to your dashboard to see your current trips.',
+        }, { status: 400 });
+      }
+      if (matchCheck.status === 'declined') {
+        return NextResponse.json({
+          error: 'This match was already declined. Your trip remains active and we\'ll keep searching for the right match. Visit your dashboard for updates.',
+        }, { status: 400 });
+      }
+      if (matchCheck.status !== 'matched') {
+        return NextResponse.json({
+          error: `This match has already moved past the acceptance stage (current status: ${matchCheck.status}). Head to your dashboard to see the latest.`,
+        }, { status: 400 });
+      }
+
       if (action_type === 'confirm_match' || action_type === 'accept_match') {
         const role = payload?.role as 'sender' | 'traveler';
         const updateField = role === 'sender' ? 'sender_accepted' : 'traveler_accepted';

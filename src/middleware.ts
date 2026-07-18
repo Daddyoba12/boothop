@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Protect BootHop user routes — require boothop_session
-  const protectedPaths = ['/dashboard', '/journeys/create', '/profile'];
+  const protectedPaths = ['/dashboard', '/journeys/create', '/profile', '/requests/create'];
   if (protectedPaths.some(p => pathname.startsWith(p))) {
     if (!request.cookies.get('boothop_session')) {
       return NextResponse.redirect(

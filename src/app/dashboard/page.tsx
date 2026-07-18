@@ -376,9 +376,9 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Link href={role === 'sender' ? '/start?role=sender' : '/start?role=traveller'}
+            <Link href="/start"
               className="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all">
-              <PlusCircle className="w-4 h-4" /> {role === 'sender' ? 'New package' : 'New trip'}
+              <PlusCircle className="w-4 h-4" /> New listing
             </Link>
           </div>
         </div>
@@ -435,10 +435,10 @@ export default function DashboardPage() {
                   : 'Post your first trip to start receiving parcel requests from senders.'}
               </p>
               <Link
-                href={role === 'sender' ? '/start?role=sender' : '/start?role=traveller'}
+                href="/start"
                 className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-all"
               >
-                {role === 'sender' ? <><Package className="w-4 h-4" /> Post a delivery request</> : <><Plane className="w-4 h-4" /> Post my trip</>}
+                <PlusCircle className="w-4 h-4" /> Post a new listing
               </Link>
             </div>
           ) : (
