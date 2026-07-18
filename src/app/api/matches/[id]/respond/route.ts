@@ -5,6 +5,7 @@ import { getAppSession } from '@/lib/auth/session';
 import { sendMatchAcceptedEmail, sendMatchDeclinedEmail } from '@/lib/email/sendMatchEmail';
 import { isIpBanned, isAccountBanned, evaluateFraud, banIp, banAccount, logFraudFlag } from '@/lib/services/fraud-engine';
 import { checkItemCompliance } from '@/lib/services/item-compliance';
+import { sendPushToEmail } from '@/lib/services/notifications';
 
 export async function POST(
   request: Request,
@@ -158,23 +159,37 @@ export async function POST(
         return NextResponse.json({ error: 'Match is no longer available.' }, { status: 409 });
       }
 
-      // Create magic login token for Mr B so they land on their dashboard
+      // Notify the other party (the one who expressed interest)
       if (otherEmail) {
         const expires_at = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-        const { data: tokenData } = await supabase
+        const { data: tokenData, error: tokenErr } = await supabase
           .from('action_tokens')
           .insert({ email: otherEmail, action_type: 'magic_login', entity_id: matchId, payload: { redirectTo: '/dashboard' }, expires_at })
           .select('token').single();
 
-        sendMatchAcceptedEmail({
-          toEmail:    otherEmail,
-          fromCity,
-          toCity,
-          travelDate,
-          price,
-          loginToken: tokenData?.token,
-          appUrl,
-        }).catch(e => console.error('sendMatchAcceptedEmail failed', e));
+        if (tokenErr) console.error('action_tokens insert failed', tokenErr);
+
+        // Send email + push in parallel — failures are logged but never block the response
+        const notifyPromises: Promise<unknown>[] = [
+          sendMatchAcceptedEmail({
+            toEmail:    otherEmail,
+            fromCity,
+            toCity,
+            travelDate,
+            price,
+            loginToken: tokenData?.token,
+            appUrl,
+          }).catch(e => console.error('sendMatchAcceptedEmail failed', { matchId, toEmail: otherEmail, error: String(e) })),
+
+          sendPushToEmail(supabase, otherEmail, {
+            title: '🎉 Your offer was accepted!',
+            body:  `${fromCity} → ${toCity} · £${Number(price).toFixed(2)} — tap to view your match.`,
+            url:   `${appUrl}/dashboard`,
+          }).catch(e => console.error('sendPushToEmail (accept) failed', String(e))),
+        ];
+
+        // Fire both — don't await so we don't add latency to the accept response
+        Promise.allSettled(notifyPromises);
       }
 
       return NextResponse.json({ ok: true, status: 'agreed' });
