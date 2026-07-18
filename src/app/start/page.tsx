@@ -228,12 +228,28 @@ function StartContent() {
     const res = await fetch('/api/auth/request-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ email }),
     });
     setSubmitting(false);
     if (!res.ok) {
       const d = await res.json();
       setEmailError(d.error || 'Unable to send code. Try again.');
+      return;
+    }
+    const data = await res.json();
+    // Server recognised this device via remember-me and refreshed the session —
+    // no OTP was sent. Re-check auth so the price step appears and they can post.
+    if (data.skipOtp) {
+      const meRes = await fetch('/api/auth/me', { credentials: 'include' });
+      if (meRes.ok) {
+        setAuthenticated(true);
+        // Roll back to the last question step (price) so they can fill it in
+        setStep(TOTAL);
+        return;
+      }
+      // Fallback: go to dashboard (session cookie was set server-side)
+      router.push('/dashboard');
       return;
     }
     setEmailSent(true);
