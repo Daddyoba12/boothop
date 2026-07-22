@@ -9,8 +9,13 @@ import { sendMatchCancelledEmail } from '@/lib/email/sendMatchEmail';
 const FREE_CANCEL   = ['matched', 'agreed', 'committed', 'kyc_pending', 'kyc_complete'];
 // Payment pending/processing — refund request (90% rule)
 const REFUND_CANCEL = ['payment_processing'];
+// Compliance locked — sender may cancel, full refund (escrow not yet earned by carrier)
+const COMPLIANCE_FULL_REFUND = ['locked_pending_compliance'];
+// Declaration under review — cancel blocked until outcome
+const COMPLIANCE_BLOCKED = ['compliance_in_progress'];
 // Post-contact-release — no cancel, must dispute
-const NO_CANCEL     = ['active', 'delivery_confirmed', 'disputed', 'completed'];
+const NO_CANCEL     = ['active', 'delivery_confirmed', 'disputed', 'completed',
+                       'sealed_for_transit', 'compliance_rejected', 'compliance_timeout'];
 
 export async function POST(request: Request) {
   try {
@@ -43,9 +48,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Access denied.' }, { status: 403 });
     }
 
+    if (COMPLIANCE_BLOCKED.includes(match.status)) {
+      return NextResponse.json({
+        error: 'Your item declaration is currently under review. Cancellation is not available until the review is complete. Please wait for the outcome.',
+      }, { status: 400 });
+    }
+
     if (NO_CANCEL.includes(match.status)) {
       return NextResponse.json({
-        error: 'This match cannot be cancelled after contact details have been released. Please raise a dispute if there is an issue.',
+        error: 'This match cannot be cancelled at this stage. Please raise a dispute if there is an issue.',
         canDispute: true,
       }, { status: 400 });
     }
@@ -80,6 +91,86 @@ export async function POST(request: Request) {
       ]);
 
       return NextResponse.json({ ok: true, type: 'free_cancel' });
+    }
+
+    if (COMPLIANCE_FULL_REFUND.includes(match.status)) {
+      // Escrow was secured but carrier has done no work yet — full refund to sender
+      if (match.sender_email !== email) {
+        return NextResponse.json({
+          error: 'Only the sender can cancel a shipment during the compliance declaration period.',
+        }, { status: 403 });
+      }
+
+      await supabase
+        .from('matches')
+        .update({ status: 'cancellation_requested', cancelled_by: email, cancelled_at: new Date().toISOString(), cancellation_reason: reason ?? null })
+        .eq('id', matchId);
+
+      await supabase.from('shipment_events').insert({
+        match_id:     matchId,
+        event_type:   'SHIPMENT_CANCELLED_TIMEOUT',
+        performed_by: email,
+        metadata:     { reason: reason ?? 'sender_requested', source: 'cancel_route' },
+      }).maybeSingle();
+
+      const trip        = (match as any).sender_trip;
+      const fromCity    = Array.isArray(trip) ? trip[0]?.from_city  : trip?.from_city  ?? '';
+      const toCity      = Array.isArray(trip) ? trip[0]?.to_city    : trip?.to_city    ?? '';
+      const agreedPrice = match.agreed_price ?? 0;
+      const adminEmail  = process.env.ADMIN_EMAIL    || 'admin@boothop.com';
+      const from        = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
+      const appUrl      = process.env.NEXT_PUBLIC_APP_URL || '';
+
+      await Promise.allSettled([
+        sendResendEmail({
+          from,
+          to: adminEmail,
+          subject: `[FULL REFUND] Compliance cancel — ${fromCity} → ${toCity} — £${agreedPrice.toFixed(2)}`,
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px 24px;">
+              <h2>Full refund required — compliance gate cancellation</h2>
+              <p><strong>Route:</strong> ${fromCity} → ${toCity}</p>
+              <p><strong>Sender:</strong> ${email}</p>
+              <p><strong>Amount to refund (100%):</strong> £${agreedPrice.toFixed(2)}</p>
+              <p><strong>Reason:</strong> ${reason ?? 'Sender cancelled during declaration window'}</p>
+              <p>Match ID: ${matchId}</p>
+              <p>The shipment was in <code>locked_pending_compliance</code> — carrier has not been assigned yet. Full refund applies per escrow policy.</p>
+            </div>
+          `,
+          text: `Full refund required: ${fromCity} → ${toCity} — £${agreedPrice.toFixed(2)}. Sender: ${email}. Match: ${matchId}`,
+        }),
+        sendResendEmail({
+          from,
+          to: email,
+          subject: `Cancellation confirmed — ${fromCity} → ${toCity}`,
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;">
+              <span style="font-size:22px;font-weight:900;color:#1e3a8a;">Boot</span><span style="font-size:22px;font-weight:900;color:#2563eb;">Hop</span>
+              <h2 style="margin:24px 0 8px;">Cancellation confirmed</h2>
+              <p style="color:#475569;">Your <strong>${fromCity} → ${toCity}</strong> booking has been cancelled.</p>
+              <p style="color:#475569;">As your item declaration had not yet been submitted, a <strong>full refund of £${agreedPrice.toFixed(2)}</strong> will be issued within 3–5 business days.</p>
+              <p style="font-size:12px;color:#94a3b8;margin-top:24px;">Reply to this email if you need help.</p>
+            </div>
+          `,
+          text: `Cancellation confirmed for ${fromCity} → ${toCity}. Full refund of £${agreedPrice.toFixed(2)} will be processed within 3–5 business days.`,
+        }),
+        match.traveler_email && sendResendEmail({
+          from,
+          to: match.traveler_email,
+          subject: `Booking cancelled — ${fromCity} → ${toCity}`,
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;">
+              <span style="font-size:22px;font-weight:900;color:#1e3a8a;">Boot</span><span style="font-size:22px;font-weight:900;color:#2563eb;">Hop</span>
+              <h2 style="margin:24px 0 8px;">Booking cancelled</h2>
+              <p style="color:#475569;">The sender has cancelled the <strong>${fromCity} → ${toCity}</strong> delivery before completing their item declaration. No action is required from you.</p>
+              <p style="color:#475569;">Your account is in good standing and your trip remains available for new matches.</p>
+            </div>
+          `,
+          text: `The sender cancelled the ${fromCity} → ${toCity} booking before completing their item declaration. No action needed from you.`,
+        }),
+      ]);
+
+      return NextResponse.json({ ok: true, type: 'full_refund', refundAmount: agreedPrice });
     }
 
     if (REFUND_CANCEL.includes(match.status)) {
