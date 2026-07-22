@@ -38,19 +38,25 @@ Matches progress through a strict linear status pipeline:
 
 ```
 matched
-  → agreed              (both parties accept price)
-  → committed           (both parties sign T&Cs)
-  → kyc_pending         (at least one party started KYC)
-  → kyc_complete        (both parties verified by Stripe Identity)
-  → payment_processing  (sender submitted payment request)
-  → active              (admin confirmed payment received)
-  → delivery_confirmed  (both parties clicked confirm delivery)
-  → completed           (admin released payment to carrier)
+  → agreed                      (both parties accept price)
+  → committed                   (both parties sign T&Cs)
+  → kyc_pending                 (at least one party started KYC)
+  → kyc_complete                (both parties verified by Stripe Identity)
+  → payment_processing          (sender submitted payment + escrow secured)
+  → locked_pending_compliance   (escrow confirmed — awaiting sender declaration)
+  → compliance_in_progress      (declaration submitted — under review)
+  → sealed_for_transit          (compliance approved — shipment locked for handover)
+  → active                      (handover confirmed, both parties have contact details)
+  → delivery_confirmed          (both parties clicked confirm delivery)
+  → completed                   (admin released payment to carrier)
 ```
 
 **Side states** (can occur from multiple points):
 - `cancelled` — cancelled before payment
 - `cancellation_requested` — cancelled after payment_processing
+- `compliance_rejected` — declaration failed compliance review → full refund
+- `compliance_timeout` — sender did not complete declaration within SLA → refund
+- `suspended_pending_review` — shipment details changed after declaration submitted → ops review
 - `disputed` — dispute raised during active/delivery_confirmed
 
 ---
@@ -107,11 +113,100 @@ matched
    - Emails `admin@boothop.com`: rich HTML alert with match details + green **Confirm Payment Received** button
 
 2. Admin clicks confirm button (email link → `/api/admin/confirm-payment?matchId=X&adminKey=SECRET`)
-   - Status → `active`
-   - Sets `payment_confirmed_at`
-   - Emails **both parties** with each other's contact details (email address)
+   - Status → `locked_pending_compliance`
+   - Sets `payment_confirmed_at`, `compliance_locked_at`
+   - Writes `SHIPMENT_LOCKED` chain-of-custody event
+   - Emails **sender**: "Complete your item declaration" (48h deadline)
+   - Emails **traveller**: "Payment confirmed — compliance check underway"
+   - Contact details are **not** released yet
 
-3. Both parties now see contact details on the match page and can coordinate directly
+3. Sender completes and submits item declaration via `/api/matches/[id]/declare` (POST)
+   - Status → `compliance_in_progress`; sets `compliance_review_started_at`
+   - Writes `DECLARATION_SUBMITTED` + `COMPLIANCE_REVIEW_STARTED` events
+   - Auto-check runs immediately:
+     - Clean (no flags, low value) → auto-approved → Status → `active`, contacts released
+     - Flagged (currency, meds, jewellery, high value) → admin emailed for manual review
+     - Prohibited (weapons, hazardous) → auto-rejected → `compliance_rejected`, full refund
+
+4. Admin approves via `POST /api/admin/compliance/approve`
+   - Status → `active`; sets `sealed_at`
+   - Writes `COMPLIANCE_APPROVED`, `SHIPMENT_SEALED`, `SHIPMENT_LOCK_OVERRIDDEN` (audited) events
+   - Emails **both parties** with each other's contact details
+
+5. Both parties now see contact details on the match page and can coordinate directly
+
+---
+
+## Shipment Lock Rule (Compliance Gate)
+
+Once admin confirms payment received, the match does **not** move directly to `active`. Instead it enters a compliance gate before the shipment is sealed for transit.
+
+### Sub-State Model
+
+```
+payment_processing
+  → locked_pending_compliance   (escrow secured — sender must now submit item declaration)
+      → compliance_in_progress  (declaration submitted — AI + optional admin review running)
+          → sealed_for_transit  (COMPLIANCE_APPROVED — shipment locked, handover can proceed)
+          → compliance_rejected (COMPLIANCE_REJECTED → cancelled_refunded)
+          → compliance_timeout  (COMPLIANCE_TIMEOUT → cancelled_refunded or escalated)
+      → suspended_pending_review (any shipment detail changed after declaration submitted)
+```
+
+### Declaration Draft Window
+
+- Before the sender submits their declaration it is in `DRAFT` state.
+- The sender may freely edit a DRAFT declaration — item description, dimensions, value — without triggering any suspension or penalty.
+- Once the sender explicitly **submits** the declaration it becomes **immutable**.
+- Any attempt to modify shipment details (item, destination, traveller assignment) **after submission** automatically transitions the match to `suspended_pending_review` and notifies BootHop operations.
+- Only an authorised administrator can resolve a suspension — either reinstating the original shipment state or requiring cancellation and rebooking.
+
+### Compliance SLA Timers
+
+| Step | Timer | On Expiry |
+|------|-------|-----------|
+| Sender submits declaration | **48 hours** from `locked_pending_compliance` | Auto-cancel → `compliance_timeout` → full refund to sender |
+| Compliance review completes | **24 hours** from `compliance_in_progress` | Escalate to admin review queue |
+| Traveller inspection + seal activation | **48 hours** from `sealed_for_transit` | Admin notified; match may be escalated or cancelled |
+
+Reminder notifications are sent to the sender at **24h** and **6h** before each SLA expires.
+
+### Escrow Handling on Each Outcome
+
+| Outcome | Escrow Action |
+|---------|--------------|
+| `compliance_approved` → `sealed_for_transit` | Escrow remains held until delivery confirmed + payment released by admin |
+| `compliance_rejected` | Full refund to sender. Platform review fee (if applicable) retained per policy. No fee to traveller. |
+| `compliance_timeout` (sender never submitted) | Full refund to sender. No penalty to traveller — match returns to pool for re-matching if traveller wishes. |
+| Traveller backs out during compliance (before sealing) | Shipment returns to `locked_pending_compliance` for re-matching. Escrow held. Sender notified. |
+| `suspended_pending_review` resolved by admin — reinstate | Match returns to state it was in before suspension. |
+| `suspended_pending_review` resolved by admin — cancel | Full cancellation. Refund per cancellation policy. |
+
+> **Escrow and refund amounts** (platform fee retention, partial refunds, processing fees) are defined in the separate Escrow & Dispute Policy document. This must be explicitly finalised before implementation — the state machine does not hardcode amounts.
+
+### Admin Override
+
+- Only an authorised administrator can unlock, override, or manually transition any `locked_pending_compliance`, `compliance_in_progress`, or `suspended_pending_review` state.
+- All override actions are **audited** — recorded as chain-of-custody events (see below).
+- Admin actions are protected by `ADMIN_SECRET` and must pass through `/api/admin/compliance/` routes.
+
+### Chain-of-Custody Events
+
+Every compliance-related state transition is recorded as an immutable event in the `shipment_events` table:
+
+| Event Type | Triggered By |
+|-----------|-------------|
+| `SHIPMENT_LOCKED` | Admin confirms payment → match enters `locked_pending_compliance` |
+| `DECLARATION_DRAFT_SAVED` | Sender saves a draft declaration |
+| `DECLARATION_SUBMITTED` | Sender submits declaration (makes it immutable) |
+| `COMPLIANCE_REVIEW_STARTED` | AI compliance engine begins review |
+| `COMPLIANCE_APPROVED` | Review passed → `sealed_for_transit` |
+| `COMPLIANCE_REJECTED` | Review failed → `compliance_rejected` |
+| `COMPLIANCE_TIMEOUT` | SLA expired without submission → `compliance_timeout` |
+| `SHIPMENT_SEALED` | Traveller activates seal → `active` |
+| `SHIPMENT_SUSPENDED` | Post-submission change detected → `suspended_pending_review` |
+| `SHIPMENT_LOCK_OVERRIDDEN` | Admin manually overrides lock/suspension (audited) |
+| `SHIPMENT_CANCELLED_TIMEOUT` | Match cancelled due to SLA expiry |
 
 ---
 
@@ -145,7 +240,12 @@ matched
 |------------------------|---------|
 | `matched`, `agreed`, `committed`, `kyc_pending`, `kyc_complete` | Immediate cancel, no penalty |
 | `payment_processing` | Status → `cancellation_requested`, admin emailed, sender told 90% refund in 3–5 days |
-| `active`, `delivery_confirmed`, `disputed`, `completed` | Cannot cancel — shown dispute option instead |
+| `locked_pending_compliance` | Sender may request cancel → full refund (escrow not yet earned) |
+| `compliance_in_progress` | Cancel blocked — declaration under review. Sender must wait for outcome. |
+| `compliance_rejected` | Auto-cancelled, full refund per escrow policy |
+| `compliance_timeout` | Auto-cancelled, full refund per escrow policy |
+| `suspended_pending_review` | Admin resolves — either reinstate or cancel with refund per policy |
+| `sealed_for_transit`, `active`, `delivery_confirmed`, `disputed`, `completed` | Cannot cancel — shown dispute option instead |
 
 ---
 
@@ -204,6 +304,7 @@ matched
 | `/api/cron/auto-match` | Every 6 hours | Match unmatched trips by city pair |
 | `/api/cron/delivery-reminders` | Every 6 hours | Send confirm delivery reminders to active matches |
 | `/api/cron/expire-matches` | Every 3 hours | Cancel stale matches (agreed/committed >12h, kyc_pending >72h) |
+| `/api/cron/compliance-sla` | Every hour | Check compliance SLA timers — send reminders at 24h/6h remaining, auto-cancel at 48h expiry, escalate overdue reviews |
 
 All cron endpoints are protected — they check for `CRON_SECRET` header or can be restricted by IP.
 
@@ -238,6 +339,8 @@ All emails sent via **Resend**. The `Resend` client is always instantiated **ins
 | `disputes` | Dispute records linked to matches |
 | `ratings` | Star ratings per match per reviewer |
 | `match_messages` | In-app chat messages per match |
+| `item_declarations` | Sender item declarations per match (DRAFT → SUBMITTED, immutable after submit) |
+| `shipment_events` | Immutable chain-of-custody audit log — one row per compliance/lock event |
 
 ---
 

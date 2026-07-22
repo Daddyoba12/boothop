@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminApi } from '@/lib/auth/admin';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { sendContactReleasedEmail } from '@/lib/email/sendPaymentEmail';
+import { sendDeclarationPromptEmail, sendTravelerComplianceWaitEmail } from '@/lib/email/sendComplianceEmail';
 
 // GET — triggered from an email link; authenticated by ADMIN_SECRET in query string.
 export async function GET(request: NextRequest) {
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   if (!result.ok) return new NextResponse(result.error, { status: result.status });
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
-  return NextResponse.redirect(`${appUrl}/admin?confirmed=${matchId}`);
+  return NextResponse.redirect(`${appUrl}/admin?compliance_locked=${matchId}`);
 }
 
 // POST — called from the Hub dashboard; authenticated by session cookie.
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   const result = await confirmPayment(matchId);
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: result.status });
 
-  return NextResponse.json({ ok: true, matchId, status: 'active' });
+  return NextResponse.json({ ok: true, matchId, status: 'locked_pending_compliance' });
 }
 
 async function confirmPayment(matchId: string): Promise<{ ok: boolean; error?: string; status?: number }> {
@@ -51,22 +51,36 @@ async function confirmPayment(matchId: string): Promise<{ ok: boolean; error?: s
       return { ok: false, error: `Match status is '${match.status}' — already confirmed or not in payment_processing.`, status: 400 };
     }
 
+    const nowIso = new Date().toISOString();
+
     await supabase
       .from('matches')
-      .update({ status: 'active', payment_confirmed_at: new Date().toISOString() })
+      .update({
+        status:               'locked_pending_compliance',
+        payment_confirmed_at: nowIso,
+        compliance_locked_at: nowIso,
+      })
       .eq('id', matchId);
+
+    // Write SHIPMENT_LOCKED chain-of-custody event
+    await supabase.from('shipment_events').insert({
+      match_id:     matchId,
+      event_type:   'SHIPMENT_LOCKED',
+      performed_by: 'admin-email-link',
+      metadata:     { triggered_by: 'confirm-payment' },
+    });
 
     const trip       = (match as any).sender_trip;
     const fromCity   = trip?.from_city   ?? '';
     const toCity     = trip?.to_city     ?? '';
-    const travelDate = trip?.travel_date ?? '';
 
+    // Sender must now submit declaration; traveller waits for compliance clearance
     await Promise.allSettled([
-      match.sender_email && sendContactReleasedEmail({
-        toEmail: match.sender_email, fromCity, toCity, travelDate, matchId, otherEmail: match.traveler_email, role: 'sender',
+      match.sender_email && sendDeclarationPromptEmail({
+        toEmail: match.sender_email, fromCity, toCity, matchId,
       }),
-      match.traveler_email && sendContactReleasedEmail({
-        toEmail: match.traveler_email, fromCity, toCity, travelDate, matchId, otherEmail: match.sender_email, role: 'traveler',
+      match.traveler_email && sendTravelerComplianceWaitEmail({
+        toEmail: match.traveler_email, fromCity, toCity, matchId,
       }),
     ]);
 
