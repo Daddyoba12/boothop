@@ -4,6 +4,12 @@ Items deferred from the main compliance gate build (Stages 1–8). Not scheduled
 
 ---
 
+## AUDIT NOTE — statusInfo.test.ts pre-commit count discrepancy
+
+Pre-commit test count for `statusInfo.test.ts` dropped from a reported 72 to 53 between Stage 9A and the first real commit (`6a3c074` on mobile, 2026-07-24). No version history exists to explain the delta. Current 53-test coverage was manually reviewed post-hoc and found structurally complete against the 8-status/2-role matrix (blocks 1/3/7 cover presence, forbidden-fields, and shape exhaustively; block 4 covers the 4 asymmetric statuses only; block 5 covers the 3 terminal statuses). The 72→53 delta is recorded here as a known unknown, not a resolved discrepancy.
+
+---
+
 ## 1. CLEARED-path delivery PIN extension
 
 **Priority:** Medium
