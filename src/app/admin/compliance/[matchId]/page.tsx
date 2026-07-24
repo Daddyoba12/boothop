@@ -37,6 +37,35 @@ export default async function ComplianceMatchPage({
         .maybeSingle()
     : { data: null };
 
+  // Fetch evidence and generate signed URLs (private bucket)
+  const { data: evidenceRows } = match.declaration_id
+    ? await supabase
+        .from('declaration_evidence')
+        .select('id, evidence_type, storage_key, mime_type, created_at')
+        .eq('declaration_id', match.declaration_id)
+        .order('created_at', { ascending: true })
+    : { data: [] };
+
+  const evidence = await Promise.all(
+    (evidenceRows ?? []).map(async (row: any) => {
+      const { data: signed } = await supabase.storage
+        .from('declaration-evidence')
+        .createSignedUrl(row.storage_key, 60 * 60);
+      return { ...row, signed_url: signed?.signedUrl ?? null };
+    })
+  );
+
+  // Fetch most recent risk assessment
+  const { data: riskAssessment } = match.declaration_id
+    ? await supabase
+        .from('shipment_risk_assessments')
+        .select('risk_score, risk_classification, flags, breakdown, assessed_at')
+        .eq('match_id', matchId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+    : { data: null };
+
   // Fetch chain-of-custody events
   const { data: events } = await supabase
     .from('shipment_events')
@@ -48,6 +77,8 @@ export default async function ComplianceMatchPage({
     <ComplianceMatchDetail
       match={match}
       declaration={declaration}
+      evidence={evidence}
+      riskAssessment={riskAssessment ?? null}
       events={events ?? []}
     />
   );
