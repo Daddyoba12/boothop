@@ -603,6 +603,7 @@ export default function ComplianceMatchDetail({
                 const failureReason = meta.failure_reason as string | undefined;
                 const evSource      = meta.source as string | undefined;
                 const autoEscalated = !!meta.auto_escalated;
+                const evReason      = meta.reason as string | undefined;
 
                 return (
                   <div key={e.id} className="px-5 py-3 flex items-start gap-3">
@@ -658,8 +659,8 @@ export default function ComplianceMatchDetail({
                               ? 'auto-escalated from inspection'
                               : 'risk engine'}
                           </span>
-                          {meta.reason && (
-                            <span className="text-xs text-slate-400 truncate">{String(meta.reason).replace(/_/g, ' ')}</span>
+                          {evReason && (
+                            <span className="text-xs text-slate-400 truncate">{evReason.replace(/_/g, ' ')}</span>
                           )}
                         </div>
                       )}
