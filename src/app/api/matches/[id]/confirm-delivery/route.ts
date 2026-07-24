@@ -49,6 +49,21 @@ export async function POST(
       return NextResponse.json({ error: 'Not a participant in this match.' }, { status: 403 });
     }
 
+    // Sealed shipments must use /delivery/confirm-pin — this endpoint is for CLEARED shipments only
+    const { data: activatedSeal } = await supabase
+      .from('shipment_secure_seals')
+      .select('id')
+      .eq('match_id', matchId)
+      .eq('status', 'activated')
+      .maybeSingle();
+
+    if (activatedSeal) {
+      return NextResponse.json(
+        { error: 'This shipment uses SecureSeal verification. Delivery must be confirmed using the receiver PIN.' },
+        { status: 409 }
+      );
+    }
+
     // Idempotency: if caller already confirmed, don't double-process
     if (isSender    && match.sender_confirmed_delivery)    return NextResponse.json({ ok: true, alreadyConfirmed: true, message: 'Already confirmed.' });
     if (isTraveller && match.traveller_confirmed_delivery) return NextResponse.json({ ok: true, alreadyConfirmed: true, message: 'Already confirmed.' });

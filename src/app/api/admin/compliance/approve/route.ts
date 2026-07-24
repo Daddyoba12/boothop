@@ -11,15 +11,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminApi } from '@/lib/auth/admin';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import {
-  sendComplianceApprovedEmail,
   sendComplianceRejectedEmail,
 } from '@/lib/email/sendComplianceEmail';
+import {
+  sendInspectionRequestEmail,
+  sendInspectionWaitEmail,
+} from '@/lib/email/sendInspectionEmail';
+import {
+  sendAdminExternalVerificationEmail,
+  sendExternalVerificationHoldEmail,
+} from '@/lib/email/sendExternalVerificationEmail';
+import { sendSMS } from '@/lib/services/telnyx';
 
 export async function POST(req: NextRequest) {
   const admin = await requireAdminApi();
   if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  let body: { matchId: string; decision: 'approve' | 'reject'; note?: string };
+  let body: { matchId: string; decision: 'approve' | 'reject' | 'escalate_to_verification'; note?: string };
   try {
     body = await req.json();
   } catch {
@@ -30,8 +38,8 @@ export async function POST(req: NextRequest) {
   if (!matchId || !decision) {
     return NextResponse.json({ error: 'matchId and decision are required' }, { status: 400 });
   }
-  if (decision !== 'approve' && decision !== 'reject') {
-    return NextResponse.json({ error: 'decision must be approve or reject' }, { status: 400 });
+  if (!['approve', 'reject', 'escalate_to_verification'].includes(decision)) {
+    return NextResponse.json({ error: 'decision must be approve, reject, or escalate_to_verification' }, { status: 400 });
   }
 
   const supabase = createSupabaseAdminClient();
@@ -64,7 +72,64 @@ export async function POST(req: NextRequest) {
   const toCity   = trip?.to_city     ?? '';
   const travelDate = trip?.travel_date ?? '';
 
+  if (decision === 'escalate_to_verification') {
+    const nowIso = new Date().toISOString();
+
+    await supabase.from('matches').update({
+      status:                            'external_verification_required',
+      external_verification_required_at: nowIso,
+    }).eq('id', matchId);
+
+    await supabase.from('shipment_verification_requests').insert({
+      match_id:      matchId,
+      status:        'pending',
+      reason:        note?.trim() ?? 'Admin escalation from manual review',
+      requested_by:  admin.email,
+      requested_at:  nowIso,
+    });
+
+    await supabase.from('shipment_events').insert({
+      match_id:       matchId,
+      declaration_id: match.declaration_id,
+      event_type:     'EXTERNAL_VERIFICATION_REQUESTED',
+      performed_by:   admin.email,
+      metadata:       { source: 'admin_escalation', reason: note?.trim() ?? null },
+    });
+
+    const adminPhone = process.env.ADMIN_PHONE;
+    await Promise.allSettled([
+      sendAdminExternalVerificationEmail({
+        matchId, fromCity, toCity,
+        senderEmail:   match.sender_email,
+        travelerEmail: match.traveler_email,
+        riskScore:     0,
+        flags:         ['admin escalation'],
+        reason:        note?.trim() ?? 'Admin escalation from manual review',
+        source:        'admin_escalation',
+      }),
+      adminPhone && sendSMS(
+        adminPhone,
+        `[BOOTHOP] Escalated to external verification: ${fromCity}→${toCity} by ${admin.email} Match:${matchId}`
+      ).catch(() => {}),
+      match.sender_email && sendExternalVerificationHoldEmail({
+        toEmail: match.sender_email, fromCity, toCity, matchId, role: 'sender',
+      }),
+      match.traveler_email && sendExternalVerificationHoldEmail({
+        toEmail: match.traveler_email, fromCity, toCity, matchId, role: 'traveler',
+      }),
+    ]);
+
+    return NextResponse.json({ ok: true, matchId, status: 'external_verification_required', escalated_by: admin.email });
+  }
+
   if (decision === 'approve') {
+    // Fetch declaration for item name (inspection email needs it)
+    const { data: decl } = await supabase
+      .from('item_declarations')
+      .select('item_name, risk_assessment_id:id')
+      .eq('id', match.declaration_id)
+      .maybeSingle();
+
     await supabase.from('item_declarations').update({
       declaration_status: 'approved',
       reviewed_at:        nowIso,
@@ -72,10 +137,27 @@ export async function POST(req: NextRequest) {
       review_note:        note ?? null,
     }).eq('id', match.declaration_id);
 
+    // Admin approve for MANUAL_REVIEW → inspection_pending (not active)
     await supabase.from('matches').update({
-      status:    'active',
-      sealed_at: nowIso,
+      status:                'inspection_pending',
+      inspection_pending_at: nowIso,
     }).eq('id', matchId);
+
+    // Pre-create inspection record if one doesn't exist yet
+    const { data: existingInspection } = await supabase
+      .from('shipment_inspections')
+      .select('id')
+      .eq('match_id', matchId)
+      .maybeSingle();
+
+    if (!existingInspection) {
+      await supabase.from('shipment_inspections').insert({
+        match_id:        matchId,
+        declaration_id:  match.declaration_id,
+        inspector_email: match.traveler_email,
+        status:          'pending',
+      });
+    }
 
     await supabase.from('shipment_events').insert([
       {
@@ -83,36 +165,46 @@ export async function POST(req: NextRequest) {
         declaration_id: match.declaration_id,
         event_type:     'COMPLIANCE_APPROVED',
         performed_by:   admin.email,
-        metadata:       { note: note ?? null },
+        metadata:       { note: note ?? null, action: 'manual_review_approved' },
       },
       {
         match_id:       matchId,
         declaration_id: match.declaration_id,
-        event_type:     'SHIPMENT_SEALED',
-        performed_by:   'system',
-        metadata:       { approved_by: admin.email },
+        event_type:     'INSPECTION_UNLOCKED',
+        performed_by:   admin.email,
+        metadata:       { auto: false, approved_by: admin.email },
       },
       {
         match_id:       matchId,
         declaration_id: match.declaration_id,
         event_type:     'SHIPMENT_LOCK_OVERRIDDEN',
         performed_by:   admin.email,
-        metadata:       { action: 'manual_approve', note: note ?? null },
+        metadata:       { action: 'manual_approve_for_inspection', note: note ?? null },
       },
     ]);
 
+    const itemName = decl?.item_name ?? 'Item';
+
     await Promise.allSettled([
-      match.sender_email && sendComplianceApprovedEmail({
-        toEmail: match.sender_email, fromCity, toCity, travelDate, matchId,
-        otherEmail: match.traveler_email, role: 'sender',
+      match.traveler_email && sendInspectionRequestEmail({
+        toEmail:     match.traveler_email,
+        fromCity,
+        toCity,
+        matchId,
+        itemName,
+        senderEmail: match.sender_email,
       }),
-      match.traveler_email && sendComplianceApprovedEmail({
-        toEmail: match.traveler_email, fromCity, toCity, travelDate, matchId,
-        otherEmail: match.sender_email, role: 'traveler',
+      match.sender_email && sendInspectionWaitEmail({
+        toEmail: match.sender_email, fromCity, toCity, matchId,
       }),
+      // SMS the admin number to confirm their own action
+      process.env.ADMIN_PHONE && sendSMS(
+        process.env.ADMIN_PHONE,
+        `[BOOTHOP] Approved for inspection: ${fromCity}→${toCity} Match:${matchId}`
+      ).catch(() => {}),
     ]);
 
-    return NextResponse.json({ ok: true, matchId, status: 'active', approved_by: admin.email });
+    return NextResponse.json({ ok: true, matchId, status: 'inspection_pending', approved_by: admin.email });
   }
 
   // Reject

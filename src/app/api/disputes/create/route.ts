@@ -14,7 +14,7 @@ const DISPUTE_REASONS = [
 ];
 
 // Matches that can have disputes raised (post-payment only)
-const DISPUTABLE_STATUSES = ['active', 'delivery_confirmed', 'payment_processing'];
+const DISPUTABLE_STATUSES = ['seal_pending', 'active', 'delivery_confirmed', 'payment_processing'];
 
 export async function POST(request: Request) {
   try {

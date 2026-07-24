@@ -31,10 +31,11 @@ type Match = {
 };
 
 type PageData = {
-  match: Match;
-  userRole: 'sender' | 'traveler';
-  userEmail: string;
-  alreadyAccepted: boolean;
+  match:                 Match;
+  userRole:              'sender' | 'traveler';
+  userEmail:             string;
+  alreadyAccepted:       boolean;
+  verificationProviders?: any[];
 };
 
 type Message = {
@@ -44,26 +45,42 @@ type Message = {
   created_at: string;
 };
 
+type TimelineEvent = {
+  id: string;
+  label: string;
+  description: string;
+  actor: string;
+  timestamp: string;
+};
+
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  matched:              { label: 'Matched',             color: 'text-blue-400' },
-  agreed:               { label: 'Price agreed',        color: 'text-blue-400' },
-  committed:            { label: 'Terms signed',        color: 'text-blue-400' },
-  kyc_pending:          { label: 'Verifying identity',  color: 'text-amber-400' },
-  kyc_complete:         { label: 'Identity verified',   color: 'text-green-400' },
-  payment_pending:      { label: 'Payment pending',     color: 'text-amber-400' },
-  payment_processing:   { label: 'Payment processing',  color: 'text-amber-400' },
-  active:               { label: 'Active — live',       color: 'text-green-400' },
-  delivery_confirmed:   { label: 'Delivery confirmed',  color: 'text-green-400' },
-  completed:            { label: 'Completed',           color: 'text-green-400' },
-  cancelled:            { label: 'Cancelled',           color: 'text-red-400' },
-  declined:             { label: 'Declined',            color: 'text-red-400' },
-  disputed:             { label: 'Disputed',            color: 'text-red-400' },
-  cancellation_requested: { label: 'Cancellation requested', color: 'text-orange-400' },
+  matched:                   { label: 'Matched',                 color: 'text-blue-400' },
+  agreed:                    { label: 'Price agreed',            color: 'text-blue-400' },
+  committed:                 { label: 'Terms signed',            color: 'text-blue-400' },
+  kyc_pending:               { label: 'Verifying identity',      color: 'text-amber-400' },
+  kyc_complete:              { label: 'Identity verified',       color: 'text-green-400' },
+  payment_pending:           { label: 'Payment pending',         color: 'text-amber-400' },
+  payment_processing:        { label: 'Payment processing',      color: 'text-amber-400' },
+  locked_pending_compliance: { label: 'Declaration required',    color: 'text-amber-400' },
+  compliance_in_progress:    { label: 'Compliance review',       color: 'text-amber-400' },
+  inspection_pending:                { label: 'Inspection required',          color: 'text-amber-400' },
+  seal_pending:                      { label: 'SecureSeal required',          color: 'text-blue-400'  },
+  external_verification_required:    { label: 'External verification required', color: 'text-orange-400' },
+  compliance_rejected:               { label: 'Compliance rejected',            color: 'text-red-400' },
+  compliance_timeout:        { label: 'Declaration expired',     color: 'text-red-400' },
+  suspended_pending_review:  { label: 'Suspended — under review', color: 'text-red-400' },
+  active:                    { label: 'Active — live',           color: 'text-green-400' },
+  delivery_confirmed:        { label: 'Delivery confirmed',      color: 'text-green-400' },
+  completed:                 { label: 'Completed',               color: 'text-green-400' },
+  cancelled:                 { label: 'Cancelled',               color: 'text-red-400' },
+  declined:                  { label: 'Declined',                color: 'text-red-400' },
+  disputed:                  { label: 'Disputed',                color: 'text-red-400' },
+  cancellation_requested:    { label: 'Cancellation requested',  color: 'text-orange-400' },
 };
 
 const CANCELLABLE = ['matched', 'agreed', 'committed', 'kyc_pending', 'kyc_complete'];
-const MESSAGING_STATUSES = ['active', 'delivery_confirmed', 'disputed'];
-const DISPUTE_STATUSES = ['active', 'delivery_confirmed'];
+const MESSAGING_STATUSES = ['seal_pending', 'active', 'delivery_confirmed', 'disputed'];
+const DISPUTE_STATUSES = ['seal_pending', 'active', 'delivery_confirmed'];
 
 const DISPUTE_REASONS = [
   'Item not delivered',
@@ -107,6 +124,9 @@ export default function MatchPage() {
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [error,         setError]         = useState<string | null>(null);
 
+  // Timeline
+  const [timeline,     setTimeline]     = useState<TimelineEvent[]>([]);
+
   // Messages
   const [messages,     setMessages]     = useState<Message[]>([]);
   const [msgContent,   setMsgContent]   = useState('');
@@ -136,14 +156,38 @@ export default function MatchPage() {
       if (res.status === 401) { router.replace('/login'); return; }
       if (!res.ok) { const j = await res.json(); setError(j.error || 'Failed to load match.'); setLoading(false); return; }
       const d = await res.json();
+
+      // Fetch active verification providers when external verification is required
+      if (d.match.status === 'external_verification_required') {
+        const trip = d.match.sender_trip;
+        const country = trip?.from_city ? undefined : undefined; // route-based filter via country if available
+        const pvRes = await fetch(`/api/matches/${matchId}/verification-providers`);
+        if (pvRes.ok) {
+          const pvData = await pvRes.json();
+          d.verificationProviders = pvData.providers ?? [];
+        }
+      }
+
       setData(d);
 
       // Load messages if in messaging-eligible status
       if (MESSAGING_STATUSES.includes(d.match.status)) {
         loadMessages();
       }
+
+      loadTimeline();
     } catch { setError('Could not load match.'); }
     finally { setLoading(false); }
+  };
+
+  const loadTimeline = async () => {
+    try {
+      const res = await fetch(`/api/matches/${matchId}/timeline`);
+      if (res.ok) {
+        const j = await res.json();
+        setTimeline(j.events ?? []);
+      }
+    } catch {}
   };
 
   const loadMessages = async () => {
@@ -343,20 +387,200 @@ export default function MatchPage() {
           </div>
         )}
 
+        {/* ── COMPLIANCE DECLARATION CTA (sender, locked_pending_compliance) ── */}
+        {match.status === 'locked_pending_compliance' && userRole === 'sender' && (
+          <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-amber-400 mb-2 flex items-center gap-2">
+              <Shield className="h-3.5 w-3.5" /> Action required
+            </p>
+            <p className="text-white font-bold mb-1">Complete your item declaration</p>
+            <p className="text-white/50 text-sm mb-5">
+              Payment has been secured. Before contact details are released, BootHop requires you to declare what you are sending.
+              You have 48 hours from payment confirmation.
+            </p>
+            <Link
+              href={`/matches/${matchId}/declare`}
+              className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded-2xl transition-all text-sm"
+            >
+              <Package className="h-4 w-4" /> Declare my item →
+            </Link>
+          </div>
+        )}
+
+        {/* ── COMPLIANCE WAITING (traveller, locked_pending_compliance) ── */}
+        {match.status === 'locked_pending_compliance' && userRole === 'traveler' && (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2 flex items-center gap-2">
+              <Clock className="h-3.5 w-3.5" /> Waiting on sender
+            </p>
+            <p className="text-white/60 text-sm">
+              The sender is completing their item declaration. Contact details will be released once BootHop Safety &amp; Compliance approves the shipment.
+            </p>
+          </div>
+        )}
+
+        {/* ── INSPECTION PENDING (traveller) ── */}
+        {match.status === 'inspection_pending' && userRole === 'traveler' && (
+          <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-amber-400 mb-2 flex items-center gap-2">
+              <Shield className="h-3.5 w-3.5" /> Action required
+            </p>
+            <p className="text-white font-bold mb-1">Inspect the item before accepting</p>
+            <p className="text-white/50 text-sm mb-5">
+              The sender&apos;s declaration has been approved. Before contact details are released, please complete the quick handover inspection checklist.
+            </p>
+            <Link
+              href={`/matches/${matchId}/inspection`}
+              className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded-2xl transition-all text-sm"
+            >
+              <Package className="h-4 w-4" /> Complete inspection →
+            </Link>
+          </div>
+        )}
+
+        {/* ── INSPECTION PENDING (sender) ── */}
+        {match.status === 'inspection_pending' && userRole === 'sender' && (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2 flex items-center gap-2">
+              <Clock className="h-3.5 w-3.5" /> Waiting for inspection
+            </p>
+            <p className="text-white font-semibold">Your declaration was approved</p>
+            <p className="text-white/50 text-sm mt-1">
+              The carrier is completing a brief handover inspection before contact details are released. This usually takes a few hours.
+            </p>
+          </div>
+        )}
+
+        {/* ── SEAL PENDING (traveller) ── */}
+        {match.status === 'seal_pending' && userRole === 'traveler' && (
+          <div className="rounded-2xl border border-blue-500/40 bg-blue-500/10 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-blue-400 mb-2 flex items-center gap-2">
+              <Shield className="h-3.5 w-3.5" /> Action required — apply SecureSeal
+            </p>
+            <p className="text-white font-bold mb-1">Seal the package before departure</p>
+            <p className="text-white/50 text-sm mb-5">
+              Inspection passed. Generate the BootHop SecureSeal label, print it, apply it across the package opening,
+              then activate it here with a photo and weight confirmation.
+            </p>
+            <Link
+              href={`/matches/${matchId}/seal`}
+              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-2xl transition-all text-sm"
+            >
+              <Lock className="h-4 w-4" /> Generate &amp; activate SecureSeal →
+            </Link>
+          </div>
+        )}
+
+        {/* ── SEAL PENDING (sender) ── */}
+        {match.status === 'seal_pending' && userRole === 'sender' && (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2 flex items-center gap-2">
+              <Clock className="h-3.5 w-3.5" /> Waiting for SecureSeal activation
+            </p>
+            <p className="text-white font-semibold">Inspection passed</p>
+            <p className="text-white/50 text-sm mt-1">
+              The carrier is applying the BootHop SecureSeal to your package. Contact details will be released once the seal is activated.
+            </p>
+          </div>
+        )}
+
+        {/* ── EXTERNAL VERIFICATION REQUIRED ── */}
+        {match.status === 'external_verification_required' && (
+          <div className="rounded-2xl border border-orange-500/40 bg-orange-500/10 p-6 space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-orange-400 flex items-center gap-2">
+              <Shield className="h-3.5 w-3.5" /> External verification required
+            </p>
+            <p className="text-white font-semibold leading-snug">
+              This item cannot proceed through the standard BootHop handover process.
+              Independent verification is required before transportation.
+            </p>
+            {userRole === 'sender' && data?.verificationProviders && data.verificationProviders.length > 0 && (
+              <div className="mt-4 space-y-3">
+                <p className="text-white/60 text-sm">Please visit one of the approved verification facilities below and obtain a reference number. BootHop will enter the result once we hear from the provider.</p>
+                <div className="space-y-2">
+                  {data.verificationProviders.map((p: any) => (
+                    <div key={p.id} className="rounded-xl border border-orange-500/20 bg-black/20 p-4">
+                      <div className="flex items-start justify-between gap-3 mb-1">
+                        <p className="text-white font-semibold text-sm">{p.name}</p>
+                        <span className="text-xs text-orange-300 bg-orange-500/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+                          {p.provider_type.replace(/_/g, ' ')}
+                        </span>
+                      </div>
+                      {p.address && <p className="text-white/50 text-sm">{p.address}{p.city ? `, ${p.city}` : ''}</p>}
+                      {p.email   && <p className="text-white/50 text-sm">{p.email}</p>}
+                      {p.phone   && <p className="text-white/50 text-sm">{p.phone}</p>}
+                      {p.instructions && (
+                        <p className="text-white/40 text-xs mt-2 leading-relaxed">{p.instructions}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {userRole === 'traveler' && (
+              <p className="text-white/50 text-sm">
+                The sender has been notified. You will receive an email once external verification is complete and the handover inspection is unlocked.
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* ── COMPLIANCE IN PROGRESS ── */}
+        {match.status === 'compliance_in_progress' && (
+          <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-blue-400 mb-2 flex items-center gap-2">
+              <Shield className="h-3.5 w-3.5" /> Compliance review in progress
+            </p>
+            <p className="text-white/60 text-sm">
+              {userRole === 'sender'
+                ? 'Your item declaration has been submitted and is under review. You will receive an email once approved — usually within a few hours.'
+                : 'The sender\'s item declaration is being reviewed by BootHop Safety & Compliance. Contact details will be released once approved.'}
+            </p>
+          </div>
+        )}
+
+        {/* ── COMPLIANCE REJECTED ── */}
+        {match.status === 'compliance_rejected' && (
+          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-red-400 mb-2 flex items-center gap-2">
+              <AlertCircle className="h-3.5 w-3.5" /> Compliance rejected
+            </p>
+            <p className="text-white/60 text-sm">
+              {userRole === 'sender'
+                ? 'Your item declaration was rejected. A refund will be issued within 3–5 business days. Contact support if you have questions.'
+                : 'The sender\'s item declaration was rejected. This match has been closed. Your trip remains available for new matches.'}
+            </p>
+          </div>
+        )}
+
+        {/* ── COMPLIANCE TIMEOUT ── */}
+        {match.status === 'compliance_timeout' && (
+          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-red-400 mb-2 flex items-center gap-2">
+              <AlertCircle className="h-3.5 w-3.5" /> Declaration window expired
+            </p>
+            <p className="text-white/60 text-sm">
+              {userRole === 'sender'
+                ? 'The 48-hour declaration window has passed. This booking has been cancelled and a refund will be issued within 3–5 business days.'
+                : 'The sender did not complete their item declaration in time. This match has been closed. Your trip remains available.'}
+            </p>
+          </div>
+        )}
+
         {/* ── PENDING STAGES ── */}
-        {!isActive && !isComplete && !isCancelled && (
+        {!isActive && !isComplete && !isCancelled && !['locked_pending_compliance', 'compliance_in_progress', 'inspection_pending', 'seal_pending', 'compliance_rejected', 'compliance_timeout', 'suspended_pending_review'].includes(match.status) && (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-4 flex items-center gap-2">
               <Shield className="h-3.5 w-3.5" /> Progress
             </p>
             <div className="space-y-3">
               {[
-                { done: true,                                                                                   label: 'Match found' },
-                { done: match.sender_kyc_status !== 'none',                                                    label: 'Identity verification started' },
-                { done: myKyc === 'verified',                                                                  label: 'Your identity verified' },
-                { done: theirKyc === 'verified',                                                               label: "Other party's identity verified" },
-                { done: ['payment_processing', 'active', 'delivery_confirmed', 'completed'].includes(match.status), label: 'Payment received' },
-                { done: isActive || isComplete,                                                                label: 'Contact details released' },
+                { done: true,                                                                                                  label: 'Match found' },
+                { done: match.sender_kyc_status !== 'none',                                                                   label: 'Identity verification started' },
+                { done: myKyc === 'verified',                                                                                 label: 'Your identity verified' },
+                { done: theirKyc === 'verified',                                                                              label: "Other party's identity verified" },
+                { done: ['payment_processing', 'locked_pending_compliance', 'compliance_in_progress', 'active', 'delivery_confirmed', 'completed'].includes(match.status), label: 'Payment received' },
+                { done: isActive || isComplete,                                                                               label: 'Contact details released' },
               ].map(({ done, label }) => (
                 <div key={label} className="flex items-center gap-3 text-sm">
                   {done
@@ -588,6 +812,34 @@ export default function MatchPage() {
                 </button>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ── SHIPMENT PROGRESS (chain-of-custody timeline) ── */}
+        {timeline.length > 0 && (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-5 flex items-center gap-2">
+              <Clock className="h-3.5 w-3.5" /> Shipment progress
+            </p>
+            <ol className="relative border-l border-white/10 ml-1.5 space-y-5">
+              {timeline.map((ev, i) => (
+                <li key={ev.id} className="ml-5">
+                  <span className={`absolute -left-[7px] mt-[3px] h-3.5 w-3.5 rounded-full border-2 ${i === timeline.length - 1 ? 'border-blue-400 bg-blue-400' : 'border-white/20 bg-slate-900'}`} />
+                  <p className="text-white text-sm font-semibold leading-snug">{ev.label}</p>
+                  <p className="text-white/40 text-xs mt-0.5 leading-relaxed">{ev.description}</p>
+                  <p className="text-white/20 text-xs mt-1">
+                    {new Date(ev.timestamp).toLocaleString('en-GB', {
+                      day: 'numeric', month: 'short', year: 'numeric',
+                      hour: '2-digit', minute: '2-digit',
+                    })}
+                    {' · '}{ev.actor}
+                  </p>
+                </li>
+              ))}
+            </ol>
+            <p className="text-white/20 text-xs mt-5">
+              Some milestones may take a few minutes to appear. All times are in your local timezone.
+            </p>
           </div>
         )}
 

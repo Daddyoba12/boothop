@@ -71,11 +71,19 @@ export async function GET(
       .eq('email', email)
       .maybeSingle();
 
+    const { data: sealRow } = await supabase
+      .from('shipment_secure_seals')
+      .select('id')
+      .eq('match_id', matchId)
+      .eq('status', 'activated')
+      .maybeSingle();
+
     return NextResponse.json({
       match,
-      userRole: match.sender_email === email ? 'sender' : 'traveler',
-      userEmail: email,
-      alreadyAccepted: !!acceptance,
+      userRole:         match.sender_email === email ? 'sender' : 'traveler',
+      userEmail:        email,
+      alreadyAccepted:  !!acceptance,
+      hasActivatedSeal: !!sealRow,
     });
 
   } catch (error) {

@@ -20,7 +20,7 @@ function containsContactInfo(text: string): boolean {
   return CONTACT_PATTERNS.some(p => p.test(text));
 }
 
-const MESSAGING_STATUSES = ['active', 'delivery_confirmed', 'disputed'];
+const MESSAGING_STATUSES = ['seal_pending', 'active', 'delivery_confirmed', 'disputed'];
 
 export async function POST(request: Request) {
   try {

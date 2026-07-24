@@ -11,11 +11,12 @@ const FREE_CANCEL   = ['matched', 'agreed', 'committed', 'kyc_pending', 'kyc_com
 const REFUND_CANCEL = ['payment_processing'];
 // Compliance locked — sender may cancel, full refund (escrow not yet earned by carrier)
 const COMPLIANCE_FULL_REFUND = ['locked_pending_compliance'];
-// Declaration under review — cancel blocked until outcome
-const COMPLIANCE_BLOCKED = ['compliance_in_progress'];
-// Post-contact-release — no cancel, must dispute
+// Declaration under review, awaiting inspection/seal activation, or pending external verification — cancel blocked until outcome
+const COMPLIANCE_BLOCKED = ['compliance_in_progress', 'inspection_pending', 'seal_pending', 'external_verification_required'];
+// Post-contact-release or terminal compliance states — no cancel, must dispute or contact support
 const NO_CANCEL     = ['active', 'delivery_confirmed', 'disputed', 'completed',
-                       'sealed_for_transit', 'compliance_rejected', 'compliance_timeout'];
+                       'sealed_for_transit', 'compliance_rejected', 'compliance_timeout',
+                       'suspended_pending_review'];
 
 export async function POST(request: Request) {
   try {
@@ -49,9 +50,10 @@ export async function POST(request: Request) {
     }
 
     if (COMPLIANCE_BLOCKED.includes(match.status)) {
-      return NextResponse.json({
-        error: 'Your item declaration is currently under review. Cancellation is not available until the review is complete. Please wait for the outcome.',
-      }, { status: 400 });
+      const msg = match.status === 'inspection_pending'
+        ? 'The carrier is completing their handover inspection. Cancellation is not available at this stage. Please wait for the inspection to complete or contact support.'
+        : 'Your item declaration is currently under review. Cancellation is not available until the review is complete. Please wait for the outcome.';
+      return NextResponse.json({ error: msg }, { status: 400 });
     }
 
     if (NO_CANCEL.includes(match.status)) {

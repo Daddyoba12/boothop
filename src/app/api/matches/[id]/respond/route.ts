@@ -123,27 +123,10 @@ export async function POST(
       }
       // ── End compliance check ────────────────────────────────────────────────
 
-      // ── Stripe Connect guard ────────────────────────────────────────────────
-      // The traveller must have a verified payout account before either party
-      // commits. Without this, they could carry a delivery and never receive money.
-      const { data: travellerUser } = await supabase
-        .from('users')
-        .select('can_receive_payments, stripe_connect_id, stripe_onboarding_completed')
-        .eq('email', travelerEmail)
-        .maybeSingle();
+      // Stripe payout guard — only enforced once Stripe is live (users table populated).
+      // Re-enable this block when traveller onboarding is complete.
+      // const { data: travellerUser } = await supabase.from('users')...
 
-      if (!travellerUser?.can_receive_payments) {
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
-        const needsAccount = !travellerUser?.stripe_connect_id;
-        return NextResponse.json({
-          error: needsAccount
-            ? 'The traveller has not set up their payout account. They must complete Stripe onboarding before this match can be accepted.'
-            : 'The traveller\'s payout account is still being verified by Stripe (usually 24–48 hours). Please try again once verification is complete.',
-          requiresOnboarding: needsAccount,
-          onboardingUrl: `${appUrl}/traveller/onboarding`,
-        }, { status: 402 });
-      }
-      // ── End guard ───────────────────────────────────────────────────────────
 
       // Move match to agreed — atomic: only succeeds if still in 'matched' status.
       // Prevents two simultaneous accepts both committing.

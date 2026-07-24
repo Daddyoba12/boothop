@@ -13,7 +13,7 @@ export async function sendDeclarationPromptEmail(params: {
   hoursRemaining?: number;
 }) {
   const { toEmail, fromCity, toCity, matchId, hoursRemaining = 48 } = params;
-  const declareUrl = `${appUrl}/matches/${matchId}#declare`;
+  const declareUrl = `${appUrl}/matches/${matchId}/declare`;
   const isReminder = hoursRemaining < 48;
   const urgency    = hoursRemaining <= 6 ? '⚠️ Urgent' : hoursRemaining <= 24 ? '⏰ Reminder' : '📋 Action required';
 

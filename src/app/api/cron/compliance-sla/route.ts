@@ -38,11 +38,15 @@ export async function GET(request: Request) {
     // Time anchor for 24h review SLA
     const cutoffReview24h = new Date(now - 24 * 3_600_000).toISOString();
 
+    // Time anchor for 24h inspection SLA
+    const cutoffInspection24h = new Date(now - 24 * 3_600_000).toISOString();
+
     const results = {
-      timed_out:        0,
-      reminders_24h:    0,
-      reminders_6h:     0,
-      review_escalated: 0,
+      timed_out:             0,
+      reminders_24h:         0,
+      reminders_6h:          0,
+      review_escalated:      0,
+      inspection_escalated:  0,
     };
 
     // ── 1a. Timed out — locked 48h+ ago, no submitted declaration ────────────
@@ -190,6 +194,43 @@ export async function GET(request: Request) {
       }).catch(() => {});
 
       results.review_escalated++;
+    }
+
+    // ── 3. inspection_pending > 24h → remind traveller + escalate to admin ────
+    const { data: inspectionOverdue } = await supabase
+      .from('matches')
+      .select(`
+        id, traveler_email, sender_email, inspection_pending_at,
+        declaration_id,
+        sender_trip:sender_trip_id(from_city, to_city)
+      `)
+      .eq('status', 'inspection_pending')
+      .lt('inspection_pending_at', cutoffInspection24h)
+      .is('inspection_reminder_sent_at', null);
+
+    for (const match of inspectionOverdue ?? []) {
+      const trip     = Array.isArray(match.sender_trip) ? match.sender_trip[0] : (match.sender_trip as any);
+      const fromCity = trip?.from_city ?? '';
+      const toCity   = trip?.to_city   ?? '';
+
+      await sendResendEmail({
+        from,
+        to:      adminEmail,
+        subject: `[INSPECTION] Overdue >24h — ${fromCity} → ${toCity} — Match ${match.id}`,
+        html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;">
+          <div style="margin-bottom:16px;"><span style="font-size:22px;font-weight:900;color:#1e3a8a;">Boot</span><span style="font-size:22px;font-weight:900;color:#2563eb;">Hop</span></div>
+          <h2 style="color:#d97706;">⚠️ Inspection overdue</h2>
+          <p>Match <strong>${match.id}</strong> (${fromCity} → ${toCity}) has been in <code>inspection_pending</code> for more than 24 hours. The carrier (${match.traveler_email}) has not completed the inspection.</p>
+          <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/compliance/${match.id}" style="background:#d97706;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">Review in admin →</a></p>
+        </div>`,
+        text: `Inspection overdue for match ${match.id} (${fromCity} → ${toCity}). Carrier: ${match.traveler_email}. Review: ${process.env.NEXT_PUBLIC_APP_URL}/admin/compliance/${match.id}`,
+      }).catch(() => {});
+
+      await supabase.from('matches')
+        .update({ inspection_reminder_sent_at: new Date().toISOString() })
+        .eq('id', match.id);
+
+      results.inspection_escalated++;
     }
 
     return NextResponse.json({ ok: true, ...results });

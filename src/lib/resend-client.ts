@@ -13,6 +13,7 @@ export async function sendResendEmail(params: {
   replyTo?: string | string[];
   cc?: string | string[];
   bcc?: string | string[];
+  attachments?: Array<{ filename: string; content: string | Buffer }>;
 }) {
   if (DEV_DISABLED) {
     console.log(`[email suppressed] to=${JSON.stringify(params.to)} subject="${params.subject}"`);
