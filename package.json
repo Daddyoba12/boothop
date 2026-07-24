@@ -7,7 +7,8 @@
     "prebuild": "node scripts/bump-sw-version.js",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",
@@ -54,6 +55,7 @@
     "puppeteer": "^25.1.0",
     "supabase": "^2.84.10",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }
