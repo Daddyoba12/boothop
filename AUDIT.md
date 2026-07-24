@@ -91,7 +91,9 @@ Total to close all gaps: **7 tests** → would bring file to 60 tests.
 
 The 53-test coverage is **structurally complete** (presence, tone, forbidden-field, shape, web-action-redirect). The 4 gaps are body-content assertions, not missing status coverage or missing role differentiation. **Decision: add 7 targeted body-content tests to bring the file to 60**, documenting this as a restoration of body-copy assertions rather than new coverage. The 12 tests between 60 and the reported 72 remain permanently unrecoverable and are formally accepted as a known unknown.
 
-**Status: OPEN — 7 tests to be added at next review session.**
+**Status: CLOSED — 2026-07-24**
+
+7 body-content tests added to `boothop-mobile/__tests__/statusInfo.test.ts` in mobile commit `37d0360`. File now has 60 tests. Full mobile suite: **317 passed, 317 total** (verbatim runner output confirmed). The 12 tests between 60 and the reported 72 are permanently logged as unrecoverable and will not be reconstructed.
 
 ---
 
@@ -128,3 +130,5 @@ Stages 9B.2 and 9B.3 were built without stage prompts. This is a process violati
 | **Total** | **242** | | **218 (pre-commit)** |
 
 **Delta 218 → 242 = +24.** The only per-file attribution that can be confirmed: `confirm-delivery-route.test.ts` = 8, matching the explicitly cited "+8 confirm-delivery guard." The remaining +24 across the other 12 files cannot be allocated per-file without git history.
+
+**Likely explanation (pending confirmation):** Files such as `delivery-confirm-pin-route.test.ts` (19), `seal-activation-photo-route.test.ts` (11), and `verification-result-route.test.ts` (15) are exactly what Stages 9B.2 and 9B.3 would have added as server-side test coverage. The +24 is expected to fall out naturally once the 9B.2 and 9B.3 retroactive reviews are completed — at that point each file can be attributed to a specific stage and this table updated. Until then the +24 remains unallocated rather than fabricated.
