@@ -100,10 +100,10 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   // Strip any stray characters (whitespace, smart-quotes, etc.) that can creep
   // in from copy-paste or Vercel env-var encoding issues.  Only valid
   // base64url characters survive, then we convert to standard base64 for atob.
-  const cleaned = base64String.replace(/[^A-Za-z0-9+/\-_=]/g, ‘’);
-  if (!cleaned) throw new Error(‘VAPID public key is empty or invalid’);
-  const padding = ‘=’.repeat((4 - (cleaned.length % 4)) % 4);
-  const base64 = (cleaned + padding).replace(/-/g, ‘+’).replace(/_/g, ‘/’);
+  const cleaned = base64String.replace(/[^A-Za-z0-9+/\-_=]/g, '');
+  if (!cleaned) throw new Error('VAPID public key is empty or invalid');
+  const padding = '='.repeat((4 - (cleaned.length % 4)) % 4);
+  const base64 = (cleaned + padding).replace(/-/g, '+').replace(/_/g, '/');
   const rawData = window.atob(base64);
   return Uint8Array.from([...rawData].map((c) => c.charCodeAt(0)));
 }
