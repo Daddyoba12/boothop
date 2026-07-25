@@ -21,8 +21,6 @@ interface Declaration {
   sender_owns_item:            boolean | null;
   proof_of_ownership_url:      string | null;
   proof_of_ownership_explanation: string | null;
-  risk_classification:         string | null;
-  risk_score:                  number | null;
 }
 
 interface Evidence {
@@ -190,6 +188,7 @@ export default function InspectionPage() {
   const [submitting,    setSubmitting]    = useState(false);
   const [error,         setError]         = useState<string | null>(null);
   const [done,          setDone]          = useState<'passed' | 'failed' | null>(null);
+  const [doneStatus,    setDoneStatus]    = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -233,6 +232,7 @@ export default function InspectionPage() {
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? 'Submission failed'); return; }
       setDone(data.result);
+      setDoneStatus(data.status);
     } finally {
       setSubmitting(false);
     }
@@ -280,14 +280,24 @@ export default function InspectionPage() {
   }
 
   if (done === 'failed') {
+    const escalated = doneStatus === 'external_verification_required';
     return (
       <div className="min-h-screen bg-[#07111f] flex flex-col items-center justify-center px-4 text-center">
         <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-4">
           <AlertTriangle className="h-8 w-8 text-red-400" />
         </div>
         <h1 className="text-2xl font-bold text-white mb-2">Inspection flagged</h1>
-        <p className="text-white/50 mb-2">You have flagged issues with this shipment. Our team has been alerted and will investigate.</p>
-        <p className="text-white/30 text-sm mb-6">Please do not accept the item until BootHop confirms it is safe to proceed.</p>
+        {escalated ? (
+          <>
+            <p className="text-white/50 mb-2">This shipment has been escalated to BootHop&apos;s verification team. You will be contacted directly.</p>
+            <p className="text-white/30 text-sm mb-6">Do not accept the item.</p>
+          </>
+        ) : (
+          <>
+            <p className="text-white/50 mb-2">You have flagged issues with this shipment. Our team has been alerted and will investigate.</p>
+            <p className="text-white/30 text-sm mb-6">Please do not accept the item until BootHop confirms it is safe to proceed.</p>
+          </>
+        )}
         <Link
           href={`/matches/${matchId}`}
           className="bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-8 rounded-2xl transition"
@@ -341,15 +351,6 @@ export default function InspectionPage() {
             <div className="px-5 py-4 border-b border-white/10 flex items-center gap-2">
               <Package className="h-4 w-4 text-white/40" />
               <span className="font-semibold text-white/80 text-sm">Item to inspect</span>
-              {declaration.risk_classification && (
-                <span className={`ml-auto text-xs font-bold px-2 py-0.5 rounded-full ${
-                  declaration.risk_classification === 'MANUAL_REVIEW' ? 'bg-orange-500/20 text-orange-300' :
-                  declaration.risk_classification === 'STANDARD_REVIEW' ? 'bg-amber-500/20 text-amber-300' :
-                  'bg-green-500/20 text-green-300'
-                }`}>
-                  {declaration.risk_classification.replace('_', ' ')}
-                </span>
-              )}
             </div>
             <div className="px-5 py-4 grid grid-cols-2 gap-3 text-sm">
               <div>

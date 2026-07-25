@@ -54,7 +54,7 @@ export async function GET(
           item_name, item_category, item_description, brand, quantity,
           declared_value, declared_currency, declared_weight_kg,
           country_of_origin, sender_owns_item, proof_of_ownership_url,
-          proof_of_ownership_explanation, risk_classification, risk_score
+          proof_of_ownership_explanation
         `)
         .eq('id', match.declaration_id)
         .maybeSingle()
@@ -80,7 +80,7 @@ export async function GET(
 
   const { data: inspection } = await supabase
     .from('shipment_inspections')
-    .select('*')
+    .select('id, status, overall_pass, inspector_note, failure_reason, started_at, completed_at, updated_at')
     .eq('match_id', matchId)
     .order('created_at', { ascending: false })
     .limit(1)

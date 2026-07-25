@@ -99,7 +99,18 @@ export async function GET(
 
   const { data: decl } = await supabase
     .from('item_declarations')
-    .select('*')
+    .select(`
+      id, match_id, status, locked_at, reviewed_at, reviewed_by, created_at, updated_at,
+      item_name, item_category, item_description, brand, quantity, country_of_origin,
+      declared_value, declared_currency, declared_weight_kg,
+      contains_electronics, contains_medication, contains_food, contains_liquids,
+      contains_currency, contains_jewellery, contains_documents, contains_clothing,
+      contains_hazardous, contains_weapons, contains_battery, contains_powder,
+      contains_chemical, contains_plant_or_animal, item_modified,
+      sender_owns_item, proof_of_ownership_url, proof_of_ownership_explanation,
+      ack_description_accurate, ack_nothing_concealed, ack_complies_with_laws,
+      ack_may_be_reported, ack_false_decl_consequences, ack_legally_responsible
+    `)
     .eq('id', match.declaration_id)
     .maybeSingle();
 
