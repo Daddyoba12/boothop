@@ -82,6 +82,13 @@ export async function POST(
   if (!activation_photo_url.startsWith(`${matchId}/`)) {
     return NextResponse.json({ error: 'activation_photo_url does not belong to this shipment.' }, { status: 422 });
   }
+  const photoFilename = activation_photo_url.slice(`${matchId}/`.length);
+  const { data: photoList } = await supabase.storage
+    .from('seal-photos')
+    .list(matchId, { search: photoFilename });
+  if (!photoList?.length) {
+    return NextResponse.json({ error: 'Activation photo not found in storage.' }, { status: 422 });
+  }
   if (typeof activated_weight !== 'number' || activated_weight <= 0) {
     return NextResponse.json({ error: 'activated_weight must be a positive number (kg)' }, { status: 422 });
   }

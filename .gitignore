@@ -27,6 +27,10 @@
 # Claude Code local settings (auto-approve list, machine-specific)
 .claude/settings.local.json
 
+# Expo / mobile config files — belong in boothop-mobile, not here
+eas.json
+app.json
+
 # debug
 npm-debug.log*
 yarn-debug.log*

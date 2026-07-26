@@ -48,47 +48,27 @@ Scan events should be written to `shipment_seal_scans`, not `shipment_events`, t
 
 ---
 
-## 4. Seal activation photo — Supabase Storage existence check
+## 3. Traveller inspection evidence upload
 
-**Priority:** Low — prefix check (Stage 9B.3) already prevents cross-match faking; this would close the remaining gap where a client supplies a correctly-prefixed but non-existent key.
+**Priority:** Low
 
-**Context:**
-`POST /api/matches/[id]/seal/activate` validates that `activation_photo_url` starts with `${matchId}/` (added Stage 9B.3). However it does not verify that the key resolves to a real object in the `seal-photos` bucket. A client could supply `matchId/fabricated.jpg` and activation would succeed with a broken storage link.
+**Context:**  
+The inspection screen shows the sender's declaration evidence (read-only) but provides no mechanism for the traveller to upload their own photos during inspection (e.g. to document item condition at handover, supporting a disputed-outcome claim later). This was deliberately excluded from Stage 9B.2 — it was never in the original spec and requires new server scope.
 
-**Current mitigation:**
-- The mobile client always uploads first via `POST /seal/activation-photo` and only passes the returned `storageKey` to activate — so legitimate usage always produces a real key.
-- The prefix check blocks cross-match and fully fabricated keys.
-- A tampered client supplying a correctly-prefixed non-existent key is the remaining attack surface.
+**What to build:**  
+1. New Supabase Storage bucket (`inspection-evidence`, private).
+2. Server: add an evidence upload endpoint (e.g. `POST /api/matches/[id]/inspection/evidence`) and optionally an `inspection_photo_url` field on the `shipment_inspections` POST body.
+3. Mobile: add an `uploadInspectionEvidence` API wrapper and a photo-picker section to the inspection screen, disabled until the traveller has answered at least one checklist item.
 
-**What to build:**
-In `activate/route.ts`, after the prefix check, perform a Supabase Storage existence check:
-```ts
-const { data: photoExists } = await supabase.storage
-  .from('seal-photos')
-  .list(matchId, { search: activation_photo_url.replace(`${matchId}/`, '') });
-if (!photoExists?.length) {
-  return NextResponse.json({ error: 'Activation photo not found in storage.' }, { status: 422 });
-}
-```
-Or use `createSignedUrl` with a short TTL to confirm existence without exposing a URL.
-
-**Trade-off:** Adds one extra Supabase Storage round-trip on every activation. Given activation happens once per shipment, latency is acceptable. Deferred because prefix check already blocks 99% of attack surface and legitimate usage is never affected.
+**Design note:**  
+Mirrors the declaration-evidence upload pattern (`declaration-evidence` bucket, `POST /declare/evidence`). Access should be limited to the traveller for the match in question. Evidence uploaded here should be surfaced in the admin compliance timeline alongside declaration evidence.
 
 ---
 
-## 3. Inspection fail done-screen: no differentiation between escalation paths
+~~## 4. Seal activation photo — Supabase Storage existence check~~ **RESOLVED** — storage `.list()` existence check added to `activate/route.ts` after the prefix check. Returns 422 if the key is not found in the `seal-photos` bucket.
 
-**Priority:** Low — cosmetic, affects both web and mobile
+---
 
-**Context:**  
-After a traveller submits a failed inspection, the done-screen shows generic "Inspection flagged / Our team has been alerted" copy regardless of which failure_reason was chosen. The server returns `status: 'external_verification_required'` or `status: 'suspended_pending_review'` in the response body, but the client (web `page.tsx:282–299`, mobile `app/inspect/[id].tsx:120–133`) reads only `result.result` ('passed'/'failed') and discards `result.status`.
+~~## 3. Inspection fail done-screen~~ **RESOLVED** — both web (`inspection/page.tsx:282–308`) and mobile (`app/inspect/[id].tsx:127–144`) already capture `result.status` and branch the done-screen copy on `external_verification_required` vs `suspended_pending_review`. Implemented during 9B.2 build.
 
-**Effect:**  
-A traveller who selected `prohibited_or_suspicious` or `sender_refused_inspection` (which immediately escalate to external verification) sees the same screen as one whose mismatch went to standard admin review. The differentiation is only visible later, on the match screen's status card.
-
-**What to build:**  
-Read `result.status` from the POST response and branch the done-screen copy:
-- `external_verification_required` → "This shipment has been escalated to BootHop's verification team. You will be contacted directly. Do not accept the item."
-- `suspended_pending_review` → "This shipment has been paused pending admin review. Our team has been alerted and will contact both parties."
-
-**Scope:** Web inspection `page.tsx` and mobile `app/inspect/[id].tsx` — same change in both.
+~~## 5. Category proof-of-ownership check~~ **RESOLVED** — `validate.ts` substring changed to exact match + `VALID_CATEGORIES` enum guard added to `validateSubmit`; mobile `lib/declarations.ts` substring changed to exact match. Web `declare/page.tsx` was already correct.

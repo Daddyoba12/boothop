@@ -83,25 +83,31 @@ function makeChain(singleResult: unknown, updateResult: unknown = null) {
 }
 
 interface SupabaseOpts {
-  matchData?:       unknown;
-  generatedSeal?:   unknown;   // first seal query (status='generated')
-  activatedSeal?:   unknown;   // idempotent seal query (status='activated')
+  matchData?:     unknown;
+  generatedSeal?: unknown;   // first seal query (status='generated')
+  activatedSeal?: unknown;   // idempotent seal query (status='activated')
+  photoExists?:   boolean;   // whether seal-photos storage returns a file (default: true)
 }
 
 function makeSupabase({
   matchData     = SEAL_PENDING_MATCH as unknown,
   generatedSeal = null as unknown,
   activatedSeal = null as unknown,
+  photoExists   = true,
 }: SupabaseOpts = {}) {
   const matchChain   = makeChain(matchData);
   const eventsChain  = makeChain(null);
   (eventsChain.insert as ReturnType<typeof vi.fn>).mockResolvedValue({ data: null, error: null });
 
-  // Update chains for seal and match (void — just need to not throw)
   const sealUpdateChain  = makeChain(null);
   const matchUpdateChain = makeChain(null);
 
   let sealCallCount = 0;
+
+  const storageList = vi.fn().mockResolvedValue({
+    data:  photoExists ? [{ name: 'photo.jpg' }] : [],
+    error: null,
+  });
 
   return {
     from: vi.fn().mockImplementation((table: string) => {
@@ -114,18 +120,16 @@ function makeSupabase({
       if (table === 'shipment_secure_seals') {
         sealCallCount++;
         if (sealCallCount === 1) {
-          // First call: look for status='generated'
           return makeChain(generatedSeal);
         }
         if (sealCallCount === 2 && generatedSeal === null) {
-          // Second call: idempotent check for status='activated'
           return makeChain(activatedSeal);
         }
-        // Subsequent calls: updates
         return sealUpdateChain;
       }
       return makeChain(null);
     }),
+    storage: { from: vi.fn().mockReturnValue({ list: storageList }) },
   };
 }
 
@@ -344,6 +348,36 @@ describe('POST /seal/activate — activation_photo_url prefix check', () => {
     const json = await res.json();
     expect(json.error).not.toMatch(/does not belong/i);
     expect(res.status).toBe(409); // no seal found — proof we got past prefix check
+  });
+});
+
+// ── Storage existence check ───────────────────────────────────────────────────
+
+describe('POST /seal/activate — storage existence check', () => {
+  it('returns 422 when the photo key is not found in the seal-photos bucket', async () => {
+    mockSession(TRAVELER_EMAIL);
+    const seal = makeGeneratedSeal();
+    vi.mocked(createSupabaseAdminClient).mockReturnValue(
+      makeSupabase({ generatedSeal: seal, photoExists: false }) as never
+    );
+    const res  = await activatePOST(makeRequest(validBody(seal)), { params: Promise.resolve({ id: MATCH_ID }) });
+    expect(res.status).toBe(422);
+    const json = await res.json();
+    expect(json.error).toMatch(/not found in storage/i);
+  });
+
+  it('proceeds past storage check when photo exists — prefix-check "does not belong" error is NOT returned', async () => {
+    // This confirms the storage check passes and execution continues into seal lookup.
+    // generatedSeal=null forces a 409 (no seal), proving we got past both prefix and storage checks.
+    mockSession(TRAVELER_EMAIL);
+    vi.mocked(createSupabaseAdminClient).mockReturnValue(
+      makeSupabase({ generatedSeal: null, activatedSeal: null, photoExists: true }) as never
+    );
+    const body = { token: 'tok', seal_number: SEAL_NUMBER, activation_photo_url: VALID_PHOTO_KEY, activated_weight: 5 };
+    const res  = await activatePOST(makeRequest(body), { params: Promise.resolve({ id: MATCH_ID }) });
+    const json = await res.json();
+    expect(json.error).not.toMatch(/not found in storage|does not belong/i);
+    expect(res.status).toBe(409); // reached seal lookup, no generated seal found
   });
 });
 

@@ -5,6 +5,12 @@ export const HIGH_RISK_POW_CATEGORIES =
   (process.env.PROOF_OF_OWNERSHIP_CATEGORIES ?? 'jewellery,electronics,antiques,art')
     .split(',').map(s => s.trim().toLowerCase());
 
+export const VALID_CATEGORIES = [
+  'clothing', 'electronics', 'documents', 'cosmetics', 'books', 'toys',
+  'food', 'perfume', 'alcohol', 'art', 'medicine', 'antiques',
+  'jewellery', 'other',
+];
+
 export const DECLARATION_TEXT_VERSION = '1.0';
 
 const VAGUE_DESCRIPTIONS = [
@@ -29,7 +35,7 @@ export function validateDescription(desc: unknown): string | null {
 export function requiresProofOfOwnership(fields: Record<string, unknown>): boolean {
   if ((fields.declared_value as number ?? 0) > PROOF_OF_OWNERSHIP_THRESHOLD) return true;
   const cat = (fields.item_category as string ?? '').toLowerCase();
-  return HIGH_RISK_POW_CATEGORIES.some(c => cat.includes(c));
+  return HIGH_RISK_POW_CATEGORIES.includes(cat);
 }
 
 export function validateSubmit(fields: Record<string, unknown>): string[] {
@@ -39,6 +45,8 @@ export function validateSubmit(fields: Record<string, unknown>): string[] {
     errors.push('Item name is required.');
   if (!fields.item_category)
     errors.push('Item category is required.');
+  if (fields.item_category && !VALID_CATEGORIES.includes(String(fields.item_category)))
+    errors.push('Item category is not valid.');
   if (fields.quantity == null || Number(fields.quantity) < 1)
     errors.push('Quantity must be at least 1.');
   if (fields.declared_value == null || Number(fields.declared_value) <= 0)

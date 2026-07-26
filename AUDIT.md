@@ -132,3 +132,140 @@ Stages 9B.2 and 9B.3 were built without stage prompts. This is a process violati
 **Delta 218 → 242 = +24.** The only per-file attribution that can be confirmed: `confirm-delivery-route.test.ts` = 8, matching the explicitly cited "+8 confirm-delivery guard." The remaining +24 across the other 12 files cannot be allocated per-file without git history.
 
 **Likely explanation (pending confirmation):** Files such as `delivery-confirm-pin-route.test.ts` (19), `seal-activation-photo-route.test.ts` (11), and `verification-result-route.test.ts` (15) are exactly what Stages 9B.2 and 9B.3 would have added as server-side test coverage. The +24 is expected to fall out naturally once the 9B.2 and 9B.3 retroactive reviews are completed — at that point each file can be attributed to a specific stage and this table updated. Until then the +24 remains unallocated rather than fabricated.
+
+---
+
+## Stage 9B.4 Close — Mobile delivery PIN and issue reporting
+
+**Date:** 2026-07-25  
+**Commit hash:** `6a3c074` — same baseline commit as 9B.1–9B.3. No separate per-stage commit was made. The staged test counts in this record (334→354) are unverifiable for the same reason as INCIDENT-001: no git snapshot separates 9B.4 from the prior stages within that commit.
+
+### What was built
+
+| File | Type | Description |
+|------|------|-------------|
+| `boothop-mobile/lib/api.ts` | edited | Added `generateDeliveryPin`, `confirmDeliveryPin`, `reportDeliveryIssue` wrappers |
+| `boothop-mobile/app/deliver/[id]/pin.tsx` | new | Sender: generate + display 6-digit delivery PIN |
+| `boothop-mobile/app/deliver/[id]/confirm.tsx` | new | Traveller: PIN entry, attempt tracking, lockout state |
+| `boothop-mobile/app/deliver/[id]/report.tsx` | new | Sender: 24h issue report (4 types, ≥20 char description) |
+| `boothop-mobile/app/match/[id].tsx` | edited | Replaced static boothop.com card with native delivery PIN buttons; added canReport; narrowed canDispute |
+| `boothop-mobile/__tests__/deliveryFlow.test.ts` | new | 20 tests across A–D (API wrappers, canReport, canDispute, CLEARED regression) |
+
+### Match screen changes
+
+- `canDispute` narrowed from `["active","delivery_confirmed"].includes(status)` to `status === "active" && !hasActivatedSeal` — sealed active shipments no longer show "Raise Dispute" (they use PIN confirm flow); CLEARED active shipments retain the dispute button
+- Added `canReport = status === "delivery_confirmed" && role === "sender"` — routes sender to native `/deliver/${id}/report` screen
+- Replaced the static "Open boothop.com" info card for `active + hasActivatedSeal` with role-split buttons: sender → `/deliver/${id}/pin`; traveller → `/deliver/${id}/confirm`
+- CLEARED path unchanged: `canConfirm = status === "active" && !hasActivatedSeal` still shows "Confirm Delivery" → legacy `confirm-delivery` flow
+
+### Test results (verbatim)
+
+```
+PASS __tests__/deliveryFlow.test.ts
+PASS __tests__/sealFlow.test.ts
+PASS __tests__/declarationForm.test.ts
+PASS __tests__/inspectionForm.test.ts
+PASS __tests__/statusInfo.test.ts
+PASS __tests__/statusConstants.test.ts
+PASS __tests__/timeline.test.ts
+PASS __tests__/confirmDeliveryGuard.test.ts
+
+Test Suites: 8 passed, 8 total
+Tests:       354 passed, 354 total
+Snapshots:   0 total
+Time:        1.228 s
+```
+
+Previous total (pre-9B.4): **334** (7 suites)  
+Added: **20** (`deliveryFlow.test.ts`)  
+New total: **354** (8 suites)
+
+---
+
+## Stage 9B.5 Close — Mobile integration hardening
+
+**Date:** 2026-07-25  
+**Commit hash:** `6a3c074` — same baseline commit as 9B.1–9B.4. Same caveat applies: staged counts (354→391) are unverifiable without per-stage snapshots.
+
+### What was built
+
+| File | Action | Description |
+|------|--------|-------------|
+| `boothop-mobile/lib/network.ts` | new | `isNetworkError(e)` — distinguishes fetch TypeError (offline) from server Error |
+| `boothop-mobile/app/deliver/[id]/confirm.tsx` | edited | `useRef` double-submit guard; `isNetworkError` error branching |
+| `boothop-mobile/app/deliver/[id]/report.tsx` | edited | `useRef` guard; `isNetworkError` branching; inline "Retry" button on network failure |
+| `boothop-mobile/app/deliver/[id]/pin.tsx` | edited | `isNetworkError` error branching |
+| `boothop-mobile/app/inspect/[id].tsx` | edited | `useRef` double-submit guard (each bad submit burns a server-side inspection slot) |
+| `boothop-mobile/app/seal/[id]/index.tsx` | edited | Photo upload recovery: keep photoUri on failure + inline "Retry upload" button; AppState listener to dismiss scan overlay if user revokes camera permission from Settings mid-scan |
+| `boothop-mobile/__tests__/network.test.ts` | new | 12 tests for `isNetworkError` (true/false/non-Error values) |
+| `boothop-mobile/__tests__/deliveryJourney.test.ts` | new | 25 tests — full compliance journey contract chain (A declaration → B inspection → C seal → D PIN → E report → F CLEARED path) |
+
+### Decisions
+
+- **AppState camera revoke**: logic lives in `seal/[id]/index.tsx` only — no Jest coverage. AppState is a native event; the existing expo-camera mock infrastructure does not model it. The handler dismisses the scan overlay on any app-foreground event while scanning, forcing the next tap to re-request permission through the existing flow.
+- **`useRef` guard scope**: applied to `inspect`, `deliver/confirm`, `deliver/report` only. `declare` uses PUT draft (idempotent) + server-side submit check. `seal/activate` and `seal/confirm` return `idempotent: true` from the server. `deliver/pin` regeneration is explicitly gated by an Alert confirmation, making the double-tap path user-intentional.
+- **Offline retry**: screens distinguish network failures from server errors and show "No connection — try again." No offline queue or background sync was added (out of scope).
+
+### Test results (verbatim)
+
+```
+PASS __tests__/deliveryJourney.test.ts
+PASS __tests__/network.test.ts
+PASS __tests__/deliveryFlow.test.ts
+PASS __tests__/sealFlow.test.ts
+PASS __tests__/declarationForm.test.ts
+PASS __tests__/inspectionForm.test.ts
+PASS __tests__/statusInfo.test.ts
+PASS __tests__/timeline.test.ts
+PASS __tests__/statusConstants.test.ts
+PASS __tests__/confirmDeliveryGuard.test.ts
+
+Test Suites: 10 passed, 10 total
+Tests:       391 passed, 391 total
+Snapshots:   0 total
+Time:        1.575 s
+```
+
+Previous total (pre-9B.5): **354** (8 suites)  
+Added: **37** (network: 12, deliveryJourney: 25)  
+New total: **391** (10 suites)
+
+---
+
+## Verified suite baseline — 2026-07-26
+
+First per-file runner verification after all 9B stages. All 10 suites green.
+
+| Suite | Tests | Notes |
+|---|---|---|
+| declarationForm.test.ts | 76 | Includes 2 tests added 2026-07-25 (draft bypass, ack-specific 422) |
+| inspectionForm.test.ts | 68 | |
+| sealFlow.test.ts | 56 | |
+| statusInfo.test.ts | 61 | INCIDENT-002 closed at 60; commit `73bc601` added 1 test for 9B.2 status-card fix |
+| statusConstants.test.ts | 62 | |
+| deliveryJourney.test.ts | 25 | |
+| timeline.test.ts | 12 | |
+| deliveryFlow.test.ts | 20 | |
+| network.test.ts | 12 | |
+| confirmDeliveryGuard.test.ts | 6 | |
+| **Total** | **398** | |
+
+`git status --porcelain` on mobile repo at time of this entry: working tree has uncommitted AUDIT.md edits (web repo, not mobile). Mobile working tree clean at `4462d10`.
+
+---
+
+## Stage 10 — Disposition (2026-07-26)
+
+Stage 10 was scoped as "Mobile Traveller Inspection Write Flow." On investigation, this stage is already complete as **Stage 9B.2**.
+
+Existing implementation:
+- `boothop-mobile/lib/inspections.ts` — FAILURE_REASONS (5 values, escalates flag), CHECKS, INITIAL_CHECKS, canSubmitInspection, buildInspectionPayload
+- `boothop-mobile/lib/api.ts:234–252` — getInspection, submitInspectionResult
+- `boothop-mobile/app/inspect/[id].tsx` — full screen with checklist, fail path, failure-reason selector, MANUAL_REVIEW hard gate (compliance_in_progress differentiation), done-screen escalation branching
+- `boothop-mobile/__tests__/inspectionForm.test.ts` — 68 tests
+
+Two items from the Stage 10 spec were explicitly deferred rather than built:
+1. `startInspection` wrapper — no server endpoint exists; upsert-on-POST was the original design. Not adding a mobile-only start step would create asymmetry with web.
+2. Traveller inspection evidence upload — new server scope (bucket, endpoint, evidence field), never in original spec. Added to BACKLOG.md as item 3.
+
+**Stage 10 closed — no new code required. Work already in mobile commit `6a3c074`.**

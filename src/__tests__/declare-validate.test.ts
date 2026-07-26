@@ -3,6 +3,7 @@ import {
   validateDescription,
   requiresProofOfOwnership,
   validateSubmit,
+  VALID_CATEGORIES,
 } from '../lib/declarations/validate';
 
 // ── validateDescription ───────────────────────────────────────────────────────
@@ -69,6 +70,13 @@ describe('requiresProofOfOwnership', () => {
     expect(requiresProofOfOwnership({ declared_value: 10, item_category: 'electronics' })).toBe(true);
     expect(requiresProofOfOwnership({ declared_value: 10, item_category: 'antiques'   })).toBe(true);
     expect(requiresProofOfOwnership({ declared_value: 10, item_category: 'art'        })).toBe(true);
+  });
+
+  it('exact-match regression: substring category does not trigger (old code would have matched)', () => {
+    // 'antiques_collection' contains 'antiques' — substring logic would have triggered POW.
+    // Exact-match logic must not trigger for a non-enum value containing a high-risk word.
+    expect(requiresProofOfOwnership({ declared_value: 10, item_category: 'antiques_collection' })).toBe(false);
+    expect(requiresProofOfOwnership({ declared_value: 10, item_category: 'fine_art'            })).toBe(false);
   });
 });
 
@@ -234,5 +242,19 @@ describe('validateSubmit', () => {
     // Submitting with only item_name set should produce many errors.
     const partialFields = { item_name: 'shoes', item_category: 'clothing' };
     expect(validateSubmit(partialFields).length).toBeGreaterThan(3);
+  });
+
+  // VALID_CATEGORIES enum guard (added when substring → exact-match fix landed)
+  it('rejects a tampered category value not in the 14-value enum', () => {
+    const errors = validateSubmit({ ...VALID_FIELDS, item_category: 'unknown_category' });
+    expect(errors.some(e => /category.*not valid|not valid/i.test(e))).toBe(true);
+  });
+
+  it('accepts all 14 valid item categories without a category error', () => {
+    for (const category of VALID_CATEGORIES) {
+      const errors = validateSubmit({ ...VALID_FIELDS, item_category: category });
+      const categoryErrors = errors.filter(e => /category.*not valid|not valid/i.test(e));
+      expect(categoryErrors).toHaveLength(0);
+    }
   });
 });
