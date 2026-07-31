@@ -131,6 +131,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency:  'yearly',
       priority:         0.5,
     },
+    // ── Send hub ──────────────────────────────────────────────
+    {
+      url:              `${APP_URL}/send`,
+      lastModified:     now,
+      changeFrequency:  'weekly',
+      priority:         0.9,
+    },
     // ── Send landing pages ────────────────────────────────────
     {
       url:              `${APP_URL}/send/uk-same-day`,
@@ -181,10 +188,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
       'nottingham-to-glasgow','glasgow-to-nottingham',
       'manchester-to-birmingham', 'birmingham-to-manchester',
       'manchester-to-edinburgh',  'edinburgh-to-manchester',
-      // International
-      'london-to-prague',  'prague-to-london',
-      'london-to-lagos',   'lagos-to-london',
-      'london-to-abuja',   'abuja-to-london',
+      // International — UK ↔ Nigeria extended
+      'london-to-prague',        'prague-to-london',
+      'london-to-lagos',         'lagos-to-london',
+      'london-to-abuja',         'abuja-to-london',
+      'london-to-port-harcourt', 'port-harcourt-to-london',
+      'manchester-to-lagos',     'lagos-to-manchester',
+      'manchester-to-abuja',     'abuja-to-manchester',
+      'birmingham-to-lagos',     'lagos-to-birmingham',
+      'birmingham-to-abuja',     'abuja-to-birmingham',
+      // Nigeria ↔ USA
+      'lagos-to-chicago',        'chicago-to-lagos',
+      'abuja-to-chicago',        'chicago-to-abuja',
+      'lagos-to-houston',        'houston-to-lagos',
+      'lagos-to-new-york',       'new-york-to-lagos',
+      'abuja-to-new-york',       'new-york-to-abuja',
+      'lagos-to-atlanta',        'atlanta-to-lagos',
+      'lagos-to-washington-dc',  'washington-dc-to-lagos',
+      // Nigeria ↔ Canada
+      'lagos-to-toronto',        'toronto-to-lagos',
+      'abuja-to-toronto',        'toronto-to-abuja',
+      'lagos-to-calgary',        'calgary-to-lagos',
+      'lagos-to-vancouver',      'vancouver-to-lagos',
+      'lagos-to-ottawa',         'ottawa-to-lagos',
+      // UK ↔ Ghana
+      'london-to-accra',         'accra-to-london',
     ].map(slug => ({
       url:             `${APP_URL}/send/${slug}`,
       lastModified:    now,

@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 export const metadata = {
   title: 'Privacy Policy – BootHop',
   description: 'How BootHop collects, uses, and protects your personal data.',
+  alternates: { canonical: 'https://www.boothop.com/privacy' },
 };
 
 function Section({ id, title, icon: Icon, children }: {

@@ -158,25 +158,33 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'Organization',
-      '@id':   `${APP_URL}/#org`,
-      name:    'BootHop',
-      url:     APP_URL,
+      '@type':       'Organization',
+      '@id':         `${APP_URL}/#org`,
+      name:          'BootHop',
+      legalName:     'BootHop Ltd',
+      alternateName: ['Boothop', 'Boot Hop', 'boothop.com'],
+      url:           APP_URL,
       logo: {
         '@type':      'ImageObject',
+        '@id':        `${APP_URL}/#logo`,
         url:          `${APP_URL}/images/boothop1.png`,
         width:        512,
         height:       512,
+        caption:      'BootHop',
       },
+      image: { '@id': `${APP_URL}/#logo` },
       description:
         'BootHop is a compliance-first logistics network delivering same-day, cross-border, and business logistics through verified travellers and couriers — with AI customs screening, Stripe escrow, and KYC on every movement.',
       foundingDate: '2024',
+      foundingLocation: { '@type': 'Country', name: 'United Kingdom' },
       areaServed:   'Worldwide',
+      slogan:       'Ship Anything. Anywhere. With a Verified Traveller.',
       sameAs: [
         'https://www.instagram.com/boothop',
         'https://www.tiktok.com/@boothop',
         'https://www.facebook.com/boothop',
         'https://twitter.com/boothop',
+        'https://apps.apple.com/app/id6788029982',
       ],
       contactPoint: {
         '@type':            'ContactPoint',
@@ -190,6 +198,7 @@ const jsonLd = {
       '@id':     `${APP_URL}/#website`,
       url:       APP_URL,
       name:      'BootHop',
+      alternateName: 'boothop.com',
       inLanguage: 'en-GB',
       publisher:  { '@id': `${APP_URL}/#org` },
       potentialAction: {
@@ -197,6 +206,17 @@ const jsonLd = {
         target:       `${APP_URL}/journeys?q={search_term_string}`,
         'query-input': 'required name=search_term_string',
       },
+    },
+    {
+      '@type':         'WebPage',
+      '@id':           `${APP_URL}/#webpage`,
+      url:             APP_URL,
+      name:            'BootHop – Ship Anything. Anywhere. With a Verified Traveller.',
+      isPartOf:        { '@id': `${APP_URL}/#website` },
+      about:           { '@id': `${APP_URL}/#org` },
+      primaryImageOfPage: { '@id': `${APP_URL}/#logo` },
+      inLanguage:      'en-GB',
+      description:     'Peer-to-peer delivery marketplace connecting senders with verified travellers for same-day UK and international shipping. Cheaper than DHL, with Stripe escrow and live GPS tracking.',
     },
     {
       '@type':       'Service',

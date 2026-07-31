@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 export const metadata = {
   title: 'Terms & Conditions – BootHop',
   description: 'BootHop Terms and Conditions — your responsibilities as a sender or traveller on our platform.',
+  alternates: { canonical: 'https://www.boothop.com/terms' },
 };
 
 function Section({ id, title, icon: Icon, children }: {

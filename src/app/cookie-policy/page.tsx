@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 export const metadata = {
   title: 'Cookie Policy – BootHop',
   description: 'How BootHop uses cookies and how you can control them.',
+  alternates: { canonical: 'https://www.boothop.com/cookie-policy' },
 };
 
 function Section({ id, title, icon: Icon, children }: {
