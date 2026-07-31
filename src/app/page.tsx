@@ -45,15 +45,15 @@ const testimonials = [
 ];
 
 const featuredRoutes = [
-  { from: 'London', to: 'Lagos',         tag: 'Most Popular',   color: 'from-blue-500/20 to-blue-600/10',    border: 'border-blue-500/20',    badge: 'bg-blue-500/20 text-blue-300',     travellers: 12, departs: 'Today' },
-  { from: 'Manchester', to: 'Lagos',     tag: 'High Demand',    color: 'from-emerald-500/20 to-emerald-600/10', border: 'border-emerald-500/20', badge: 'bg-emerald-500/20 text-emerald-300', travellers: 7, departs: 'Tomorrow' },
-  { from: 'Derby', to: 'Heathrow',       tag: 'UK Domestic',    color: 'from-violet-500/20 to-violet-600/10', border: 'border-violet-500/20',  badge: 'bg-violet-500/20 text-violet-300', travellers: 4, departs: 'Today' },
-  { from: 'London', to: 'Aberdeen',      tag: 'UK Domestic',    color: 'from-sky-500/20 to-sky-600/10',      border: 'border-sky-500/20',     badge: 'bg-sky-500/20 text-sky-300',       travellers: 3, departs: 'Tomorrow' },
-  { from: 'London', to: 'Edinburgh',     tag: 'High Demand',    color: 'from-green-500/20 to-green-600/10',  border: 'border-green-500/20',   badge: 'bg-green-500/20 text-green-300',   travellers: 9, departs: 'Today' },
-  { from: 'London', to: 'New York',      tag: 'Transatlantic',  color: 'from-cyan-500/20 to-cyan-600/10',    border: 'border-cyan-500/20',    badge: 'bg-cyan-500/20 text-cyan-300',     travellers: 5, departs: 'Thu' },
-  { from: 'Birmingham', to: 'Lagos',     tag: 'Growing Route',  color: 'from-amber-500/20 to-amber-600/10',  border: 'border-amber-500/20',   badge: 'bg-amber-500/20 text-amber-300',   travellers: 6, departs: 'Tomorrow' },
-  { from: 'London', to: 'Dubai',         tag: 'International',  color: 'from-orange-500/20 to-orange-600/10', border: 'border-orange-500/20', badge: 'bg-orange-500/20 text-orange-300', travellers: 8, departs: 'Today' },
-  { from: 'Nottingham', to: 'Lagos',     tag: 'New Corridor',   color: 'from-purple-500/20 to-purple-600/10', border: 'border-purple-500/20', badge: 'bg-purple-500/20 text-purple-300', travellers: 2, departs: 'Fri' },
+  { from: 'London',     to: 'Lagos',     tag: 'Most Popular',  color: 'from-blue-500/20 to-blue-600/10',       border: 'border-blue-500/20',    badge: 'bg-blue-500/20 text-blue-300',       travellers: 12, departs: 'Today',     sendSlug: 'london-to-lagos'      },
+  { from: 'Manchester', to: 'Lagos',     tag: 'High Demand',   color: 'from-emerald-500/20 to-emerald-600/10', border: 'border-emerald-500/20', badge: 'bg-emerald-500/20 text-emerald-300', travellers: 7,  departs: 'Tomorrow',  sendSlug: 'manchester-to-lagos'  },
+  { from: 'Derby',      to: 'Heathrow',  tag: 'UK Domestic',   color: 'from-violet-500/20 to-violet-600/10',   border: 'border-violet-500/20',  badge: 'bg-violet-500/20 text-violet-300',   travellers: 4,  departs: 'Today',     sendSlug: null                   },
+  { from: 'London',     to: 'Aberdeen',  tag: 'UK Domestic',   color: 'from-sky-500/20 to-sky-600/10',         border: 'border-sky-500/20',     badge: 'bg-sky-500/20 text-sky-300',         travellers: 3,  departs: 'Tomorrow',  sendSlug: null                   },
+  { from: 'London',     to: 'Edinburgh', tag: 'High Demand',   color: 'from-green-500/20 to-green-600/10',     border: 'border-green-500/20',   badge: 'bg-green-500/20 text-green-300',     travellers: 9,  departs: 'Today',     sendSlug: 'london-to-edinburgh'  },
+  { from: 'London',     to: 'New York',  tag: 'Transatlantic', color: 'from-cyan-500/20 to-cyan-600/10',       border: 'border-cyan-500/20',    badge: 'bg-cyan-500/20 text-cyan-300',       travellers: 5,  departs: 'Thu',       sendSlug: null                   },
+  { from: 'Birmingham', to: 'Lagos',     tag: 'Growing Route', color: 'from-amber-500/20 to-amber-600/10',     border: 'border-amber-500/20',   badge: 'bg-amber-500/20 text-amber-300',     travellers: 6,  departs: 'Tomorrow',  sendSlug: 'birmingham-to-lagos'  },
+  { from: 'London',     to: 'Dubai',     tag: 'International', color: 'from-orange-500/20 to-orange-600/10',   border: 'border-orange-500/20',  badge: 'bg-orange-500/20 text-orange-300',   travellers: 8,  departs: 'Today',     sendSlug: null                   },
+  { from: 'Nottingham', to: 'Lagos',     tag: 'New Corridor',  color: 'from-purple-500/20 to-purple-600/10',   border: 'border-purple-500/20',  badge: 'bg-purple-500/20 text-purple-300',   travellers: 2,  departs: 'Fri',       sendSlug: null                   },
 ];
 
 const weightOptions = [
@@ -1079,10 +1079,13 @@ function HomePageContent() {
                 const liveCount = routeCounts[`${route.from}→${route.to}`] ?? 0;
                 const displayCount = liveCount > 0 ? liveCount : route.travellers;
                 const isLive = liveCount > 0;
+                const href = route.sendSlug
+                  ? `/send/${route.sendSlug}`
+                  : `/journeys?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`;
                 return (
-                  <div key={`${route.from}-${route.to}`}
-                    onClick={() => router.push(`/journeys?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`)}
-                    className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${route.color} ${route.border} p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer`}>
+                  <Link key={`${route.from}-${route.to}`}
+                    href={href}
+                    className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${route.color} ${route.border} p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer block`}>
                     <div className="mb-3 flex items-center justify-between">
                       <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${route.badge}`}>{route.tag}</span>
                       {isLive ? (
@@ -1106,7 +1109,7 @@ function HomePageContent() {
                       </p>
                       <span className="text-xs text-white/25 group-hover:text-white/60 transition-colors">Book →</span>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
@@ -1115,6 +1118,38 @@ function HomePageContent() {
       </section>
 
 
+
+      {/* ── ROUTE LINK HUB — crawlable anchor links for Google ── */}
+      <section className="py-10 bg-[#07111f] border-t border-white/[0.04]">
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+          <p className="text-xs font-semibold uppercase tracking-widest text-white/25 mb-4">Popular delivery routes</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: 'London → Lagos',        href: '/send/london-to-lagos'        },
+              { label: 'Manchester → Lagos',     href: '/send/manchester-to-lagos'    },
+              { label: 'Birmingham → Lagos',     href: '/send/birmingham-to-lagos'    },
+              { label: 'London → Abuja',         href: '/send/london-to-abuja'        },
+              { label: 'London → Accra',         href: '/send/london-to-accra'        },
+              { label: 'Lagos → Chicago',        href: '/send/lagos-to-chicago'       },
+              { label: 'Lagos → New York',       href: '/send/lagos-to-new-york'      },
+              { label: 'Lagos → Toronto',        href: '/send/lagos-to-toronto'       },
+              { label: 'London → Edinburgh',     href: '/send/london-to-edinburgh'    },
+              { label: 'London → Manchester',    href: '/send/london-to-manchester'   },
+              { label: 'London → Birmingham',    href: '/send/london-to-birmingham'   },
+              { label: 'London → Glasgow',       href: '/send/london-to-glasgow'      },
+              { label: 'Same-Day UK',            href: '/send/uk-same-day'            },
+              { label: 'UK → Europe',            href: '/send/uk-to-europe'           },
+              { label: 'Student Delivery',       href: '/send/student-delivery'       },
+              { label: 'Business Urgent',        href: '/send/business-urgent'        },
+            ].map(({ label, href }) => (
+              <Link key={href} href={href}
+                className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/45 hover:text-white/80 hover:border-white/20 hover:bg-white/[0.06] transition-all">
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ── USE CASES — "What people use BootHop for" ── */}
       <section className="py-24 md:py-32 bg-[#07111f]">
