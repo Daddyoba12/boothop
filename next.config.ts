@@ -51,6 +51,13 @@ const nextConfig: NextConfig = {
         destination: 'https://www.boothop.com/:path*',
         permanent: true,
       },
+      // Ghost URLs Google found that don't exist — redirect to homepage
+      { source: '/Home',        destination: '/', permanent: true },
+      { source: '/Home/',       destination: '/', permanent: true },
+      { source: '/index.html',  destination: '/', permanent: true },
+      { source: '/index.htm',   destination: '/', permanent: true },
+      { source: '/default.asp', destination: '/', permanent: true },
+      { source: '/default.aspx',destination: '/', permanent: true },
       // /pipeline/commander → /commander (Commander is now native in Next.js)
       {
         source: '/pipeline/commander',
