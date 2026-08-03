@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Protect Commander dashboard routes — require boothop_commander_session
-  const commanderProtected = ['/commander/dashboard', '/commander/music', '/commander/change-password', '/commander/pipeline'];
+  const commanderProtected = ['/commander/dashboard', '/commander/music', '/commander/change-password', '/commander/pipeline', '/commanderNew'];
   if (commanderProtected.some(p => pathname.startsWith(p))) {
     if (!request.cookies.get('boothop_commander_session')) {
       return NextResponse.redirect(new URL('/commander', request.url));

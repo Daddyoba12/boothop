@@ -16,23 +16,30 @@ export default async function ClientPipelinePage({
   const cookieStore = await cookies();
   const session = getCommanderSession(cookieStore);
   if (!session) redirect('/commander');
-  if (!session.isSuper) redirect('/commander/dashboard');
+
+  const normalised = clientSlug.toLowerCase();
+
+  // Regular clients can only view their own pipeline
+  if (!session.isSuper && session.slug !== normalised) redirect('/commander/dashboard');
 
   const db = createSupabaseAdminClient();
   const { data: client } = await db
     .from('pipeline_clients')
     .select('id, company, slug, oracle_pipeline')
-    .eq('slug', clientSlug.toLowerCase())
+    .eq('slug', normalised)
     .single();
 
   if (!client) notFound();
 
+  // Only inject forClient when superadmin is managing another client's pipeline
+  const targetSlug = session.isSuper ? client.slug : undefined;
+
   return (
     <CommanderNewClient
       companyName={client.company}
-      isSuper={true}
+      isSuper={session.isSuper}
       companySlug={session.slug}
-      targetSlug={client.slug}
+      targetSlug={targetSlug}
     />
   );
 }

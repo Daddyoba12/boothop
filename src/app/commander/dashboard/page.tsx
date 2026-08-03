@@ -174,6 +174,7 @@ async function ClientDashboard({ session, db }: { session: any; db: any }) {
         {/* Quick links */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {[
+            { href: `/commander/pipeline/${session.slug}`, label: 'My Pipeline', desc: 'Manage your video pipeline' },
             { href: '/commander/music', label: 'Music Library', desc: 'Browse, add, replace tracks' },
             { href: '/client-onboarding', label: 'Pipeline Onboarding', desc: 'Oracle onboarding portal' },
           ].map(({ href, label, desc }) => (
