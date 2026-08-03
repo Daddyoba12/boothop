@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { getCommanderSession } from '@/lib/auth/commander';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import CommanderNav from '@/components/commander/CommanderNav';
+import SuperAdminClients from './SuperAdminClients';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,13 +27,8 @@ export default async function CommanderDashboard() {
 async function SuperAdminDashboard({ session, db }: { session: any; db: any }) {
   const { data: allClients } = await db
     .from('pipeline_clients')
-    .select('id, slug, company, email, contact_name, plan, status, created_at, is_super_admin')
+    .select('id, slug, company, email, contact_name, plan, status, created_at, is_super_admin, oracle_pipeline')
     .order('created_at', { ascending: false });
-
-  const planBadge: Record<string, string> = {
-    basic: 'bg-slate-700 text-slate-200',
-    pro:   'bg-amber-500/20 text-amber-300',
-  };
 
   return (
     <div className="min-h-screen bg-[#07111f] text-white">
@@ -53,41 +49,7 @@ async function SuperAdminDashboard({ session, db }: { session: any; db: any }) {
         </div>
 
         {/* Clients table */}
-        <div className="rounded-2xl border border-white/8 bg-white/[0.03] overflow-hidden">
-          <div className="px-6 py-4 border-b border-white/8">
-            <h2 className="text-sm font-bold text-white">Pipeline Clients</h2>
-          </div>
-          <div className="divide-y divide-white/5">
-            {(!allClients || allClients.length === 0) && (
-              <p className="text-center py-12 text-white/25 text-sm">No clients yet.</p>
-            )}
-            {allClients?.map((c: any) => (
-              <div key={c.id} className="px-6 py-4 flex items-center gap-4 hover:bg-white/[0.02] transition-colors">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-semibold text-white">{c.company}</p>
-                    {c.is_super_admin && (
-                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 uppercase tracking-wider">Admin</span>
-                    )}
-                  </div>
-                  <p className="text-xs text-white/35 font-mono mt-0.5">{c.slug}</p>
-                  {c.email && <p className="text-xs text-white/25 mt-0.5 truncate">{c.email}</p>}
-                </div>
-                <div className="shrink-0 flex items-center gap-2">
-                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${planBadge[c.plan ?? 'basic'] ?? planBadge.basic}`}>
-                    {c.plan ?? 'basic'}
-                  </span>
-                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${c.status === 'active' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'}`}>
-                    {c.status ?? 'active'}
-                  </span>
-                  <span className="hidden sm:block text-[10px] text-white/20">
-                    {c.created_at ? new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : ''}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <SuperAdminClients clients={allClients ?? []} />
 
         {/* Quick links */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">

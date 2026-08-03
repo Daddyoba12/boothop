@@ -37,6 +37,25 @@ export async function GET() {
   );
 }
 
+// PATCH { clientId, oraclePipeline } — superadmin only
+export async function PATCH(req: NextRequest) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
+  if (!session.isSuper) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+  const { clientId, oraclePipeline } = await req.json();
+  if (!clientId) return NextResponse.json({ error: 'clientId required' }, { status: 400 });
+
+  const db = createSupabaseAdminClient();
+  const { error } = await db
+    .from('pipeline_clients')
+    .update({ oracle_pipeline: oraclePipeline?.trim() || null })
+    .eq('id', clientId);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ ok: true });
+}
+
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
