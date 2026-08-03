@@ -3,8 +3,16 @@ import { NextRequest, NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = new URL(request.url);
 
+  // Protect admin routes — require boothop_admin_session
+  const adminPublic = ['/admin/login', '/admin/change-password'];
+  if (pathname.startsWith('/admin') && !adminPublic.some(p => pathname.startsWith(p))) {
+    if (!request.cookies.get('boothop_admin_session')) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+  }
+
   // Protect Commander dashboard routes — require boothop_commander_session
-  const commanderProtected = ['/commander/dashboard', '/commander/music'];
+  const commanderProtected = ['/commander/dashboard', '/commander/music', '/commander/change-password'];
   if (commanderProtected.some(p => pathname.startsWith(p))) {
     if (!request.cookies.get('boothop_commander_session')) {
       return NextResponse.redirect(new URL('/commander', request.url));

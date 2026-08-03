@@ -4,11 +4,12 @@ import { scryptSync, randomBytes, timingSafeEqual } from 'crypto';
 const COOKIE = 'boothop_commander_session';
 
 export interface CommanderSession {
-  clientId: string;
-  slug:     string;
-  company:  string;
-  email:    string;
-  isSuper:  boolean;
+  clientId:       string;
+  slug:           string;
+  company:        string;
+  email:          string;
+  isSuper:        boolean;
+  isTempPassword: boolean;
 }
 
 // ── Password hashing ──────────────────────────────────────────────────────────
@@ -50,7 +51,7 @@ export function verifyCommanderSession(token: string): CommanderSession | null {
       issuer:   'boothop',
       audience: 'boothop-commander',
     }) as CommanderSession & { commander: true };
-    return { clientId: p.clientId, slug: p.slug, company: p.company, email: p.email, isSuper: p.isSuper ?? false };
+    return { clientId: p.clientId, slug: p.slug, company: p.company, email: p.email, isSuper: p.isSuper ?? false, isTempPassword: p.isTempPassword ?? false };
   } catch {
     return null;
   }

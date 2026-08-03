@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const db = createSupabaseAdminClient();
   const { data: client } = await db
     .from('pipeline_clients')
-    .select('id, slug, company, email, password_hash, status, is_super_admin')
+    .select('id, slug, company, email, password_hash, status, is_super_admin, is_temp_password')
     .eq('slug', slug.trim().toLowerCase())
     .single();
 
@@ -20,15 +20,19 @@ export async function POST(req: NextRequest) {
   if (client.status === 'inactive')
     return NextResponse.json({ error: 'This account has been deactivated. Contact support.' }, { status: 403 });
 
+  const isTempPassword = client.is_temp_password ?? false;
+
   const token = signCommanderSession({
-    clientId: client.id,
-    slug:     client.slug,
-    company:  client.company,
-    email:    client.email ?? '',
-    isSuper:  client.is_super_admin ?? false,
+    clientId:       client.id,
+    slug:           client.slug,
+    company:        client.company,
+    email:          client.email ?? '',
+    isSuper:        client.is_super_admin ?? false,
+    isTempPassword,
   });
 
-  const res = NextResponse.json({ ok: true, redirectTo: '/commander/dashboard' });
+  const redirectTo = isTempPassword ? '/commander/change-password' : '/commander/dashboard';
+  const res = NextResponse.json({ ok: true, redirectTo });
   res.cookies.set(getCommanderCookieName(), token, {
     httpOnly: true,
     secure:   process.env.NODE_ENV === 'production',
