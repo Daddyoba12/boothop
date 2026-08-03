@@ -46,11 +46,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to create account' }, { status: 500 });
 
   const token = signCommanderSession({
-    clientId: client.id,
-    slug:     client.slug,
-    company:  client.company,
-    email:    client.email ?? '',
-    isSuper:  false,
+    clientId:       client.id,
+    slug:           client.slug,
+    company:        client.company,
+    email:          client.email ?? '',
+    isSuper:        false,
+    isTempPassword: false,
   });
 
   const res = NextResponse.json({ ok: true, redirectTo: '/commander/dashboard' });

@@ -2,6 +2,14 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getAdminSession, type AdminSession } from '@/lib/auth/admin-session';
 
+export const ADMIN_EMAILS: string[] = [
+  process.env.ADMIN_EMAIL ?? 'admin@boothop.com',
+];
+
+export function isAdminEmail(email: string): boolean {
+  return ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email.toLowerCase());
+}
+
 // Call at the top of any admin server page component. Redirects if not admin.
 export async function requireAdminPage(): Promise<AdminSession> {
   const cookieStore = await cookies();
