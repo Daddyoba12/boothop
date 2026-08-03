@@ -5,19 +5,29 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: Request) {
   const store = await cookies();
   const session = getCommanderSession(store);
   if (!session) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
 
+  const { searchParams } = new URL(req.url);
+  const forClient = searchParams.get('forClient')?.trim().toLowerCase() || '';
+
   const db  = createSupabaseAdminClient();
   const ago = new Date(Date.now() - 7 * 86_400_000).toISOString();
+
+  // Resolve clientId when superadmin is viewing another client
+  let clientId = session.clientId;
+  if (session.isSuper && forClient) {
+    const { data: c } = await db.from('pipeline_clients').select('id').eq('slug', forClient).single();
+    if (c) clientId = c.id;
+  }
 
   // Try post_history table (from commander schema)
   const { data } = await db
     .from('post_history')
     .select('platform, slot')
-    .eq('company_id', session.clientId)
+    .eq('company_id', clientId)
     .gte('posted_at', ago);
 
   if (!data || data.length === 0) {

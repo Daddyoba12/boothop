@@ -1,0 +1,269 @@
+I think it's a strong direction, but I'd tweak the priorities based on what you've shown me about BootHop.
+What I agree with (100%)
+1. Split Sender vs Traveller immediately ⭐⭐⭐⭐⭐
+This is the biggest improvement.
+When someone clicks Get Started, don't ask them for locations or dates.
+Ask:
+What are you here to do today?
+📦 Send a Package
+✈️ Earn While Travelling
+This is a natural first decision.
+2. Progressive disclosure ⭐⭐⭐⭐⭐
+I strongly agree.
+Don't show:
+From 
+To 
+Weight 
+Date 
+Budget 
+on one screen.
+Instead:
+Step 1: Origin
+↓
+Step 2: Destination
+↓
+Step 3: Date
+↓
+Step 4: Weight
+↓
+Step 5: Budget
+Each screen feels quick.
+3. Separate dashboards ⭐⭐⭐⭐⭐
+This is something I've wanted BootHop to have for a while.
+Sender dashboard
+Traveller dashboard
+Different home pages.
+That makes BootHop feel much more personal.
+What I would change
+❌ I wouldn't use exit-intent popups
+Those are common on e-commerce sites, but for a trust-based platform like BootHop they can feel pushy, especially on mobile where many TikTok users are browsing.
+Instead, if someone abandons registration, I'd rather use:
+a follow-up email (if they've entered their email), 
+or a reminder when they return. 
+⚠️ Be careful with testimonials
+The idea of social proof is excellent, but I'd avoid showing a quote unless it's from a genuine customer.
+For a marketplace like BootHop, trust is critical. If you don't yet have a large library of real testimonials, it's better to lean on things you can already verify, such as:
+✔️ ID Verified Travellers 
+✔️ Escrow Protected Payments 
+✔️ Live Journey Tracking 
+✔️ Transparent Pricing 
+As more completed deliveries happen, you can gradually introduce real customer stories.
+⚠️ Don't overstate percentages
+Claims like:
+"A progress bar increases completion by 30–40%"
+or
+"One testimonial doubles conversion"
+can be true in some studies or products, but they aren't guaranteed for BootHop. Think of them as ideas worth testing rather than expected outcomes.
+My priority order for BootHop
+This is how I'd sequence the work:
+Priority
+Feature
+Impact
+⭐⭐⭐⭐⭐
+Split Sender / Traveller immediately after Get Started
+Huge
+⭐⭐⭐⭐⭐
+Separate sender and traveller dashboards
+Huge
+⭐⭐⭐⭐⭐
+Progressive multi-step posting flow
+Huge
+⭐⭐⭐⭐
+Verify CompleteRegistration tracking is firing correctly
+Very high
+⭐⭐⭐⭐
+Add trust signals (ID verification, escrow, tracking) near the top
+High
+⭐⭐⭐
+Add real social proof as it becomes available
+Medium
+⭐⭐
+Progress bar
+Helpful but not essential
+⭐
+Exit-intent popup
+Low priority
+One thing I'd add that isn't on that list
+Because BootHop is a two-sided marketplace, your first question could be even more visual:
+Welcome to BootHopHow can we help today?┌────────────────────────────┐📦 SEND A PACKAGEFind someone alreadytravelling your route.[Continue]└────────────────────────────┘┌────────────────────────────┐✈️ I'M TRAVELLINGEarn money with yourspare luggage space.[Continue]└────────────────────────────┘
+That immediately tells visitors there are two ways to use BootHop, which is one of your biggest differentiators.
+Overall
+I'd give this proposal 9/10.
+The only things I'd avoid are relying on exit-intent popups and assuming generic conversion statistics will apply to BootHop. Everything else aligns well with the evidence you've shared: your ads are generating interest, and the biggest opportunity is making the first few interactions simpler and more focused.
+Having seen your ads, TikTok Events, website, homepage, and knowing BootHop from the last few months, I'd actually refine the plan further.
+I think BootHop's problem isn't the homepage. It's not the registration page either.
+It's that you're asking users to do the wrong thing first.
+My BootHop 2.0 Strategy
+Phase 1 — Don't touch the homepage much
+Your homepage is already good enough.
+I'd change only three things:
+Hero
+Send packages with people already travelling.
+Faster. Cheaper. Verified.
+Keep it simple.
+CTA
+Instead of
+Send a Package
+I'd have
+Start with BootHop
+because at that point you don't know if they're a sender or traveller.
+Remove friction
+Don't take them to the package form.
+Take them here...
+Phase 2 — The Decision Screen
+Welcome to BootHopHow can we help you today?┌─────────────────────────────┐📦 SEND A PACKAGEFind someone alreadytravelling your route.[Continue]└─────────────────────────────┘┌─────────────────────────────┐✈️ I'M TRAVELLINGEarn money fromyour spare luggage space.[Continue]└─────────────────────────────┘
+This is where I now think 90% of your improvement will come from.
+Phase 3 — No registration yet
+This is where I disagree slightly with the earlier proposal.
+I would not force registration immediately.
+Instead:
+User clicks
+📦 Send Package
+↓
+Ask ONE question.
+Where are you sending from?
+Next
+Where is it going?
+Next
+Package weight?
+Next
+Preferred delivery date?
+Now...
+Only then register
+At this point the user has already invested effort.
+Now say:
+Excellent.We've found possible traveller matches.Create your FREE BootHop accountto see them.✓ Takes less than 30 seconds✓ £20 welcome credit✓ Secure & verified
+Email
+OTP
+Done.
+This is called commitment before registration.
+The user has already mentally decided:
+"Yes, I want to send this parcel."
+Now registration feels like the final step rather than a barrier.
+Same for travellers
+Traveller
+↓
+Where are you travelling?
+↓
+Date?
+↓
+How much luggage space?
+↓
+Then
+We already have parcelsthat may match your journey.Create your FREE accountto view them.
+This changes everything
+Instead of
+TikTok↓Homepage↓Register↓Package
+it becomes
+TikTok↓Homepage↓Choose Sender↓Tell us your route↓"We've found matches"↓Register↓Dashboard
+Now registration has a reason.
+Dashboards
+This part I completely agree with.
+Sender dashboard
+Welcome back.Your Packages+ New PackageMatchesTracking
+Traveller
+Welcome back.Your Trips+ New JourneyParcel RequestsEarnings
+Completely different experiences.
+Homepages after login
+Sender should NEVER see traveller tools first.
+Traveller should NEVER see sender tools first.
+Every click matters.
+Another thing I'd change
+I wouldn't call it
+Get Started
+I'd call it
+Find a Traveller
+or
+Earn While Travelling
+Action beats generic wording.
+My biggest recommendation
+After looking at your analytics, I'd build BootHop like this:
+Visitor↓Homepage↓Choose Sender/Traveller↓Complete ONE task↓Show value↓Register↓Dashboard↓Post↓Match↓Escrow↓Tracking
+Notice what's different?
+Registration moves later.
+Why I've changed my thinking
+When we first discussed this, I assumed registration was a small hurdle. Your TikTok analytics changed that.
+You have:
+843 Page Views 
+358 Landing Page Views 
+Only 1 Complete Registration 
+That tells me registration is acting as a wall, not a doorway.
+At the same time, BootHop is a marketplace. If someone can complete too much without registering, you risk people browsing indefinitely or scraping information. So I'd use a hybrid approach:
+Let users begin their task without friction. 
+Stop them just before they receive something valuable (like seeing matching travellers or parcel opportunities). 
+Then ask them to register to unlock the results. 
+This is the same principle used by many successful marketplaces: users experience value first, then create an account to access it.
+If I were your Head of Product
+I'd make this the roadmap:
+Sprint 1 (Highest ROI)
+✅ Split Sender vs Traveller immediately after the homepage. 
+✅ Replace generic "Get Started" with role-specific actions. 
+✅ Separate sender and traveller dashboards. 
+Sprint 2
+✅ Convert long forms into a multi-step flow. 
+✅ Move registration to just before users see their matches or save their listing. 
+✅ Verify that CompleteRegistration is tracked correctly in TikTok Events. 
+Sprint 3
+✅ Add trust indicators (ID verification, escrow, live tracking) near the top. 
+✅ Add genuine customer testimonials as you accumulate them. 
+✅ Improve post-registration onboarding and first-match guidance. 
+I think this approach preserves what makes BootHop unique, reduces friction, and gives users a clear reason to register instead of asking them to commit before they've experienced the product's value.
+Option 1
+No. In fact, I'd do the opposite.
+Keep "Get Started". It's a good, universal call-to-action. What's broken isn't the button—it's where the button takes people.
+Here's what I would do
+Navigation
+Current
+Log In 
+Get Started 
+Keep exactly as it is.
+When someone clicks Get Started, don't send them to the registration form. Send them to a new page.
+New Get Started page
+Welcome to BootHopHow can we help you today?┌───────────────────────────┐📦 SEND A PACKAGEFind someone already travelling[Continue]└───────────────────────────┘┌───────────────────────────┐✈️ EARN WHILE TRAVELLINGMake money from empty luggage[Continue]└───────────────────────────┘
+Only after they've chosen do you ask them to register.
+Hero section
+Your current hero is actually very good.
+The only thing I'd change is this button:
+Instead of
+🎁 Send a Package — Claim £20 Free
+I'd consider:
+📦 Start Sending →
+Then below it, in smaller text:
+🎁 New members receive £20 delivery credit.
+Why?
+The primary action becomes using BootHop, while the incentive supports it rather than leading the message.
+"Earn from your empty luggage"
+Don't remove it.
+I'd simply make it a proper button rather than a text link.
+For example:
+📦 Start SendingOR✈️ Earn While Travelling
+Now both sides of your marketplace are equally visible.
+My ideal hero
+Sending home shouldn'tcost £300 and take a week.Connect with a verified travelleralready flying your route.[📦 Start Sending]────────── or ──────────[✈️ Earn While Travelling]✓ ID Verified✓ Escrow Protected✓ Same-Day on many routes
+That's all.
+No other changes.
+I would NOT remove "Get Started"
+Actually, I'd make every button eventually lead to the same decision page.
+For example:
+User clicks
+Goes to
+Get Started
+Sender/Traveller choice
+Send a Package
+Sender/Traveller choice (Sender pre-selected)
+Earn While Travelling
+Sender/Traveller choice (Traveller pre-selected)
+Claim £20
+Sender/Traveller choice
+Start Now
+Sender/Traveller choice
+The difference is the selection is already made.
+For example:
+If they click Earn While Travelling, the page opens with:
+Welcome to BootHop✓ I'm TravellingContinue →
+If they click Send a Package:
+Welcome to BootHop✓ I'm SendingContinue →
+This is the key idea
+Right now you have many entry points. That's good.
+But they all should funnel into one onboarding experience, with the appropriate role already selected based on the button they clicked.
+That keeps the site simple, preserves your BootHop branding, and gives u

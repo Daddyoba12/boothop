@@ -8,9 +8,11 @@ export async function POST(req: NextRequest) {
   const session = getCommanderSession(store);
   if (!session) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
 
-  const fd   = await req.formData();
-  const slot = parseInt(String(fd.get('slot') || '0'));
-  const decision = String(fd.get('decision') || '');
+  const fd        = await req.formData();
+  const slot      = parseInt(String(fd.get('slot') || '0'));
+  const decision  = String(fd.get('decision') || '');
+  const forClient = String(fd.get('forClient') || '').trim().toLowerCase();
+  const slug      = (session.isSuper && forClient) ? forClient : session.slug;
 
   if (!slot || !['post', 'skip', 'regen'].includes(decision)) {
     return NextResponse.json({ error: 'Invalid params' }, { status: 400 });
@@ -22,12 +24,12 @@ export async function POST(req: NextRequest) {
     db.from('otb_pipeline_commands').insert({
       slot,
       command:      decision,
-      company_slug: session.slug,
+      company_slug: slug,
       status:       'pending',
     }),
     db.from('otb_pipeline_state')
       .update({ pending_approval: false })
-      .eq('company_slug', session.slug)
+      .eq('company_slug', slug)
       .eq('slot', slot),
   ]);
 

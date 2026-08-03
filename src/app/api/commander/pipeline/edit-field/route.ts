@@ -13,10 +13,12 @@ export async function POST(req: NextRequest) {
   const session = getCommanderSession(store);
   if (!session) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
 
-  const fd    = await req.formData();
-  const slot  = parseInt(String(fd.get('slot') || '0'));
-  const field = String(fd.get('field') || '');
-  const value = String(fd.get('value') || '');
+  const fd        = await req.formData();
+  const slot      = parseInt(String(fd.get('slot') || '0'));
+  const field     = String(fd.get('field') || '');
+  const value     = String(fd.get('value') || '');
+  const forClient = String(fd.get('forClient') || '').trim().toLowerCase();
+  const slug      = (session.isSuper && forClient) ? forClient : session.slug;
 
   if (!slot || !ALLOWED_FIELDS.has(field)) {
     return NextResponse.json({ error: 'Invalid params' }, { status: 400 });
@@ -26,7 +28,7 @@ export async function POST(req: NextRequest) {
   const { error } = await db
     .from('otb_pipeline_state')
     .update({ [field]: value })
-    .eq('company_slug', session.slug)
+    .eq('company_slug', slug)
     .eq('slot', slot);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

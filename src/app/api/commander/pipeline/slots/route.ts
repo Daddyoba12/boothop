@@ -5,16 +5,20 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: Request) {
   const store = await cookies();
   const session = getCommanderSession(store);
   if (!session) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
+
+  const { searchParams } = new URL(req.url);
+  const forClient = searchParams.get('forClient')?.trim().toLowerCase() || '';
+  const slug = (session.isSuper && forClient) ? forClient : session.slug;
 
   const db = createSupabaseAdminClient();
   const { data } = await db
     .from('otb_pipeline_state')
     .select('slot, hook, hook_v2, problem, stakes, resolution, lesson, lesson_v2, caption_tiktok, caption_instagram, v1_url, v2_url, pending_approval, rendered_at')
-    .eq('company_slug', session.slug)
+    .eq('company_slug', slug)
     .in('slot', [1, 2, 3, 4]);
 
   const result: Record<string, object> = {};

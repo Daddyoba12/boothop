@@ -165,8 +165,8 @@ function vidUrl(path: string): string {
 }
 
 export default function CommanderNewClient({
-  companyName, isSuper, companySlug,
-}: { companyName: string; isSuper: boolean; companySlug: string }) {
+  companyName, isSuper, companySlug, targetSlug,
+}: { companyName: string; isSuper: boolean; companySlug: string; targetSlug?: string }) {
 
   const [activeTab,   setActiveTab]   = useState('');
   const [slots,       setSlots]       = useState<Record<string, Slot>>({});
@@ -254,9 +254,19 @@ export default function CommanderNewClient({
 
   async function api(method: string, url: string, body?: any): Promise<any> {
     const opts: RequestInit = { method, credentials: 'same-origin' };
-    if (body instanceof FormData) { opts.body = body; }
-    else if (body) { opts.headers = { 'Content-Type': 'application/json' }; opts.body = JSON.stringify(body); }
-    const r = await fetch(url, opts);
+    // When superadmin is managing another client, inject forClient into every request
+    const fc = targetSlug || '';
+    if (body instanceof FormData) {
+      if (fc) body.append('forClient', fc);
+      opts.body = body;
+    } else if (body) {
+      opts.headers = { 'Content-Type': 'application/json' };
+      opts.body = JSON.stringify(fc ? { ...body, forClient: fc } : body);
+    }
+    const fullUrl = (method === 'GET' && fc)
+      ? `${url}${url.includes('?') ? '&' : '?'}forClient=${encodeURIComponent(fc)}`
+      : url;
+    const r = await fetch(fullUrl, opts);
     if (!r.ok) { const txt = await r.text().catch(() => ''); throw new Error(`${r.status}: ${txt.slice(0, 120)}`); }
     return r.json().catch(() => ({}));
   }

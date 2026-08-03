@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 interface Client {
   id:              string;
@@ -118,6 +119,16 @@ export default function SuperAdminClients({ clients }: { clients: Client[] }) {
             <div className="sm:w-48">
               <p className="text-[9px] font-bold text-white/20 uppercase tracking-wider mb-1">Oracle Pipeline</p>
               <PipelineCell client={c} />
+            </div>
+
+            {/* Open pipeline button */}
+            <div className="shrink-0">
+              <Link
+                href={`/commander/pipeline/${c.slug}`}
+                className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg bg-orange-500/15 text-orange-400 hover:bg-orange-500/25 hover:text-orange-300 transition-all"
+              >
+                Open Pipeline →
+              </Link>
             </div>
 
             {/* Badges */}

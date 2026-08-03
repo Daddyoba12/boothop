@@ -5,10 +5,14 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: Request) {
   const store = await cookies();
   const session = getCommanderSession(store);
   if (!session) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
+
+  const { searchParams } = new URL(req.url);
+  const forClient = searchParams.get('forClient')?.trim().toLowerCase() || '';
+  const slug = (session.isSuper && forClient) ? forClient : session.slug;
 
   const pipelineBase = process.env.PIPELINE_BASE_URL;
   const secret       = process.env.PIPELINE_SECRET ?? '';
@@ -17,7 +21,7 @@ export async function GET() {
   if (pipelineBase) {
     try {
       const r = await fetch(`${pipelineBase}/api/post-log?days=14`, {
-        headers: { 'x-pipeline-secret': secret, 'x-commander-slug': session.slug },
+        headers: { 'x-pipeline-secret': secret, 'x-commander-slug': slug },
         signal: AbortSignal.timeout(8000),
       });
       if (r.ok) {
@@ -32,7 +36,7 @@ export async function GET() {
   const { data } = await db
     .from('otb_pipeline_state')
     .select('slot, hook, v1_url, v2_url, rendered_at, caption_tiktok')
-    .eq('company_slug', session.slug)
+    .eq('company_slug', slug)
     .gte('slot', 1)
     .not('rendered_at', 'is', null)
     .order('rendered_at', { ascending: false })
