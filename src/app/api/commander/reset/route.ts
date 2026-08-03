@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   if (email && !token) {
     const { data: client } = await db
       .from('pipeline_clients')
-      .select('id, company, slug')
+      .select('id, company, slug, recovery_email, is_super_admin')
       .eq('email', email.trim().toLowerCase())
       .single();
 
@@ -30,12 +30,14 @@ export async function POST(req: NextRequest) {
       expires_at: expiresAt,
     });
 
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/commander/reset?token=${rawToken}`;
+    const resetUrl  = `${process.env.NEXT_PUBLIC_APP_URL}/commander/reset?token=${rawToken}`;
+    // Super users have a pseudo login email — route reset links to their real inbox instead
+    const sendTo    = (client.is_super_admin && client.recovery_email) ? client.recovery_email : email.trim();
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
       from:    `BootHop Pipeline <noreply@boothop.com>`,
-      to:      email.trim(),
+      to:      sendTo,
       subject: `Reset your Commander password — ${client.company}`,
       html: `
         <p>Hi ${client.company},</p>
