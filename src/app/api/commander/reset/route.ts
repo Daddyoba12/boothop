@@ -5,17 +5,17 @@ import { randomBytes } from 'crypto';
 import { Resend } from 'resend';
 
 export async function POST(req: NextRequest) {
-  const { email } = await req.json();
-  if (!email) return NextResponse.json({ ok: true });
+  const { slug } = await req.json();
+  if (!slug) return NextResponse.json({ ok: true });
 
   const db = createSupabaseAdminClient();
   const { data: client } = await db
     .from('pipeline_clients')
-    .select('id, company, recovery_email, is_super_admin')
-    .eq('email', email.trim().toLowerCase())
+    .select('id, company, email, recovery_email, is_super_admin')
+    .eq('slug', slug.trim().toLowerCase())
     .single();
 
-  // Always return ok to prevent email enumeration
+  // Always return ok to prevent enumeration
   if (!client) return NextResponse.json({ ok: true });
 
   // Generate a random 10-character temporary password
@@ -26,8 +26,11 @@ export async function POST(req: NextRequest) {
     is_temp_password: true,
   }).eq('id', client.id);
 
-  // Super users have a pseudo login email — send to recovery_email instead
-  const sendTo = (client.is_super_admin && client.recovery_email) ? client.recovery_email : email.trim();
+  // Super users: always send to recovery_email (titobalo12@gmail.com)
+  // Regular clients: send to their stored email
+  const sendTo = (client.is_super_admin && client.recovery_email)
+    ? client.recovery_email
+    : (client.email ?? '');
 
   const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({

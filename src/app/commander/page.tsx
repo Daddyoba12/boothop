@@ -27,7 +27,7 @@ export default function CommanderPage() {
   const [regPlan,        setRegPlan]        = useState<'basic' | 'pro'>('basic');
 
   // Reset state
-  const [resetEmail, setResetEmail] = useState('');
+  const [resetSlug, setResetSlug] = useState('');
 
   function switchTab(t: Tab) { setTab(t); setError(''); setSuccess(''); }
 
@@ -72,10 +72,10 @@ export default function CommanderPage() {
     await fetch('/api/commander/reset', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: resetEmail }),
+      body: JSON.stringify({ slug: resetSlug.trim().toLowerCase() }),
     });
     setLoading(false);
-    setSuccess("If that email matches an account, a reset link is on its way.");
+    setSuccess("If that Company ID matches an account, a temporary password is on its way.");
   }
 
   const input  = "w-full rounded-xl border border-white/12 bg-white/5 px-4 py-3 text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500/40 transition-all text-sm";
@@ -202,12 +202,12 @@ export default function CommanderPage() {
           {tab === 'reset' && (
             <form onSubmit={handleReset} className="space-y-4">
               <p className="text-sm text-white/45 mb-2">
-                Enter the email address on your account and we&apos;ll send a password reset link.
+                Enter your Company ID and a temporary password will be sent to your account&apos;s registered inbox.
               </p>
               <div>
-                <label className={label}>Email Address</label>
-                <input type="email" value={resetEmail} onChange={e => setResetEmail(e.target.value)}
-                  placeholder="john@acme.com" autoComplete="email" className={input} required />
+                <label className={label}>Company ID</label>
+                <input type="text" value={resetSlug} onChange={e => setResetSlug(e.target.value)}
+                  placeholder="e.g. acme-corp" autoComplete="username" className={input} required />
               </div>
               {error   && <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{error}</p>}
               {success && <p className="text-sm text-green-400 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">{success}</p>}
