@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
   const slot      = parseInt(String(fd.get('slot') || '0'));
   const decision  = String(fd.get('decision') || '');
   const forClient = String(fd.get('forClient') || '').trim().toLowerCase();
+  const platformsRaw = fd.get('platforms') ? String(fd.get('platforms')) : null;
   const slug      = (session.isSuper && forClient) ? forClient : session.slug;
 
   if (!slot || !['post', 'skip', 'regen'].includes(decision)) {
@@ -25,6 +26,7 @@ export async function POST(req: NextRequest) {
       slot,
       command:      decision,
       company_slug: slug,
+      platforms:    platformsRaw,   // e.g. '["tiktok"]' — Oracle reads this to target specific platform
       status:       'pending',
     }),
     db.from('otb_pipeline_state')

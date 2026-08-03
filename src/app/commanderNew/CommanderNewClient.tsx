@@ -69,8 +69,11 @@ main{max-width:1200px;margin:0 auto;padding:32px 24px}
 .slot-caption{font-size:0.72rem;color:#555;margin-bottom:8px;line-height:1.4}
 .slot-caption strong{color:#666}
 .slot-ts{font-size:0.68rem;color:#333;margin-bottom:10px}
-.slot-actions{display:flex;gap:6px;flex-wrap:wrap}
+.slot-actions{display:flex;gap:5px;flex-wrap:wrap}
 .slot-actions .btn{flex:1;min-width:0;font-size:0.75rem;padding:7px 6px}
+.platform-btns{display:flex;gap:4px;margin-top:6px}
+.plat-btn{flex:1;padding:4px 2px;font-size:0.65rem;font-weight:700;border-radius:6px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:#666;cursor:pointer;transition:all 0.15s;text-align:center;white-space:nowrap}
+.plat-btn:hover{border-color:#ff6a00;color:#ff9a50;background:rgba(255,106,0,0.08)}
 .v2-toggle{background:none;border:1px solid #1e1e30;border-radius:6px;color:#555;font-size:0.7rem;padding:3px 8px;cursor:pointer;margin-bottom:8px;transition:all 0.15s}
 .v2-toggle:hover{border-color:#444;color:#aaa}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:200;display:none}
@@ -358,9 +361,13 @@ export default function CommanderNewClient({
     try { setSlots(await api('GET', '/api/commander/pipeline/slots')); } catch { /* silent */ }
   }
 
-  async function approve(slot: number, decision: string) {
-    const fd = new FormData(); fd.append('slot', String(slot)); fd.append('decision', decision);
-    try { await api('POST', '/api/commander/pipeline/approve', fd); showToast(`Slot ${slot} — ${decision}`); setTimeout(loadSlots, 1500); }
+  async function approve(slot: number, decision: string, platforms?: string[]) {
+    const fd = new FormData();
+    fd.append('slot', String(slot));
+    fd.append('decision', decision);
+    if (platforms && platforms.length > 0) fd.append('platforms', JSON.stringify(platforms));
+    const label = platforms?.length ? `→ ${platforms.join(', ')}` : decision;
+    try { await api('POST', '/api/commander/pipeline/approve', fd); showToast(`Slot ${slot} — ${label}`); setTimeout(loadSlots, 1500); }
     catch (e: any) { showToast(e.message, 'err'); }
   }
 
@@ -371,7 +378,7 @@ export default function CommanderNewClient({
     setEditTiktok(s.caption_tiktok || ''); setEditInsta(s.caption_instagram || ''); setEditOpen(true);
   }
 
-  async function submitEdit() {
+  async function submitEdit(andRegen = false) {
     if (!editSlotNum) return;
     const fields = [
       { field: 'hook', value: editHook }, { field: 'problem', value: editProblem },
@@ -384,7 +391,13 @@ export default function CommanderNewClient({
         const fd = new FormData(); fd.append('slot', String(editSlotNum)); fd.append('field', field); fd.append('value', value);
         await api('POST', '/api/commander/pipeline/edit-field', fd);
       }
-      showToast(`✅ Slot ${editSlotNum} saved`); setEditOpen(false); setTimeout(loadSlots, 800);
+      if (andRegen) {
+        await approve(editSlotNum, 'regen');
+        showToast(`✅ Slot ${editSlotNum} saved — re-rendering…`);
+      } else {
+        showToast(`✅ Slot ${editSlotNum} saved`);
+      }
+      setEditOpen(false); setTimeout(loadSlots, 800);
     } catch (e: any) { showToast('Edit failed: ' + e.message, 'err'); }
   }
 
@@ -463,6 +476,7 @@ export default function CommanderNewClient({
   async function uploadVid(file: File) {
     try {
       const fd = new FormData(); fd.append('file', file);
+      if (targetSlug) fd.append('forClient', targetSlug);
       const r = await fetch('/api/commander/revoice/upload', { method: 'POST', body: fd });
       if (!r.ok) throw new Error(await r.text());
       const data = await r.json();
@@ -510,6 +524,7 @@ export default function CommanderNewClient({
     const voice = voiceBlobRef.current ? new Blob([voiceBlobRef.current], { type: 'audio/webm' }) : voiceFileRef.current!;
     fd.append('voice', voice, voiceBlobRef.current ? 'voice.webm' : voiceFileRef.current!.name);
     if (music) fd.append('music', music);
+    if (targetSlug) fd.append('forClient', targetSlug);
     setBaking(true); setBakeReady(null);
     try {
       const d = await fetch('/api/commander/revoice/bake', { method: 'POST', body: fd }).then(r => { if (!r.ok) throw new Error('Bake failed'); return r.json(); });
@@ -537,6 +552,7 @@ export default function CommanderNewClient({
     if (!q) { showToast('Enter a YouTube URL or search term', 'err'); return; }
     setYtStatus('⏳ Downloading via yt-dlp on Oracle… (~30 seconds)');
     const fd = new FormData(); fd.append('query', q);
+    if (targetSlug) fd.append('forClient', targetSlug);
     try {
       const r = await fetch('/api/commander/revoice/youtube-music', { method: 'POST', body: fd });
       if (!r.ok) {
@@ -630,14 +646,21 @@ export default function CommanderNewClient({
           {ts && <div className="slot-ts">{ts}</div>}
           <div className="slot-actions">
             <button className={`btn ${ip ? 'btn-success' : 'btn-secondary'}`}
-              onClick={() => approve(n, 'post')} disabled={!hasVid} title={ip ? 'Approve & post now' : 'Force post'}>✅ Post</button>
+              onClick={() => approve(n, 'post')} disabled={!hasVid} title="Post to all active platforms">✅ All</button>
             <button className="btn btn-skip"
-              onClick={() => approve(n, 'skip')} disabled={!hasVid} title="Skip this slot">Skip</button>
+              onClick={() => approve(n, 'skip')} disabled={!hasVid} title="Skip this slot">⏭</button>
             <button className="btn btn-secondary"
-              onClick={() => approve(n, 'regen')} title="Regenerate content">🔄 Regen</button>
-            <button className="btn btn-secondary" onClick={() => openEdit(n)}>✏️ Edit</button>
-            <button className="btn btn-secondary" onClick={() => revoiceSlot(n, showV2)}>🎙 Revoice</button>
+              onClick={() => approve(n, 'regen')} title="Regenerate content">🔄</button>
+            <button className="btn btn-secondary" onClick={() => openEdit(n)} title="Edit text">✏️</button>
+            <button className="btn btn-secondary" onClick={() => revoiceSlot(n, showV2)} title="Revoice Studio">🎙</button>
           </div>
+          {hasVid && (
+            <div className="platform-btns">
+              {[['TikTok','tiktok'],['IG','instagram'],['YT','youtube'],['LI','linkedin'],['Blog','blog']].map(([label, key]) => (
+                <button key={key} className="plat-btn" onClick={() => approve(n, 'post', [key])} title={`Post to ${label} only`}>{label}</button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -942,9 +965,10 @@ export default function CommanderNewClient({
         <div className="ef"><label>Lesson</label><textarea rows={2} value={editLesson} onChange={e => setEditLesson(e.target.value)} /></div>
         <div className="ef"><label>Caption — TikTok</label><textarea rows={2} value={editTiktok} onChange={e => setEditTiktok(e.target.value)} /></div>
         <div className="ef"><label>Caption — Instagram</label><textarea rows={2} value={editInsta} onChange={e => setEditInsta(e.target.value)} /></div>
-        <div className="flex gap8 mt16">
-          <button className="btn btn-primary" onClick={submitEdit}>Save Changes</button>
-          <button className="btn btn-secondary" onClick={() => setEditOpen(false)}>Cancel</button>
+        <div className="flex gap8 mt16" style={{ flexWrap: 'wrap' }}>
+          <button className="btn btn-primary" onClick={() => submitEdit(true)} style={{ flex: '1 1 100%' }}>💾 Save &amp; Re-render</button>
+          <button className="btn btn-secondary" onClick={() => submitEdit(false)} style={{ flex: 1 }}>Save Only</button>
+          <button className="btn btn-secondary" onClick={() => setEditOpen(false)} style={{ flex: 1 }}>Cancel</button>
         </div>
       </div>
 
