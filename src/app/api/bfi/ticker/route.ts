@@ -3,7 +3,7 @@ import type { TickerEntry } from '@/lib/bfi/types';
 
 export const revalidate = 1800; // refresh every 30 min
 
-const MARKER = process.env.TRAVELPAYOUTS_MARKER ?? '544322';
+const MARKER = (process.env.TRAVELPAYOUTS_MARKER ?? '544322').replace(/^﻿/, '');
 
 const AIRLINE_NAMES: Record<string, string> = {
   AP: 'Air Peace',          WB: 'RwandAir',           AT: 'Royal Air Maroc',
