@@ -38,12 +38,12 @@ export default async function ClientOnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-gray-50">
       <CommanderNav company={session.company} slug={session.slug} isSuper={session.isSuper} />
       <main className="max-w-3xl mx-auto px-4 py-10">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-white">Pipeline Onboarding</h1>
-          <p className="text-sm text-slate-400 mt-1">Your profile powers the AI pipeline — keep it accurate.</p>
+          <h1 className="text-2xl font-bold text-gray-900">Pipeline Onboarding</h1>
+          <p className="text-sm text-gray-500 mt-1">Your profile powers the AI pipeline — keep it accurate.</p>
         </div>
         <OnboardForm clientId={session.clientId} profile={seeded} />
       </main>

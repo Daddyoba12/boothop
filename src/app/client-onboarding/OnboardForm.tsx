@@ -65,56 +65,57 @@ export default function OnboardForm({ clientId, profile }: { clientId: string; p
     setBusy(false);
   }
 
-  const inputClass = 'w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all';
+  const inputClass = 'w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/10 transition-all';
+  const labelClass = 'block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5';
 
   return (
-    <form onSubmit={save} className="space-y-8">
+    <form onSubmit={save} className="space-y-6">
 
       {/* Core fields */}
-      <div className="rounded-2xl border border-slate-700 bg-slate-800/60 p-6 space-y-5">
-        <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Company Profile</h2>
+      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6 space-y-5">
+        <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Company Profile</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs text-slate-400 mb-1.5">Business Name</label>
+            <label className={labelClass}>Business Name</label>
             <input className={inputClass} value={form.business_name} onChange={e => set('business_name', e.target.value)} placeholder="Your company name" />
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1.5">Contact Name</label>
+            <label className={labelClass}>Contact Name</label>
             <input className={inputClass} value={form.contact_name} onChange={e => set('contact_name', e.target.value)} placeholder="Your full name" />
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1.5">Email</label>
+            <label className={labelClass}>Email</label>
             <input type="email" className={inputClass} value={form.email} onChange={e => set('email', e.target.value)} placeholder="you@example.com" />
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1.5">Phone</label>
+            <label className={labelClass}>Phone</label>
             <input type="tel" className={inputClass} value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+44 7700 000000" />
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1.5">Website</label>
+            <label className={labelClass}>Website</label>
             <input type="url" className={inputClass} value={form.website} onChange={e => set('website', e.target.value)} placeholder="https://yoursite.com" />
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1.5">Telegram Chat ID</label>
+            <label className={labelClass}>Telegram Chat ID</label>
             <input className={inputClass} value={form.tg_chat_id} onChange={e => set('tg_chat_id', e.target.value)} placeholder="-100123456789" />
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1.5">WhatsApp</label>
+            <label className={labelClass}>WhatsApp</label>
             <input type="tel" className={inputClass} value={form.whatsapp} onChange={e => set('whatsapp', e.target.value)} placeholder="+44 7700 000000" />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs text-slate-400 mb-1.5">Bio / Brand Description</label>
+          <label className={labelClass}>Bio / Brand Description</label>
           <textarea className={`${inputClass} resize-none`} rows={4} value={form.bio} onChange={e => set('bio', e.target.value)} placeholder="Your brand, niche, target audience, tone of voice…" />
         </div>
 
         <div>
-          <label className="block text-xs text-slate-400 mb-2">Active Platforms</label>
+          <label className={`${labelClass} mb-2`}>Active Platforms</label>
           <div className="flex flex-wrap gap-3">
             {PLATFORMS.map(p => (
-              <label key={p} className={`flex items-center gap-2 px-4 py-2 rounded-xl border cursor-pointer text-sm font-medium transition-all ${platforms.includes(p) ? 'border-orange-500/50 bg-orange-500/15 text-orange-400' : 'border-slate-700 bg-slate-800 text-slate-500 hover:border-slate-500 hover:text-slate-300'}`}>
+              <label key={p} className={`flex items-center gap-2 px-4 py-2 rounded-xl border cursor-pointer text-sm font-medium transition-all ${platforms.includes(p) ? 'border-orange-400 bg-orange-50 text-orange-600' : 'border-gray-300 bg-white text-gray-500 hover:border-gray-400 hover:text-gray-700'}`}>
                 <input type="checkbox" className="hidden" checked={platforms.includes(p)} onChange={() => togglePlatform(p)} />
                 {p.charAt(0).toUpperCase() + p.slice(1)}
               </label>
@@ -124,8 +125,11 @@ export default function OnboardForm({ clientId, profile }: { clientId: string; p
       </div>
 
       {/* Custom fields */}
-      <div className="rounded-2xl border border-slate-700 bg-slate-800/60 p-6 space-y-4">
-        <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Custom Fields <span className="text-slate-600 normal-case font-normal">— up to 4 extra details for your pipeline</span></h2>
+      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6 space-y-4">
+        <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider">
+          Custom Fields{' '}
+          <span className="text-gray-400 normal-case font-normal">— up to 4 extra details for your pipeline</span>
+        </h2>
 
         {([1, 2, 3, 4] as const).map(n => (
           <div key={n} className="grid grid-cols-3 gap-3">
@@ -133,7 +137,7 @@ export default function OnboardForm({ clientId, profile }: { clientId: string; p
               className={inputClass}
               value={(form as any)[`custom_${n}_label`]}
               onChange={e => set(`custom_${n}_label` as keyof Profile, e.target.value)}
-              placeholder={`Label (e.g. Brand Tone)`}
+              placeholder="Label (e.g. Brand Tone)"
             />
             <div className="col-span-2">
               <textarea
@@ -150,7 +154,7 @@ export default function OnboardForm({ clientId, profile }: { clientId: string; p
 
       {/* Save */}
       {msg && (
-        <div className={`rounded-xl px-5 py-3 text-sm ${msg.ok ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-300' : 'bg-red-500/20 border border-red-500/30 text-red-300'}`}>
+        <div className={`rounded-xl px-5 py-3 text-sm ${msg.ok ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' : 'bg-red-50 border border-red-200 text-red-700'}`}>
           {msg.text}
         </div>
       )}
@@ -161,7 +165,7 @@ export default function OnboardForm({ clientId, profile }: { clientId: string; p
           {busy ? 'Saving…' : 'Save Profile'}
         </button>
         <button type="button" onClick={() => setForm(profile ?? empty())}
-          className="px-6 py-2.5 rounded-xl border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 font-semibold text-sm transition-colors">
+          className="px-6 py-2.5 rounded-xl border border-gray-300 text-gray-500 hover:text-gray-800 hover:border-gray-400 font-semibold text-sm transition-colors">
           Discard
         </button>
       </div>
