@@ -24,6 +24,7 @@ export default function CommanderPage() {
   const [regPassword,    setRegPassword]    = useState('');
   const [regPlan,        setRegPlan]        = useState<'basic' | 'pro'>('basic');
 
+  const [resetSlug,  setResetSlug]  = useState('');
   const [resetEmail, setResetEmail] = useState('');
 
   function switchTab(t: Tab) { setTab(t); setError(''); setSuccess(''); }
@@ -69,10 +70,10 @@ export default function CommanderPage() {
     await fetch('/api/commander/reset', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: resetEmail }),
+      body: JSON.stringify({ slug: resetSlug.trim().toLowerCase(), email: resetEmail.trim() }),
     });
     setLoading(false);
-    setSuccess('If that email matches an account, a reset link is on its way.');
+    setSuccess('If the details match an account, a reset email is on its way. Check your inbox — the link expires after first use.');
   }
 
   const input  = "w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-all text-sm";
@@ -199,19 +200,24 @@ export default function CommanderPage() {
           {tab === 'reset' && (
             <form onSubmit={handleReset} className="space-y-4">
               <p className="text-sm text-slate-400 mb-2">
-                Enter the email address on your account and we&apos;ll send a password reset link.
+                Enter your Company ID and the email address on your account. A temporary password will be sent to you.
               </p>
+              <div>
+                <label className={label}>Company ID</label>
+                <input type="text" value={resetSlug} onChange={e => setResetSlug(e.target.value)}
+                  placeholder="e.g. ginspired" autoComplete="username" className={input} required />
+              </div>
               <div>
                 <label className={label}>Email Address</label>
                 <input type="email" value={resetEmail} onChange={e => setResetEmail(e.target.value)}
-                  placeholder="john@acme.com" autoComplete="email" className={input} required />
+                  placeholder="you@yourcompany.com" autoComplete="email" className={input} required />
               </div>
               {error   && <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{error}</p>}
               {success && <p className="text-sm text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3">{success}</p>}
               {!success && (
                 <button type="submit" disabled={loading}
                   className="w-full py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-400 text-white font-bold text-sm transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-500/30 disabled:opacity-60 disabled:translate-y-0">
-                  {loading ? 'Sending…' : 'Send Reset Link →'}
+                  {loading ? 'Sending…' : 'Send Reset Email →'}
                 </button>
               )}
             </form>
