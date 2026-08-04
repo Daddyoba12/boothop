@@ -609,8 +609,15 @@ export default function CommanderNewClient({
         const r = await api('GET', '/api/commander/onboard');
         const p = r.profile;
         if (p) fillProfile(p);
-        switchTab(p?.business_name ? 'pipeline' : 'onboard');
-      } catch { switchTab('onboard'); }
+        // Super-admin managing another client always lands on Pipeline
+        if (isSuper && targetSlug && targetSlug !== companySlug) {
+          switchTab('pipeline');
+        } else {
+          switchTab(p?.business_name ? 'pipeline' : 'onboard');
+        }
+      } catch {
+        switchTab(isSuper && targetSlug && targetSlug !== companySlug ? 'pipeline' : 'onboard');
+      }
     })();
     return () => { stopPoll(); if (bakeInterval.current) clearInterval(bakeInterval.current); };
   }, []);
