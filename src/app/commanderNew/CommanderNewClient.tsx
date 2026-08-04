@@ -87,19 +87,19 @@ main{max-width:1200px;margin:0 auto;padding:32px 24px}
 .ef textarea{background:#0a0a14;border:1px solid #222232;border-radius:8px;color:#e4e4e8;padding:9px 12px;font-size:0.875rem;resize:vertical;outline:none;font-family:inherit;line-height:1.5}
 .ef textarea:focus{border-color:#ff6a00}
 .revoice-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
-.rv-card{background:#0f0f1c;border:1px solid #1a1a28;border-radius:16px;padding:22px}
-.rv-card h3{font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:16px}
-.drop-zone{border:2px dashed #1e1e30;border-radius:12px;padding:36px 20px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:14px}
-.drop-zone:hover,.drop-zone.dragover{border-color:#ff6a00;background:rgba(255,106,0,0.04)}
-.drop-zone p{color:#555;font-size:0.83rem;line-height:1.6}
-.drop-zone strong{color:#888}
+.rv-card{background:#111120;border:1px solid #1e1e30;border-radius:16px;padding:22px}
+.rv-card h3{font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:16px}
+.drop-zone{border:2px dashed #2a2a40;border-radius:12px;padding:36px 20px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:14px}
+.drop-zone:hover,.drop-zone.dragover{border-color:#ff6a00;background:rgba(255,106,0,0.06)}
+.drop-zone p{color:#888;font-size:0.83rem;line-height:1.6}
+.drop-zone strong{color:#bbb}
 .video-preview{width:100%;border-radius:8px;max-height:280px;margin-bottom:12px;display:none}
 .vid-name{font-size:0.78rem;color:#555;margin-bottom:8px;display:none}
 .record-btn{width:100%;padding:13px;background:#141422;border:2px solid #1e1e30;border-radius:12px;color:#e4e4e8;font-size:0.875rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}
 .record-btn:hover{border-color:#ff6a00}
 .record-btn.recording{background:rgba(220,38,38,0.1);border-color:#dc2626;color:#fca5a5}
 .rdot{width:9px;height:9px;border-radius:50%;background:#dc2626;animation:pulse 1s infinite}
-.or-sep{text-align:center;color:#333;font-size:0.78rem;margin:8px 0}
+.or-sep{text-align:center;color:#555;font-size:0.78rem;margin:8px 0}
 .voice-ready{font-size:0.8rem;color:#4ade80;margin-top:8px;display:none}
 .music-sel{width:100%;background:#0a0a14;border:1px solid #222232;border-radius:9px;color:#e4e4e8;padding:10px 14px;font-size:0.875rem;outline:none;margin-bottom:10px}
 .yt-row{display:flex;gap:8px;margin-top:8px}
@@ -190,7 +190,8 @@ export default function CommanderNewClient({
   const [v2Active,    setV2Active]    = useState<Record<number, boolean>>({});
   const [toast,       setToast]       = useState({ show: false, msg: '', type: 'ok' });
   const [reportBody,  setReportBody]  = useState('Click Refresh to load.');
-  const [clientRows,  setClientRows]  = useState<any[]>([]);
+  const [clientRows,    setClientRows]    = useState<any[]>([]);
+  const [clientsLoading, setClientsLoading] = useState(false);
   const [bakeRows,    setBakeRows]    = useState<any[]>([]);
   const [baking,          setBaking]          = useState(false);
   const [bakeReady,       setBakeReady]       = useState<{ id: number } | null>(null);
@@ -283,8 +284,9 @@ export default function CommanderNewClient({
     if (name === 'pipeline') {
       if (!pollRef.current) { loadStatus(); loadSlots(); loadPostHistory(); pollRef.current = setInterval(() => { loadStatus(); loadSlots(); }, 12000); }
     } else { stopPoll(); }
-    if (name === 'revoice') { loadBakeHistory(); loadMusicTracks(); }
-    if (name === 'clients') { loadClients(); }
+    if (name === 'onboard')  { loadProfile(); }
+    if (name === 'revoice')  { loadBakeHistory(); loadMusicTracks(); }
+    if (name === 'clients')  { loadClients(); }
   }
 
   // ── Onboard ──────────────────────────────────────────────────────────────────
@@ -576,8 +578,10 @@ export default function CommanderNewClient({
   // ── Clients ──────────────────────────────────────────────────────────────────
 
   async function loadClients() {
+    setClientsLoading(true);
     try { const rows = await api('GET', '/api/commander/clients'); setClientRows(Array.isArray(rows) ? rows : []); }
     catch (e: any) { showToast(e.message, 'err'); }
+    finally { setClientsLoading(false); }
   }
 
   async function addClient() {
@@ -910,7 +914,9 @@ export default function CommanderNewClient({
               All Clients
               <button className="btn btn-secondary btn-sm" onClick={loadClients}>Refresh</button>
             </div>
-            {clientRows.length === 0
+            {clientsLoading
+              ? <p className="txt-sm txt-muted">Loading…</p>
+              : clientRows.length === 0
               ? <p className="txt-sm txt-muted">No clients yet.</p>
               : <table className="clients-tbl">
                   <thead><tr><th>Company</th><th>Slug</th><th>Plan</th><th>Status</th><th>Created</th></tr></thead>
