@@ -128,23 +128,23 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
     s ? `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}` : '—';
 
   const tabClass = (t: Tab) =>
-    `flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${tab === t ? 'bg-orange-500 text-black' : 'text-white/35 hover:text-white/60'}`;
+    `flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${tab === t ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`;
 
-  const inputCls = "rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-orange-500/40";
+  const inputCls = "rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400/30 focus:border-orange-400 transition-all";
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-10">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold">Music Management</h1>
-        <span className="text-xs text-white/30">{assigned.size} track{assigned.size !== 1 ? 's' : ''} assigned</span>
+        <h1 className="text-xl font-bold text-gray-900">Music Management</h1>
+        <span className="text-xs text-gray-400 font-medium">{assigned.size} track{assigned.size !== 1 ? 's' : ''} assigned</span>
       </div>
 
       {msg && (
-        <div className="mb-4 text-sm text-green-300 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">{msg}</div>
+        <div className="mb-4 text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3">{msg}</div>
       )}
 
       {/* Tabs */}
-      <div className="flex bg-white/[0.04] border border-white/8 rounded-xl p-1 mb-6">
+      <div className="flex bg-gray-100 border border-gray-200 rounded-xl p-1 mb-6 gap-1">
         <button className={tabClass('library')}  onClick={() => setTab('library')}>BootHop Library</button>
         <button className={tabClass('youtube')}  onClick={() => setTab('youtube')}>Add from YouTube</button>
         <button className={tabClass('assigned')} onClick={() => setTab('assigned')}>My Tracks ({assigned.size})</button>
@@ -162,9 +162,9 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
             </select>
           </div>
           {filtered.length === 0 ? (
-            <div className="text-center py-16 text-white/25 text-sm">
+            <div className="text-center py-16 text-gray-400 text-sm">
               No tracks in the library yet.<br />
-              <span className="text-white/15 text-xs">
+              <span className="text-gray-300 text-xs">
                 Use the &ldquo;Add from YouTube&rdquo; tab to add tracks via YouTube URL.<br />
                 Admin can run a music sync to import the archive of ~120 tracks.
               </span>
@@ -176,7 +176,7 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                 const aUrl = audioUrl(t);
                 const isPlaying = playingId === t.id;
                 return (
-                  <div key={t.id} className="rounded-2xl border border-white/8 bg-white/[0.02] hover:bg-white/[0.04] px-5 py-4 transition-all">
+                  <div key={t.id} className="rounded-2xl border border-gray-100 bg-white hover:border-orange-100 hover:shadow-sm px-5 py-4 transition-all">
                     <div className="flex items-center gap-4">
                       {t.youtube_id && (
                         <img src={`https://i.ytimg.com/vi/${t.youtube_id}/mqdefault.jpg`} alt=""
@@ -185,21 +185,21 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                       )}
                       {aUrl && !t.youtube_id && (
                         <button onClick={() => setPlayingId(isPlaying ? null : t.id)}
-                          className="shrink-0 w-10 h-10 rounded-lg bg-white/8 hover:bg-orange-500/20 text-white/60 hover:text-orange-400 text-base transition-all flex items-center justify-center">
+                          className="shrink-0 w-10 h-10 rounded-lg bg-gray-100 hover:bg-orange-50 text-gray-500 hover:text-orange-500 text-base transition-all flex items-center justify-center">
                           {isPlaying ? '⏸' : '▶'}
                         </button>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{t.title}</p>
-                        <p className="text-xs text-white/40">{t.artist} · {t.genre} · {fmtDuration(t.duration_seconds)}</p>
+                        <p className="text-sm font-semibold text-gray-900 truncate">{t.title}</p>
+                        <p className="text-xs text-gray-400">{t.artist} · {t.genre} · {fmtDuration(t.duration_seconds)}</p>
                       </div>
-                      <span className="text-[10px] text-white/20 shrink-0">{t.source}</span>
+                      <span className="text-[10px] text-gray-300 shrink-0">{t.source}</span>
                       {t.youtube_id && (
                         <a href={`https://www.youtube.com/watch?v=${t.youtube_id}`} target="_blank" rel="noreferrer"
-                          className="text-xs text-white/25 hover:text-orange-400 transition-colors shrink-0">▶ YT</a>
+                          className="text-xs text-gray-400 hover:text-orange-500 transition-colors shrink-0">▶ YT</a>
                       )}
                       <button onClick={() => toggleAssign(t.id)} disabled={busy === t.id}
-                        className={`shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${isOn ? 'bg-red-500/20 text-red-300 hover:bg-red-500/30' : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30'}`}>
+                        className={`shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${isOn ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}>
                         {busy === t.id ? '…' : isOn ? 'Remove' : '+ Add'}
                       </button>
                     </div>
@@ -238,9 +238,9 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
 
           {/* Divider */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-white/8" />
-            <span className="text-[10px] text-white/25 font-semibold uppercase tracking-wider">or search by keyword</span>
-            <div className="flex-1 h-px bg-white/8" />
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">or search by keyword</span>
+            <div className="flex-1 h-px bg-gray-200" />
           </div>
 
           {/* Keyword search */}
@@ -262,28 +262,28 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
 
           {/* Error */}
           {ytError && (
-            <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4">{ytError}</p>
+            <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3 mb-4">{ytError}</p>
           )}
 
           {/* Results */}
           {ytResults.length > 0 && (
             <div className="space-y-3">
               {ytResults.map(v => (
-                <div key={v.id} className="flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.02] px-5 py-4">
+                <div key={v.id} className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white shadow-sm px-5 py-4">
                   <img src={v.thumbnail} alt="" width="80" height="48" className="h-12 w-20 object-cover rounded-lg shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">{v.title}</p>
-                    <p className="text-xs text-white/40">{v.channel}</p>
+                    <p className="text-sm font-semibold text-gray-900 truncate">{v.title}</p>
+                    <p className="text-xs text-gray-400">{v.channel}</p>
                     <a href={`https://www.youtube.com/watch?v=${v.id}`} target="_blank" rel="noreferrer"
-                      className="text-[10px] text-white/25 hover:text-orange-400 transition-colors">
+                      className="text-[10px] text-gray-400 hover:text-orange-500 transition-colors">
                       ▶ Preview →
                     </a>
                   </div>
                   <button onClick={() => importTrack(v)} disabled={busy === v.id || assigned.has(v.id)}
                     className={`shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${
                       assigned.has(v.id)
-                        ? 'bg-white/10 text-white/30 cursor-default'
-                        : 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30'
+                        ? 'bg-gray-100 text-gray-400 cursor-default'
+                        : 'bg-amber-50 text-amber-600 hover:bg-amber-100'
                     }`}>
                     {busy === v.id ? 'Adding…' : assigned.has(v.id) ? '✓ Added' : '+ Add'}
                   </button>
@@ -298,7 +298,7 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
       {tab === 'assigned' && (
         <div>
           {assigned.size === 0 ? (
-            <div className="text-center py-16 text-white/25 text-sm">
+            <div className="text-center py-16 text-gray-400 text-sm">
               No tracks assigned yet. Go to the Library tab to add some.
             </div>
           ) : (
@@ -307,7 +307,7 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                 const aUrl = audioUrl(t);
                 const isPlaying = playingId === t.id;
                 return (
-                  <div key={t.id} className="rounded-2xl border border-white/8 bg-white/[0.02] px-5 py-4">
+                  <div key={t.id} className="rounded-2xl border border-gray-100 bg-white shadow-sm px-5 py-4">
                     <div className="flex items-center gap-4">
                       {t.youtube_id && (
                         <img src={`https://i.ytimg.com/vi/${t.youtube_id}/mqdefault.jpg`} alt=""
@@ -316,20 +316,20 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                       )}
                       {aUrl && !t.youtube_id && (
                         <button onClick={() => setPlayingId(isPlaying ? null : t.id)}
-                          className="shrink-0 w-10 h-10 rounded-lg bg-white/8 hover:bg-orange-500/20 text-white/60 hover:text-orange-400 text-base transition-all flex items-center justify-center">
+                          className="shrink-0 w-10 h-10 rounded-lg bg-gray-100 hover:bg-orange-50 text-gray-500 hover:text-orange-500 text-base transition-all flex items-center justify-center">
                           {isPlaying ? '⏸' : '▶'}
                         </button>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{t.title}</p>
-                        <p className="text-xs text-white/40">{t.artist} · {t.genre} · {fmtDuration(t.duration_seconds)}</p>
+                        <p className="text-sm font-semibold text-gray-900 truncate">{t.title}</p>
+                        <p className="text-xs text-gray-400">{t.artist} · {t.genre} · {fmtDuration(t.duration_seconds)}</p>
                       </div>
                       {t.youtube_id && (
                         <a href={`https://www.youtube.com/watch?v=${t.youtube_id}`} target="_blank" rel="noreferrer"
-                          className="text-xs text-white/25 hover:text-white/50 transition-colors shrink-0">▶ YT</a>
+                          className="text-xs text-gray-400 hover:text-orange-500 transition-colors shrink-0">▶ YT</a>
                       )}
                       <button onClick={() => toggleAssign(t.id)} disabled={busy === t.id}
-                        className="shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all disabled:opacity-50">
+                        className="shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-500 hover:bg-red-100 transition-all disabled:opacity-50">
                         {busy === t.id ? '…' : 'Remove'}
                       </button>
                     </div>

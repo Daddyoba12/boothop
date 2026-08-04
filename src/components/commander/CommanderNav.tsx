@@ -27,22 +27,22 @@ export default function CommanderNav({ company, slug, isSuper }: Props) {
   ];
 
   return (
-    <nav className="border-b border-white/8 bg-[#07111f]/90 backdrop-blur-xl sticky top-0 z-40">
+    <nav className="border-b border-gray-100 bg-white shadow-sm sticky top-0 z-40">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <Link href="/commander/dashboard" className="flex items-center gap-2 group">
+          <Link href="/commander/dashboard" className="flex items-center gap-2.5 group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/boothop-icon-512.png" alt="" className="h-7 w-auto rounded-lg" style={{ mixBlendMode: 'screen' }} />
+            <img src="/images/boothop-icon-512.png" alt="" className="h-7 w-auto rounded-lg" />
             <div className="hidden sm:block leading-tight">
-              <p className="text-[10px] font-bold text-white/25 uppercase tracking-[0.12em]">Pipeline</p>
-              <p className="text-xs font-bold text-orange-400 uppercase tracking-[0.1em]">Commander</p>
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em]">Pipeline</p>
+              <p className="text-xs font-bold text-orange-500 uppercase tracking-[0.1em]">Commander</p>
             </div>
           </Link>
-          <span className="hidden sm:block text-white/15 text-sm">/</span>
-          <span className="hidden sm:block text-xs font-semibold text-white/50 truncate max-w-[140px]">{company}</span>
+          <span className="hidden sm:block text-gray-200 text-sm">/</span>
+          <span className="hidden sm:block text-xs font-semibold text-gray-500 truncate max-w-[140px]">{company}</span>
           {isSuper && (
-            <span className="hidden sm:block text-[9px] font-bold px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 uppercase tracking-wider">Admin</span>
+            <span className="hidden sm:block text-[9px] font-bold px-2 py-0.5 rounded-full bg-violet-100 text-violet-600 uppercase tracking-wider">Admin</span>
           )}
         </div>
 
@@ -50,10 +50,10 @@ export default function CommanderNav({ company, slug, isSuper }: Props) {
         <div className="flex items-center gap-1">
           {links.map(({ href, label }) => (
             <Link key={href} href={href}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 pathname === href
-                  ? 'bg-white/10 text-white'
-                  : 'text-white/35 hover:text-white/70 hover:bg-white/[0.05]'
+                  ? 'bg-orange-50 text-orange-600'
+                  : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
               }`}>
               {label}
             </Link>
@@ -62,9 +62,9 @@ export default function CommanderNav({ company, slug, isSuper }: Props) {
 
         {/* Right: slug + logout */}
         <div className="flex items-center gap-3">
-          <span className="hidden sm:block text-[10px] font-mono text-white/20">{slug}</span>
+          <span className="hidden sm:block text-[10px] font-mono text-gray-300">{slug}</span>
           <button onClick={handleLogout} disabled={loggingOut}
-            className="text-xs text-white/30 hover:text-white/60 transition-colors disabled:opacity-40">
+            className="text-xs text-gray-400 hover:text-gray-700 transition-colors disabled:opacity-40 font-medium">
             {loggingOut ? 'Signing out…' : 'Sign out'}
           </button>
         </div>

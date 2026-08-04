@@ -26,7 +26,7 @@ export default async function MusicPage() {
   const assignedTrackIds = new Set((assigned ?? []).map(r => r.track_id));
 
   return (
-    <div className="min-h-screen bg-[#07111f] text-white">
+    <div className="min-h-screen bg-gray-50">
       <CommanderNav company={session.company} slug={session.slug} isSuper={session.isSuper} />
       <MusicManager
         clientId={session.clientId}
