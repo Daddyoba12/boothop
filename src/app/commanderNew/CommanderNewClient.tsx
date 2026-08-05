@@ -3,12 +3,12 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const CSS = `
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0a0a0f;color:#e4e4e8;font-family:system-ui,-apple-system,sans-serif;font-size:15px;min-height:100vh}
+body{background:#0d0d18;color:#e4e4e8;font-family:system-ui,-apple-system,sans-serif;font-size:15px;min-height:100vh}
 nav{display:flex;align-items:center;padding:0 24px;height:58px;background:#0f0f1c;border-bottom:1px solid #1a1a28;gap:8px;position:sticky;top:0;z-index:100;flex-wrap:wrap}
 .nav-brand{font-size:1.05rem;font-weight:800;white-space:nowrap;letter-spacing:-0.3px}
 .nav-brand span{color:#ff6a00}
 .nav-tabs{display:flex;gap:2px;flex:1;margin:0 16px;overflow-x:auto}
-.tab-btn{background:none;border:none;color:#666;padding:7px 16px;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:500;white-space:nowrap;transition:all 0.15s}
+.tab-btn{background:none;border:none;color:#888;padding:7px 16px;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:500;white-space:nowrap;transition:all 0.15s}
 .tab-btn:hover{color:#e4e4e8;background:#1a1a2a}
 .tab-btn.active{color:#ff6a00;background:#1a1a2a}
 .nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
@@ -19,11 +19,11 @@ main{max-width:1200px;margin:0 auto;padding:32px 24px}
 .tab-pane{display:none}
 .tab-pane.active{display:block}
 .section-title{font-size:1rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:12px}
-.section-title small{color:#555;font-size:0.78rem;font-weight:400}
+.section-title small{color:#888;font-size:0.78rem;font-weight:400}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .form-group{display:flex;flex-direction:column;gap:6px}
 .form-group.full{grid-column:1/-1}
-.form-group label{font-size:0.72rem;color:#666;font-weight:600;letter-spacing:0.5px;text-transform:uppercase}
+.form-group label{font-size:0.72rem;color:#8a8aaa;font-weight:600;letter-spacing:0.5px;text-transform:uppercase}
 .form-group input,.form-group textarea,.form-group select{background:#0d0d1a;border:1px solid #222232;border-radius:9px;color:#e4e4e8;padding:10px 14px;font-size:0.9rem;outline:none;transition:border 0.2s;font-family:inherit}
 .form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:#ff6a00}
 .form-group textarea{resize:vertical;min-height:80px}
@@ -63,12 +63,12 @@ main{max-width:1200px;margin:0 auto;padding:32px 24px}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
 .slot-video{width:100%;aspect-ratio:9/16;background:#080810;position:relative}
 .slot-video video{width:100%;height:100%;object-fit:cover;display:block}
-.no-video{display:flex;align-items:center;justify-content:center;height:100%;color:#222;font-size:0.82rem;flex-direction:column;gap:6px}
+.no-video{display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:0.82rem;flex-direction:column;gap:6px}
 .slot-body{padding:12px 16px}
-.slot-hook{font-size:0.78rem;color:#888;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5}
-.slot-caption{font-size:0.72rem;color:#555;margin-bottom:8px;line-height:1.4}
-.slot-caption strong{color:#666}
-.slot-ts{font-size:0.68rem;color:#333;margin-bottom:10px}
+.slot-hook{font-size:0.78rem;color:#bbb;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5}
+.slot-caption{font-size:0.72rem;color:#888;margin-bottom:8px;line-height:1.4}
+.slot-caption strong{color:#aaa}
+.slot-ts{font-size:0.68rem;color:#666;margin-bottom:10px}
 .slot-actions{display:flex;gap:5px;flex-wrap:wrap}
 .slot-actions .btn{flex:1;min-width:0;font-size:0.75rem;padding:7px 6px}
 .platform-btns{display:flex;gap:4px;margin-top:6px}
@@ -83,7 +83,7 @@ main{max-width:1200px;margin:0 auto;padding:32px 24px}
 .edit-ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
 .edit-ph h3{font-weight:700}
 .ef{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
-.ef label{font-size:0.7rem;color:#555;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.ef label{font-size:0.7rem;color:#888;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
 .ef textarea{background:#0a0a14;border:1px solid #222232;border-radius:8px;color:#e4e4e8;padding:9px 12px;font-size:0.875rem;resize:vertical;outline:none;font-family:inherit;line-height:1.5}
 .ef textarea:focus{border-color:#ff6a00}
 .revoice-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
@@ -99,7 +99,7 @@ main{max-width:1200px;margin:0 auto;padding:32px 24px}
 .record-btn:hover{border-color:#ff6a00}
 .record-btn.recording{background:rgba(220,38,38,0.1);border-color:#dc2626;color:#fca5a5}
 .rdot{width:9px;height:9px;border-radius:50%;background:#dc2626;animation:pulse 1s infinite}
-.or-sep{text-align:center;color:#555;font-size:0.78rem;margin:8px 0}
+.or-sep{text-align:center;color:#777;font-size:0.78rem;margin:8px 0}
 .voice-ready{font-size:0.8rem;color:#4ade80;margin-top:8px;display:none}
 .music-sel{width:100%;background:#0a0a14;border:1px solid #222232;border-radius:9px;color:#e4e4e8;padding:10px 14px;font-size:0.875rem;outline:none;margin-bottom:10px}
 .yt-row{display:flex;gap:8px;margin-top:8px}
@@ -110,26 +110,26 @@ main{max-width:1200px;margin:0 auto;padding:32px 24px}
 .bake-progress{display:none;text-align:center;padding:12px;color:#fbbf24;font-size:0.85rem}
 .bake-ready{display:none;text-align:center;padding:12px}
 .bake-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#0a0a14;border-radius:8px;margin-bottom:8px}
-.bake-meta{font-size:0.75rem;color:#555}
+.bake-meta{font-size:0.75rem;color:#888}
 .bake-badge{display:inline-flex;padding:3px 10px;border-radius:10px;font-size:0.7rem;font-weight:600}
 .bake-done{background:rgba(22,163,74,0.12);color:#4ade80}
 .bake-pending,.bake-running{background:rgba(245,158,11,0.12);color:#fbbf24}
 .bake-failed{background:rgba(220,38,38,0.12);color:#fca5a5}
 .clients-tbl{width:100%;border-collapse:collapse;font-size:0.875rem}
-.clients-tbl th{text-align:left;color:#444;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;border-bottom:1px solid #1a1a28;font-weight:600}
+.clients-tbl th{text-align:left;color:#777;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;border-bottom:1px solid #1a1a28;font-weight:600}
 .clients-tbl td{padding:13px 12px;border-bottom:1px solid #0f0f1a;vertical-align:middle}
 .clients-tbl tr:hover td{background:#0f0f1a}
 .adot{width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;margin-right:5px}
-.idot{width:7px;height:7px;border-radius:50%;background:#333;display:inline-block;margin-right:5px}
+.idot{width:7px;height:7px;border-radius:50%;background:#555;display:inline-block;margin-right:5px}
 .add-client-box{background:#0f0f1c;border:1px solid #1a1a28;border-radius:16px;padding:24px;margin-top:24px}
 .add-client-box h3{font-size:0.85rem;font-weight:700;margin-bottom:16px}
 .mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt24{margin-top:24px}
 .flex{display:flex}.gap8{gap:8px}.gap12{gap:12px}.gap16{gap:16px}
-.txt-sm{font-size:0.83rem}.txt-xs{font-size:0.75rem}.txt-muted{color:#555}
+.txt-sm{font-size:0.83rem}.txt-xs{font-size:0.75rem}.txt-muted{color:#888}
 .block-row{display:flex;gap:8px;align-items:center}
 .block-input{background:#0a0a14;border:1px solid #222232;border-radius:8px;color:#e4e4e8;padding:9px 14px;font-size:0.875rem;outline:none;width:160px}
 .block-input:focus{border-color:#ff6a00}
-#report-body{font-size:0.85rem;color:#555;margin-top:12px}
+#report-body{font-size:0.85rem;color:#aaa;margin-top:12px}
 .toast{position:fixed;bottom:24px;right:24px;background:#141422;border:1px solid #252535;border-radius:10px;padding:12px 18px;font-size:0.85rem;z-index:500;opacity:0;transform:translateY(8px);transition:all 0.25s;pointer-events:none;max-width:320px}
 .toast.show{opacity:1;transform:translateY(0)}
 .toast.ok{border-color:rgba(74,222,128,0.3);color:#4ade80}
@@ -344,6 +344,15 @@ export default function CommanderNewClient({
     };
     try { await api('POST', '/api/commander/onboard', data); showToast('✅ Profile saved'); }
     catch (e: any) { showToast('Save failed: ' + e.message, 'err'); }
+  }
+
+  async function syncPipeline() {
+    try {
+      const url = targetSlug ? `/api/commander/pipeline/sync?forClient=${targetSlug}` : '/api/commander/pipeline/sync';
+      const r = await api('POST', url);
+      if (r.ok) showToast(`↺ Pipeline synced — ${r.synced?.niche_lines || 0} niche lines ready`);
+      else showToast('Sync failed: ' + (r.error || 'unknown'), 'err');
+    } catch (e: any) { showToast('Sync failed: ' + e.message, 'err'); }
   }
 
   // ── Pipeline ─────────────────────────────────────────────────────────────────
@@ -652,7 +661,7 @@ export default function CommanderNewClient({
         </div>
         <div className="slot-body">
           {(v1 && v2) && <button className="v2-toggle" onClick={() => setV2Active(p => ({ ...p, [n]: !p[n] }))}>{showV2 ? '← V1' : 'V2 →'}</button>}
-          {displayHook && <div className="slot-hook">{displayHook}{v2SameText && <span style={{ color: '#444', fontSize: '0.65rem' }}> (same text as V1)</span>}</div>}
+          {displayHook && <div className="slot-hook">{displayHook}{v2SameText && <span style={{ color: '#777', fontSize: '0.65rem' }}> (same text as V1)</span>}</div>}
           {cap && <div className="slot-caption"><strong>TK:</strong> {cap.slice(0, 90)}{cap.length > 90 ? '…' : ''}</div>}
           {ts && <div className="slot-ts">{ts}</div>}
           <div className="slot-actions">
@@ -700,7 +709,16 @@ export default function CommanderNewClient({
 
         {/* ── ONBOARD TAB ─────────────────────────────────────────────────────── */}
         <div className={`tab-pane${activeTab === 'onboard' ? ' active' : ''}`}>
-          <div className="section-title">Onboard Profile <small>Your details — always editable</small></div>
+          <div className="section-title">
+            Onboard Profile
+            <small>Powers the AI pipeline — same data as your public onboarding page</small>
+            {!isSuper && (
+              <a href="/client-onboarding" target="_blank" rel="noreferrer"
+                style={{ fontSize: '0.72rem', color: '#ff6a00', marginLeft: 'auto', textDecoration: 'none', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                Public onboarding page →
+              </a>
+            )}
+          </div>
           <div className="form-grid">
             <div className="form-group"><label>Business Name</label><input type="text" ref={pfBiz} placeholder="Your company name" /></div>
             <div className="form-group"><label>Contact Name</label><input type="text" ref={pfCon} placeholder="Your full name" /></div>
@@ -743,6 +761,14 @@ export default function CommanderNewClient({
           <div className="flex gap8 mt16">
             <button className="btn btn-primary" onClick={saveProfile}>Save Profile</button>
             <button className="btn btn-secondary" onClick={loadProfile}>Discard</button>
+          </div>
+          <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid #1a1a28' }}>
+            <button className="btn btn-secondary" onClick={syncPipeline} style={{ borderColor: '#ff6a00', color: '#ff6a00' }}>
+              ↺ Refresh Pipeline
+            </button>
+            <p style={{ marginTop: '6px', fontSize: '0.72rem', color: '#888', lineHeight: 1.5 }}>
+              Pushes your saved niche &amp; bio to the Oracle server so the next generated post uses your latest profile. Save first.
+            </p>
           </div>
         </div>
 
@@ -919,22 +945,27 @@ export default function CommanderNewClient({
           <div className={`tab-pane${activeTab === 'clients' ? ' active' : ''}`}>
             <div className="section-title">
               All Clients
-              <button className="btn btn-secondary btn-sm" onClick={loadClients}>Refresh</button>
+              <small>Click a row to open that client&apos;s pipeline</small>
+              <button className="btn btn-secondary btn-sm" onClick={loadClients} style={{ marginLeft: 'auto' }}>Refresh</button>
             </div>
             {clientsLoading
               ? <p className="txt-sm txt-muted">Loading…</p>
               : clientRows.length === 0
               ? <p className="txt-sm txt-muted">No clients yet.</p>
               : <table className="clients-tbl">
-                  <thead><tr><th>Company</th><th>Slug</th><th>Plan</th><th>Status</th><th>Created</th></tr></thead>
+                  <thead><tr><th>Company</th><th>Slug</th><th>Plan</th><th>Status</th><th>Created</th><th></th></tr></thead>
                   <tbody>
                     {clientRows.map((c, i) => (
-                      <tr key={i}>
+                      <tr key={i} style={{ cursor: 'pointer' }}
+                        onClick={() => { window.location.href = `/commander/pipeline/${c.slug}`; }}>
                         <td>{c.name || c.company}{c.is_super_admin ? <span style={{ color: '#ff6a00', fontSize: '0.7rem' }}> SUPER</span> : ''}</td>
                         <td className="txt-sm txt-muted">{c.slug}</td>
                         <td className="txt-sm txt-muted">{c.plan || 'basic'}</td>
                         <td>{c.is_active !== false ? <><span className="adot" />Active</> : <><span className="idot" />Inactive</>}</td>
                         <td className="txt-xs txt-muted">{(c.created_at || '').slice(0, 10)}</td>
+                        <td style={{ textAlign: 'right', paddingRight: '8px' }}>
+                          <span style={{ color: '#ff6a00', fontSize: '0.75rem', fontWeight: 600 }}>Open →</span>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
