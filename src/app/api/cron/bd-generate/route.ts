@@ -42,6 +42,15 @@ async function callClaude(prompt: string) {
   return JSON.parse(match[0]);
 }
 
+const TIKTOK_TYPOGRAPHY_RULES = `
+CAPTION/TEXT OVERLAY RULES (mandatory — apply to every visual_desc):
+- All text must sit inside the central 60% safe zone — never within 10% of any edge. TikTok search bar covers the top; interaction buttons cover the right side.
+- Font: Montserrat ExtraBold or equivalent bold sans-serif, minimum 72–100px. Must be readable from 3 feet away.
+- Maximum 8–10 words per screen. Break into 2–3 short lines, never one long line that spans the full width.
+- Text style: white bold text with a soft black drop-shadow. No solid black rectangles. If contrast requires a background, use a rounded semi-transparent black box at 40–50% opacity only.
+- Visual hierarchy: the most important word or phrase should be largest. Secondary words normal size. Never uniform sizing across all text.
+- Design standard: think Apple or Nike advert — minimal, elegant, bold, cinematic. Not PowerPoint.`;
+
 function buildPrompt(pillar: string, templateKey: string) {
   return `You are a content creator for a faceless TikTok/Instagram Reels page "How things move around the world".
 Tone: ${TONE[templateKey] ?? TONE.documentary}. No fluff.
@@ -54,7 +63,7 @@ Formula — HOOK(1 line, <12 words, stops scroll) → PROBLEM(2-3 lines) → STA
 Also provide:
 CAPTION: 3-4 sentences with CTA mentioning BootHop.
 HASHTAGS: 20 hashtags (logistics, travel, UK/Nigeria diaspora, boothop).
-VISUAL_DESC: 2-3 sentences describing ideal real-world photos/footage to use as background.
+VISUAL_DESC: 2-3 sentences describing ideal real-world photos/footage to use as background. ${TIKTOK_TYPOGRAPHY_RULES}
 PHOTO_QUERIES: 5 short Pexels search queries (comma-separated, each 2-4 words) matching the visual.
 
 Return ONLY valid JSON:
