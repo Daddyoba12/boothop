@@ -22,6 +22,7 @@ export async function GET(
       .select(`
         id,
         status,
+        tracking_status,
         sender_email,
         traveler_email,
         agreed_price,
@@ -36,6 +37,8 @@ export async function GET(
         hooper_confirmed_at,
         cancelled_by,
         cancellation_reason,
+        sender_barcode,
+        traveller_barcode,
         created_at,
         sender_trip:sender_trip_id(
           id,

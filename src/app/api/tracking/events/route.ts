@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { getAppSession } from '@/lib/auth/session';
+import { sendMilestoneNotification } from '@/lib/services/notifications';
 
 function getSupabase() {
   return createClient(
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     const { data: match } = await supabase
       .from('matches')
-      .select('id, traveler_email')
+      .select('id, sender_email, traveler_email')
       .eq('id', matchId)
       .single();
 
@@ -69,6 +70,16 @@ export async function POST(req: NextRequest) {
           .update({ tracking_status: 'delivered' })
           .eq('id', matchId),
       ]);
+    }
+
+    // Notify the sender (fire-and-forget — never block the response)
+    if (match.sender_email) {
+      sendMilestoneNotification({
+        recipientEmail: match.sender_email,
+        eventType,
+        matchId,
+        supabase,
+      }).catch(() => {});
     }
 
     return NextResponse.json({ success: true });

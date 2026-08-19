@@ -185,30 +185,34 @@ const MILESTONE_LABELS: Record<string, string> = {
 };
 
 export async function sendMilestoneNotification(opts: MilestoneNotificationOpts): Promise<void> {
-  const label = MILESTONE_LABELS[opts.eventType] || opts.eventType;
+  const label    = MILESTONE_LABELS[opts.eventType] || opts.eventType;
   const trackUrl = `${APP_URL}/track/${opts.matchId}`;
 
-  await sendResendEmail({
-    from: 'BootHop Tracking <noreply@boothop.com>',
-    to: opts.recipientEmail,
-    subject: `BootHop update: ${label}`,
-    html: `<div style="font-family:system-ui;padding:32px;background:#07111f;color:#e2e8f0;">
-      <h2 style="color:#3b82f6;">${label}</h2>
-      <p style="color:#94a3b8;">Your package journey has been updated.</p>
-      <a href="${trackUrl}" style="background:#3b82f6;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:16px;">View Live Tracking</a>
-    </div>`,
-  }).catch(() => {});
-
+  // Push for every milestone — instant and non-intrusive
   if (opts.supabase) {
     await sendPushToEmail(opts.supabase, opts.recipientEmail, {
       title: label,
-      body: 'Your package journey has been updated',
-      url: trackUrl,
+      body:  'Tap to view live tracking',
+      url:   trackUrl,
     }).catch(() => {});
   }
 
-  if (opts.recipientPhone) {
-    await sendSMS(opts.recipientPhone, `BootHop: ${label}. Track: ${trackUrl}`).catch(() => {});
+  // Email only for the final delivery event (acts as a delivery receipt)
+  if (opts.eventType === 'delivered') {
+    await sendResendEmail({
+      from:    'BootHop Tracking <noreply@boothop.com>',
+      to:      opts.recipientEmail,
+      subject: `BootHop: ${label} — your package has arrived`,
+      html: `<div style="font-family:system-ui;padding:32px;background:#07111f;color:#e2e8f0;">
+        <h2 style="color:#10b981;">${label}</h2>
+        <p style="color:#94a3b8;">Your package has been delivered. Open the app to confirm receipt and release payment to the carrier.</p>
+        <a href="${trackUrl}" style="background:#10b981;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:16px;">View Delivery Details</a>
+      </div>`,
+    }).catch(() => {});
+
+    if (opts.recipientPhone) {
+      await sendSMS(opts.recipientPhone, `BootHop: Your package has been delivered. Open the app to confirm and release payment. Track: ${trackUrl}`).catch(() => {});
+    }
   }
 }
 
