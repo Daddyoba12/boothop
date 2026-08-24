@@ -7,6 +7,8 @@ const NAV_LINKS = [
   ['About', '/about'],
   ['Help', '/help'],
   ['Contact', '/contact'],
+  ['Pitch Deck', '/downloads/boothop-pitch-deck.pdf'],
+  ['Exec Summary', '/downloads/boothop-executive-summary.pdf'],
 ];
 
 const LEGAL_LINKS = [
@@ -36,9 +38,13 @@ export default function Footer() {
 
           {/* Nav links */}
           <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/60">
-            {NAV_LINKS.map(([label, href]) => (
-              <Link key={href} href={href} className="hover:text-white transition-colors duration-200">{label}</Link>
-            ))}
+            {NAV_LINKS.map(([label, href]) =>
+              href.endsWith('.pdf') ? (
+                <a key={href} href={href} download className="hover:text-white transition-colors duration-200">{label}</a>
+              ) : (
+                <Link key={href} href={href} className="hover:text-white transition-colors duration-200">{label}</Link>
+              )
+            )}
           </nav>
 
           {/* Contact + social */}
