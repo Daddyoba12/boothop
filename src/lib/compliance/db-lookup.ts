@@ -131,11 +131,11 @@ export async function checkCache(
   if (error || !data) return null;
 
   // Fire-and-forget hit counter bump
-  supabase.rpc('bump_compliance_cache_hit', {
+  void Promise.resolve(supabase.rpc('bump_compliance_cache_hit', {
     p_item: normalized,
     p_from: fromCountry.toUpperCase(),
     p_to:   toCountry.toUpperCase(),
-  }).then(() => {}).catch(() => {});
+  })).catch(() => {});
 
   return {
     verdict:        data.verdict as ComplianceVerdict,
