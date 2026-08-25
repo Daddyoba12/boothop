@@ -154,7 +154,7 @@ Rules:
 async function extractRules(queryResult: string, from: string, to: string): Promise<ScrapedRule[]> {
   const msg = await claude.messages.create({
     model:      'claude-sonnet-4-6',
-    max_tokens: 2000,
+    max_tokens: 4096,
     system:     EXTRACTION_SYSTEM,
     messages:   [{ role: 'user', content: queryResult }],
   });
