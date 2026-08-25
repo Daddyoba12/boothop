@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { classifyItem } from '@/lib/classifier';
 import { calculateRisk } from '@/lib/riskEngine';
 import { rulesDB } from '@/data/complianceRules';
+import { sendAdminAISafetyFlagEmail } from '@/lib/email/sendComplianceEmail';
 
 export interface SafetyCheckRequest {
   item:        string;
@@ -133,7 +134,20 @@ Based on this, give your verdict and explanation.`;
       };
     }
 
-    // ── 5. Build response ─────────────────────────────────────────────────────
+    // ── 5. Notify admin if review required ───────────────────────────────────
+    if (aiResult.requiresReview || aiResult.verdict === 'REVIEW_REQUIRED') {
+      sendAdminAISafetyFlagEmail({
+        item,
+        fromLabel,
+        toLabel,
+        category,
+        riskScore:   risk.score,
+        verdict:     aiResult.verdict,
+        explanation: aiResult.explanation,
+      }).catch((e) => console.error('[ai/safety-check] admin email failed:', e));
+    }
+
+    // ── 6. Build response ─────────────────────────────────────────────────────
     const response: SafetyCheckResponse = {
       verdict:        aiResult.verdict,
       verdictLabel:   VERDICT_LABELS[aiResult.verdict],

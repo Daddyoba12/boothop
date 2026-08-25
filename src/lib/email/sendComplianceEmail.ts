@@ -208,6 +208,60 @@ export async function sendComplianceTimeoutEmail(params: {
   });
 }
 
+// ── Admin: AI pre-flight safety flag ─────────────────────────────────────────
+export async function sendAdminAISafetyFlagEmail(params: {
+  item:        string;
+  fromLabel:   string;
+  toLabel:     string;
+  category:    string;
+  riskScore:   number;
+  verdict:     string;
+  explanation: string;
+}) {
+  const adminReviewUrl = `${appUrl}/admin/compliance`;
+  const aiCheckUrl     = `${appUrl}/ai-check`;
+
+  await sendResendEmail({
+    from,
+    to: adminEmail,
+    subject: `[AI SAFETY FLAG] "${params.item}" — ${params.fromLabel} to ${params.toLabel} — Risk ${params.riskScore}/100`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px 24px;color:#0f172a;background:#ffffff;">
+        <div style="margin-bottom:24px;">
+          <span style="font-size:22px;font-weight:900;color:#1e3a8a;">Boot</span><span style="font-size:22px;font-weight:900;color:#2563eb;">Hop</span>
+          <span style="margin-left:12px;background:#ede9fe;color:#6d28d9;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">AI Safety Flag</span>
+        </div>
+        <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;">🛡️ AI safety check flagged for review</h2>
+        <p style="font-size:14px;color:#475569;margin:0 0 20px;">
+          A user ran an AI safety check on the /ai-check page or journey create form and the AI determined manual review is recommended.
+        </p>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:24px;font-size:14px;">
+          <tr style="background:#f8fafc;"><td style="padding:10px 14px;color:#64748b;font-weight:600;width:40%;">Item</td><td style="padding:10px 14px;font-weight:700;">${params.item}</td></tr>
+          <tr><td style="padding:10px 14px;color:#64748b;font-weight:600;">Route</td><td style="padding:10px 14px;">${params.fromLabel} &rarr; ${params.toLabel}</td></tr>
+          <tr style="background:#f8fafc;"><td style="padding:10px 14px;color:#64748b;font-weight:600;">Category</td><td style="padding:10px 14px;">${params.category}</td></tr>
+          <tr style="background:#fef3c7;"><td style="padding:10px 14px;color:#92400e;font-weight:700;">Risk Score</td><td style="padding:10px 14px;font-weight:900;color:#d97706;">${params.riskScore}/100</td></tr>
+          <tr><td style="padding:10px 14px;color:#64748b;font-weight:600;">AI Verdict</td><td style="padding:10px 14px;font-weight:700;color:#7c3aed;">${params.verdict}</td></tr>
+        </table>
+        <div style="background:#f5f3ff;border:1px solid #c4b5fd;border-radius:12px;padding:16px 20px;margin:0 0 24px;">
+          <p style="margin:0 0 6px;font-size:12px;color:#6d28d9;font-weight:700;text-transform:uppercase;">AI Explanation</p>
+          <p style="margin:0;font-size:14px;color:#374151;line-height:1.6;">${params.explanation}</p>
+        </div>
+        <p style="font-size:13px;color:#64748b;margin:0 0 20px;">
+          No match ID yet — this was a pre-flight check before a journey was submitted. If this user proceeds to post a journey or send this item, it should be reviewed.
+        </p>
+        <a href="${adminReviewUrl}" style="display:inline-block;background:#7c3aed;color:#ffffff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:10px;text-decoration:none;margin-right:8px;">
+          Open compliance hub &rarr;
+        </a>
+        <a href="${aiCheckUrl}" style="display:inline-block;background:#f1f5f9;color:#374151;font-weight:600;font-size:14px;padding:12px 24px;border-radius:10px;text-decoration:none;">
+          View AI check page
+        </a>
+        <p style="font-size:11px;color:#94a3b8;margin-top:20px;">Sent automatically by the BootHop AI Safety Assistant.</p>
+      </div>
+    `,
+    text: `AI Safety Flag\nItem: "${params.item}"\nRoute: ${params.fromLabel} to ${params.toLabel}\nCategory: ${params.category}\nRisk: ${params.riskScore}/100\nVerdict: ${params.verdict}\n\n${params.explanation}\n\nReview: ${adminReviewUrl}`,
+  });
+}
+
 // ── Admin: manual review required ────────────────────────────────────────────
 export async function sendAdminComplianceReviewEmail(params: {
   matchId:         string;
