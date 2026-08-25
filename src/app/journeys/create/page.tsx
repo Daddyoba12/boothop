@@ -104,6 +104,8 @@ export default function CreateJourneyPage() {
           item:        item.trim(),
           fromCountry: from || 'United Kingdom',
           toCountry:   to,
+          fromCity:    formData.fromCity || undefined,
+          toCity:      formData.toCity   || undefined,
           value:       0,
           quantity:    1,
         }),
@@ -322,7 +324,9 @@ export default function CreateJourneyPage() {
                       Check if an item is allowed on this route
                     </p>
                     <p className="text-xs text-blue-700 mb-3">
-                      Type any item below — our AI checks customs rules for {formData.fromCountry} → {formData.toCountry} in real time.
+                      Type any item below — our AI checks customs rules for{' '}
+                      {formData.fromCity ? `${formData.fromCity}, ` : ''}{formData.fromCountry} →{' '}
+                      {formData.toCity ? `${formData.toCity}, ` : ''}{formData.toCountry} in real time.
                     </p>
                     <div className="flex gap-2">
                       <input

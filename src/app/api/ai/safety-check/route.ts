@@ -8,9 +8,11 @@ export interface SafetyCheckRequest {
   item:        string;
   fromCountry: string;
   toCountry:   string;
+  fromCity?:   string;
+  toCity?:     string;
   value?:      number;
   quantity?:   number;
-  question?:   string;  // optional free-text question from user
+  question?:   string;
 }
 
 export interface SafetyCheckResponse {
@@ -34,7 +36,7 @@ const VERDICT_LABELS = {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json() as SafetyCheckRequest;
-    const { item, fromCountry, toCountry, value = 0, quantity = 1, question } = body;
+    const { item, fromCountry, toCountry, fromCity, toCity, value = 0, quantity = 1, question } = body;
 
     if (!item || !toCountry) {
       return NextResponse.json(
@@ -80,9 +82,12 @@ Respond ONLY as a valid JSON object with these exact fields:
   "requiresReview": true | false
 }`;
 
+    const fromLabel = fromCity ? `${fromCity}, ${fromCountry}` : fromCountry || 'Not specified';
+    const toLabel   = toCity   ? `${toCity}, ${toCountry}`   : toCountry;
+
     const userMessage = `Item to send: "${item}"
-From: ${fromCountry || 'Not specified'}
-To: ${toCountry}
+From: ${fromLabel}
+To: ${toLabel}
 Declared value: ${value > 0 ? `£${value}` : 'Not declared'}
 Quantity: ${quantity}
 ${question ? `User question: "${question}"` : ''}
