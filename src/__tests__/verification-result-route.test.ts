@@ -85,7 +85,7 @@ function makeSupabase(verReq: unknown, matchData: unknown, declData: unknown = {
 }
 
 function mockAdmin() {
-  vi.mocked(requireAdminApi).mockResolvedValue({ email: ADMIN_EMAIL });
+  vi.mocked(requireAdminApi).mockResolvedValue({ adminId: 'admin-1', email: ADMIN_EMAIL, isTempPassword: false });
 }
 
 function mockNonAdmin() {

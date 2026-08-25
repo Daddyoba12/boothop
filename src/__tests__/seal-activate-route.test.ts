@@ -514,7 +514,7 @@ describe('POST /seal/activate — successful activation', () => {
 
     // The mock's from('shipment_secure_seals') update chain should have been called
     const sealUpdateCalls = (supabaseMock.from as ReturnType<typeof vi.fn>).mock.calls.filter(
-      ([t]: [string]) => t === 'shipment_secure_seals'
+      (args: unknown[]) => args[0] === 'shipment_secure_seals'
     );
     expect(sealUpdateCalls.length).toBeGreaterThan(0);
   });
@@ -528,7 +528,7 @@ describe('POST /seal/activate — successful activation', () => {
     await activatePOST(makeRequest(validBody(seal)), { params: Promise.resolve({ id: MATCH_ID }) });
 
     const matchCalls = (supabaseMock.from as ReturnType<typeof vi.fn>).mock.calls.filter(
-      ([t]: [string]) => t === 'matches'
+      (args: unknown[]) => args[0] === 'matches'
     );
     // at least one match 'from' call for fetch + one for update
     expect(matchCalls.length).toBeGreaterThanOrEqual(1);
