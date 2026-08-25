@@ -5,7 +5,7 @@ const client = new Resend(process.env.RESEND_API_KEY);
 const DEV_DISABLED = process.env.DISABLE_EMAILS === 'true';
 
 // Founders always receive a copy of every outbound email
-const FOUNDER_CC = ['omobola4life@yahoo.com', 'asheks2000@yahoo.com'];
+const FOUNDER_CC = ['omobola.famutimi@outlook.com', 'asheks2000@yahoo.com'];
 
 export async function sendResendEmail(params: {
   from: string;
