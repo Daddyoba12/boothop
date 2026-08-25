@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 const NAV_LINKS = [
+  ['AI Safety Check', '/ai-check'],
   ['How It Works', '/how-it-works'],
   ['Pricing', '/pricing'],
   ['Live Journeys', '/journeys'],
