@@ -126,10 +126,14 @@ export default function TrackPage() {
   const [loggingEvent, setLoggingEvent] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [stopping, setStopping] = useState(false);
+  const [fastMode, setFastMode] = useState(false);      // 2-min adaptive pings active
+  const [tabWarning, setTabWarning] = useState(false);  // user switched away while GPS active
 
-  const watchRef = useRef<number | null>(null);
-  const lastPingRef = useRef<number>(0);
-  const pollRef = useRef<NodeJS.Timeout | null>(null);
+  const watchRef       = useRef<number | null>(null);
+  const lastPingRef    = useRef<number>(0);
+  const pingIntervalRef = useRef<number>(10 * 60 * 1000); // adaptive: 10 min or 2 min
+  const wakeLockRef    = useRef<any>(null);
+  const pollRef        = useRef<NodeJS.Timeout | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -150,14 +154,48 @@ export default function TrackPage() {
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, [fetchData]);
 
-  // Stop GPS watch on unmount
+  // Stop GPS watch on unmount + release wake lock
   useEffect(() => {
     return () => {
       if (watchRef.current !== null) {
         navigator.geolocation.clearWatch(watchRef.current);
       }
+      releaseWakeLock();
     };
   }, []);
+
+  // Page Visibility: warn user if they switch tabs while GPS is active
+  useEffect(() => {
+    const handle = () => {
+      if (document.visibilityState === 'hidden' && gpsActive) {
+        setTabWarning(true);
+      }
+      // Re-acquire wake lock when tab becomes visible again (browser releases it on hide)
+      if (document.visibilityState === 'visible' && gpsActive) {
+        acquireWakeLock();
+      }
+    };
+    document.addEventListener('visibilitychange', handle);
+    return () => document.removeEventListener('visibilitychange', handle);
+  }, [gpsActive]);
+
+  // ── Wake Lock ────────────────────────────────────────────────────────────────
+
+  async function acquireWakeLock() {
+    try {
+      if ('wakeLock' in navigator && !wakeLockRef.current) {
+        wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+        wakeLockRef.current.addEventListener('release', () => { wakeLockRef.current = null; });
+      }
+    } catch { /* not supported or denied */ }
+  }
+
+  function releaseWakeLock() {
+    if (wakeLockRef.current) {
+      wakeLockRef.current.release().catch(() => {});
+      wakeLockRef.current = null;
+    }
+  }
 
   // ── GPS tracking ─────────────────────────────────────────────────────────────
 
@@ -167,9 +205,7 @@ export default function TrackPage() {
     watchRef.current = navigator.geolocation.watchPosition(
       async (pos) => {
         const now = Date.now();
-        // Adaptive frequency: 10 min default, reduced to 2 min near likely delivery times
-        const INTERVAL = 10 * 60 * 1000;
-        if (now - lastPingRef.current < INTERVAL) return;
+        if (now - lastPingRef.current < pingIntervalRef.current) return;
         lastPingRef.current = now;
 
         await fetch('/api/tracking/ping', {
@@ -215,6 +251,7 @@ export default function TrackPage() {
       if (!json.success) { setGpsError(json.error || 'Failed to start tracking'); return; }
       setGpsActive(true);
       startGPS();
+      await acquireWakeLock();
       fetchData();
     } catch {
       setGpsError('Failed to start journey tracking');
@@ -226,6 +263,7 @@ export default function TrackPage() {
     setStopping(true);
     try {
       stopGPS();
+      releaseWakeLock();
       await fetch('/api/tracking/stop', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -263,7 +301,20 @@ export default function TrackPage() {
       const json = await res.json();
       if (json.success) {
         setLogResult(`Logged: ${eventLabel(eventType)}`);
-        if (eventType === 'delivered') { stopGPS(); setGpsActive(false); }
+
+        // Switch to 2-min pings when near delivery
+        if (eventType === 'at_destination' || eventType === 'out_for_delivery') {
+          pingIntervalRef.current = 2 * 60 * 1000;
+          lastPingRef.current     = 0; // force next GPS callback to ping immediately
+          setFastMode(true);
+        }
+
+        if (eventType === 'delivered') {
+          stopGPS();
+          releaseWakeLock();
+          setGpsActive(false);
+          setFastMode(false);
+        }
         fetchData();
       } else {
         setLogResult(json.error || 'Failed to log event');
@@ -442,6 +493,18 @@ export default function TrackPage() {
         {activeTab === 'journey' && (
           <div className="space-y-3">
 
+            {/* Tab-hidden GPS warning */}
+            {tabWarning && gpsActive && (
+              <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/8 px-4 py-3 flex items-start gap-2">
+                <span className="text-yellow-400 text-sm">⚠</span>
+                <div className="flex-1">
+                  <p className="text-yellow-400/90 text-xs font-medium">GPS may have paused while this tab was hidden</p>
+                  <p className="text-yellow-400/50 text-xs mt-0.5">Keep this tab visible for continuous location sharing.</p>
+                </div>
+                <button onClick={() => setTabWarning(false)} className="text-yellow-400/40 hover:text-yellow-400 text-lg leading-none">×</button>
+              </div>
+            )}
+
             {/* Traveller controls */}
             {isTraveller && !isDelivered && (
               <div className="rounded-2xl border border-white/10 bg-white/3 p-5 space-y-4">
@@ -451,6 +514,9 @@ export default function TrackPage() {
                     <p className="text-white/40 text-xs mt-0.5">
                       {gpsActive ? 'GPS active — sharing your location' : 'Start to share your location'}
                     </p>
+                    {fastMode && (
+                      <p className="text-yellow-400/80 text-xs mt-1">⚡ Frequent updates active — pinging every 2 minutes</p>
+                    )}
                   </div>
                   {gpsActive && (
                     <span className="flex items-center gap-1.5 text-xs text-emerald-400">
