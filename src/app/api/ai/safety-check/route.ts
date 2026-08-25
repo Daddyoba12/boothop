@@ -4,6 +4,7 @@ import { classifyItem } from '@/lib/classifier';
 import { calculateRisk } from '@/lib/riskEngine';
 import { rulesDB } from '@/data/complianceRules';
 import { sendAdminAISafetyFlagEmail } from '@/lib/email/sendComplianceEmail';
+import { checkRulesDB, checkCache, storeInCache } from '@/lib/compliance/db-lookup';
 
 export interface SafetyCheckRequest {
   item:        string;
@@ -46,7 +47,40 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── 1. Run existing rule-based check ──────────────────────────────────────
+    // ── 1. Check local compliance DB first (free — no Claude token cost) ────
+    const [rulesHit, cacheHit] = await Promise.all([
+      checkRulesDB(item, fromCountry || 'ANY', toCountry),
+      checkCache(item, fromCountry || 'ANY', toCountry),
+    ]);
+
+    const dbHit = rulesHit ?? cacheHit; // rules_db takes priority over cache
+    if (dbHit) {
+      const fromLabel = fromCity ? `${fromCity}, ${fromCountry}` : fromCountry || 'Not specified';
+      const toLabel   = toCity   ? `${toCity}, ${toCountry}`   : toCountry;
+      if (dbHit.requiresReview || dbHit.verdict === 'REVIEW_REQUIRED') {
+        sendAdminAISafetyFlagEmail({
+          item, fromLabel, toLabel,
+          category: 'compliance_db',
+          riskScore: dbHit.riskScore,
+          verdict: dbHit.verdict,
+          explanation: dbHit.explanation,
+        }).catch(() => {});
+      }
+      return NextResponse.json({
+        verdict:        dbHit.verdict,
+        verdictLabel:   VERDICT_LABELS[dbHit.verdict],
+        explanation:    dbHit.explanation,
+        tips:           dbHit.tips,
+        requiresReview: dbHit.requiresReview,
+        riskScore:      dbHit.riskScore,
+        category:       'compliance_db',
+        source:         dbHit.source,
+        legalRef:       dbHit.legalRef,
+        disclaimer:     'This check is advisory only. Final customs and border decisions rest with the relevant authorities. BootHop accepts no liability for items rejected at the border.',
+      } satisfies SafetyCheckResponse & { source: string; legalRef?: string });
+    }
+
+    // ── 2. Run existing rule-based check ──────────────────────────────────────
     const category  = classifyItem(item);
     const risk      = calculateRisk({ item, country: toCountry, value, quantity });
     const itemLower = item.toLowerCase();
@@ -134,7 +168,14 @@ Based on this, give your verdict and explanation.`;
       };
     }
 
-    // ── 5. Notify admin if review required ───────────────────────────────────
+    // ── 5. Store Claude result in cache for future reuse ─────────────────────
+    storeInCache(
+      item, fromCountry || 'ANY', toCountry,
+      aiResult.verdict, aiResult.explanation, aiResult.tips ?? [],
+      aiResult.requiresReview, risk.score, category,
+    ).catch(() => {});
+
+    // ── 6. Notify admin if review required ───────────────────────────────────
     if (aiResult.requiresReview || aiResult.verdict === 'REVIEW_REQUIRED') {
       sendAdminAISafetyFlagEmail({
         item,
@@ -147,7 +188,7 @@ Based on this, give your verdict and explanation.`;
       }).catch((e) => console.error('[ai/safety-check] admin email failed:', e));
     }
 
-    // ── 6. Build response ─────────────────────────────────────────────────────
+    // ── 7. Build response ─────────────────────────────────────────────────────
     const response: SafetyCheckResponse = {
       verdict:        aiResult.verdict,
       verdictLabel:   VERDICT_LABELS[aiResult.verdict],
