@@ -1,20 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  Package, 
-  ArrowRight, 
-  Calendar, 
-  MapPin, 
-  Weight, 
+import {
+  Package,
+  ArrowRight,
+  Calendar,
+  MapPin,
+  Weight,
   DollarSign,
   AlertCircle,
   X,
-  Plus
+  Plus,
+  Shield,
 } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
+import type { SafetyCheckResponse } from '@/app/api/ai/safety-check/route';
 
 export default function CreateJourneyPage() {
   const router = useRouter();
@@ -39,6 +41,13 @@ export default function CreateJourneyPage() {
 
   const [newExclude, setNewExclude] = useState('');
   const [newAccept, setNewAccept] = useState('');
+
+  // AI safety check state
+  const [aiItem,    setAiItem]    = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResult,  setAiResult]  = useState<SafetyCheckResponse | null>(null);
+  const [aiError,   setAiError]   = useState('');
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const countries = [
     'United Kingdom', 'United States', 'Canada', 'Australia', 'Germany', 'France',
@@ -81,6 +90,38 @@ export default function CreateJourneyPage() {
       acceptsOnly: formData.acceptsOnly.filter((_, i) => i !== index)
     });
   };
+
+  const runAiCheck = useCallback(async (item: string, from: string, to: string) => {
+    if (!item.trim() || !to) return;
+    setAiLoading(true);
+    setAiResult(null);
+    setAiError('');
+    try {
+      const res = await fetch('/api/ai/safety-check', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item:        item.trim(),
+          fromCountry: from || 'United Kingdom',
+          toCountry:   to,
+          value:       0,
+          quantity:    1,
+        }),
+      });
+      if (!res.ok) throw new Error('Check failed. Try again.');
+      setAiResult(await res.json());
+    } catch (e: unknown) {
+      setAiError(e instanceof Error ? e.message : 'Check failed.');
+    } finally {
+      setAiLoading(false);
+    }
+  }, []);
+
+  const scheduleAiCheck = useCallback((item: string, from: string, to: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (!item.trim() || !to) return;
+    debounceRef.current = setTimeout(() => runAiCheck(item, from, to), 800);
+  }, [runAiCheck]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -261,17 +302,101 @@ export default function CreateJourneyPage() {
                 </div>
               </div>
 
-              {/* International Warning */}
+              {/* International Warning + AI Route Check */}
               {formData.fromCountry && formData.toCountry && formData.fromCountry !== formData.toCountry && (
-                <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <div className="flex items-start">
-                    <AlertCircle className="h-5 w-5 text-yellow-600 mr-2 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-yellow-800">
-                      <p className="font-semibold mb-1">International Journey</p>
-                      <p>
-                        This is an international route. Both you and Hoopers must comply with customs regulations.
-                      </p>
+                <div className="mt-4 space-y-3">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div className="flex items-start">
+                      <AlertCircle className="h-5 w-5 text-yellow-600 mr-2 flex-shrink-0 mt-0.5" />
+                      <div className="text-sm text-yellow-800">
+                        <p className="font-semibold mb-1">International Journey</p>
+                        <p>This is an international route. Both you and Hoopers must comply with customs regulations.</p>
+                      </div>
                     </div>
+                  </div>
+
+                  {/* AI Safety Check Panel */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm font-semibold text-blue-900 mb-2 flex items-center gap-1.5">
+                      <Shield className="h-4 w-4 text-blue-600" />
+                      Check if an item is allowed on this route
+                    </p>
+                    <p className="text-xs text-blue-700 mb-3">
+                      Type any item below — our AI checks customs rules for {formData.fromCountry} → {formData.toCountry} in real time.
+                    </p>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={aiItem}
+                        onChange={(e) => {
+                          setAiItem(e.target.value);
+                          scheduleAiCheck(e.target.value, formData.fromCountry, formData.toCountry);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (debounceRef.current) clearTimeout(debounceRef.current);
+                            runAiCheck(aiItem, formData.fromCountry, formData.toCountry);
+                          }
+                        }}
+                        placeholder="e.g. Samsung phone, perfume, medication..."
+                        className="flex-1 px-3 py-2 rounded-lg border border-blue-300 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (debounceRef.current) clearTimeout(debounceRef.current);
+                          runAiCheck(aiItem, formData.fromCountry, formData.toCountry);
+                        }}
+                        disabled={aiLoading || !aiItem.trim()}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1.5"
+                      >
+                        {aiLoading ? (
+                          <>
+                            <span className="h-3.5 w-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            Checking
+                          </>
+                        ) : 'Check'}
+                      </button>
+                    </div>
+
+                    {aiError && (
+                      <p className="mt-2 text-xs text-red-600">{aiError}</p>
+                    )}
+
+                    {aiResult && (() => {
+                      const STYLES: Record<string, { bg: string; border: string; text: string; icon: string }> = {
+                        PERMITTED:       { bg: 'bg-emerald-50', border: 'border-emerald-300', text: 'text-emerald-800', icon: '✓' },
+                        RESTRICTED:      { bg: 'bg-amber-50',   border: 'border-amber-300',   text: 'text-amber-800',   icon: '⚠' },
+                        PROHIBITED:      { bg: 'bg-red-50',     border: 'border-red-300',     text: 'text-red-800',     icon: '✗' },
+                        REVIEW_REQUIRED: { bg: 'bg-blue-50',    border: 'border-blue-300',    text: 'text-blue-800',    icon: '?' },
+                      };
+                      const s = STYLES[aiResult.verdict] ?? STYLES.REVIEW_REQUIRED;
+                      return (
+                        <div className={`mt-3 rounded-lg border ${s.border} ${s.bg} p-3`}>
+                          <p className={`text-sm font-bold mb-1 ${s.text}`}>
+                            {s.icon} {aiResult.verdictLabel}
+                          </p>
+                          <p className="text-xs text-gray-700 leading-relaxed">{aiResult.explanation}</p>
+                          {aiResult.tips.length > 0 && (
+                            <ul className="mt-2 space-y-1">
+                              {aiResult.tips.map((tip, i) => (
+                                <li key={i} className={`text-xs ${s.text} flex gap-1`}>
+                                  <span>›</span>{tip}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          <p className="mt-2 text-xs text-gray-400">
+                            Advisory only — final decisions rest with border authorities.
+                          </p>
+                        </div>
+                      );
+                    })()}
+
+                    <p className="mt-2 text-xs text-blue-600">
+                      <Link href="/ai-check" className="underline hover:text-blue-800">Full AI Safety Check →</Link>
+                    </p>
                   </div>
                 </div>
               )}
