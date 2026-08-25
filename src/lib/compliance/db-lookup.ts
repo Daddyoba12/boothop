@@ -3,7 +3,7 @@
  * Order: compliance_rules (static) → compliance_cache (Claude results) → Claude
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { createSupabaseAdminClient as createAdminClient } from '@/lib/supabase/admin';
 
 export type ComplianceVerdict = 'PERMITTED' | 'RESTRICTED' | 'PROHIBITED' | 'REVIEW_REQUIRED';
 
