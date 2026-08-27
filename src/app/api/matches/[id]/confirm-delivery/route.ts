@@ -27,7 +27,7 @@ export async function POST(
 
     const { data: match, error } = await supabase
       .from('matches')
-      .select('id, status, sender_email, traveler_email, payment_intent_id, sender_confirmed_delivery, traveller_confirmed_delivery')
+      .select('id, status, sender_email, traveler_email, stripe_payment_intent_id, sender_confirmed_delivery, traveller_confirmed_delivery')
       .eq('id', matchId)
       .maybeSingle();
 
@@ -77,7 +77,7 @@ export async function POST(
     // Re-fetch to check if both have now confirmed
     const { data: updated } = await supabase
       .from('matches')
-      .select('sender_confirmed_delivery, traveller_confirmed_delivery, payment_intent_id')
+      .select('sender_confirmed_delivery, traveller_confirmed_delivery, stripe_payment_intent_id')
       .eq('id', matchId)
       .single();
 
@@ -91,11 +91,11 @@ export async function POST(
         locked_at: new Date().toISOString(),
       }).eq('id', matchId);
 
-      if (updated?.payment_intent_id) {
+      if (updated?.stripe_payment_intent_id) {
         // Release escrow by capturing the payment.
         // charge.captured webhook → stripe.transfers.create → traveller paid.
         const stripe = getStripe();
-        await stripe.paymentIntents.capture(updated.payment_intent_id);
+        await stripe.paymentIntents.capture(updated.stripe_payment_intent_id);
       }
     }
 

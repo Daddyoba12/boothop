@@ -39,7 +39,7 @@ async function runAutoPayout() {
     .from('matches')
     .select(`
       id, status, agreed_price, sender_email, traveler_email,
-      updated_at, payment_session_id, traveler_id,
+      updated_at, stripe_payment_intent_id, payment_session_id,
       sender_trip:sender_trip_id(from_city, to_city)
     `)
     .eq('status', 'delivery_confirmed')
@@ -76,42 +76,49 @@ async function runAutoPayout() {
     }
 
     try {
-      const agreedPrice = (match as any).agreed_price ?? 0;
+      const agreedPrice      = (match as any).agreed_price ?? 0;
+      const paymentSessionId = (match as any).payment_session_id;
+      const directPiId       = (match as any).stripe_payment_intent_id;
 
       // ── Step 1: Capture the held payment intent ──────────────────────────
-      if ((match as any).payment_session_id) {
+      // Support both Checkout-session flow and direct PaymentIntent flow.
+      let piIdToCapture: string | null = null;
+
+      if (paymentSessionId) {
         const session = await stripe.checkout.sessions.retrieve(
-          (match as any).payment_session_id,
-          { expand: ['payment_intent'] }
+          paymentSessionId, { expand: ['payment_intent'] }
         );
-
         const pi = session.payment_intent as any;
+        if (pi?.id && pi?.status === 'requires_capture') piIdToCapture = pi.id;
+      } else if (directPiId) {
+        const pi = await stripe.paymentIntents.retrieve(directPiId);
+        if (pi.status === 'requires_capture') piIdToCapture = directPiId;
+      }
 
-        if (pi?.id && pi?.status === 'requires_capture') {
-          await stripe.paymentIntents.capture(pi.id);
-        }
+      if (piIdToCapture) {
+        await stripe.paymentIntents.capture(piIdToCapture);
+      }
 
-        // ── Step 2: Transfer traveler's share to their Connect account ─────
-        if (agreedPrice > 0 && (match as any).traveler_id) {
-          const { data: travelerUser } = await supabase
-            .from('users')
-            .select('stripe_connect_id')
-            .eq('id', (match as any).traveler_id)
-            .maybeSingle();
+      // ── Step 2: Transfer traveler's share to their Connect account ─────
+      if (agreedPrice > 0 && match.traveler_email) {
+        const { data: travelerUser } = await supabase
+          .from('users')
+          .select('stripe_connect_id')
+          .eq('email', match.traveler_email)
+          .maybeSingle();
 
-          if (travelerUser?.stripe_connect_id) {
-            const { booterReceives } = calculateFees(agreedPrice);
-            await stripe.transfers.create({
-              amount:      Math.round(booterReceives * 100), // pence
-              currency:    'gbp',
-              destination: travelerUser.stripe_connect_id,
-              metadata:    { match_id: match.id },
-            });
-          } else {
-            // Traveler hasn't completed Connect onboarding — funds stay on
-            // platform until they do. Log so admin can follow up.
-            console.warn(`auto-payout: traveler ${(match as any).traveler_id} has no stripe_connect_id — funds held on platform for match ${match.id}`);
-          }
+        if (travelerUser?.stripe_connect_id) {
+          const { booterReceives } = calculateFees(agreedPrice);
+          await stripe.transfers.create({
+            amount:      Math.round(booterReceives * 100), // pence
+            currency:    'gbp',
+            destination: travelerUser.stripe_connect_id,
+            metadata:    { match_id: match.id },
+          });
+        } else {
+          // Traveler hasn't completed Connect onboarding — funds stay on
+          // platform until they do. Log so admin can follow up.
+          console.warn(`auto-payout: traveler ${match.traveler_email} has no stripe_connect_id — funds held on platform for match ${match.id}`);
         }
       }
 
