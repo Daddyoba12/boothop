@@ -43,6 +43,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency:  'monthly',
       priority:         0.8,
     },
+    {
+      url:              `${APP_URL}/guide`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.75,
+    },
+    {
+      url:              `${APP_URL}/start`,
+      lastModified:     now,
+      changeFrequency:  'monthly',
+      priority:         0.7,
+    },
     // ── Auth ──────────────────────────────────────────────────
     {
       url:              `${APP_URL}/login`,
