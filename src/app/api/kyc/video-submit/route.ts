@@ -82,7 +82,7 @@ export async function POST(request: Request) {
 
     // ── Determine which side of the match this user is ──────────────────────
     const isSender   = match.sender_email === email;
-    const expiresAt  = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // +30 days
+    const expiresAt  = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(); // +90 days (3 months)
 
     const updatePayload = isSender
       ? {

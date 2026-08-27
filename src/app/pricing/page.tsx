@@ -141,7 +141,7 @@ export default function PricingPage() {
                 <span className="text-xs font-bold uppercase tracking-widest text-blue-400">For Hoopers · Senders</span>
               </div>
               <div className="flex items-end gap-2 mb-2">
-                <span className="text-5xl sm:text-7xl font-black bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">+3%</span>
+                <span className="text-5xl sm:text-7xl font-black bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">+5.5%</span>
               </div>
               <p className="text-slate-400 mb-8 text-sm">Service fee on top of the agreed price</p>
 
@@ -154,18 +154,18 @@ export default function PricingPage() {
                     <span className="text-white font-semibold">£100.00</span>
                   </div>
                   <div className="flex justify-between text-blue-400">
-                    <span>+ Service fee (3%)</span>
-                    <span className="font-semibold">£3.00</span>
+                    <span>+ Service fee (5.5%)</span>
+                    <span className="font-semibold">£5.50</span>
                   </div>
                   <div className="border-t border-white/10 pt-2 flex justify-between text-base font-black">
                     <span className="text-white">You pay</span>
-                    <span className="text-cyan-400">£103.00</span>
+                    <span className="text-cyan-400">£105.50</span>
                   </div>
                 </div>
               </div>
 
               <ul className="space-y-3">
-                {['Pay only when a Booter accepts', 'Funds held securely in escrow', 'Released only after dual confirmation'].map((t) => (
+                {['Pay only when a Booter accepts', 'Funds held securely in escrow', 'Both parties verified before release'].map((t) => (
                   <li key={t} className="flex items-start gap-3">
                     <div className="w-5 h-5 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Check className="h-3 w-3 text-white" />
@@ -188,7 +188,7 @@ export default function PricingPage() {
                 <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">For Booters · Travellers</span>
               </div>
               <div className="flex items-end gap-2 mb-2">
-                <span className="text-5xl sm:text-7xl font-black bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">−5%</span>
+                <span className="text-5xl sm:text-7xl font-black bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">−8%</span>
               </div>
               <p className="text-slate-400 mb-8 text-sm">Deducted from the agreed price on payout</p>
 
@@ -200,18 +200,18 @@ export default function PricingPage() {
                     <span className="text-white font-semibold">£100.00</span>
                   </div>
                   <div className="flex justify-between text-red-400">
-                    <span>− Service fee (5%)</span>
-                    <span className="font-semibold">£5.00</span>
+                    <span>− Service fee (8%)</span>
+                    <span className="font-semibold">£8.00</span>
                   </div>
                   <div className="border-t border-white/10 pt-2 flex justify-between text-base font-black">
                     <span className="text-white">You receive</span>
-                    <span className="text-emerald-400">£95.00</span>
+                    <span className="text-emerald-400">£92.00</span>
                   </div>
                 </div>
               </div>
 
               <ul className="space-y-3">
-                {['Earn money on your existing travels', 'Fee covers identity verification & escrow', 'Automatic payout after both confirmations'].map((t) => (
+                {['Earn money on your existing travels', 'Both parties verified before payout', 'Automatic payout after both confirmations'].map((t) => (
                   <li key={t} className="flex items-start gap-3">
                     <div className="w-5 h-5 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Check className="h-3 w-3 text-white" />
@@ -240,17 +240,17 @@ export default function PricingPage() {
               <thead>
                 <tr className="border-b border-white/10">
                   <th className="text-left py-5 px-6 text-slate-400 font-semibold">Agreed Price</th>
-                  <th className="text-right py-5 px-6 text-blue-400 font-semibold">Hooper Pays<br/><span className="text-xs font-normal text-slate-500">(+3%)</span></th>
-                  <th className="text-right py-5 px-6 text-emerald-400 font-semibold">Booter Receives<br/><span className="text-xs font-normal text-slate-500">(−5%)</span></th>
+                  <th className="text-right py-5 px-6 text-blue-400 font-semibold">Hooper Pays<br/><span className="text-xs font-normal text-slate-500">(+5.5%)</span></th>
+                  <th className="text-right py-5 px-6 text-emerald-400 font-semibold">Booter Receives<br/><span className="text-xs font-normal text-slate-500">(−8%)</span></th>
                   <th className="text-right py-5 px-6 text-slate-500 font-semibold">Platform Fee</th>
                 </tr>
               </thead>
               <tbody>
                 {[
-                  { agreed: 50,  hooper: 51.50, booter: 47.50, fee: 4 },
-                  { agreed: 100, hooper: 103,   booter: 95,    fee: 8 },
-                  { agreed: 200, hooper: 206,   booter: 190,   fee: 16 },
-                  { agreed: 500, hooper: 515,   booter: 475,   fee: 40 },
+                  { agreed: 50,  hooper: 52.75, booter: 46.00, fee: 6.75  },
+                  { agreed: 100, hooper: 105.50, booter: 92.00, fee: 13.50 },
+                  { agreed: 200, hooper: 211.00, booter: 184.00, fee: 27.00 },
+                  { agreed: 500, hooper: 527.50, booter: 460.00, fee: 67.50 },
                 ].map((row, i) => (
                   <tr key={row.agreed} className={`border-b border-white/5 hover:bg-white/3 transition-colors duration-200 ${i % 2 === 0 ? '' : 'bg-white/2'}`}>
                     <td className="py-4 px-6 font-bold text-white">£{row.agreed}</td>
@@ -275,7 +275,7 @@ export default function PricingPage() {
                 <Lock className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors duration-300">ID verified · Escrow payments · 8-stage pipeline</p>
+                <p className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors duration-300">Both parties verified · Escrow payments · 8-stage pipeline</p>
                 <p className="mt-0.5 text-xs text-white/40">See how every payment is protected →</p>
               </div>
             </div>

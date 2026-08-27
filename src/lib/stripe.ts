@@ -28,8 +28,8 @@ export interface DeliveryFees {
 }
 
 export function calculateFees(agreedPrice: number): DeliveryFees {
-  const hooperFeePercent = 3;
-  const booterFeePercent = 5;
+  const hooperFeePercent = 5.5;
+  const booterFeePercent = 8;
   const hooperPays     = Math.round(agreedPrice * (1 + hooperFeePercent / 100) * 100) / 100;
   const booterReceives = Math.round(agreedPrice * (1 - booterFeePercent / 100) * 100) / 100;
   const platformFee    = Math.round((hooperPays - booterReceives) * 100) / 100;
