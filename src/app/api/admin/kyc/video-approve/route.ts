@@ -54,33 +54,33 @@ export async function POST(request: Request) {
     // ── Update matches table for the relevant side ───────────────────────────
     const { data: match } = await supabase
       .from('matches')
-      .select('booter_email, hooper_email')
+      .select('sender_email, traveler_email')
       .eq('id', matchId)
       .maybeSingle();
 
     if (match) {
-      const isBooter = match.booter_email === email;
-      const matchUpdate = isBooter
-        ? { booter_video_kyc_status: decision }
-        : { hooper_video_kyc_status: decision };
+      const isSender = match.sender_email === email;
+      const matchUpdate = isSender
+        ? { sender_video_kyc_status: decision }
+        : { traveler_video_kyc_status: decision };
 
       // If approved, also flag id_received for that side
       if (decision === 'approved') {
-        Object.assign(matchUpdate, isBooter
-          ? { booter_id_received: true }
-          : { hooper_id_received: true }
+        Object.assign(matchUpdate, isSender
+          ? { sender_id_received: true }
+          : { traveler_id_received: true }
         );
       }
 
       await supabase.from('matches').update(matchUpdate).eq('id', matchId);
     }
 
-    // ── If approved, mark profile as id_verified ─────────────────────────────
+    // ── If approved, mark user as id_verified ────────────────────────────────
+    // profiles is tied to Supabase Auth (not used here); write to user_verifications
     if (decision === 'approved') {
       await supabase
-        .from('profiles')
-        .update({ id_verified: true, id_verified_at: now })
-        .eq('email', email);
+        .from('user_verifications')
+        .upsert({ email, id_verified: true, id_verified_at: now, updated_at: now }, { onConflict: 'email' });
     }
 
     return NextResponse.json({ ok: true, decision });

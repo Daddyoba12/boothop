@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Package, Calendar, MapPin, FileText, AlertCircle, Plane, Globe, ShieldCheck } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
+import { checkCityCountry } from '@/lib/cityCountry';
 export default function CreateRequestPage() {
   const router   = useRouter();
   const supabase = createSupabaseClient();
 
   const [loading, setLoading]               = useState(false);
   const [error, setError]                   = useState<string | null>(null);
+  const [locationWarnings, setLocationWarnings] = useState<{ pickup?: string; delivery?: string }>({});
   const [customsAccepted,    setCustomsAccepted]    = useState(false);
   const [personalEffects,    setPersonalEffects]    = useState(false);
   const [underValueLimit,    setUnderValueLimit]    = useState(false);
@@ -54,6 +56,28 @@ export default function CreateRequestPage() {
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setFormData((p) => ({ ...p, [field]: e.target.value }));
+
+  function validatePickupCity() {
+    if (!checkCityCountry(formData.pickupCity, formData.pickupCountry)) {
+      setLocationWarnings(prev => ({
+        ...prev,
+        pickup: `"${formData.pickupCity}" doesn't appear to be in "${formData.pickupCountry}" — please double-check.`,
+      }));
+    } else {
+      setLocationWarnings(prev => ({ ...prev, pickup: undefined }));
+    }
+  }
+
+  function validateDeliveryCity() {
+    if (!checkCityCountry(formData.deliveryCity, formData.deliveryCountry)) {
+      setLocationWarnings(prev => ({
+        ...prev,
+        delivery: `"${formData.deliveryCity}" doesn't appear to be in "${formData.deliveryCountry}" — please double-check.`,
+      }));
+    } else {
+      setLocationWarnings(prev => ({ ...prev, delivery: undefined }));
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -258,24 +282,44 @@ export default function CreateRequestPage() {
             <div className="grid md:grid-cols-2 gap-5">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Pickup City *</label>
-                <input type="text" value={formData.pickupCity} onChange={set('pickupCity')} required
-                  placeholder="e.g. Lagos" className={inputCls} />
+                <input type="text" value={formData.pickupCity}
+                  onChange={(e) => { set('pickupCity')(e); setLocationWarnings(p => ({ ...p, pickup: undefined })); }}
+                  onBlur={validatePickupCity}
+                  required placeholder="e.g. Lagos" className={inputCls} />
+                {locationWarnings.pickup && (
+                  <p className="mt-1 text-xs text-amber-600 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3 flex-shrink-0" /> {locationWarnings.pickup}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Pickup Country *</label>
-                <select value={formData.pickupCountry} onChange={set('pickupCountry')} required className={inputCls}>
+                <select value={formData.pickupCountry}
+                  onChange={(e) => { set('pickupCountry')(e); setLocationWarnings(p => ({ ...p, pickup: undefined })); }}
+                  onBlur={validatePickupCity}
+                  required className={inputCls}>
                   <option value="">Select country…</option>
                   {countries.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Delivery City *</label>
-                <input type="text" value={formData.deliveryCity} onChange={set('deliveryCity')} required
-                  placeholder="e.g. London" className={inputCls} />
+                <input type="text" value={formData.deliveryCity}
+                  onChange={(e) => { set('deliveryCity')(e); setLocationWarnings(p => ({ ...p, delivery: undefined })); }}
+                  onBlur={validateDeliveryCity}
+                  required placeholder="e.g. London" className={inputCls} />
+                {locationWarnings.delivery && (
+                  <p className="mt-1 text-xs text-amber-600 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3 flex-shrink-0" /> {locationWarnings.delivery}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Delivery Country *</label>
-                <select value={formData.deliveryCountry} onChange={set('deliveryCountry')} required className={inputCls}>
+                <select value={formData.deliveryCountry}
+                  onChange={(e) => { set('deliveryCountry')(e); setLocationWarnings(p => ({ ...p, delivery: undefined })); }}
+                  onBlur={validateDeliveryCity}
+                  required className={inputCls}>
                   <option value="">Select country…</option>
                   {countries.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>

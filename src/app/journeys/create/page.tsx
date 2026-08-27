@@ -16,14 +16,16 @@ import {
   Shield,
 } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
+import { checkCityCountry } from '@/lib/cityCountry';
 import type { SafetyCheckResponse } from '@/app/api/ai/safety-check/route';
 
 export default function CreateJourneyPage() {
   const router = useRouter();
   const supabase = createSupabaseClient();
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [locationWarnings, setLocationWarnings] = useState<{ from?: string; to?: string }>({});
   const [formData, setFormData] = useState({
     fromCity: '',
     fromCountry: '',
@@ -35,6 +37,7 @@ export default function CreateJourneyPage() {
     availableSpaceKg: '',
     maxDimensions: '',
     pricePerDelivery: '',
+    notes: '',
     excludes: [] as string[],
     acceptsOnly: [] as string[],
   });
@@ -125,6 +128,28 @@ export default function CreateJourneyPage() {
     debounceRef.current = setTimeout(() => runAiCheck(item, from, to), 800);
   }, [runAiCheck]);
 
+  function validateFromCity() {
+    if (!checkCityCountry(formData.fromCity, formData.fromCountry)) {
+      setLocationWarnings(prev => ({
+        ...prev,
+        from: `"${formData.fromCity}" doesn't appear to be in "${formData.fromCountry}" — please double-check.`,
+      }));
+    } else {
+      setLocationWarnings(prev => ({ ...prev, from: undefined }));
+    }
+  }
+
+  function validateToCity() {
+    if (!checkCityCountry(formData.toCity, formData.toCountry)) {
+      setLocationWarnings(prev => ({
+        ...prev,
+        to: `"${formData.toCity}" doesn't appear to be in "${formData.toCountry}" — please double-check.`,
+      }));
+    } else {
+      setLocationWarnings(prev => ({ ...prev, to: undefined }));
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -132,7 +157,7 @@ export default function CreateJourneyPage() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         router.push('/login');
         return;
@@ -141,6 +166,10 @@ export default function CreateJourneyPage() {
       // Validation
       if (!formData.fromCity || !formData.fromCountry || !formData.toCity || !formData.toCountry) {
         throw new Error('Please fill in all location fields');
+      }
+
+      if (!formData.notes.trim()) {
+        throw new Error('Please add a description — tell senders what items you are willing to carry.');
       }
 
       if (!formData.departureDate || !formData.arrivalDate) {
@@ -175,6 +204,7 @@ export default function CreateJourneyPage() {
           price_per_delivery: formData.pricePerDelivery ? Number(formData.pricePerDelivery) : null,
           excludes: formData.excludes.length > 0 ? formData.excludes : null,
           accepts_only: formData.acceptsOnly.length > 0 ? formData.acceptsOnly : null,
+          notes: formData.notes.trim() || null,
           status: 'active',
         })
         .select()
@@ -247,11 +277,17 @@ export default function CreateJourneyPage() {
                   <input
                     type="text"
                     value={formData.fromCity}
-                    onChange={(e) => setFormData({ ...formData, fromCity: e.target.value })}
+                    onChange={(e) => { setFormData({ ...formData, fromCity: e.target.value }); setLocationWarnings(p => ({ ...p, from: undefined })); }}
+                    onBlur={validateFromCity}
                     placeholder="e.g., London"
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   />
+                  {locationWarnings.from && (
+                    <p className="mt-1 text-xs text-amber-600 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3 flex-shrink-0" /> {locationWarnings.from}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -260,7 +296,8 @@ export default function CreateJourneyPage() {
                   </label>
                   <select
                     value={formData.fromCountry}
-                    onChange={(e) => setFormData({ ...formData, fromCountry: e.target.value })}
+                    onChange={(e) => { setFormData({ ...formData, fromCountry: e.target.value }); setLocationWarnings(p => ({ ...p, from: undefined })); }}
+                    onBlur={validateFromCity}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   >
@@ -279,11 +316,17 @@ export default function CreateJourneyPage() {
                   <input
                     type="text"
                     value={formData.toCity}
-                    onChange={(e) => setFormData({ ...formData, toCity: e.target.value })}
+                    onChange={(e) => { setFormData({ ...formData, toCity: e.target.value }); setLocationWarnings(p => ({ ...p, to: undefined })); }}
+                    onBlur={validateToCity}
                     placeholder="e.g., Paris"
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   />
+                  {locationWarnings.to && (
+                    <p className="mt-1 text-xs text-amber-600 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3 flex-shrink-0" /> {locationWarnings.to}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -292,7 +335,8 @@ export default function CreateJourneyPage() {
                   </label>
                   <select
                     value={formData.toCountry}
-                    onChange={(e) => setFormData({ ...formData, toCountry: e.target.value })}
+                    onChange={(e) => { setFormData({ ...formData, toCountry: e.target.value }); setLocationWarnings(p => ({ ...p, to: undefined })); }}
+                    onBlur={validateToCity}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   >
@@ -525,6 +569,28 @@ export default function CreateJourneyPage() {
                 <p className="text-xs text-gray-500 mt-1">
                   Leave blank to negotiate with Hoopers. You'll receive 95% after 5% service fee.
                 </p>
+              </div>
+            </div>
+
+            {/* Description Section */}
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Package className="h-6 w-6 text-blue-600" />
+                Description *
+              </h2>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  What are you willing to carry? *
+                </label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  placeholder="Tell senders what items you'll carry, any restrictions, packaging requirements, etc."
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">Required — senders need this to decide if you're a good match.</p>
               </div>
             </div>
 

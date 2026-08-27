@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     // ── Confirm the user belongs to this match ───────────────────────────────
     const { data: match, error: matchErr } = await supabase
       .from('matches')
-      .select('id, booter_email, hooper_email, status')
+      .select('id, sender_email, traveler_email, status')
       .eq('id', matchId)
       .maybeSingle();
 
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Match not found.' }, { status: 404 });
     }
 
-    if (match.booter_email !== email && match.hooper_email !== email) {
+    if (match.sender_email !== email && match.traveler_email !== email) {
       return NextResponse.json({ error: 'You are not part of this match.' }, { status: 403 });
     }
 
@@ -81,23 +81,23 @@ export async function POST(request: Request) {
     }
 
     // ── Determine which side of the match this user is ──────────────────────
-    const isBooter   = match.booter_email === email;
+    const isSender   = match.sender_email === email;
     const expiresAt  = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // +30 days
 
-    const updatePayload = isBooter
+    const updatePayload = isSender
       ? {
-          booter_video_kyc_path:       videoPath,
-          booter_photo_kyc_path:       photoPath,
-          booter_video_kyc_status:     'pending_review',
-          booter_video_kyc_expires_at: expiresAt,
-          booter_video_kyc_submitted:  timestamp,
+          sender_video_kyc_path:       videoPath,
+          sender_photo_kyc_path:       photoPath,
+          sender_video_kyc_status:     'pending_review',
+          sender_video_kyc_expires_at: expiresAt,
+          sender_video_kyc_submitted:  timestamp,
         }
       : {
-          hooper_video_kyc_path:       videoPath,
-          hooper_photo_kyc_path:       photoPath,
-          hooper_video_kyc_status:     'pending_review',
-          hooper_video_kyc_expires_at: expiresAt,
-          hooper_video_kyc_submitted:  timestamp,
+          traveler_video_kyc_path:       videoPath,
+          traveler_photo_kyc_path:       photoPath,
+          traveler_video_kyc_status:     'pending_review',
+          traveler_video_kyc_expires_at: expiresAt,
+          traveler_video_kyc_submitted:  timestamp,
         };
 
     const { error: updateErr } = await supabase
