@@ -699,6 +699,9 @@ export default function CommanderNewClient({
         const r = await api('GET', '/api/commander/onboard');
         const p = r.profile;
         if (p) fillProfile(p);
+        // Don't override tab if tour mode already set it
+        const sp2 = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+        if (sp2?.get('tour')) return;
         // Super-admin managing another client always lands on Pipeline
         if (isSuper && targetSlug && targetSlug !== companySlug) {
           switchTab('pipeline');
@@ -706,7 +709,8 @@ export default function CommanderNewClient({
           switchTab(p?.business_name ? 'pipeline' : 'onboard');
         }
       } catch {
-        switchTab(isSuper && targetSlug && targetSlug !== companySlug ? 'pipeline' : 'onboard');
+        const sp2 = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+        if (!sp2?.get('tour')) switchTab(isSuper && targetSlug && targetSlug !== companySlug ? 'pipeline' : 'onboard');
       }
     })();
     return () => { stopPoll(); if (bakeInterval.current) clearInterval(bakeInterval.current); };
