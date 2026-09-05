@@ -115,6 +115,25 @@ main{max-width:1200px;margin:0 auto;padding:32px 24px}
 .bake-done{background:rgba(22,163,74,0.12);color:#4ade80}
 .bake-pending,.bake-running{background:rgba(245,158,11,0.12);color:#fbbf24}
 .bake-failed{background:rgba(220,38,38,0.12);color:#fca5a5}
+.rv-textarea{width:100%;background:#0a0a14;border:1px solid #222232;border-radius:9px;color:#e4e4e8;padding:10px 14px;font-size:0.875rem;resize:vertical;min-height:110px;outline:none;font-family:inherit;line-height:1.5}
+.rv-textarea:focus{border-color:#ff6a00}
+.tour-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;background:#0f0f1c;border:1px solid #ff6a00;border-radius:18px;padding:18px 24px;box-shadow:0 8px 40px rgba(0,0,0,0.7);max-width:480px;width:calc(100vw - 32px);display:flex;flex-direction:column;gap:10px}
+.tour-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tour-badge{font-size:0.62rem;font-weight:700;color:#ff6a00;text-transform:uppercase;letter-spacing:1px;background:rgba(255,106,0,0.12);padding:3px 10px;border-radius:10px;border:1px solid rgba(255,106,0,0.25);white-space:nowrap}
+.tour-title{font-size:0.95rem;font-weight:700;color:#fff;flex:1}
+.tour-close{background:none;border:none;color:#555;font-size:1rem;cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1}
+.tour-close:hover{color:#e4e4e8}
+.tour-body{font-size:0.85rem;color:#a0a0c0;line-height:1.6}
+.tour-footer{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tour-dots{display:flex;gap:5px}
+.tour-dot{width:6px;height:6px;border-radius:50%;background:#1e1e30;transition:background 0.2s}
+.tour-dot.on{background:#ff6a00}
+.tour-btns{display:flex;gap:8px}
+.tour-btn{padding:7px 18px;border-radius:9px;font-size:0.8rem;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
+.tour-btn-prev{background:#141422;color:#888;border:1px solid #252535}
+.tour-btn-prev:hover{color:#e4e4e8}
+.tour-btn-next{background:#ff6a00;color:#fff}
+.tour-btn-next:hover{background:#e55a00}
 .clients-tbl{width:100%;border-collapse:collapse;font-size:0.875rem}
 .clients-tbl th{text-align:left;color:#777;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;border-bottom:1px solid #1a1a28;font-weight:600}
 .clients-tbl td{padding:13px 12px;border-bottom:1px solid #0f0f1a;vertical-align:middle}
@@ -167,6 +186,28 @@ function vidUrl(path: string): string {
   return '';
 }
 
+const CLIENT_TOUR = [
+  { tab: 'pipeline', title: 'Welcome to your Command Center', body: 'This is where your AI-generated video pipeline lives. Every day the pipeline produces fresh content — approved, edited, and ready to post.' },
+  { tab: 'pipeline', title: 'Your 4 Pipeline Slots', body: 'Each card is a complete video ready for review. The pipeline fills all 4 slots automatically with your brand\'s content, captions, and hook.' },
+  { tab: 'pipeline', title: 'Approve & Post', body: 'Hit "All" to approve and post everything at once, or click the individual platform buttons (TikTok, Instagram, YouTube) to post selectively.' },
+  { tab: 'pipeline', title: 'Edit Your Content', body: 'Click the pencil icon on any slot to open the Edit panel. Refine your hook, problem, stakes, resolution, lesson, or captions before posting.' },
+  { tab: 'revoice',  title: 'Revoice Studio', body: 'Want to swap the voiceover? Go to Revoice Studio. Load any pipeline slot, edit the script, and record or generate an AI voiceover.' },
+  { tab: 'revoice',  title: 'Load a Slot', body: 'Switch to the Pipeline tab and click the microphone icon on any slot card to load it into Revoice Studio with the script auto-filled.' },
+  { tab: 'revoice',  title: 'Edit Your Script', body: 'The script is fully editable — change any line, tighten the hook, or rewrite it entirely. Then generate a fresh AI voiceover in one click.' },
+  { tab: 'revoice',  title: 'Generate AI Voiceover', body: 'Click "Generate AI Voiceover" to convert your script into a natural-sounding voice. Preview it with the audio player, then hit Bake.' },
+  { tab: 'revoice',  title: 'Bake Your Video', body: 'Baking merges your video + new voiceover + background music into a polished final file. Download it directly from the Bake History below.' },
+  { tab: 'onboard',  title: 'Business Profile', body: 'Update your business profile, contact info, platform handles, and brand keywords here. The pipeline uses these details to generate content in your voice.' },
+];
+
+const ADMIN_TOUR = [
+  { tab: 'clients',  title: 'Superadmin Command Center', body: 'You have full visibility across all pipeline clients. Switch between clients, manage their content, and monitor their pipeline from here.' },
+  { tab: 'clients',  title: 'All Clients', body: 'The All Clients tab lists every account. Click "View Pipeline" to jump into any client\'s pipeline and manage it as if you were them.' },
+  { tab: 'pipeline', title: 'Client Pipeline View', body: 'When viewing a client\'s pipeline as superadmin, you see their exact slot cards, pending approvals, and hook text — manage it on their behalf.' },
+  { tab: 'pipeline', title: 'Approve for Clients', body: 'You can approve, skip, re-generate, or edit any client\'s content. Changes sync immediately to their account.' },
+  { tab: 'revoice',  title: 'Revoice for Any Client', body: 'Open Revoice Studio to re-voice a client\'s video with a new script and AI voiceover. The baked file is stored against their account.' },
+  { tab: 'onboard',  title: 'Onboard New Clients', body: 'The Onboard tab lets you set up a new client\'s profile — business name, platforms, brand voice, content fields — everything the pipeline needs to start generating.' },
+];
+
 export default function CommanderNewClient({
   companyName, isSuper, companySlug, targetSlug,
 }: { companyName: string; isSuper: boolean; companySlug: string; targetSlug?: string }) {
@@ -207,7 +248,10 @@ export default function CommanderNewClient({
   const [ncPlan,          setNcPlan]          = useState('basic');
   const [revoiceScript,   setRevoiceScript]   = useState('');
   const [revoiceSlotNum,  setRevoiceSlotNum]  = useState<number | null>(null);
+  const [ttsLoading,      setTtsLoading]      = useState(false);
   const [postHistory,     setPostHistory]     = useState<any[]>([]);
+  const [tourMode,        setTourMode]        = useState<'client' | 'admin' | null>(null);
+  const [tourStep,        setTourStep]        = useState(0);
 
   const pollRef      = useRef<ReturnType<typeof setInterval> | null>(null);
   const toastTimer   = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -584,6 +628,28 @@ export default function CommanderNewClient({
     } catch (e: any) { setYtStatus(`❌ ${(e as any).message}`); }
   }
 
+  async function generateTTS() {
+    const text = revoiceScript.trim();
+    if (!text) { showToast('Write a script first', 'err'); return; }
+    setTtsLoading(true);
+    try {
+      const fd = new FormData();
+      fd.append('text', text);
+      fd.append('voice', 'nova');
+      if (targetSlug) fd.append('forClient', targetSlug);
+      const r = await fetch('/api/commander/revoice/tts', { method: 'POST', body: fd });
+      if (!r.ok) throw new Error(await r.text());
+      const blob = await r.blob();
+      voiceBlobRef.current = blob;
+      voiceFileRef.current = null;
+      const url = URL.createObjectURL(blob);
+      setVoicePlayUrl(url);
+      setVoiceReady('✅ AI voiceover generated from script');
+      showToast('Voiceover ready — click Bake Video below');
+    } catch (e: any) { showToast('TTS failed: ' + e.message, 'err'); }
+    finally { setTtsLoading(false); }
+  }
+
   // ── Clients ──────────────────────────────────────────────────────────────────
 
   async function loadClients() {
@@ -613,6 +679,21 @@ export default function CommanderNewClient({
   // ── Init ─────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
+    // Detect tour mode from URL param and switch to first step's tab
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      const t = sp.get('tour');
+      if (t === 'client') {
+        setTourMode('client'); setTourStep(0);
+        const first = CLIENT_TOUR[0];
+        if (first?.tab) switchTab(first.tab);
+      } else if (t === 'admin') {
+        setTourMode('admin'); setTourStep(0);
+        const first = ADMIN_TOUR[0];
+        if (first?.tab) switchTab(first.tab);
+      }
+    }
+
     (async () => {
       try {
         const r = await api('GET', '/api/commander/onboard');
@@ -900,6 +981,28 @@ export default function CommanderNewClient({
 
             <div>
               <div className="rv-card">
+                <h3>Script {revoiceSlotNum ? `— Slot ${revoiceSlotNum}` : ''}</h3>
+                <textarea
+                  className="rv-textarea"
+                  value={revoiceScript}
+                  onChange={e => setRevoiceScript(e.target.value)}
+                  placeholder="Load a slot from Pipeline tab to auto-fill, or type your script here…"
+                  rows={5}
+                />
+                <button
+                  className="btn btn-secondary"
+                  style={{ width: '100%', marginTop: '10px' }}
+                  onClick={generateTTS}
+                  disabled={ttsLoading || !revoiceScript.trim()}
+                >
+                  {ttsLoading ? '⏳ Generating voiceover…' : '🎙 Generate AI Voiceover'}
+                </button>
+                <p className="txt-xs txt-muted" style={{ marginTop: '6px' }}>
+                  AI voice from your script text — fills the Voice section. Or record / upload manually.
+                </p>
+              </div>
+
+              <div className="rv-card mt12">
                 <h3>4 — Bake</h3>
                 <p className="txt-sm txt-muted" style={{ marginBottom: '16px' }}>Merges video + voice + music into one file.</p>
                 <button className="bake-btn" onClick={startBake}>🎬 Bake Video</button>
@@ -911,13 +1014,6 @@ export default function CommanderNewClient({
                   </div>
                 )}
               </div>
-
-              {revoiceScript && (
-                <div className="rv-card mt12">
-                  <h3>Script {revoiceSlotNum ? `— Slot ${revoiceSlotNum}` : ''}</h3>
-                  <p style={{ fontSize: '0.85rem', color: '#aaa', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{revoiceScript}</p>
-                </div>
-              )}
 
               <div className="rv-card mt12">
                 <h3>Bake History</h3>
@@ -1018,6 +1114,44 @@ export default function CommanderNewClient({
 
       {/* TOAST */}
       <div className={`toast${toast.show ? ' show' : ''} ${toast.type}`}>{toast.msg}</div>
+
+      {/* TOUR OVERLAY */}
+      {tourMode && (() => {
+        const steps = tourMode === 'admin' ? ADMIN_TOUR : CLIENT_TOUR;
+        const step  = steps[tourStep] ?? steps[0];
+        const isLast = tourStep >= steps.length - 1;
+
+        function advanceTour(delta: number) {
+          const next = tourStep + delta;
+          if (next < 0) return;
+          if (next >= steps.length) { setTourMode(null); return; }
+          const nextStep = steps[next];
+          if (nextStep.tab && nextStep.tab !== activeTab) switchTab(nextStep.tab);
+          setTourStep(next);
+        }
+
+        return (
+          <div className="tour-bar">
+            <div className="tour-header">
+              <span className="tour-badge">{tourMode === 'admin' ? 'Superadmin Demo' : 'Client Demo'} · {tourStep + 1}/{steps.length}</span>
+              <span className="tour-title">{step.title}</span>
+              <button className="tour-close" onClick={() => setTourMode(null)}>✕</button>
+            </div>
+            <p className="tour-body">{step.body}</p>
+            <div className="tour-footer">
+              <div className="tour-dots">
+                {steps.map((_, i) => <span key={i} className={`tour-dot${i === tourStep ? ' on' : ''}`} />)}
+              </div>
+              <div className="tour-btns">
+                {tourStep > 0 && <button className="tour-btn tour-btn-prev" onClick={() => advanceTour(-1)}>← Back</button>}
+                <button className="tour-btn tour-btn-next" onClick={() => advanceTour(1)}>
+                  {isLast ? 'Finish Tour' : 'Next →'}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </>
   );
 }

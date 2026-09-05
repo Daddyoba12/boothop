@@ -67,3 +67,5 @@ ffmpeg2pass-*
 !public/videos/**/*.mp4
 !public/videos/**/*.mov
 !public/videos/**/*.webm
+!public/demos/*.mp4
+!public/demos/*.webm
