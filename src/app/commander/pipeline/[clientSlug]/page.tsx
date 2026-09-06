@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect, notFound } from 'next/navigation';
 import { getCommanderSession } from '@/lib/auth/commander';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import CommanderNewClient from '@/app/commanderNew/CommanderNewClient';
+import CommanderNewClient from '@/app/commander/dashboard/CommanderNewClient';
 
 export const dynamic = 'force-dynamic';
 

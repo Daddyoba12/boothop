@@ -3,166 +3,239 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const CSS = `
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0d0d18;color:#e4e4e8;font-family:system-ui,-apple-system,sans-serif;font-size:15px;min-height:100vh}
-nav{display:flex;align-items:center;padding:0 24px;height:58px;background:#0f0f1c;border-bottom:1px solid #1a1a28;gap:8px;position:sticky;top:0;z-index:100;flex-wrap:wrap}
-.nav-brand{font-size:1.05rem;font-weight:800;white-space:nowrap;letter-spacing:-0.3px}
-.nav-brand span{color:#ff6a00}
-.nav-tabs{display:flex;gap:2px;flex:1;margin:0 16px;overflow-x:auto}
-.tab-btn{background:none;border:none;color:#888;padding:7px 16px;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:500;white-space:nowrap;transition:all 0.15s}
-.tab-btn:hover{color:#e4e4e8;background:#1a1a2a}
-.tab-btn.active{color:#ff6a00;background:#1a1a2a}
-.nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
-.company-pill{background:#1a1a2a;border:1px solid #252535;border-radius:20px;padding:4px 14px;font-size:0.78rem;color:#888;white-space:nowrap}
-.logout-btn{color:#555;font-size:0.8rem;text-decoration:none;padding:6px 12px;border-radius:7px;border:1px solid #252535;white-space:nowrap;transition:all 0.15s}
-.logout-btn:hover{color:#e4e4e8;border-color:#444}
-main{max-width:1200px;margin:0 auto;padding:32px 24px}
+html,body{height:100%}
+body{background:#f3f4f8;color:#1e1e2e;font-family:-apple-system,BlinkMacSystemFont,'Inter',system-ui,sans-serif;font-size:15px}
+.app-layout{display:flex;height:100vh;overflow:hidden}
+/* ── Sidebar ── */
+.sidebar{width:220px;flex-shrink:0;background:#111827;display:flex;flex-direction:column;overflow-y:auto;position:sticky;top:0;height:100vh}
+.sidebar-brand{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo{font-size:1.05rem;font-weight:800;color:#fff;letter-spacing:-0.3px}
+.sidebar-logo span{color:#ff6a00}
+.sidebar-tagline{font-size:0.6rem;color:#4b5563;margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px}
+.sidebar-nav{flex:1;padding:14px 10px}
+.sidebar-section{font-size:0.58rem;color:#374151;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;padding:0 10px;margin-bottom:6px;margin-top:18px}
+.sidebar-section:first-child{margin-top:0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:0.83rem;font-weight:500;color:#9ca3af;border:none;background:none;width:100%;text-align:left;transition:all 0.15s;text-decoration:none}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#e5e7eb}
+.nav-item.active{background:rgba(255,106,0,0.15);color:#ff8533;font-weight:600}
+.nav-item-icon{width:17px;height:17px;flex-shrink:0;opacity:0.7}
+.nav-item.active .nav-item-icon{opacity:1}
+.sidebar-footer{padding:14px 10px;border-top:1px solid rgba(255,255,255,0.07)}
+.sidebar-client{padding:10px 12px;background:rgba(255,255,255,0.05);border-radius:8px;margin-bottom:8px}
+.sidebar-client-name{font-size:0.78rem;font-weight:600;color:#e5e7eb;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sidebar-client-role{font-size:0.62rem;color:#4b5563;font-weight:500}
+.sidebar-logout{display:flex;align-items:center;gap:8px;color:#6b7280;font-size:0.8rem;cursor:pointer;padding:7px 10px;border-radius:7px;text-decoration:none;transition:color 0.15s;border:none;background:none;width:100%}
+.sidebar-logout:hover{color:#e5e7eb;background:rgba(255,255,255,0.05)}
+/* ── Main ── */
+.main-content{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{display:flex;align-items:center;padding:0 24px;height:54px;background:#fff;border-bottom:1px solid #e5e7eb;gap:14px;flex-shrink:0;box-shadow:0 1px 2px rgba(0,0,0,0.04)}
+.topbar-title{font-size:0.95rem;font-weight:700;color:#111827;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-badge{font-size:0.68rem;font-weight:600;padding:3px 10px;border-radius:20px;background:#fff7ed;color:#ff6a00;border:1px solid rgba(255,106,0,0.2)}
+.page-body{flex:1;overflow-y:auto;padding:24px}
 .tab-pane{display:none}
 .tab-pane.active{display:block}
-.section-title{font-size:1rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:12px}
-.section-title small{color:#888;font-size:0.78rem;font-weight:400}
+/* ── Section titles ── */
+.section-title{font-size:0.75rem;font-weight:700;color:#6b7280;margin-bottom:16px;display:flex;align-items:center;gap:10px;text-transform:uppercase;letter-spacing:0.8px}
+.section-title small{color:#9ca3af;font-size:0.75rem;font-weight:400;text-transform:none;letter-spacing:0}
+/* ── Summary ── */
+.summary-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+.summary-card{background:#fff;border-radius:10px;border:1px solid #e5e7eb;padding:14px 16px;box-shadow:0 1px 2px rgba(0,0,0,0.05)}
+.summary-label{font-size:0.65rem;color:#9ca3af;text-transform:uppercase;letter-spacing:0.7px;font-weight:600;margin-bottom:5px}
+.summary-val{font-size:1.6rem;font-weight:800;color:#111827;line-height:1}
+.summary-sub{font-size:0.68rem;color:#9ca3af;margin-top:4px}
+.summary-ok .summary-val{color:#16a34a}
+.summary-warn .summary-val{color:#d97706}
+.summary-orange .summary-val{color:#ff6a00}
+/* ── Status pills ── */
+.status-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:0.72rem;font-weight:500}
+.pill-ok{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.pill-warn{background:#fffbeb;color:#d97706;border:1px solid #fde68a}
+.pill-info{background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe}
+.pill-cloud{background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd}
+/* ── Slot grid ── */
+.slots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:24px}
+.slot-card{background:#fff;border-radius:14px;border:1px solid #e5e7eb;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.07);transition:all 0.2s}
+.slot-card:hover{box-shadow:0 4px 14px rgba(0,0,0,0.1);border-color:#d1d5db;transform:translateY(-1px)}
+.slot-card.pending{border-color:#ff6a00;box-shadow:0 0 0 2px rgba(255,106,0,0.1)}
+.slot-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #f3f4f8;background:#fafafa}
+.slot-title{font-weight:700;font-size:0.85rem;color:#111827}
+.slot-time{font-size:0.66rem;color:#9ca3af;margin-top:1px}
+.slot-badge{font-size:0.62rem;padding:3px 9px;border-radius:10px;font-weight:700;background:#fff7ed;color:#ff6a00;border:1px solid rgba(255,106,0,0.3);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+.slot-video{width:100%;aspect-ratio:9/16;background:#f3f4f8;position:relative;overflow:hidden}
+.slot-video video{width:100%;height:100%;object-fit:cover;display:block}
+.no-video{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:10px;background:linear-gradient(160deg,#f9fafb 0%,#f1f2f6 100%)}
+.no-video-icon{width:48px;height:48px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center}
+.no-video-text{font-size:0.78rem;color:#9ca3af;font-weight:500}
+.slot-body{padding:12px 14px}
+.slot-hook{font-size:0.82rem;color:#374151;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;font-weight:500}
+.slot-caption{font-size:0.7rem;color:#9ca3af;margin-bottom:6px;line-height:1.4}
+.slot-caption strong{color:#6b7280}
+.slot-ts{font-size:0.63rem;color:#d1d5db;margin-bottom:10px}
+.slot-actions{display:flex;gap:4px;margin-bottom:8px}
+.slot-actions .btn{flex:1;min-width:0;font-size:0.72rem;padding:7px 4px}
+.platform-btns{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px}
+.plat-btn{flex:1;min-width:28px;padding:5px 3px;font-size:0.6rem;font-weight:700;border-radius:5px;border:1px solid #e5e7eb;background:#f9fafb;color:#9ca3af;cursor:pointer;transition:all 0.15s;text-align:center;white-space:nowrap}
+.plat-btn:hover{border-color:#ff6a00;color:#ff6a00;background:#fff7ed}
+.plat-btn-tg{border-color:#bfdbfe;color:#3b82f6;background:#eff6ff}
+.plat-btn-tg:hover{border-color:#3b82f6;background:#dbeafe}
+.plat-btn-wa{border-color:#bbf7d0;color:#16a34a;background:#f0fdf4}
+.plat-btn-wa:hover{border-color:#16a34a;background:#dcfce7}
+.plat-btn:disabled{opacity:0.4;cursor:default}
+.v2-toggle{background:#f9fafb;border:1px solid #e5e7eb;border-radius:5px;color:#6b7280;font-size:0.68rem;padding:3px 8px;cursor:pointer;margin-bottom:8px;transition:all 0.15s}
+.v2-toggle:hover{border-color:#ff6a00;color:#ff6a00}
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border:none;border-radius:8px;font-size:0.83rem;font-weight:600;cursor:pointer;transition:all 0.15s;text-decoration:none;white-space:nowrap}
+.btn-primary{background:#ff6a00;color:#fff;box-shadow:0 2px 6px rgba(255,106,0,0.3)}
+.btn-primary:hover{background:#e55a00}
+.btn-secondary{background:#f9fafb;color:#374151;border:1px solid #e5e7eb}
+.btn-secondary:hover{background:#f3f4f8;border-color:#d1d5db}
+.btn-success{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.btn-success:hover{background:#dcfce7}
+.btn-danger{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.btn-danger:hover{background:#fee2e2}
+.btn-skip{background:#f9fafb;color:#9ca3af;border:1px solid #e5e7eb}
+.btn-skip:hover{background:#f3f4f8}
+.btn-sm{padding:5px 12px;font-size:0.75rem}
+/* ── Forms ── */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .form-group{display:flex;flex-direction:column;gap:6px}
 .form-group.full{grid-column:1/-1}
-.form-group label{font-size:0.72rem;color:#8a8aaa;font-weight:600;letter-spacing:0.5px;text-transform:uppercase}
-.form-group input,.form-group textarea,.form-group select{background:#0d0d1a;border:1px solid #222232;border-radius:9px;color:#e4e4e8;padding:10px 14px;font-size:0.9rem;outline:none;transition:border 0.2s;font-family:inherit}
-.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:#ff6a00}
+.form-group label{font-size:0.72rem;color:#6b7280;font-weight:600;letter-spacing:0.3px}
+.form-group input,.form-group textarea,.form-group select{background:#fff;border:1px solid #e5e7eb;border-radius:8px;color:#111827;padding:10px 14px;font-size:0.9rem;outline:none;transition:border 0.2s;font-family:inherit;box-shadow:0 1px 2px rgba(0,0,0,0.04)}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:#ff6a00;box-shadow:0 0 0 3px rgba(255,106,0,0.08)}
 .form-group textarea{resize:vertical;min-height:80px}
 .platform-row{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0}
-.plat-label{display:flex;align-items:center;gap:7px;background:#0d0d1a;border:1px solid #222232;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:0.85rem;transition:all 0.15s;user-select:none}
-.plat-label:hover{border-color:#444}
-.plat-label.checked{border-color:#ff6a00;background:rgba(255,106,0,0.07);color:#ff9a50}
+.plat-label{display:flex;align-items:center;gap:7px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:0.85rem;transition:all 0.15s;user-select:none;color:#374151}
+.plat-label:hover{border-color:#ff6a00;color:#ff6a00}
+.plat-label.checked{border-color:#ff6a00;background:#fff7ed;color:#ff6a00}
 .plat-label input{accent-color:#ff6a00;cursor:pointer}
-.custom-block{background:#0d0d1a;border:1px solid #1e1e30;border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.custom-block{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;margin-bottom:10px}
 .custom-row{display:grid;grid-template-columns:180px 1fr;gap:12px;align-items:start}
 .custom-row input{padding:8px 12px;font-size:0.85rem}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border:none;border-radius:9px;font-size:0.875rem;font-weight:600;cursor:pointer;transition:all 0.15s;text-decoration:none}
-.btn-primary{background:#ff6a00;color:#fff}
-.btn-primary:hover{background:#e55a00}
-.btn-secondary{background:#141422;color:#e4e4e8;border:1px solid #252535}
-.btn-secondary:hover{background:#1e1e30}
-.btn-success{background:rgba(22,163,74,0.2);color:#4ade80;border:1px solid rgba(74,222,128,0.25)}
-.btn-success:hover{background:rgba(22,163,74,0.3)}
-.btn-danger{background:rgba(220,38,38,0.15);color:#fca5a5;border:1px solid rgba(252,165,165,0.2)}
-.btn-danger:hover{background:rgba(220,38,38,0.25)}
-.btn-skip{background:rgba(100,100,100,0.15);color:#aaa;border:1px solid rgba(150,150,150,0.2)}
-.btn-skip:hover{background:rgba(100,100,100,0.25)}
-.btn-sm{padding:6px 14px;font-size:0.78rem}
-.status-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;padding:13px 18px;background:#0d0d1a;border:1px solid #1a1a28;border-radius:12px;align-items:center}
-.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:500}
-.pill-ok{background:rgba(22,163,74,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.18)}
-.pill-warn{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.18)}
-.pill-info{background:rgba(99,102,241,0.12);color:#a5b4fc;border:1px solid rgba(165,180,252,0.18)}
-.pill-cloud{background:rgba(14,165,233,0.12);color:#38bdf8;border:1px solid rgba(56,189,248,0.18)}
-.slots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
-.slot-card{background:#0f0f1c;border:1px solid #1a1a28;border-radius:16px;overflow:hidden;transition:border 0.2s}
-.slot-card.pending{border-color:rgba(255,106,0,0.5)}
-.slot-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #1a1a28}
-.slot-title{font-weight:700;font-size:0.875rem}
-.slot-time{font-size:0.72rem;color:#555;margin-top:2px}
-.slot-badge{font-size:0.68rem;padding:3px 10px;border-radius:10px;font-weight:700;background:rgba(255,106,0,0.15);color:#ff6a00;border:1px solid rgba(255,106,0,0.25);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
-.slot-video{width:100%;aspect-ratio:9/16;background:#080810;position:relative}
-.slot-video video{width:100%;height:100%;object-fit:cover;display:block}
-.no-video{display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:0.82rem;flex-direction:column;gap:6px}
-.slot-body{padding:12px 16px}
-.slot-hook{font-size:0.78rem;color:#bbb;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5}
-.slot-caption{font-size:0.72rem;color:#888;margin-bottom:8px;line-height:1.4}
-.slot-caption strong{color:#aaa}
-.slot-ts{font-size:0.68rem;color:#666;margin-bottom:10px}
-.slot-actions{display:flex;gap:5px;flex-wrap:wrap}
-.slot-actions .btn{flex:1;min-width:0;font-size:0.75rem;padding:7px 6px}
-.platform-btns{display:flex;gap:4px;margin-top:6px}
-.plat-btn{flex:1;padding:4px 2px;font-size:0.65rem;font-weight:700;border-radius:6px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:#666;cursor:pointer;transition:all 0.15s;text-align:center;white-space:nowrap}
-.plat-btn:hover{border-color:#ff6a00;color:#ff9a50;background:rgba(255,106,0,0.08)}
-.v2-toggle{background:none;border:1px solid #1e1e30;border-radius:6px;color:#555;font-size:0.7rem;padding:3px 8px;cursor:pointer;margin-bottom:8px;transition:all 0.15s}
-.v2-toggle:hover{border-color:#444;color:#aaa}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:200;display:none}
+/* ── Edit panel ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;display:none}
 .overlay.open{display:block}
-.edit-panel{position:fixed;right:0;top:0;bottom:0;width:420px;max-width:100vw;background:#0f0f1c;border-left:1px solid #1e1e30;z-index:201;overflow-y:auto;padding:24px;display:none;flex-direction:column;gap:0}
+.edit-panel{position:fixed;right:0;top:0;bottom:0;width:440px;max-width:100vw;background:#fff;border-left:1px solid #e5e7eb;z-index:201;overflow-y:auto;padding:24px;display:none;flex-direction:column;gap:0;box-shadow:-8px 0 24px rgba(0,0,0,0.1)}
 .edit-panel.open{display:flex}
 .edit-ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.edit-ph h3{font-weight:700}
+.edit-ph h3{font-weight:700;color:#111827;font-size:1rem}
 .ef{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
-.ef label{font-size:0.7rem;color:#888;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
-.ef textarea{background:#0a0a14;border:1px solid #222232;border-radius:8px;color:#e4e4e8;padding:9px 12px;font-size:0.875rem;resize:vertical;outline:none;font-family:inherit;line-height:1.5}
-.ef textarea:focus{border-color:#ff6a00}
-.revoice-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
-.rv-card{background:#111120;border:1px solid #1e1e30;border-radius:16px;padding:22px}
-.rv-card h3{font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:16px}
-.drop-zone{border:2px dashed #2a2a40;border-radius:12px;padding:36px 20px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:14px}
-.drop-zone:hover,.drop-zone.dragover{border-color:#ff6a00;background:rgba(255,106,0,0.06)}
-.drop-zone p{color:#888;font-size:0.83rem;line-height:1.6}
-.drop-zone strong{color:#bbb}
-.video-preview{width:100%;border-radius:8px;max-height:280px;margin-bottom:12px;display:none}
-.vid-name{font-size:0.78rem;color:#555;margin-bottom:8px;display:none}
-.record-btn{width:100%;padding:13px;background:#141422;border:2px solid #1e1e30;border-radius:12px;color:#e4e4e8;font-size:0.875rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}
-.record-btn:hover{border-color:#ff6a00}
-.record-btn.recording{background:rgba(220,38,38,0.1);border-color:#dc2626;color:#fca5a5}
+.ef label{font-size:0.7rem;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.ef textarea{background:#fff;border:1px solid #e5e7eb;border-radius:8px;color:#111827;padding:9px 12px;font-size:0.875rem;resize:vertical;outline:none;font-family:inherit;line-height:1.5}
+.ef textarea:focus{border-color:#ff6a00;box-shadow:0 0 0 3px rgba(255,106,0,0.08)}
+/* ── Revoice ── */
+.revoice-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.rv-card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.rv-card h3{font-size:0.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px}
+.drop-zone{border:2px dashed #e5e7eb;border-radius:10px;padding:32px 20px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:14px;background:#fafafa}
+.drop-zone:hover,.drop-zone.dragover{border-color:#ff6a00;background:#fff7ed}
+.drop-zone p{color:#9ca3af;font-size:0.83rem;line-height:1.6}
+.drop-zone strong{color:#374151}
+.video-preview{width:100%;border-radius:8px;max-height:260px;margin-bottom:12px;display:none}
+.vid-name{font-size:0.78rem;color:#9ca3af;margin-bottom:8px;display:none}
+.record-btn{width:100%;padding:12px;background:#f9fafb;border:2px solid #e5e7eb;border-radius:10px;color:#374151;font-size:0.875rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}
+.record-btn:hover{border-color:#ff6a00;color:#ff6a00}
+.record-btn.recording{background:#fef2f2;border-color:#dc2626;color:#dc2626}
 .rdot{width:9px;height:9px;border-radius:50%;background:#dc2626;animation:pulse 1s infinite}
-.or-sep{text-align:center;color:#777;font-size:0.78rem;margin:8px 0}
-.voice-ready{font-size:0.8rem;color:#4ade80;margin-top:8px;display:none}
-.music-sel{width:100%;background:#0a0a14;border:1px solid #222232;border-radius:9px;color:#e4e4e8;padding:10px 14px;font-size:0.875rem;outline:none;margin-bottom:10px}
+.or-sep{text-align:center;color:#9ca3af;font-size:0.78rem;margin:8px 0}
+.voice-ready{font-size:0.8rem;color:#16a34a;margin-top:8px;display:none}
+.music-sel{width:100%;background:#fff;border:1px solid #e5e7eb;border-radius:8px;color:#374151;padding:10px 14px;font-size:0.875rem;outline:none;margin-bottom:10px}
 .yt-row{display:flex;gap:8px;margin-top:8px}
-.yt-row input{flex:1;background:#0a0a14;border:1px solid #222232;border-radius:8px;color:#e4e4e8;padding:8px 12px;font-size:0.85rem;outline:none}
+.yt-row input{flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;color:#374151;padding:8px 12px;font-size:0.85rem;outline:none}
 .yt-row input:focus{border-color:#ff6a00}
-.bake-btn{width:100%;padding:15px;background:#ff6a00;border:none;border-radius:12px;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:background 0.15s}
+.bake-btn{width:100%;padding:14px;background:#ff6a00;border:none;border-radius:10px;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:background 0.15s;box-shadow:0 2px 8px rgba(255,106,0,0.3)}
 .bake-btn:hover{background:#e55a00}
-.bake-progress{display:none;text-align:center;padding:12px;color:#fbbf24;font-size:0.85rem}
+.bake-progress{display:none;text-align:center;padding:12px;color:#d97706;font-size:0.85rem}
 .bake-ready{display:none;text-align:center;padding:12px}
-.bake-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#0a0a14;border-radius:8px;margin-bottom:8px}
-.bake-meta{font-size:0.75rem;color:#888}
+.bake-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f9fafb;border-radius:8px;margin-bottom:8px;border:1px solid #f3f4f8}
+.bake-meta{font-size:0.75rem;color:#9ca3af}
 .bake-badge{display:inline-flex;padding:3px 10px;border-radius:10px;font-size:0.7rem;font-weight:600}
-.bake-done{background:rgba(22,163,74,0.12);color:#4ade80}
-.bake-pending,.bake-running{background:rgba(245,158,11,0.12);color:#fbbf24}
-.bake-failed{background:rgba(220,38,38,0.12);color:#fca5a5}
-.rv-textarea{width:100%;background:#0a0a14;border:1px solid #222232;border-radius:9px;color:#e4e4e8;padding:10px 14px;font-size:0.875rem;resize:vertical;min-height:110px;outline:none;font-family:inherit;line-height:1.5}
+.bake-done{background:#f0fdf4;color:#16a34a}
+.bake-pending,.bake-running{background:#fffbeb;color:#d97706}
+.bake-failed{background:#fef2f2;color:#dc2626}
+.rv-textarea{width:100%;background:#fff;border:1px solid #e5e7eb;border-radius:8px;color:#374151;padding:10px 14px;font-size:0.875rem;resize:vertical;min-height:110px;outline:none;font-family:inherit;line-height:1.5}
 .rv-textarea:focus{border-color:#ff6a00}
-.tour-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;background:#0f0f1c;border:1px solid #ff6a00;border-radius:18px;padding:18px 24px;box-shadow:0 8px 40px rgba(0,0,0,0.7);max-width:480px;width:calc(100vw - 32px);display:flex;flex-direction:column;gap:10px}
+/* ── Clients ── */
+.clients-tbl{width:100%;border-collapse:collapse;font-size:0.875rem}
+.clients-tbl th{text-align:left;color:#9ca3af;font-size:0.67rem;text-transform:uppercase;letter-spacing:0.5px;padding:8px 14px;border-bottom:2px solid #f3f4f8;font-weight:600}
+.clients-tbl td{padding:13px 14px;border-bottom:1px solid #f9fafb;color:#374151;vertical-align:middle}
+.clients-tbl tr:hover td{background:#fafafa}
+.adot{width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;margin-right:5px}
+.idot{width:7px;height:7px;border-radius:50%;background:#d1d5db;display:inline-block;margin-right:5px}
+.add-client-box{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;margin-top:24px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.add-client-box h3{font-size:0.9rem;font-weight:700;margin-bottom:16px;color:#111827}
+/* ── Recent videos ── */
+.recent-videos-strip{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;margin-top:8px}
+.recent-vid-card{flex:0 0 120px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.06)}
+.recent-vid-thumb{width:100%;aspect-ratio:9/16;object-fit:cover;display:block;background:#f3f4f8}
+.recent-vid-footer{padding:6px 8px}
+.recent-vid-name{font-size:0.6rem;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px}
+.recent-vid-btns{display:flex;gap:4px}
+.recent-vid-btn{flex:1;padding:4px 3px;font-size:0.6rem;font-weight:700;border-radius:5px;border:none;cursor:pointer;text-align:center;transition:all 0.15s}
+.rvb-tg{background:#eff6ff;color:#3b82f6}
+.rvb-tg:hover{background:#dbeafe}
+.rvb-wa{background:#f0fdf4;color:#16a34a}
+.rvb-wa:hover{background:#dcfce7}
+/* ── Post history ── */
+.history-row{background:#fff;border:1px solid #f3f4f8;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;box-shadow:0 1px 2px rgba(0,0,0,0.04)}
+.history-meta{font-size:0.72rem;color:#9ca3af;margin-bottom:3px}
+.history-hook{font-size:0.85rem;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+/* ── Block media ── */
+.block-row{display:flex;gap:8px;align-items:center}
+.block-input{background:#fff;border:1px solid #e5e7eb;border-radius:8px;color:#374151;padding:9px 14px;font-size:0.875rem;outline:none;width:160px}
+.block-input:focus{border-color:#ff6a00}
+#report-body{font-size:0.85rem;color:#6b7280;margin-top:12px;line-height:1.7}
+/* ── Tour ── */
+.tour-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;background:#fff;border:2px solid #ff6a00;border-radius:16px;padding:20px 24px;box-shadow:0 8px 32px rgba(0,0,0,0.15);max-width:480px;width:calc(100vw - 32px);display:flex;flex-direction:column;gap:12px}
 .tour-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.tour-badge{font-size:0.62rem;font-weight:700;color:#ff6a00;text-transform:uppercase;letter-spacing:1px;background:rgba(255,106,0,0.12);padding:3px 10px;border-radius:10px;border:1px solid rgba(255,106,0,0.25);white-space:nowrap}
-.tour-title{font-size:0.95rem;font-weight:700;color:#fff;flex:1}
-.tour-close{background:none;border:none;color:#555;font-size:1rem;cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1}
-.tour-close:hover{color:#e4e4e8}
-.tour-body{font-size:0.85rem;color:#a0a0c0;line-height:1.6}
+.tour-badge{font-size:0.62rem;font-weight:700;color:#ff6a00;text-transform:uppercase;letter-spacing:1px;background:#fff7ed;padding:3px 10px;border-radius:10px;border:1px solid rgba(255,106,0,0.25);white-space:nowrap}
+.tour-title{font-size:1rem;font-weight:700;color:#111827;flex:1}
+.tour-close{background:none;border:none;color:#9ca3af;font-size:1rem;cursor:pointer;padding:2px 6px;border-radius:6px}
+.tour-close:hover{color:#374151}
+.tour-body{font-size:0.88rem;color:#6b7280;line-height:1.6}
 .tour-footer{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .tour-dots{display:flex;gap:5px}
-.tour-dot{width:6px;height:6px;border-radius:50%;background:#1e1e30;transition:background 0.2s}
+.tour-dot{width:6px;height:6px;border-radius:50%;background:#e5e7eb;transition:background 0.2s}
 .tour-dot.on{background:#ff6a00}
 .tour-btns{display:flex;gap:8px}
-.tour-btn{padding:7px 18px;border-radius:9px;font-size:0.8rem;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
-.tour-btn-prev{background:#141422;color:#888;border:1px solid #252535}
-.tour-btn-prev:hover{color:#e4e4e8}
-.tour-btn-next{background:#ff6a00;color:#fff}
+.tour-btn{padding:8px 20px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
+.tour-btn-prev{background:#f9fafb;color:#6b7280;border:1px solid #e5e7eb}
+.tour-btn-prev:hover{color:#374151}
+.tour-btn-next{background:#ff6a00;color:#fff;box-shadow:0 2px 6px rgba(255,106,0,0.3)}
 .tour-btn-next:hover{background:#e55a00}
-.clients-tbl{width:100%;border-collapse:collapse;font-size:0.875rem}
-.clients-tbl th{text-align:left;color:#777;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;border-bottom:1px solid #1a1a28;font-weight:600}
-.clients-tbl td{padding:13px 12px;border-bottom:1px solid #0f0f1a;vertical-align:middle}
-.clients-tbl tr:hover td{background:#0f0f1a}
-.adot{width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;margin-right:5px}
-.idot{width:7px;height:7px;border-radius:50%;background:#555;display:inline-block;margin-right:5px}
-.add-client-box{background:#0f0f1c;border:1px solid #1a1a28;border-radius:16px;padding:24px;margin-top:24px}
-.add-client-box h3{font-size:0.85rem;font-weight:700;margin-bottom:16px}
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;right:24px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px 18px;font-size:0.85rem;z-index:500;opacity:0;transform:translateY(8px);transition:all 0.25s;pointer-events:none;max-width:320px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{border-color:#bbf7d0;color:#16a34a;background:#f0fdf4}
+.toast.err{border-color:#fecaca;color:#dc2626;background:#fef2f2}
+.toast.info{border-color:#bfdbfe;color:#3b82f6;background:#eff6ff}
+/* ── Utility ── */
 .mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt24{margin-top:24px}
 .flex{display:flex}.gap8{gap:8px}.gap12{gap:12px}.gap16{gap:16px}
-.txt-sm{font-size:0.83rem}.txt-xs{font-size:0.75rem}.txt-muted{color:#888}
-.block-row{display:flex;gap:8px;align-items:center}
-.block-input{background:#0a0a14;border:1px solid #222232;border-radius:8px;color:#e4e4e8;padding:9px 14px;font-size:0.875rem;outline:none;width:160px}
-.block-input:focus{border-color:#ff6a00}
-#report-body{font-size:0.85rem;color:#aaa;margin-top:12px}
-.toast{position:fixed;bottom:24px;right:24px;background:#141422;border:1px solid #252535;border-radius:10px;padding:12px 18px;font-size:0.85rem;z-index:500;opacity:0;transform:translateY(8px);transition:all 0.25s;pointer-events:none;max-width:320px}
-.toast.show{opacity:1;transform:translateY(0)}
-.toast.ok{border-color:rgba(74,222,128,0.3);color:#4ade80}
-.toast.err{border-color:rgba(252,165,165,0.3);color:#fca5a5}
-.toast.info{border-color:rgba(165,180,252,0.3);color:#a5b4fc}
+.txt-sm{font-size:0.85rem}.txt-xs{font-size:0.75rem}.txt-muted{color:#6b7280}
+/* ── Responsive ── */
+@media(max-width:900px){
+  .sidebar{width:180px}
+}
 @media(max-width:768px){
-  nav{height:auto;padding:10px 16px;flex-wrap:wrap}
-  .nav-tabs{margin:4px 0;width:100%}
-  main{padding:20px 16px}
+  .app-layout{flex-direction:column;height:auto;overflow:visible}
+  .sidebar{width:100%;height:auto;flex-direction:row;flex-wrap:wrap;position:sticky;top:0;z-index:50}
+  .sidebar-brand{padding:12px 16px;border-bottom:none;border-right:1px solid rgba(255,255,255,0.07)}
+  .sidebar-nav{display:flex;flex:1;padding:6px;overflow-x:auto;flex-direction:row}
+  .sidebar-section{display:none}
+  .nav-item{white-space:nowrap;padding:8px 12px;border-radius:6px}
+  .sidebar-footer{display:none}
+  .main-content{overflow:visible;height:auto}
+  .page-body{padding:16px}
   .form-grid{grid-template-columns:1fr}
   .revoice-cols{grid-template-columns:1fr}
-  .edit-panel{width:100%;border-left:none;border-top:1px solid #1e1e30}
+  .edit-panel{width:100%;border-left:none;border-top:1px solid #e5e7eb}
   .custom-row{grid-template-columns:1fr}
+  .slots-grid{grid-template-columns:1fr 1fr}
 }
+@media(max-width:480px){.slots-grid{grid-template-columns:1fr}}
 `;
 
 const SLOT_TIMES: Record<number, string> = { 1: '07:00', 2: '12:00', 3: '17:30', 4: '20:30' };
@@ -252,6 +325,11 @@ export default function CommanderNewClient({
   const [postHistory,     setPostHistory]     = useState<any[]>([]);
   const [tourMode,        setTourMode]        = useState<'client' | 'admin' | null>(null);
   const [tourStep,        setTourStep]        = useState(0);
+  const [recentVideos,    setRecentVideos]    = useState<{ url: string; filename: string; created_at: string }[]>([]);
+  const [tgPosting,       setTgPosting]       = useState<string | null>(null); // video_url being posted
+  const [waPosting,       setWaPosting]       = useState<string | null>(null);
+  const [hasTg,           setHasTg]           = useState(false);
+  const [hasWa,           setHasWa]           = useState(false);
 
   const pollRef      = useRef<ReturnType<typeof setInterval> | null>(null);
   const toastTimer   = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -323,10 +401,73 @@ export default function CommanderNewClient({
     if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
   }
 
+  async function postToTelegram(videoUrl: string, caption: string) {
+    setTgPosting(videoUrl);
+    try {
+      const body: any = { video_url: videoUrl, caption };
+      if (targetSlug) body.forClient = targetSlug;
+      const r = await fetch('/api/commander/telegram', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(body),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (d.ok) showToast('Sent to Telegram ✓');
+      else showToast(d.error || 'Telegram send failed', 'err');
+    } catch (e: any) {
+      showToast(e.message || 'Telegram error', 'err');
+    } finally {
+      setTgPosting(null);
+    }
+  }
+
+  async function postToWhatsApp(videoUrl: string, caption: string) {
+    setWaPosting(videoUrl);
+    try {
+      const body: any = { video_url: videoUrl, caption };
+      if (targetSlug) body.forClient = targetSlug;
+      const r = await fetch('/api/commander/whatsapp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(body),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (d.ok) showToast('Sent to WhatsApp ✓');
+      else showToast(d.error || 'WhatsApp send failed', 'err');
+    } catch (e: any) {
+      showToast(e.message || 'WhatsApp error', 'err');
+    } finally {
+      setWaPosting(null);
+    }
+  }
+
+  async function loadRecentVideos() {
+    try {
+      const fc = targetSlug ? `&forClient=${encodeURIComponent(targetSlug)}` : '';
+      const r = await fetch(`/api/commander/recent-videos?hours=48${fc}`, { credentials: 'same-origin' });
+      const d = await r.json().catch(() => []);
+      setRecentVideos(Array.isArray(d) ? d : []);
+    } catch { setRecentVideos([]); }
+  }
+
+  async function loadContactFlags() {
+    try {
+      const fc = targetSlug ? `?forClient=${encodeURIComponent(targetSlug)}` : '';
+      const r = await fetch(`/api/commander/onboard${fc}`, { credentials: 'same-origin' });
+      const d = await r.json().catch(() => ({}));
+      setHasTg(!!(d.profile?.tg_chat_id));
+      setHasWa(!!(d.profile?.whatsapp));
+    } catch { /* silent */ }
+  }
+
   function switchTab(name: string) {
     setActiveTab(name);
     if (name === 'pipeline') {
       if (!pollRef.current) { loadStatus(); loadSlots(); loadPostHistory(); pollRef.current = setInterval(() => { loadStatus(); loadSlots(); }, 12000); }
+      loadRecentVideos();
+      loadContactFlags();
     } else { stopPoll(); }
     if (name === 'onboard')  { loadProfile(); }
     if (name === 'revoice')  { loadBakeHistory(); loadMusicTracks(); }
@@ -742,7 +883,14 @@ export default function CommanderNewClient({
         <div className="slot-video">
           {currentSrc
             ? <video id={`sv${n}`} src={currentSrc} controls playsInline />
-            : <div className="no-video"><span style={{ fontSize: '2rem' }}>📭</span><span>No video yet</span></div>}
+            : <div className="no-video">
+                <div className="no-video-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                  </svg>
+                </div>
+                <div className="no-video-text">No video yet</div>
+              </div>}
         </div>
         <div className="slot-body">
           {(v1 && v2) && <button className="v2-toggle" onClick={() => setV2Active(p => ({ ...p, [n]: !p[n] }))}>{showV2 ? '← V1' : 'V2 →'}</button>}
@@ -764,6 +912,20 @@ export default function CommanderNewClient({
               {[['TikTok','tiktok'],['IG','instagram'],['YT','youtube'],['LI','linkedin'],['Blog','blog']].map(([label, key]) => (
                 <button key={key} className="plat-btn" onClick={() => approve(n, 'post', [key])} title={`Post to ${label} only`}>{label}</button>
               ))}
+              {hasTg && (
+                <button className="plat-btn plat-btn-tg" disabled={tgPosting === currentSrc}
+                  title="Send to Telegram"
+                  onClick={() => postToTelegram(currentSrc, displayHook)}>
+                  {tgPosting === currentSrc ? '…' : 'TG'}
+                </button>
+              )}
+              {hasWa && (
+                <button className="plat-btn plat-btn-wa" disabled={waPosting === currentSrc}
+                  title="Send to WhatsApp"
+                  onClick={() => postToWhatsApp(currentSrc, displayHook)}>
+                  {waPosting === currentSrc ? '…' : 'WA'}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -771,26 +933,83 @@ export default function CommanderNewClient({
     );
   }
 
+  const NavIcon = ({ d }: { d: string }) => (
+    <svg className="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d={d} />
+    </svg>
+  );
+
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      {/* NAV */}
-      <nav>
-        <div className="nav-brand"><span>Boot</span>Hop Commander</div>
-        <div className="nav-tabs">
-          <button className={`tab-btn${activeTab === 'onboard'   ? ' active' : ''}`} onClick={() => switchTab('onboard')}>Onboard</button>
-          <button className={`tab-btn${activeTab === 'pipeline'  ? ' active' : ''}`} onClick={() => switchTab('pipeline')}>Pipeline</button>
-          <button className={`tab-btn${activeTab === 'revoice'   ? ' active' : ''}`} onClick={() => switchTab('revoice')}>Revoice Studio</button>
-          {isSuper && <button className={`tab-btn${activeTab === 'clients' ? ' active' : ''}`} onClick={() => switchTab('clients')}>All Clients</button>}
-        </div>
-        <div className="nav-right">
-          <span className="company-pill">{companyName}</span>
-          <a href="/api/commander/logout" className="logout-btn">Logout</a>
-        </div>
-      </nav>
+      <div className="app-layout">
 
-      <main>
+        {/* ── SIDEBAR ── */}
+        <aside className="sidebar">
+          <div className="sidebar-brand">
+            <div className="sidebar-logo"><span>Boot</span>Hop</div>
+            <div className="sidebar-tagline">Commander</div>
+          </div>
+
+          <nav className="sidebar-nav">
+            <div className="sidebar-section">Content</div>
+            <button className={`nav-item${activeTab === 'pipeline' ? ' active' : ''}`} onClick={() => switchTab('pipeline')}>
+              <NavIcon d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.258a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+              Pipeline
+            </button>
+            <button className={`nav-item${activeTab === 'revoice' ? ' active' : ''}`} onClick={() => switchTab('revoice')}>
+              <NavIcon d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4M12 3a7 7 0 017 7" />
+              Revoice Studio
+            </button>
+            <div className="sidebar-section">Account</div>
+            <button className={`nav-item${activeTab === 'onboard' ? ' active' : ''}`} onClick={() => switchTab('onboard')}>
+              <NavIcon d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              Settings
+            </button>
+            {isSuper && (
+              <>
+                <div className="sidebar-section">Admin</div>
+                <button className={`nav-item${activeTab === 'clients' ? ' active' : ''}`} onClick={() => switchTab('clients')}>
+                  <NavIcon d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  All Clients
+                </button>
+              </>
+            )}
+          </nav>
+
+          <div className="sidebar-footer">
+            <div className="sidebar-client">
+              <div className="sidebar-client-name">{companyName}</div>
+              <div className="sidebar-client-role">{isSuper ? 'Superadmin' : 'Client'}</div>
+            </div>
+            <a href="/api/commander/logout" className="sidebar-logout">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+              </svg>
+              Sign out
+            </a>
+          </div>
+        </aside>
+
+        {/* ── MAIN CONTENT ── */}
+        <div className="main-content">
+          <div className="topbar">
+            <div className="topbar-title">
+              {activeTab === 'pipeline' && 'Content Pipeline'}
+              {activeTab === 'revoice'  && 'Revoice Studio'}
+              {activeTab === 'onboard'  && 'Settings & Profile'}
+              {activeTab === 'clients'  && 'All Clients'}
+              {!activeTab && 'Commander'}
+            </div>
+            {targetSlug && targetSlug !== companySlug && (
+              <span className="topbar-badge">Viewing: {targetSlug}</span>
+            )}
+            {pillPending.show && <span className="pill pill-warn" style={{ fontSize: '0.7rem' }}>{pillPending.text}</span>}
+            {cloudMode && <span className="pill pill-cloud" style={{ fontSize: '0.7rem' }}>☁ Cloud</span>}
+          </div>
+
+          <div className="page-body">
 
         {/* ── ONBOARD TAB ─────────────────────────────────────────────────────── */}
         <div className={`tab-pane${activeTab === 'onboard' ? ' active' : ''}`}>
@@ -847,7 +1066,7 @@ export default function CommanderNewClient({
             <button className="btn btn-primary" onClick={saveProfile}>Save Profile</button>
             <button className="btn btn-secondary" onClick={loadProfile}>Discard</button>
           </div>
-          <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid #1a1a28' }}>
+          <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid #e5e7eb' }}>
             <button className="btn btn-secondary" onClick={syncPipeline} style={{ borderColor: '#ff6a00', color: '#ff6a00' }}>
               ↺ Refresh Pipeline
             </button>
@@ -874,6 +1093,47 @@ export default function CommanderNewClient({
             }
           </div>
 
+          {recentVideos.length > 0 && (
+            <div className="mt24">
+              <div className="section-title">
+                Recent 48h Videos
+                <small>Generated by pipeline — send directly to Telegram or WhatsApp</small>
+              </div>
+              <div className="recent-videos-strip">
+                {recentVideos.map((v, i) => {
+                  const label = v.filename.replace(/\.(mp4)$/i, '').slice(0, 22);
+                  const dateStr = v.created_at ? new Date(v.created_at).toLocaleString() : '';
+                  return (
+                    <div key={i} className="recent-vid-card">
+                      <video src={v.url} className="recent-vid-thumb" playsInline muted preload="metadata" />
+                      <div className="recent-vid-footer">
+                        <div className="recent-vid-name" title={v.filename}>{label}</div>
+                        {dateStr && <div className="recent-vid-name">{dateStr}</div>}
+                        <div className="recent-vid-btns">
+                          {hasTg && (
+                            <button className="recent-vid-btn rvb-tg" disabled={tgPosting === v.url}
+                              onClick={() => postToTelegram(v.url, label)}>
+                              {tgPosting === v.url ? '…' : 'TG'}
+                            </button>
+                          )}
+                          {hasWa && (
+                            <button className="recent-vid-btn rvb-wa" disabled={waPosting === v.url}
+                              onClick={() => postToWhatsApp(v.url, label)}>
+                              {waPosting === v.url ? '…' : 'WA'}
+                            </button>
+                          )}
+                          {!hasTg && !hasWa && (
+                            <span style={{ fontSize: '0.58rem', color: '#555' }}>Add TG/WA in Onboard</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="mt24">
             <div className="section-title">Block Media</div>
             <div className="block-row">
@@ -895,14 +1155,10 @@ export default function CommanderNewClient({
               <div className="section-title">Last 14 Days <small>Click Revoice to re-use any post</small></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {postHistory.map((p: any, i: number) => (
-                  <div key={i} style={{ background: '#0f0f1c', border: '1px solid #1a1a28', borderRadius: '12px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div key={i} className="history-row">
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: '0.78rem', color: '#888', marginBottom: '3px' }}>
-                        {p.date} · {p.platform} · Slot {p.slot}
-                      </div>
-                      <div style={{ fontSize: '0.85rem', color: '#e4e4e8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {p.hook || '—'}
-                      </div>
+                      <div className="history-meta">{p.date} · {p.platform} · Slot {p.slot}</div>
+                      <div className="history-hook">{p.hook || '—'}</div>
                     </div>
                     {p.video_url && (
                       <button className="btn btn-secondary btn-sm" onClick={() => {
@@ -1093,7 +1349,9 @@ export default function CommanderNewClient({
           </div>
         )}
 
-      </main>
+          </div>{/* end page-body */}
+        </div>{/* end main-content */}
+      </div>{/* end app-layout */}
 
       {/* EDIT PANEL */}
       <div className={`overlay${editOpen ? ' open' : ''}`} onClick={() => setEditOpen(false)} />

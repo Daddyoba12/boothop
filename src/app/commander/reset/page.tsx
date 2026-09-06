@@ -3,7 +3,27 @@
 import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import BootHopLogo from '@/components/BootHopLogo';
+
+function ShieldIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+  );
+}
+
+function StyledInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input
+      {...props}
+      className="w-full rounded-lg border px-4 py-3 text-sm outline-none transition-all"
+      style={{ background: '#1a2840', borderColor: '#253047', color: '#e2eaf5', caretColor: '#ff6a00' }}
+      onFocus={e => { e.currentTarget.style.borderColor = '#ff6a00'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255,106,0,0.12)'; }}
+      onBlur={e =>  { e.currentTarget.style.borderColor = '#253047'; e.currentTarget.style.boxShadow = 'none'; }}
+    />
+  );
+}
 
 function CommanderResetContent() {
   const params  = useSearchParams();
@@ -15,9 +35,6 @@ function CommanderResetContent() {
   const [loading,   setLoading]   = useState(false);
   const [error,     setError]     = useState('');
   const [success,   setSuccess]   = useState(false);
-
-  const input = "w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400/30 focus:border-orange-400 transition-all text-sm";
-  const label = "block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -36,71 +53,112 @@ function CommanderResetContent() {
     setTimeout(() => router.push('/commander'), 3000);
   }
 
-  if (!token) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
-        <div className="text-center">
-          <p className="text-slate-500 mb-4">Invalid reset link.</p>
-          <Link href="/commander" className="text-orange-500 hover:underline text-sm font-medium">Back to login →</Link>
-        </div>
-      </div>
-    );
-  }
+  const shell = (
+    <div style={{ minHeight: '100vh', background: '#0d1526', display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
 
-  return (
-    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col items-center mb-8">
-          <BootHopLogo size="md" />
-          <div className="mt-3 flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Pipeline</span>
-            <span className="w-1 h-1 rounded-full bg-gray-300" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-orange-500">Commander</span>
+      <div style={{ position: 'absolute', top: 20, left: 24 }}>
+        <Link href="/" style={{ fontSize: 13, color: '#4b6080', textDecoration: 'none', fontWeight: 500 }}>← BootHop.com</Link>
+      </div>
+
+      <div style={{ width: '100%', maxWidth: 460 }}>
+        {/* Logo */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 32 }}>
+          <img src="/images/boothop-icon-512.png" alt="BootHop"
+            style={{ height: 72, width: 'auto', objectFit: 'contain', display: 'block' }} draggable={false} />
+          <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#3d5170' }}>Pipeline</span>
+            <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#253047', display: 'inline-block' }} />
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#ff6a00' }}>Commander</span>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-700 bg-slate-800/80 shadow-2xl shadow-black/40 p-8">
+        {/* Card */}
+        <div style={{ background: '#131f35', border: '1px solid #1e2f4a', borderRadius: 16, padding: 32,
+          boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
           {success ? (
-            <div className="text-center">
-              <div className="text-4xl mb-3">✓</div>
-              <p className="text-white font-semibold mb-1">Password updated</p>
-              <p className="text-sm text-slate-400">Redirecting to login…</p>
+            <div style={{ textAlign: 'center', padding: '20px 0' }}>
+              <div style={{ fontSize: 36, color: '#22c55e', marginBottom: 12 }}>✓</div>
+              <p style={{ color: '#e2eaf5', fontWeight: 700, marginBottom: 6 }}>Password updated successfully</p>
+              <p style={{ fontSize: 13, color: '#5a7090' }}>Redirecting to sign in…</p>
+            </div>
+          ) : !token ? (
+            <div style={{ textAlign: 'center', padding: '20px 0' }}>
+              <p style={{ color: '#5a7090', marginBottom: 16 }}>This reset link is invalid or has expired.</p>
+              <Link href="/commander" style={{ color: '#ff6a00', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>← Back to sign in</Link>
             </div>
           ) : (
-            <>
-              <h1 className="text-base font-bold text-white mb-5">Set new password</h1>
-              <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {/* Heading */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#ff6a00', marginBottom: 4 }}>
+                <ShieldIcon />
                 <div>
-                  <label className={label}>New Password</label>
-                  <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-                    placeholder="Min 8 characters" autoComplete="new-password" className={input} required />
+                  <h1 style={{ fontSize: 18, fontWeight: 800, color: '#e2eaf5', margin: 0, lineHeight: 1.2 }}>Set new password</h1>
+                  <p style={{ fontSize: 13, color: '#5a7090', margin: '3px 0 0', lineHeight: 1.4 }}>Choose a strong password for your Commander workspace.</p>
                 </div>
-                <div>
-                  <label className={label}>Confirm Password</label>
-                  <input type="password" value={password2} onChange={e => setPassword2(e.target.value)}
-                    placeholder="Repeat password" autoComplete="new-password" className={input} required />
-                </div>
-                {error && <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{error}</p>}
-                <button type="submit" disabled={loading}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-400 text-white font-bold text-sm transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-200 disabled:opacity-60 disabled:translate-y-0">
-                  {loading ? 'Saving…' : 'Update Password →'}
-                </button>
-              </form>
-            </>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase',
+                  letterSpacing: '0.06em', color: '#8fa4c0', marginBottom: 6 }}>New Password</label>
+                <StyledInput type="password" value={password} onChange={e => setPassword(e.target.value)}
+                  placeholder="Min 8 characters" autoComplete="new-password" required />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase',
+                  letterSpacing: '0.06em', color: '#8fa4c0', marginBottom: 6 }}>Confirm Password</label>
+                <StyledInput type="password" value={password2} onChange={e => setPassword2(e.target.value)}
+                  placeholder="Repeat password" autoComplete="new-password" required />
+              </div>
+
+              {error && (
+                <p style={{ fontSize: 13, color: '#fca5a5', background: 'rgba(220,38,38,0.1)',
+                  border: '1px solid rgba(220,38,38,0.2)', borderRadius: 8, padding: '10px 14px', margin: 0 }}>
+                  {error}
+                </p>
+              )}
+
+              <button type="submit" disabled={loading}
+                style={{ width: '100%', padding: '14px', borderRadius: 9, border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                  background: '#ff6a00', color: '#fff', fontWeight: 700, fontSize: 14, opacity: loading ? 0.6 : 1, transition: 'background .15s' }}
+                onMouseEnter={e => !loading && (e.currentTarget.style.background = '#e55a00')}
+                onMouseLeave={e => (e.currentTarget.style.background = '#ff6a00')}>
+                {loading ? 'Saving…' : 'Update Password →'}
+              </button>
+
+              <p style={{ fontSize: 11, color: '#3d5170', textAlign: 'center', margin: 0 }}>
+                For your security, reset links expire after 30 minutes.
+              </p>
+            </form>
           )}
         </div>
 
-        <p className="mt-5 text-center text-xs text-slate-400">
-          <Link href="/commander" className="hover:text-white transition-colors">← Back to login</Link>
-        </p>
+        <div style={{ marginTop: 20, textAlign: 'center' }}>
+          <Link href="/commander"
+            style={{ fontSize: 13, color: '#5a7090', textDecoration: 'none', fontWeight: 500 }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#8fa4c0')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#5a7090')}>
+            ← Back to sign in
+          </Link>
+          <span style={{ margin: '0 10px', color: '#253047' }}>·</span>
+          <a href="mailto:info@boothop.com"
+            style={{ fontSize: 13, color: '#5a7090', textDecoration: 'none', fontWeight: 500 }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#8fa4c0')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#5a7090')}>
+            Need help?
+          </a>
+        </div>
       </div>
     </div>
   );
+
+  return shell;
 }
 
 export default function CommanderResetConfirmPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#07111f]" />}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#0d1526' }} />}>
       <CommanderResetContent />
     </Suspense>
   );

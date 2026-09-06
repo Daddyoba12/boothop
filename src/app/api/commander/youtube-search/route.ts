@@ -15,7 +15,10 @@ export async function GET(req: NextRequest) {
     const id = extractVideoId(urlParam.trim());
     if (!id) return NextResponse.json({ error: 'Could not recognise a YouTube video ID from that URL' }, { status: 400 });
 
-    const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`);
+    const res = await fetch(
+      `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`,
+      { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BootHopBot/1.0)' } },
+    );
     if (!res.ok) return NextResponse.json({ error: 'Video not found or not accessible' }, { status: 404 });
 
     const data = await res.json();
