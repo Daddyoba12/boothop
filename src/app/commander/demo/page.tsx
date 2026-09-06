@@ -1,8 +1,7 @@
 'use client';
-import { useState } from 'react';
 import Link from 'next/link';
 
-const CLIENT_STEPS = [
+const STEPS = [
   { n: '01', label: 'Daily pipeline produces fresh video content automatically' },
   { n: '02', label: 'Review slot cards — each with hook, caption and ready video' },
   { n: '03', label: 'One-click Approve & Post to connected platforms' },
@@ -13,42 +12,7 @@ const CLIENT_STEPS = [
   { n: '08', label: 'Send to Telegram or WhatsApp directly from Commander' },
 ];
 
-const ADMIN_STEPS = [
-  { n: '01', label: 'All Clients dashboard — every account at a glance' },
-  { n: '02', label: 'Search, filter by status and plan in one view' },
-  { n: '03', label: 'Open any client workspace with a single click' },
-  { n: '04', label: 'Manage subscriptions, features and account status' },
-  { n: '05', label: 'Create new client accounts and send secure invitations' },
-  { n: '06', label: 'Switch between client workspaces without logging out' },
-  { n: '07', label: 'Context-aware pipeline — always the selected client\'s content' },
-  { n: '08', label: 'Revoice and Settings scoped to the active workspace' },
-];
-
-const tabs = [
-  { id: 'client', label: 'Client View',     badge: 'Content Team',  video: '/demos/demo_ginspired_client_voiced.mp4', steps: CLIENT_STEPS },
-  { id: 'admin',  label: 'Admin View',      badge: 'Superadmin',    video: '/demos/demo_boothop_admin_voiced.mp4',    steps: ADMIN_STEPS },
-] as const;
-
-type TabId = typeof tabs[number]['id'];
-
-function BrowserChrome({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ borderRadius: 18, overflow: 'hidden', border: '1px solid #e5e7eb', background: '#111827', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
-      <div style={{ background: '#1e293b', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444' }} />
-        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#f59e0b' }} />
-        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#22c55e' }} />
-        <span style={{ flex: 1, textAlign: 'center', fontSize: '0.72rem', color: '#4b5563' }}>boothop.com/commander</span>
-      </div>
-      {children}
-    </div>
-  );
-}
-
 export default function DemoPage() {
-  const [activeTab, setActiveTab] = useState<TabId>('client');
-  const current = tabs.find(t => t.id === activeTab)!;
-
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f8', color: '#1e1e2e', fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif" }}>
 
@@ -66,12 +30,12 @@ export default function DemoPage() {
         </Link>
       </div>
 
-      <div style={{ maxWidth: 920, margin: '0 auto', padding: '48px 24px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '48px 24px' }}>
 
         {/* Hero */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#fff7ed', color: '#ff6a00', borderRadius: 20, padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 20, border: '1px solid rgba(255,106,0,0.2)' }}>
-            Product Walkthrough
+            Commander Demo
           </div>
           <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#111827', margin: 0, lineHeight: 1.2, letterSpacing: '-0.5px' }}>
             Your content operation,<br />controlled from one place.
@@ -81,49 +45,31 @@ export default function DemoPage() {
           </p>
         </div>
 
-        {/* View switcher */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 24, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: 6 }}>
-          {tabs.map(t => (
-            <button key={t.id} onClick={() => setActiveTab(t.id)}
-              style={{
-                flex: 1, padding: '10px 16px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                background: activeTab === t.id ? '#ff6a00' : 'transparent',
-                color: activeTab === t.id ? '#fff' : '#6b7280',
-                fontWeight: 700, fontSize: '0.85rem', transition: 'all .15s',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              }}>
-              {t.label}
-              <span style={{
-                fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 10,
-                background: activeTab === t.id ? 'rgba(255,255,255,0.2)' : '#f3f4f8',
-                color: activeTab === t.id ? '#fff' : '#9ca3af',
-              }}>{t.badge}</span>
-            </button>
-          ))}
-        </div>
-
         {/* Video */}
-        <div style={{ marginBottom: 32 }}>
-          <BrowserChrome>
-            <video
-              key={current.video}
-              src={current.video}
-              controls
-              autoPlay
-              playsInline
-              muted
-              style={{ width: '100%', display: 'block', maxHeight: 520, background: '#000' }}
-            />
-          </BrowserChrome>
+        <div style={{ borderRadius: 18, overflow: 'hidden', border: '1px solid #e5e7eb', background: '#111827', marginBottom: 36, boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+          <div style={{ background: '#1e293b', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444' }} />
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#f59e0b' }} />
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#22c55e' }} />
+            <span style={{ flex: 1, textAlign: 'center', fontSize: '0.72rem', color: '#4b5563' }}>boothop.com/commander</span>
+          </div>
+          <video
+            src="/demos/demo_ginspired_client_voiced.mp4"
+            controls
+            autoPlay
+            playsInline
+            muted
+            style={{ width: '100%', display: 'block', maxHeight: 540, background: '#000' }}
+          />
         </div>
 
         {/* Feature grid */}
         <div style={{ marginBottom: 40 }}>
           <h2 style={{ fontSize: '0.72rem', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 14 }}>
-            {activeTab === 'client' ? 'What the client sees' : 'What the admin controls'}
+            What you just saw
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
-            {current.steps.map(({ n, label }) => (
+            {STEPS.map(({ n, label }) => (
               <div key={n} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 10, alignItems: 'flex-start', boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
                 <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#ff6a00', background: '#fff7ed', border: '1px solid rgba(255,106,0,0.2)', borderRadius: 6, padding: '2px 7px', whiteSpace: 'nowrap', marginTop: 1, flexShrink: 0 }}>{n}</span>
                 <span style={{ fontSize: '0.8rem', color: '#374151', lineHeight: 1.45, fontWeight: 500 }}>{label}</span>
@@ -138,14 +84,9 @@ export default function DemoPage() {
           <p style={{ color: '#6b7280', fontSize: '0.88rem', margin: 0, maxWidth: 380 }}>
             Launch Commander now with a demo account, or contact us for a live walkthrough with your own brand.
           </p>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <a href="/api/commander/demo?admin=0" style={{ padding: '12px 24px', background: '#ff6a00', color: '#fff', borderRadius: 9, fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', boxShadow: '0 2px 8px rgba(255,106,0,0.4)' }}>
-              Launch Client Demo
-            </a>
-            <a href="/api/commander/demo?admin=1" style={{ padding: '12px 24px', background: 'rgba(255,255,255,0.08)', color: '#e5e7eb', borderRadius: 9, fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.12)' }}>
-              Launch Admin Demo →
-            </a>
-          </div>
+          <a href="/api/commander/demo?admin=0" style={{ padding: '12px 24px', background: '#ff6a00', color: '#fff', borderRadius: 9, fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', boxShadow: '0 2px 8px rgba(255,106,0,0.4)' }}>
+            Launch Commander Demo
+          </a>
         </div>
 
       </div>
