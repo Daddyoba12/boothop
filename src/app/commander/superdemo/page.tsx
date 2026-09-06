@@ -90,7 +90,6 @@ export default function SuperDemoPage() {
                 src="/demos/demo_ginspired_client_voiced.mp4"
                 controls
                 playsInline
-                muted
                 style={{ width: '100%', display: 'block', maxHeight: 500, background: '#000' }}
               />
             </BrowserChrome>
@@ -126,7 +125,6 @@ export default function SuperDemoPage() {
                 src="/demos/demo_boothop_admin_voiced.mp4"
                 controls
                 playsInline
-                muted
                 style={{ width: '100%', display: 'block', maxHeight: 500, background: '#000' }}
               />
             </BrowserChrome>

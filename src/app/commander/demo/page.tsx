@@ -58,7 +58,6 @@ export default function DemoPage() {
             controls
             autoPlay
             playsInline
-            muted
             style={{ width: '100%', display: 'block', maxHeight: 540, background: '#000' }}
           />
         </div>
