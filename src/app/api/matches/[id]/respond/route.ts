@@ -43,19 +43,26 @@ export async function POST(
       return NextResponse.json({ error: 'This match is no longer pending.' }, { status: 400 });
     }
 
-    // Only the listing owner (non-auto_created trip side) can respond.
-    // The person who expressed interest has the auto_created mirror trip.
     const senderEmail   = match.sender_email?.toLowerCase().trim();
     const travelerEmail = match.traveler_email?.toLowerCase().trim();
     const senderTrip    = Array.isArray(match.sender_trip)   ? match.sender_trip[0]   : match.sender_trip;
     const travelerTrip  = Array.isArray(match.traveler_trip) ? match.traveler_trip[0] : match.traveler_trip;
-    const ownerEmail    = senderTrip?.auto_created ? travelerEmail : senderEmail;
 
-    if (email !== ownerEmail) {
-      return NextResponse.json({ error: 'Only the listing owner can accept or decline.' }, { status: 403 });
+    // Express-interest matches: the expresser has auto_created=true; only the listing owner may respond.
+    // Auto-match cron matches: neither trip is auto_created; either party may accept or decline.
+    const isExpressInterest = !!(senderTrip?.auto_created || travelerTrip?.auto_created);
+    if (isExpressInterest) {
+      const ownerEmail = senderTrip?.auto_created ? travelerEmail : senderEmail;
+      if (email !== ownerEmail) {
+        return NextResponse.json({ error: 'Only the listing owner can accept or decline.' }, { status: 403 });
+      }
+    } else {
+      if (email !== senderEmail && email !== travelerEmail) {
+        return NextResponse.json({ error: 'You are not a party to this match.' }, { status: 403 });
+      }
     }
 
-    // Derive the other party (Mr B — who expressed interest)
+    // Derive the other party
     const otherEmail = email === senderEmail ? travelerEmail : senderEmail;
 
     // Get route info — prefer sender_trip, fall back to traveler_trip
@@ -184,16 +191,17 @@ export async function POST(
         .update({ status: 'declined' })
         .eq('id', matchId);
 
-      // Delete any auto-created mirror trips tied to this match
-      const mirrorTripId = email === senderEmail ? match.traveler_trip_id : match.sender_trip_id;
-      if (mirrorTripId) {
-        await supabase.from('trips').delete().eq('id', mirrorTripId).eq('auto_created', true);
-      }
-
-      // Release the original listing back to active so other users can match with it
-      const originalTripId = senderTrip?.auto_created ? match.traveler_trip_id : match.sender_trip_id;
-      if (originalTripId) {
-        await supabase.from('trips').update({ status: 'active' }).eq('id', originalTripId);
+      // Clean up auto-created mirror trips; release original listings back to active
+      if (isExpressInterest) {
+        // One trip is auto_created — delete it; release the original
+        const mirrorTripId   = senderTrip?.auto_created ? match.sender_trip_id : match.traveler_trip_id;
+        const originalTripId = senderTrip?.auto_created ? match.traveler_trip_id : match.sender_trip_id;
+        if (mirrorTripId)   await supabase.from('trips').delete().eq('id', mirrorTripId).eq('auto_created', true);
+        if (originalTripId) await supabase.from('trips').update({ status: 'active' }).eq('id', originalTripId);
+      } else {
+        // Cron match — both trips are original listings; release both back to active
+        if (match.sender_trip_id)   await supabase.from('trips').update({ status: 'active' }).eq('id', match.sender_trip_id);
+        if (match.traveler_trip_id) await supabase.from('trips').update({ status: 'active' }).eq('id', match.traveler_trip_id);
       }
 
       if (otherEmail) {

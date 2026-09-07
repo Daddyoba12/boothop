@@ -198,10 +198,7 @@ function StartContent() {
     }
   };
 
-  const minDate = (() => {
-    const d = new Date(); d.setDate(d.getDate() + 1);
-    return d.toISOString().split('T')[0];
-  })();
+  const minDate = new Date().toISOString().split('T')[0];
 
   const fmtDate = (s: string) => s
     ? new Date(s + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })

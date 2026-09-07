@@ -7,7 +7,7 @@ import { trackEvent } from '@/lib/analytics';
 import PushPermissionBanner from '@/components/PushPermissionBanner';
 import {
   Package, Plane, CheckCircle, Clock, XCircle,
-  ArrowRight, Shield, AlertCircle, FileEdit, Rocket, Trash2, PlusCircle, ThumbsUp, ThumbsDown,
+  ArrowRight, Shield, AlertCircle, FileEdit, Rocket, Trash2, PlusCircle, ThumbsUp, ThumbsDown, CalendarDays,
 } from 'lucide-react';
 
 interface PendingJourney {
@@ -40,6 +40,10 @@ export default function DashboardPage() {
   const [deletingTrip, setDeletingTrip] = useState<string | null>(null);
   const [credit, setCredit] = useState<{ amount_pence: number; redeemed: boolean } | null>(null);
   const [respondingMatch, setRespondingMatch] = useState<string | null>(null);
+  const [editingTripId, setEditingTripId] = useState<string | null>(null);
+  const [editDate, setEditDate] = useState('');
+  const [editDateError, setEditDateError] = useState('');
+  const [savingDate, setSavingDate] = useState(false);
 
   // Pending journey from /start flow
   const [pendingJourney, setPendingJourney] = useState<PendingJourney | null>(null);
@@ -159,6 +163,26 @@ export default function DashboardPage() {
       setTrips(prev => prev.filter(t => t.id !== tripId));
     } finally {
       setDeletingTrip(null);
+    }
+  };
+
+  const saveDate = async (tripId: string) => {
+    if (!editDate) { setEditDateError('Please pick a date.'); return; }
+    setSavingDate(true);
+    setEditDateError('');
+    try {
+      const res = await fetch('/api/trips/update-date', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tripId, newDate: editDate }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setEditDateError(data.error || 'Could not update date.'); return; }
+      setEditingTripId(null);
+      setEditDate('');
+      loadDashboard();
+    } finally {
+      setSavingDate(false);
     }
   };
 
@@ -446,30 +470,74 @@ export default function DashboardPage() {
               {trips.map(trip => {
                 const isPast = trip.travel_date < today;
                 return (
-                  <div key={trip.id} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${isPast ? 'bg-white/3 border-white/6 opacity-60' : 'bg-white/6 border-white/10 hover:bg-white/8'}`}>
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${trip.type === 'travel' ? 'bg-blue-500/20' : 'bg-purple-500/20'}`}>
-                      {trip.type === 'travel' ? <Plane className="w-4 h-4 text-blue-400" /> : <Package className="w-4 h-4 text-purple-400" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-white font-medium text-sm">{trip.from_city} → {trip.to_city}</p>
-                        {statusBadge(isPast ? 'cancelled' : (trip.status ?? 'active'))}
-                        {isPast && <span className="text-xs text-slate-600">Past</span>}
+                  <div key={trip.id} className={`rounded-2xl border transition-all ${isPast ? 'bg-white/3 border-white/6 opacity-60' : 'bg-white/6 border-white/10 hover:bg-white/8'}`}>
+                    <div className="flex items-center gap-4 p-4">
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${trip.type === 'travel' ? 'bg-blue-500/20' : 'bg-purple-500/20'}`}>
+                        {trip.type === 'travel' ? <Plane className="w-4 h-4 text-blue-400" /> : <Package className="w-4 h-4 text-purple-400" />}
                       </div>
-                      <p className="text-slate-500 text-xs mt-0.5">
-                        {trip.travel_date ? new Date(trip.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
-                        {' · '}{trip.type === 'travel' ? 'Travelling' : 'Sending'}
-                        {trip.price ? ` · £${Number(trip.price).toFixed(2)}` : ''}
-                      </p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-white font-medium text-sm">{trip.from_city} → {trip.to_city}</p>
+                          {statusBadge(isPast ? 'cancelled' : (trip.status ?? 'active'))}
+                          {isPast && <span className="text-xs text-slate-600">Past</span>}
+                        </div>
+                        <p className="text-slate-500 text-xs mt-0.5">
+                          {trip.travel_date ? new Date(trip.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                          {' · '}{trip.type === 'travel' ? 'Travelling' : 'Sending'}
+                          {trip.price ? ` · £${Number(trip.price).toFixed(2)}` : ''}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {!isPast && ['active', 'pending'].includes(trip.status ?? '') && (
+                          <button
+                            onClick={() => { setEditingTripId(trip.id); setEditDate(trip.travel_date ?? ''); setEditDateError(''); }}
+                            className="p-1.5 rounded-lg text-slate-600 hover:text-blue-400 hover:bg-blue-500/10 transition-all"
+                            title="Change date"
+                          >
+                            <CalendarDays className="w-4 h-4" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => deleteTrip(trip.id)}
+                          disabled={deletingTrip === trip.id}
+                          className="p-1.5 rounded-lg text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-50"
+                          title="Delete listing"
+                        >
+                          {deletingTrip === trip.id ? <Clock className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => deleteTrip(trip.id)}
-                      disabled={deletingTrip === trip.id}
-                      className="shrink-0 p-1.5 rounded-lg text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-50"
-                      title="Delete listing"
-                    >
-                      {deletingTrip === trip.id ? <Clock className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                    </button>
+                    {/* Inline date editor */}
+                    {editingTripId === trip.id && (
+                      <div className="px-4 pb-4 pt-0 border-t border-white/8 mt-0">
+                        <p className="text-xs text-white/50 mb-2 mt-3">Change your travel date (must be future)</p>
+                        <div className="flex gap-2 items-start">
+                          <div className="flex-1">
+                            <input
+                              type="date"
+                              value={editDate}
+                              min={new Date().toISOString().split('T')[0]}
+                              onChange={e => { setEditDate(e.target.value); setEditDateError(''); }}
+                              className="w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                            />
+                            {editDateError && <p className="mt-1 text-xs text-red-400">{editDateError}</p>}
+                          </div>
+                          <button
+                            onClick={() => saveDate(trip.id)}
+                            disabled={savingDate}
+                            className="shrink-0 flex items-center gap-1.5 rounded-xl bg-blue-500 hover:bg-blue-400 disabled:opacity-60 text-white font-bold px-4 py-2 text-xs transition-all"
+                          >
+                            {savingDate ? <Clock className="w-3 h-3 animate-spin" /> : 'Save'}
+                          </button>
+                          <button
+                            onClick={() => { setEditingTripId(null); setEditDate(''); setEditDateError(''); }}
+                            className="shrink-0 rounded-xl border border-white/15 text-white/40 hover:text-white/70 px-4 py-2 text-xs transition-all"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -533,15 +601,18 @@ export default function DashboardPage() {
                     </div>
                     {/* Accept / Decline — only if trip date hasn't passed */}
                     {match.status === 'matched' && !isExpired && (() => {
-                      // Determine who is the listing owner vs who expressed interest.
-                      // The person who expressed interest has the auto_created mirror trip.
-                      // The listing owner has the original (non-auto_created) trip.
                       const userIsSender = match.sender_email === user?.email;
-                      const userTrip = userIsSender ? senderTrip : travelerTrip;
-                      const isListingOwner = !userTrip?.auto_created;
-                      return isListingOwner
+                      const userTrip     = userIsSender ? senderTrip : travelerTrip;
+                      const otherTrip    = userIsSender ? travelerTrip : senderTrip;
+
+                      // Express-interest match: one side is auto_created (the expresser).
+                      // The listing owner (non-auto_created) can respond; expresser waits.
+                      // Cron match: neither is auto_created — both parties can respond.
+                      const isExpressInterest = !!(senderTrip?.auto_created || travelerTrip?.auto_created);
+                      const canRespond = isExpressInterest ? !userTrip?.auto_created : true;
+
+                      return canRespond
                         ? (
-                          // Listing owner — sees Accept/Decline
                           <div className="flex gap-2 mb-2">
                             <button
                               onClick={() => respondToMatch(match.id, 'accept')}
@@ -559,7 +630,6 @@ export default function DashboardPage() {
                             </button>
                           </div>
                         ) : (
-                          // Expresser of interest — waiting for listing owner to respond
                           <p className="text-xs text-white/30 text-center mb-2">Waiting for listing owner to respond…</p>
                         )
                     })()}

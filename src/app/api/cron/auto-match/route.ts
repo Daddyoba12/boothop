@@ -157,8 +157,9 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
       }
 
       const score = calcScore(send, travel);
-      // Threshold 50 = route match only (cities). Date/price add bonus points.
-      if (score < 50) {
+      // Threshold 60 = route match (50) + at least date within 3 days (10).
+      // A route-only match (score=50) is not enough — dates must be reasonably close.
+      if (score < 60) {
         skipped.push({ reason: 'low_score', score, sendFrom: normalizeCity(cityEn(send,'from_city')), sendTo: normalizeCity(cityEn(send,'to_city')), travelFrom: normalizeCity(cityEn(travel,'from_city')), travelTo: normalizeCity(cityEn(travel,'to_city')) });
         continue;
       }
