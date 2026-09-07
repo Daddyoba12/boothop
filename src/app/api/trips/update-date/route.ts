@@ -16,16 +16,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'tripId and newDate are required.' }, { status: 400 });
     }
 
-    // Must be today or later — no past dates allowed
+    // Must be at least tomorrow — same-day and past bookings are not allowed
     const parsed = new Date(newDate);
     if (isNaN(parsed.getTime())) {
       return NextResponse.json({ error: 'Invalid date.' }, { status: 400 });
     }
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    if (parsed < todayStart) {
+    const tomorrow = new Date();
+    tomorrow.setHours(0, 0, 0, 0);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    if (parsed < tomorrow) {
       return NextResponse.json(
-        { error: 'Date cannot be in the past.' },
+        { error: 'Date must be at least tomorrow — same-day bookings are not allowed.' },
         { status: 400 },
       );
     }

@@ -516,7 +516,7 @@ export default function DashboardPage() {
                             <input
                               type="date"
                               value={editDate}
-                              min={new Date().toISOString().split('T')[0]}
+                              min={(() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; })()}
                               onChange={e => { setEditDate(e.target.value); setEditDateError(''); }}
                               className="w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
                             />

@@ -27,13 +27,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'A valid price greater than £0 is required.' }, { status: 400 });
     }
 
-    // Enforce minimum today — no past dates
+    // Enforce minimum tomorrow — no same-day or past bookings
     const tripDate = new Date(date);
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    if (tripDate < todayStart) {
+    const tomorrow = new Date();
+    tomorrow.setHours(0, 0, 0, 0);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    if (tripDate < tomorrow) {
       return NextResponse.json(
-        { error: 'Trip date cannot be in the past.' },
+        { error: 'Trip date must be at least tomorrow — same-day bookings are not accepted.' },
         { status: 400 }
       );
     }
