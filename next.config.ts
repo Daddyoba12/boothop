@@ -18,11 +18,11 @@ const nextConfig: NextConfig = {
       // /studio/* → BootHop Creative Studio (separate Vercel deployment, Multi-Zones)
       {
         source: '/studio',
-        destination: 'https://boothop-studio-tunde-olufeks-projects.vercel.app/studio',
+        destination: 'https://desktop-web-beige.vercel.app/studio',
       },
       {
         source: '/studio/:path*',
-        destination: 'https://boothop-studio-tunde-olufeks-projects.vercel.app/studio/:path*',
+        destination: 'https://desktop-web-beige.vercel.app/studio/:path*',
       },
       // Intercept Oracle's onboard API call — saves to Supabase then forwards to Oracle
       {
