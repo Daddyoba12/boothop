@@ -15,6 +15,15 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
+      // /studio/* → BootHop Creative Studio (separate Vercel deployment, Multi-Zones)
+      {
+        source: '/studio',
+        destination: 'https://boothop-studio-tunde-olufeks-projects.vercel.app/studio',
+      },
+      {
+        source: '/studio/:path*',
+        destination: 'https://boothop-studio-tunde-olufeks-projects.vercel.app/studio/:path*',
+      },
       // Intercept Oracle's onboard API call — saves to Supabase then forwards to Oracle
       {
         source: '/api/onboard',
