@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import NavBar from '@/components/NavBar';
 
 const AIRPORT_GROUPS = [
   { label: 'London',  airports: ['LHR', 'LGW', 'STN', 'LTN', 'LCY'], primary: 'LHR' },
@@ -15,14 +16,14 @@ interface FeaturedEntry {
   origin: string; destination: string;
   originCity: string; destCity: string;
   priceGbp: number | null; airlineName: string | null;
-  savingGbp: number | null; opportunityScore: number;
-  recommendation: string;
+  savingGbp: number | null; opportunityScore: number | null;
+  recommendation: string | null;
 }
 
 function scoreColor(s: number) {
-  if (s >= 70) return 'text-green-400';
-  if (s >= 45) return 'text-yellow-400';
-  return 'text-red-400';
+  if (s >= 70) return 'text-green-600';
+  if (s >= 45) return 'text-yellow-600';
+  return 'text-red-600';
 }
 
 function recommendationBadge(r: string) {
@@ -63,9 +64,10 @@ export default function FlightsPage() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
+      <NavBar />
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-blue-50 via-white to-white border-b border-slate-200 py-20 px-4">
+      <div className="bg-gradient-to-br from-blue-50 via-white to-white border-b border-slate-200 pt-32 pb-20 px-4">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-blue-600 text-sm font-medium uppercase tracking-widest mb-4">
             BootHop Flight Intelligence
@@ -153,8 +155,8 @@ export default function FlightsPage() {
                       <p className="text-xs text-slate-600 mb-1">{entry.originCity} → {entry.destCity}</p>
                       <p className="font-mono text-sm text-slate-600">{entry.origin} → {entry.destination}</p>
                     </div>
-                    <span className={`text-xs px-2 py-0.5 rounded-full border ${recommendationBadge(entry.recommendation)}`}>
-                      {entry.recommendation}
+                    <span className={`text-xs px-2 py-0.5 rounded-full border ${entry.recommendation ? recommendationBadge(entry.recommendation) : 'bg-white text-slate-400 border-slate-200'}`}>
+                      {entry.recommendation ?? 'NO DATA'}
                     </span>
                   </div>
 
@@ -165,7 +167,7 @@ export default function FlightsPage() {
                           <p className="text-3xl font-bold text-slate-900">£{entry.priceGbp.toFixed(0)}</p>
                           <p className="text-xs text-slate-600 mt-0.5">{entry.airlineName ?? 'Multiple airlines'}</p>
                           {entry.savingGbp && entry.savingGbp > 0 && (
-                            <p className="text-xs text-green-400 mt-1">↓ £{entry.savingGbp.toFixed(0)} vs yesterday</p>
+                            <p className="text-xs text-green-600 mt-1">↓ £{entry.savingGbp.toFixed(0)} vs yesterday</p>
                           )}
                         </>
                       ) : (
@@ -173,14 +175,20 @@ export default function FlightsPage() {
                       )}
                     </div>
                     <div className="text-right">
-                      <p className={`text-2xl font-bold ${scoreColor(entry.opportunityScore)}`}>
-                        {entry.opportunityScore}
-                      </p>
-                      <p className="text-xs text-slate-600">score</p>
+                      {entry.opportunityScore !== null ? (
+                        <>
+                          <p className={`text-2xl font-bold ${scoreColor(entry.opportunityScore)}`}>
+                            {entry.opportunityScore}
+                          </p>
+                          <p className="text-xs text-slate-600">score</p>
+                        </>
+                      ) : (
+                        <p className="text-xs text-slate-400 mt-1">Score pending</p>
+                      )}
                     </div>
                   </div>
 
-                  <p className="text-xs text-blue-400 mt-4 group-hover:underline">
+                  <p className="text-xs text-blue-600 mt-4 group-hover:underline">
                     View all flights →
                   </p>
                 </Link>
@@ -209,7 +217,7 @@ export default function FlightsPage() {
             >
               <span className="text-slate-600 font-mono text-xs">{a.code}</span>
               <span className="text-slate-900">{a.city}</span>
-              <span className="text-blue-400">→</span>
+              <span className="text-blue-600">→</span>
             </Link>
           ))}
         </div>

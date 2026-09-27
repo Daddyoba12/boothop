@@ -263,7 +263,7 @@ export default function TrustSafetyPage() {
       <section className="relative py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
               <Shield className="h-5 w-5" />
             </div>
             <div>

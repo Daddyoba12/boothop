@@ -142,10 +142,10 @@ export default function HowItWorksPage() {
         backgroundAttachment: 'fixed',
       }}
     >
-      <BusinessNav />
+      <BusinessNav showDefaultNav />
 
       {/* Hero */}
-      <div className="max-w-5xl mx-auto px-8 pt-20 pb-12 text-center">
+      <div className="max-w-5xl mx-auto px-8 pt-32 pb-12 text-center">
         <motion.div {...FADE} transition={{ delay: 0.05 }}
           className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-xs font-semibold px-4 py-2 rounded-full mb-8 uppercase tracking-widest">
           <Zap className="h-3.5 w-3.5" /> Premium Business Logistics
@@ -195,7 +195,7 @@ export default function HowItWorksPage() {
                   </div>
                   <span className="text-emerald-600/60 text-xs font-black tracking-widest">{step}</span>
                 </div>
-                <p className="text-slate-900 font-bold text-sm mb-2 group-hover:text-emerald-300 transition-colors duration-300">{title}</p>
+                <p className="text-slate-900 font-bold text-sm mb-2 group-hover:text-emerald-600 transition-colors duration-300">{title}</p>
                 <p className="text-slate-600 text-xs leading-relaxed">{body}</p>
               </div>
             ))}
@@ -231,7 +231,7 @@ export default function HowItWorksPage() {
                   </div>
                   <span className="text-amber-600/60 text-xs font-black tracking-widest">{step}</span>
                 </div>
-                <p className="text-slate-900 font-bold text-sm mb-2 group-hover:text-amber-300 transition-colors duration-300">{title}</p>
+                <p className="text-slate-900 font-bold text-sm mb-2 group-hover:text-amber-600 transition-colors duration-300">{title}</p>
                 <p className="text-slate-600 text-xs leading-relaxed">{body}</p>
               </div>
             ))}
@@ -249,7 +249,7 @@ export default function HowItWorksPage() {
                 <Truck className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-slate-900 font-black group-hover:text-emerald-300 transition-colors">View full pricing</p>
+                <p className="text-slate-900 font-black group-hover:text-emerald-600 transition-colors">View full pricing</p>
                 <p className="text-slate-600 text-sm">UK local, international routes, insurance &amp; Priority Partner rates</p>
               </div>
             </div>

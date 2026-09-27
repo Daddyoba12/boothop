@@ -61,7 +61,7 @@ export default function CommanderChangePasswordPage() {
               </div>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className={label}>New Password <span className="normal-case text-slate-300">(min 8 characters)</span></label>
+                  <label className={label}>New Password <span className="normal-case text-slate-400">(min 8 characters)</span></label>
                   <input type="password" value={password} onChange={e => setPassword(e.target.value)}
                     placeholder="Choose a strong password" autoComplete="new-password" className={input} required />
                 </div>

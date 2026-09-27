@@ -45,6 +45,13 @@ export function middleware(request: NextRequest) {
   }
 
   // ── Page route protection ──────────────────────────────────────────────────
+  // /admin/login itself must stay reachable without a customer session —
+  // admin auth is enforced separately, per-page, via the boothop_admin_session
+  // cookie (see requireAdminPage()). Gating it here on the customer session
+  // cookie would redirect any admin without an existing customer login into
+  // an infinite loop back to the customer /login page.
+  if (pathname.startsWith('/admin/login')) return NextResponse.next();
+
   const isProtected = protectedPagePaths.some((p) => pathname.startsWith(p));
   if (!isProtected) return NextResponse.next();
 

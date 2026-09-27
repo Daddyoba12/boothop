@@ -128,23 +128,23 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
     s ? `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}` : '—';
 
   const tabClass = (t: Tab) =>
-    `flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${tab === t ? 'bg-gradient-to-r from-orange-500 to-amber-400 text-white shadow-md shadow-orange-500/20' : 'text-slate-400 hover:text-white'}`;
+    `flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${tab === t ? 'bg-gradient-to-r from-orange-500 to-amber-400 text-white shadow-md shadow-orange-500/20' : 'text-slate-500 hover:text-slate-900'}`;
 
-  const inputCls = "rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-all";
+  const inputCls = "rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400/30 focus:border-orange-400 transition-all";
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-10">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-white">Music Management</h1>
-        <span className="text-xs text-slate-400 font-medium">{assigned.size} track{assigned.size !== 1 ? 's' : ''} assigned</span>
+        <h1 className="text-xl font-bold text-slate-900">Music Management</h1>
+        <span className="text-xs text-slate-500 font-medium">{assigned.size} track{assigned.size !== 1 ? 's' : ''} assigned</span>
       </div>
 
       {msg && (
-        <div className="mb-4 text-sm text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3">{msg}</div>
+        <div className="mb-4 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">{msg}</div>
       )}
 
       {/* Tabs */}
-      <div className="flex bg-slate-800 border border-slate-700 rounded-xl p-1 mb-6 gap-1">
+      <div className="flex bg-slate-100 border border-slate-200 rounded-xl p-1 mb-6 gap-1">
         <button className={tabClass('library')}  onClick={() => setTab('library')}>BootHop Library</button>
         <button className={tabClass('youtube')}  onClick={() => setTab('youtube')}>Add from YouTube</button>
         <button className={tabClass('assigned')} onClick={() => setTab('assigned')}>My Tracks ({assigned.size})</button>
@@ -157,14 +157,14 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
             <input value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search title or artist…" className={`flex-1 ${inputCls}`} />
             <select value={genreFilter} onChange={e => setGenreFilter(e.target.value)} className={inputCls}>
-              <option value="" className="bg-slate-900">All genres</option>
-              {genres.map(g => <option key={g} value={g} className="bg-slate-900">{g}</option>)}
+              <option value="" className="bg-white text-slate-900">All genres</option>
+              {genres.map(g => <option key={g} value={g} className="bg-white text-slate-900">{g}</option>)}
             </select>
           </div>
           {filtered.length === 0 ? (
-            <div className="text-center py-16 text-slate-400 text-sm">
+            <div className="text-center py-16 text-slate-500 text-sm">
               No tracks in the library yet.<br />
-              <span className="text-slate-600 text-xs">
+              <span className="text-slate-400 text-xs">
                 Use the &ldquo;Add from YouTube&rdquo; tab to add tracks via YouTube URL.<br />
                 Admin can run a music sync to import the archive of ~120 tracks.
               </span>
@@ -176,7 +176,7 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                 const aUrl = audioUrl(t);
                 const isPlaying = playingId === t.id;
                 return (
-                  <div key={t.id} className="rounded-2xl border border-slate-700 bg-slate-800 hover:border-orange-500/30 px-5 py-4 transition-all">
+                  <div key={t.id} className="rounded-2xl border border-slate-200 bg-white hover:border-orange-300 px-5 py-4 transition-all">
                     <div className="flex items-center gap-4">
                       {t.youtube_id && (
                         <img src={`https://i.ytimg.com/vi/${t.youtube_id}/mqdefault.jpg`} alt=""
@@ -185,21 +185,21 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                       )}
                       {aUrl && !t.youtube_id && (
                         <button onClick={() => setPlayingId(isPlaying ? null : t.id)}
-                          className="shrink-0 w-10 h-10 rounded-lg bg-slate-700 hover:bg-orange-500/20 text-slate-400 hover:text-orange-400 text-base transition-all flex items-center justify-center">
+                          className="shrink-0 w-10 h-10 rounded-lg bg-slate-100 hover:bg-orange-100 text-slate-500 hover:text-orange-600 text-base transition-all flex items-center justify-center">
                           {isPlaying ? '⏸' : '▶'}
                         </button>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{t.title}</p>
-                        <p className="text-xs text-slate-400">{t.artist} · {t.genre} · {fmtDuration(t.duration_seconds)}</p>
+                        <p className="text-sm font-semibold text-slate-900 truncate">{t.title}</p>
+                        <p className="text-xs text-slate-500">{t.artist} · {t.genre} · {fmtDuration(t.duration_seconds)}</p>
                       </div>
-                      <span className="text-[10px] text-slate-600 shrink-0">{t.source}</span>
+                      <span className="text-[10px] text-slate-400 shrink-0">{t.source}</span>
                       {t.youtube_id && (
                         <a href={`https://www.youtube.com/watch?v=${t.youtube_id}`} target="_blank" rel="noreferrer"
-                          className="text-xs text-slate-400 hover:text-orange-500 transition-colors shrink-0">▶ YT</a>
+                          className="text-xs text-slate-500 hover:text-orange-600 transition-colors shrink-0">▶ YT</a>
                       )}
                       <button onClick={() => toggleAssign(t.id)} disabled={busy === t.id}
-                        className={`shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${isOn ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'}`}>
+                        className={`shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${isOn ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`}>
                         {busy === t.id ? '…' : isOn ? 'Remove' : '+ Add'}
                       </button>
                     </div>
@@ -221,7 +221,7 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
         <div>
           {/* URL paste — primary method (no API key needed) */}
           <div className="mb-6">
-            <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider mb-2">Paste a YouTube link (recommended)</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Paste a YouTube link (recommended)</p>
             <div className="flex gap-3">
               <input value={ytUrl}
                 onChange={e => { setYtUrl(e.target.value); setYtResults([]); setYtError(''); }}
@@ -229,23 +229,23 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                 placeholder="https://youtube.com/watch?v=… or dQw4w9WgXcQ"
                 className={`flex-1 font-mono ${inputCls}`} />
               <button onClick={lookupByUrl} disabled={ytLoading || !ytUrl.trim()}
-                className="px-5 py-2.5 rounded-xl bg-orange-500 text-black text-sm font-bold disabled:opacity-40 hover:bg-orange-400 transition-all">
+                className="px-5 py-2.5 rounded-xl bg-orange-500 text-white text-sm font-bold disabled:opacity-40 hover:bg-orange-400 transition-all">
                 {ytLoading ? '…' : 'Look up'}
               </button>
             </div>
-            <p className="text-[10px] text-white/20 mt-2">Open YouTube, copy the link and paste it here — works without any API key.</p>
+            <p className="text-[10px] text-slate-400 mt-2">Open YouTube, copy the link and paste it here — works without any API key.</p>
           </div>
 
           {/* Divider */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-slate-700" />
+            <div className="flex-1 h-px bg-slate-200" />
             <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">or search by keyword</span>
-            <div className="flex-1 h-px bg-slate-700" />
+            <div className="flex-1 h-px bg-slate-200" />
           </div>
 
           {/* Keyword search */}
           <div className="mb-6">
-            <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider mb-2">Search by artist or title</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Search by artist or title</p>
             <div className="flex gap-3">
               <input value={ytQuery}
                 onChange={e => { setYtQuery(e.target.value); setYtResults([]); setYtError(''); }}
@@ -253,37 +253,37 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                 placeholder="e.g. Burna Boy afrobeats 2025"
                 className={`flex-1 ${inputCls}`} />
               <button onClick={searchByKeyword} disabled={ytLoading || !ytQuery.trim()}
-                className="px-5 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold disabled:opacity-40 hover:bg-white/15 transition-all">
+                className="px-5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-900 text-sm font-bold disabled:opacity-40 hover:bg-slate-200 transition-all">
                 {ytLoading ? '…' : 'Search'}
               </button>
             </div>
-            <p className="text-[10px] text-white/20 mt-2">Keyword search requires a YouTube Data API key to be configured — paste a link above if this fails.</p>
+            <p className="text-[10px] text-slate-400 mt-2">Keyword search requires a YouTube Data API key to be configured — paste a link above if this fails.</p>
           </div>
 
           {/* Error */}
           {ytError && (
-            <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4">{ytError}</p>
+            <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">{ytError}</p>
           )}
 
           {/* Results */}
           {ytResults.length > 0 && (
             <div className="space-y-3">
               {ytResults.map(v => (
-                <div key={v.id} className="flex items-center gap-4 rounded-2xl border border-slate-700 bg-slate-800 px-5 py-4">
+                <div key={v.id} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white px-5 py-4">
                   <img src={v.thumbnail} alt="" width="80" height="48" className="h-12 w-20 object-cover rounded-lg shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">{v.title}</p>
-                    <p className="text-xs text-slate-400">{v.channel}</p>
+                    <p className="text-sm font-semibold text-slate-900 truncate">{v.title}</p>
+                    <p className="text-xs text-slate-500">{v.channel}</p>
                     <a href={`https://www.youtube.com/watch?v=${v.id}`} target="_blank" rel="noreferrer"
-                      className="text-[10px] text-slate-400 hover:text-orange-500 transition-colors">
+                      className="text-[10px] text-slate-500 hover:text-orange-600 transition-colors">
                       ▶ Preview →
                     </a>
                   </div>
                   <button onClick={() => importTrack(v)} disabled={busy === v.id || assigned.has(v.id)}
                     className={`shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${
                       assigned.has(v.id)
-                        ? 'bg-slate-700 text-slate-500 cursor-default'
-                        : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'
+                        ? 'bg-slate-100 text-slate-400 cursor-default'
+                        : 'bg-amber-100 text-amber-700 hover:bg-amber-200'
                     }`}>
                     {busy === v.id ? 'Adding…' : assigned.has(v.id) ? '✓ Added' : '+ Add'}
                   </button>
@@ -298,7 +298,7 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
       {tab === 'assigned' && (
         <div>
           {assigned.size === 0 ? (
-            <div className="text-center py-16 text-slate-400 text-sm">
+            <div className="text-center py-16 text-slate-500 text-sm">
               No tracks assigned yet. Go to the Library tab to add some.
             </div>
           ) : (
@@ -307,7 +307,7 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                 const aUrl = audioUrl(t);
                 const isPlaying = playingId === t.id;
                 return (
-                  <div key={t.id} className="rounded-2xl border border-slate-700 bg-slate-800 px-5 py-4">
+                  <div key={t.id} className="rounded-2xl border border-slate-200 bg-white px-5 py-4">
                     <div className="flex items-center gap-4">
                       {t.youtube_id && (
                         <img src={`https://i.ytimg.com/vi/${t.youtube_id}/mqdefault.jpg`} alt=""
@@ -316,20 +316,20 @@ export default function MusicManager({ clientId: _clientId, library, assignedTra
                       )}
                       {aUrl && !t.youtube_id && (
                         <button onClick={() => setPlayingId(isPlaying ? null : t.id)}
-                          className="shrink-0 w-10 h-10 rounded-lg bg-slate-700 hover:bg-orange-500/20 text-slate-400 hover:text-orange-400 text-base transition-all flex items-center justify-center">
+                          className="shrink-0 w-10 h-10 rounded-lg bg-slate-100 hover:bg-orange-100 text-slate-500 hover:text-orange-600 text-base transition-all flex items-center justify-center">
                           {isPlaying ? '⏸' : '▶'}
                         </button>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{t.title}</p>
-                        <p className="text-xs text-slate-400">{t.artist} · {t.genre} · {fmtDuration(t.duration_seconds)}</p>
+                        <p className="text-sm font-semibold text-slate-900 truncate">{t.title}</p>
+                        <p className="text-xs text-slate-500">{t.artist} · {t.genre} · {fmtDuration(t.duration_seconds)}</p>
                       </div>
                       {t.youtube_id && (
                         <a href={`https://www.youtube.com/watch?v=${t.youtube_id}`} target="_blank" rel="noreferrer"
-                          className="text-xs text-slate-400 hover:text-orange-500 transition-colors shrink-0">▶ YT</a>
+                          className="text-xs text-slate-500 hover:text-orange-600 transition-colors shrink-0">▶ YT</a>
                       )}
                       <button onClick={() => toggleAssign(t.id)} disabled={busy === t.id}
-                        className="shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all disabled:opacity-50">
+                        className="shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold bg-red-100 text-red-700 hover:bg-red-200 transition-all disabled:opacity-50">
                         {busy === t.id ? '…' : 'Remove'}
                       </button>
                     </div>

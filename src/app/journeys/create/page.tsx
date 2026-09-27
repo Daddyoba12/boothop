@@ -435,7 +435,7 @@ export default function CreateJourneyPage() {
                               ))}
                             </ul>
                           )}
-                          <p className="mt-2 text-xs text-slate-300">
+                          <p className="mt-2 text-xs text-slate-500">
                             Advisory only — final decisions rest with border authorities.
                           </p>
                         </div>

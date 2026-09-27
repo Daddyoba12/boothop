@@ -11,10 +11,10 @@ const COUNTRIES = [
 ];
 
 const VERDICT_STYLES: Record<string, { bg: string; border: string; text: string; icon: string }> = {
-  PERMITTED:       { bg: 'bg-emerald-950/60', border: 'border-emerald-500/40', text: 'text-emerald-400', icon: '✓' },
-  RESTRICTED:      { bg: 'bg-amber-950/60',   border: 'border-amber-500/40',   text: 'text-amber-400',   icon: '⚠' },
-  PROHIBITED:      { bg: 'bg-red-950/60',      border: 'border-red-500/40',     text: 'text-red-400',     icon: '✗' },
-  REVIEW_REQUIRED: { bg: 'bg-blue-950/60',     border: 'border-blue-500/40',    text: 'text-blue-400',    icon: '?' },
+  PERMITTED:       { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', icon: '✓' },
+  RESTRICTED:      { bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-700',   icon: '⚠' },
+  PROHIBITED:      { bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-700',     icon: '✗' },
+  REVIEW_REQUIRED: { bg: 'bg-blue-50',    border: 'border-blue-200',    text: 'text-blue-700',    icon: '?' },
 };
 
 export default function AICheckPage() {
@@ -65,8 +65,8 @@ export default function AICheckPage() {
 
         {/* Header */}
         <div className="mb-10 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-medium text-blue-400 mb-4">
-            <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-xs font-medium text-blue-700 mb-4">
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
             AI Safety Assistant
           </div>
           <h1 className="text-3xl font-bold text-slate-900 mb-3">Can I send this?</h1>
@@ -167,7 +167,7 @@ export default function AICheckPage() {
           </button>
 
           {error && (
-            <p className="text-center text-sm text-red-400">{error}</p>
+            <p className="text-center text-sm text-red-600">{error}</p>
           )}
         </div>
 
@@ -208,7 +208,7 @@ export default function AICheckPage() {
 
             {/* Review required banner */}
             {result.requiresReview && (
-              <div className="rounded-xl border border-blue-500/20 bg-blue-500/8 px-4 py-3 text-xs text-blue-300">
+              <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-xs text-blue-700">
                 This item has been flagged for manual review. A member of the BootHop team
                 will check it before your delivery is confirmed.
               </div>
@@ -223,7 +223,7 @@ export default function AICheckPage() {
             <div className="flex gap-3 pt-1">
               <a
                 href="/journeys/create"
-                className="flex-1 rounded-xl bg-blue-600 py-3 text-center text-sm font-semibold text-slate-900 hover:bg-blue-500 transition"
+                className="flex-1 rounded-xl bg-blue-600 py-3 text-center text-sm font-semibold text-white hover:bg-blue-500 transition"
               >
                 Post a Journey
               </a>

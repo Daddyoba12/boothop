@@ -138,7 +138,7 @@ function PaymentContent() {
             className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-black px-8 py-4 rounded-2xl hover:scale-105 active:scale-[0.98] transition-all shadow-xl shadow-amber-500/20 text-sm">
             Back to BootHop Business
           </a>
-          <p className="text-slate-300 text-xs mt-4">Questions? Email <span className="text-slate-600">business@boothop.com</span></p>
+          <p className="text-slate-500 text-xs mt-4">Questions? Email <span className="text-slate-600">business@boothop.com</span></p>
         </motion.div>
 
       </div>

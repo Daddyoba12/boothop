@@ -458,7 +458,7 @@ export default function OpsPage() {
             )}
 
             {/* ── Footer ──────────────────────────────────────────────────── */}
-            <div className="text-center text-slate-300 text-xs py-4 border-t border-slate-200">
+            <div className="text-center text-slate-400 text-xs py-4 border-t border-slate-200">
               BootHop Ops Dashboard · Auto-refreshes every 60 seconds · {new Date().toLocaleDateString('en-GB')}
             </div>
           </>

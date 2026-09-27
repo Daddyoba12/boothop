@@ -27,10 +27,10 @@ type Job = {
 };
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  assigned:    { label: 'Assigned',    color: 'bg-blue-500/20 text-blue-300 border-blue-500/30',   icon: <Circle className="h-3 w-3" /> },
-  collected:   { label: 'Collected',   color: 'bg-amber-500/20 text-amber-300 border-amber-500/30', icon: <Package className="h-3 w-3" /> },
-  in_transit:  { label: 'In Transit',  color: 'bg-purple-500/20 text-purple-300 border-purple-500/30', icon: <Truck className="h-3 w-3" /> },
-  delivered:   { label: 'Delivered',   color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30', icon: <CheckCircle2 className="h-3 w-3" /> },
+  assigned:    { label: 'Assigned',    color: 'bg-blue-100 text-blue-700 border-blue-200',   icon: <Circle className="h-3 w-3" /> },
+  collected:   { label: 'Collected',   color: 'bg-amber-100 text-amber-700 border-amber-200', icon: <Package className="h-3 w-3" /> },
+  in_transit:  { label: 'In Transit',  color: 'bg-purple-100 text-purple-700 border-purple-200', icon: <Truck className="h-3 w-3" /> },
+  delivered:   { label: 'Delivered',   color: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: <CheckCircle2 className="h-3 w-3" /> },
 };
 
 function fmt(iso: string | null) {
@@ -112,7 +112,7 @@ export default function CarrierPortalPage() {
             </div>
             <div className="flex items-center gap-2 bg-blue-500/15 border border-blue-500/25 rounded-xl px-4 py-2">
               <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-              <span className="text-sm font-semibold text-blue-300">Active carrier</span>
+              <span className="text-sm font-semibold text-blue-700">Active carrier</span>
             </div>
           </div>
 
@@ -143,7 +143,7 @@ export default function CarrierPortalPage() {
           >
             <Truck className="h-12 w-12 text-slate-200 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-slate-600 mb-2">No jobs assigned yet</h2>
-            <p className="text-sm text-slate-300 max-w-xs mx-auto">
+            <p className="text-sm text-slate-500 max-w-xs mx-auto">
               When a job in your coverage area is matched to you, it will appear here. You'll also receive an email alert.
             </p>
           </motion.div>
@@ -154,14 +154,14 @@ export default function CarrierPortalPage() {
           >
             {activeJobs.length > 0 && (
               <>
-                <p className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-3">Active jobs</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Active jobs</p>
                 {activeJobs.map(job => <JobCard key={job.id} job={job} />)}
               </>
             )}
 
             {completedJobs.length > 0 && (
               <>
-                <p className="text-xs font-bold text-slate-300 uppercase tracking-widest mt-8 mb-3">Completed</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-8 mb-3">Completed</p>
                 {completedJobs.map(job => <JobCard key={job.id} job={job} muted />)}
               </>
             )}
@@ -182,7 +182,7 @@ function JobCard({ job, muted = false }: { job: Job; muted?: boolean }) {
     <div className={`bg-slate-50 border ${muted ? 'border-slate-100 opacity-60' : 'border-slate-200'} rounded-2xl p-5`}>
       <div className="flex items-start justify-between gap-3 mb-4 flex-wrap">
         <div>
-          <p className="text-xs text-slate-300 font-mono mb-1">{job.reference}</p>
+          <p className="text-xs text-slate-500 font-mono mb-1">{job.reference}</p>
           <p className="font-bold">{job.cargo_description || job.package_size || '—'}</p>
           <p className="text-xs text-slate-600 mt-0.5">{typeLabel} delivery · Assigned {fmt(job.assigned_at)}</p>
         </div>

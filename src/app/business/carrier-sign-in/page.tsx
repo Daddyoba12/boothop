@@ -96,9 +96,9 @@ export default function CarrierSignInPage() {
 
   return (
     <div className="min-h-screen text-slate-900 bg-white">
-      <BusinessNav />
+      <BusinessNav showDefaultNav />
 
-      <div className="min-h-screen flex items-center justify-center px-6 py-24">
+      <div className="min-h-screen flex items-center justify-center px-6 pt-32 pb-16">
         <div className="w-full max-w-4xl grid md:grid-cols-2 gap-8 items-center">
 
           {/* Left — feature panel */}
@@ -162,7 +162,7 @@ export default function CarrierSignInPage() {
                       <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-red-600 text-sm">{error}</div>
                     )}
                     <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                       <input
                         type="email" value={email}
                         onChange={e => { setEmail(e.target.value); setError(null); }}

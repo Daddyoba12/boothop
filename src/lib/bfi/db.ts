@@ -233,12 +233,16 @@ export async function getPriceHistory(
   const since = new Date(Date.now() - days * 86_400_000).toISOString().split('T')[0];
   const { data, error } = await db
     .from('bfi_daily_summaries')
-    .select('date, cheapest_price_gbp, cheapest_airline')
+    .select('date, cheapest_price_gbp, cheapest_airline_name')
     .eq('route_id', routeId)
     .gte('date', since)
     .order('date', { ascending: true });
   if (error) throw error;
-  return (data ?? []) as { date: string; cheapest_price_gbp: number; cheapest_airline: string | null }[];
+  return (data ?? []).map(row => ({
+    date:               row.date,
+    cheapest_price_gbp: row.cheapest_price_gbp,
+    cheapest_airline:   row.cheapest_airline_name,
+  }));
 }
 
 // ── Sprint 4: Fare Calendar ───────────────────────────────────────────────────

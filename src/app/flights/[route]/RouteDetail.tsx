@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import NavBar from '@/components/NavBar';
 import type { BFIFlightOffer, BFIRoute, BFIRouteStats } from '@/lib/bfi/types';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -425,7 +426,8 @@ export default function RouteDetail({
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      <div className="mx-auto max-w-4xl px-4 py-10 space-y-8">
+      <NavBar />
+      <div className="mx-auto max-w-4xl px-4 pt-28 pb-10 space-y-8">
 
         {/* Breadcrumb */}
         <div className="text-sm text-slate-600 flex items-center gap-1.5 flex-wrap">

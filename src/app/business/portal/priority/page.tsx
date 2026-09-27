@@ -177,7 +177,7 @@ export default function PriorityPortalPage() {
             <span className="text-xs font-semibold bg-amber-500/20 border border-amber-500/30 text-amber-600 px-2.5 py-1 rounded-full uppercase tracking-widest hidden sm:inline-flex items-center gap-1.5">
               <Star className="h-3 w-3" /> Priority Partner
             </span>
-            <span className="text-slate-300 text-sm hidden md:block">{bizEmail}</span>
+            <span className="text-slate-500 text-sm hidden md:block">{bizEmail}</span>
             <button onClick={logout} className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-900 transition-colors">
               <LogOut className="h-3.5 w-3.5" /> Sign out
             </button>
@@ -196,7 +196,7 @@ export default function PriorityPortalPage() {
               <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-600 text-xs font-black px-4 py-2 rounded-full mb-4 uppercase tracking-widest">
                 <Star className="h-3.5 w-3.5" /> Priority Partner Account
               </div>
-              <p className="text-slate-300 text-sm mb-1">Welcome back{companyName ? `, ${companyName}` : ''}</p>
+              <p className="text-slate-500 text-sm mb-1">Welcome back{companyName ? `, ${companyName}` : ''}</p>
               <h1 className="text-4xl font-black tracking-tight">Priority access,<br /><span className="text-amber-600">guaranteed response.</span></h1>
               <p className="text-slate-600 mt-3 max-w-xl leading-relaxed">
                 As a BootHop Priority Partner, your jobs are first in the allocation queue. Expect operator assignment within 2 hours on all bookings.
@@ -236,7 +236,7 @@ export default function PriorityPortalPage() {
                 <div key={label} className="bg-amber-500/5 border border-amber-500/15 rounded-2xl p-4 text-center">
                   <Icon className="h-5 w-5 text-amber-600 mx-auto mb-2" />
                   <p className="font-bold text-slate-900 text-sm">{label}</p>
-                  <p className="text-slate-300 text-xs mt-0.5">{sub}</p>
+                  <p className="text-slate-500 text-xs mt-0.5">{sub}</p>
                 </div>
               ))}
             </div>
@@ -284,7 +284,7 @@ export default function PriorityPortalPage() {
           <motion.div key="jobs" {...FADE} className="max-w-3xl mx-auto px-6 pt-24 pb-12">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <button onClick={() => setStage('hub')} className="flex items-center gap-1.5 text-slate-300 hover:text-slate-900 text-sm font-semibold transition-colors mb-2">
+                <button onClick={() => setStage('hub')} className="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 text-sm font-semibold transition-colors mb-2">
                   ← Back
                 </button>
                 <h2 className="text-2xl font-black">My priority deliveries</h2>
@@ -302,8 +302,8 @@ export default function PriorityPortalPage() {
             ) : myJobs.length === 0 ? (
               <div className="text-center py-16">
                 <Package className="h-10 w-10 text-slate-200 mx-auto mb-4" />
-                <p className="text-slate-300">No deliveries yet.</p>
-                <button onClick={() => setStage('wizard')} className="mt-4 text-amber-600 hover:text-amber-300 text-sm font-bold transition-colors flex items-center gap-2 mx-auto">
+                <p className="text-slate-500">No deliveries yet.</p>
+                <button onClick={() => setStage('wizard')} className="mt-4 text-amber-600 hover:text-amber-700 text-sm font-bold transition-colors flex items-center gap-2 mx-auto">
                   Book your first priority delivery <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -311,17 +311,17 @@ export default function PriorityPortalPage() {
               <div className="space-y-4">
                 {/* Incomplete bookings — payment was never completed */}
                 {myJobs.filter(j => j.status === 'pending_payment').length > 0 && (
-                  <div className="bg-yellow-500/8 border border-yellow-500/20 rounded-2xl p-5 mb-2">
-                    <p className="text-yellow-400 font-bold text-sm mb-1">Incomplete bookings</p>
+                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-2">
+                    <p className="text-amber-700 font-bold text-sm mb-1">Incomplete bookings</p>
                     <p className="text-slate-600 text-xs mb-4">These bookings were not paid. Start a new booking to proceed — your previous reference will not be charged.</p>
                     <div className="space-y-2">
                       {myJobs.filter(j => j.status === 'pending_payment').map(job => (
                         <div key={job.id} className="flex items-center justify-between gap-4 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
                           <div>
-                            <span className="font-mono text-xs text-yellow-400 font-bold">{job.job_ref}</span>
+                            <span className="font-mono text-xs text-amber-700 font-bold">{job.job_ref}</span>
                             <p className="text-slate-600 text-xs mt-0.5">{job.pickup} → {job.dropoff}</p>
                           </div>
-                          <button onClick={() => setStage('wizard')} className="text-xs text-amber-600 hover:text-amber-300 font-bold whitespace-nowrap transition-colors">
+                          <button onClick={() => setStage('wizard')} className="text-xs text-amber-600 hover:text-amber-700 font-bold whitespace-nowrap transition-colors">
                             New booking →
                           </button>
                         </div>
@@ -347,19 +347,19 @@ export default function PriorityPortalPage() {
                             </span>
                           </div>
                           <p className="text-slate-900 font-semibold text-sm mb-1">{job.pickup} → {job.dropoff}</p>
-                          <p className="text-slate-300 text-xs">
+                          <p className="text-slate-500 text-xs">
                             {new Date(job.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </p>
                           {job.driver_name && (
-                            <div className="mt-3 flex items-center gap-2 text-xs text-blue-300">
+                            <div className="mt-3 flex items-center gap-2 text-xs text-blue-700">
                               <User className="h-3.5 w-3.5" /><span>{job.driver_name}</span>
                               {job.driver_phone && <span>· {job.driver_phone}</span>}
                             </div>
                           )}
                           {(job.assigned_at || job.picked_up_at || job.delivered_at) && (
                             <div className="mt-3 space-y-1">
-                              {job.assigned_at  && <p className="text-xs text-slate-300">Assigned: {fmt(job.assigned_at)}</p>}
-                              {job.picked_up_at && <p className="text-xs text-slate-300">Collected: {fmt(job.picked_up_at)}</p>}
+                              {job.assigned_at  && <p className="text-xs text-slate-500">Assigned: {fmt(job.assigned_at)}</p>}
+                              {job.picked_up_at && <p className="text-xs text-slate-500">Collected: {fmt(job.picked_up_at)}</p>}
                               {job.delivered_at && <p className="text-xs text-emerald-600/60">Delivered: {fmt(job.delivered_at)}</p>}
                             </div>
                           )}
@@ -377,7 +377,7 @@ export default function PriorityPortalPage() {
                           )}
                           {canAct && (
                             <button onClick={() => cancelJob(job.id)} disabled={cancellingId === job.id}
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-red-600 bg-slate-50 border border-slate-200 hover:border-red-500/20 hover:bg-red-500/8 px-3 py-2 rounded-xl transition-all disabled:opacity-50"
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-red-600 bg-slate-50 border border-slate-200 hover:border-red-500/20 hover:bg-red-500/8 px-3 py-2 rounded-xl transition-all disabled:opacity-50"
                             >
                               {cancellingId === job.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XCircle className="h-3.5 w-3.5" />}
                               Cancel
@@ -409,12 +409,12 @@ export default function PriorityPortalPage() {
               </p>
               <p className="text-amber-600/80 text-sm mb-8">Operator assignment within 2 hours — flagged as Priority.</p>
               <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl px-8 py-5 inline-block mb-6">
-                <p className="text-slate-300 text-xs font-bold uppercase tracking-widest mb-1">Reference</p>
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Reference</p>
                 <p className="text-amber-600 font-mono font-black text-2xl tracking-widest">{jobRef}</p>
               </div>
-              <p className="text-slate-300 text-sm mb-8">Confirmation sent to <span className="text-slate-600">{bizEmail}</span></p>
+              <p className="text-slate-500 text-sm mb-8">Confirmation sent to <span className="text-slate-600">{bizEmail}</span></p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button onClick={() => setStage('hub')} className="text-amber-600 hover:text-amber-300 text-sm font-bold transition-colors">
+                <button onClick={() => setStage('hub')} className="text-amber-600 hover:text-amber-700 text-sm font-bold transition-colors">
                   Back to portal →
                 </button>
                 <button onClick={() => { setStage('jobs'); loadMyJobs(); }} className="text-slate-600 hover:text-slate-900 text-sm font-semibold transition-colors">
@@ -436,12 +436,12 @@ export default function PriorityPortalPage() {
       {editingJob && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative w-full max-w-lg bg-white border border-amber-500/20 rounded-2xl p-6 shadow-2xl">
-            <button onClick={() => setEditingJob(null)} className="absolute top-4 right-4 text-slate-300 hover:text-slate-900 transition-colors"><X className="h-5 w-5" /></button>
+            <button onClick={() => setEditingJob(null)} className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 transition-colors"><X className="h-5 w-5" /></button>
             <div className="flex items-center gap-3 mb-1">
               <h3 className="text-lg font-black">Amend priority job</h3>
               <span className="text-xs bg-amber-500/10 border border-amber-500/25 text-amber-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Priority</span>
             </div>
-            <p className="text-slate-300 text-xs mb-6 font-mono">{editingJob.job_ref}</p>
+            <p className="text-slate-500 text-xs mb-6 font-mono">{editingJob.job_ref}</p>
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Pickup</label>
@@ -464,7 +464,7 @@ export default function PriorityPortalPage() {
             </div>
             {editError && <p className="mt-4 text-xs text-red-600 flex items-center gap-2"><AlertCircle className="h-4 w-4 flex-shrink-0" />{editError}</p>}
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setEditingJob(null)} className="flex-1 text-sm font-semibold text-slate-300 hover:text-slate-900 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl transition-all">Cancel</button>
+              <button onClick={() => setEditingJob(null)} className="flex-1 text-sm font-semibold text-slate-500 hover:text-slate-900 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl transition-all">Cancel</button>
               <button onClick={saveEdit} disabled={editLoading} className="flex-1 text-sm font-black text-black bg-amber-400 hover:bg-amber-300 px-4 py-3 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                 {editLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save changes'}
               </button>

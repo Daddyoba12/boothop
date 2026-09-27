@@ -522,7 +522,7 @@ export default function DeclarePage() {
 
         {/* Section 6 — Evidence upload */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-600">Evidence <span className="text-slate-300 font-normal normal-case">(photos, receipts, documents)</span></p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-600">Evidence <span className="text-slate-400 font-normal normal-case">(photos, receipts, documents)</span></p>
 
           {!declId && (
             <p className="text-xs text-slate-600 italic">Save your draft first to enable file uploads.</p>

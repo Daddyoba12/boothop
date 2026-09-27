@@ -341,9 +341,9 @@ export default function TrackPage() {
   if (error || !data) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4">
-        <AlertCircle className="w-10 h-10 text-red-400" />
-        <p className="text-red-400 font-semibold">{error || 'Not found'}</p>
-        <Link href="/dashboard" className="text-blue-400 text-sm hover:underline">Back to dashboard</Link>
+        <AlertCircle className="w-10 h-10 text-red-600" />
+        <p className="text-red-600 font-semibold">{error || 'Not found'}</p>
+        <Link href="/dashboard" className="text-blue-600 text-sm hover:underline">Back to dashboard</Link>
       </div>
     );
   }
@@ -364,7 +364,7 @@ export default function TrackPage() {
       <header className="border-b border-slate-200 px-4 py-4 sticky top-0 bg-slate-50 backdrop-blur z-10">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-blue-400 font-bold text-base">BootHop</span>
+            <span className="text-blue-600 font-bold text-base">BootHop</span>
             <span className="text-slate-600">·</span>
             <span className="text-slate-600 text-xs">Live Tracking</span>
           </div>
@@ -395,7 +395,7 @@ export default function TrackPage() {
               isDelivered
                 ? 'bg-green-500/15 text-green-400 border-green-500/25'
                 : session?.status === 'active'
-                ? 'bg-blue-500/15 text-blue-400 border-blue-500/25'
+                ? 'bg-blue-100 text-blue-700 border-blue-200'
                 : 'bg-slate-50 text-slate-600 border-slate-200'
             }`}>
               {isDelivered ? (
@@ -469,7 +469,7 @@ export default function TrackPage() {
                           : 'bg-slate-50 border-slate-200'
                       }`}>
                         {done
-                          ? <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                          ? <CheckCircle2 className="w-4 h-4 text-blue-600" />
                           : <MIcon className="w-4 h-4 text-slate-600" />
                         }
                       </div>
@@ -495,13 +495,13 @@ export default function TrackPage() {
 
             {/* Tab-hidden GPS warning */}
             {tabWarning && gpsActive && (
-              <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/8 px-4 py-3 flex items-start gap-2">
-                <span className="text-yellow-400 text-sm">⚠</span>
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-start gap-2">
+                <span className="text-amber-700 text-sm">⚠</span>
                 <div className="flex-1">
-                  <p className="text-yellow-400/90 text-xs font-medium">GPS may have paused while this tab was hidden</p>
-                  <p className="text-yellow-400/50 text-xs mt-0.5">Keep this tab visible for continuous location sharing.</p>
+                  <p className="text-amber-800 text-xs font-medium">GPS may have paused while this tab was hidden</p>
+                  <p className="text-amber-700 text-xs mt-0.5">Keep this tab visible for continuous location sharing.</p>
                 </div>
-                <button onClick={() => setTabWarning(false)} className="text-yellow-400/40 hover:text-yellow-400 text-lg leading-none">×</button>
+                <button onClick={() => setTabWarning(false)} className="text-amber-600 hover:text-amber-800 text-lg leading-none">×</button>
               </div>
             )}
 
@@ -515,11 +515,11 @@ export default function TrackPage() {
                       {gpsActive ? 'GPS active — sharing your location' : 'Start to share your location'}
                     </p>
                     {fastMode && (
-                      <p className="text-yellow-400/80 text-xs mt-1">⚡ Frequent updates active — pinging every 2 minutes</p>
+                      <p className="text-amber-700 text-xs mt-1">⚡ Frequent updates active — pinging every 2 minutes</p>
                     )}
                   </div>
                   {gpsActive && (
-                    <span className="flex items-center gap-1.5 text-xs text-emerald-400">
+                    <span className="flex items-center gap-1.5 text-xs text-emerald-700">
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                       Live
                     </span>
@@ -530,7 +530,7 @@ export default function TrackPage() {
                   <button
                     onClick={handleStartJourney}
                     disabled={starting}
-                    className="w-full flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-slate-900 font-semibold rounded-xl transition-all text-sm"
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-semibold rounded-xl transition-all text-sm"
                   >
                     {starting
                       ? <><div className="w-4 h-4 border-2 border-slate-300 border-t-transparent rounded-full animate-spin" />Starting…</>
@@ -541,7 +541,7 @@ export default function TrackPage() {
                   <button
                     onClick={handleStopTracking}
                     disabled={stopping}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-400 font-semibold rounded-xl transition-all text-sm"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-semibold rounded-xl transition-all text-sm"
                   >
                     {stopping
                       ? <><div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />Stopping…</>
@@ -551,7 +551,7 @@ export default function TrackPage() {
                 )}
 
                 {gpsError && (
-                  <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">
+                  <p className="text-red-700 text-xs bg-red-50 border border-red-200 rounded-xl px-3 py-2">
                     {gpsError}
                   </p>
                 )}
@@ -569,7 +569,7 @@ export default function TrackPage() {
                           disabled={loggingEvent !== null || done}
                           className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-medium transition-all ${
                             done
-                              ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400 cursor-default'
+                              ? 'bg-emerald-100 border-emerald-200 text-emerald-700 cursor-default'
                               : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 disabled:opacity-40'
                           }`}
                         >
@@ -594,9 +594,9 @@ export default function TrackPage() {
 
             {/* Delivered state */}
             {isTraveller && isDelivered && (
-              <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/8 p-5 text-center">
-                <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
-                <p className="text-emerald-400 font-semibold">Delivery complete</p>
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-center">
+                <CheckCircle2 className="w-10 h-10 text-emerald-700 mx-auto mb-2" />
+                <p className="text-emerald-700 font-semibold">Delivery complete</p>
                 <p className="text-slate-600 text-xs mt-1">GPS tracking has been turned off</p>
               </div>
             )}
@@ -614,7 +614,7 @@ export default function TrackPage() {
                           <div className="absolute left-[17px] top-9 bottom-0 w-px bg-slate-50" />
                         )}
                         <div className="relative z-10 flex-shrink-0 w-9 h-9 rounded-full bg-blue-500/15 border border-blue-500/30 flex items-center justify-center">
-                          <Icon className="w-4 h-4 text-blue-400" />
+                          <Icon className="w-4 h-4 text-blue-600" />
                         </div>
                         <div className="pb-5 flex-1 min-w-0">
                           <p className="text-slate-700 text-sm font-medium">{eventLabel(evt.event_type)}</p>
@@ -685,7 +685,7 @@ export default function TrackPage() {
           View match details <ChevronRight className="w-4 h-4" />
         </Link>
 
-        <p className="text-center text-slate-300 text-xs pb-6">
+        <p className="text-center text-slate-400 text-xs pb-6">
           BootHop Ltd · Tracking ID: {matchId?.slice(0, 8)}…
         </p>
 

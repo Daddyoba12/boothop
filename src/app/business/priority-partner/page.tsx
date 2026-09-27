@@ -217,8 +217,8 @@ export default function PriorityPartnerPage() {
   if (gate === 'email' || gate === 'otp') return (
     <div className="min-h-screen text-slate-900"
       style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)' }}>
-      <BusinessNav />
-      <div className="min-h-screen flex items-center justify-center px-6 py-24">
+      <BusinessNav showDefaultNav />
+      <div className="min-h-screen flex items-center justify-center px-6 pt-32 pb-16">
         <div className="w-full max-w-4xl grid md:grid-cols-2 gap-8 items-center">
 
           {/* Left — perks panel */}
@@ -277,7 +277,7 @@ export default function PriorityPartnerPage() {
               </p>
             </div>
             <div className="bg-slate-100 backdrop-blur-xl border border-slate-200 shadow-2xl rounded-2xl p-8 space-y-4">
-              {gateError && <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">{gateError}</div>}
+              {gateError && <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-700 text-sm">{gateError}</div>}
               {gate === 'email' ? (
                 <>
                   <div className="relative">
@@ -288,7 +288,7 @@ export default function PriorityPartnerPage() {
                       placeholder="you@yourcompany.com" autoFocus
                       className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm" />
                   </div>
-                  <p className="text-slate-300 text-xs text-center">Business email only — personal addresses not accepted.</p>
+                  <p className="text-slate-500 text-xs text-center">Business email only — personal addresses not accepted.</p>
                   <button onClick={sendGateOtp} disabled={gateLoading || !gateEmail.trim()}
                     className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-black bg-gradient-to-r from-amber-400 to-orange-400 text-black disabled:opacity-40 hover:scale-[1.02] transition-all">
                     {gateLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
@@ -308,11 +308,11 @@ export default function PriorityPartnerPage() {
                     {gateLoading ? 'Verifying…' : 'Verify & Continue'}
                   </button>
                   <button onClick={() => { setGate('email'); setGateOtp(''); setGateError(null); }}
-                    className="w-full text-center text-slate-300 hover:text-slate-600 text-sm transition-colors">
+                    className="w-full text-center text-slate-500 hover:text-slate-600 text-sm transition-colors">
                     ← Use a different email
                   </button>
                   <button onClick={sendGateOtp}
-                    className="w-full text-center text-slate-300 text-xs hover:text-slate-600 transition-colors">
+                    className="w-full text-center text-slate-500 text-xs hover:text-slate-600 transition-colors">
                     Didn't get it? Resend code
                   </button>
                 </>
@@ -402,7 +402,7 @@ export default function PriorityPartnerPage() {
               <h3 className="text-2xl font-black mb-1">UK Partner</h3>
               <p className="text-slate-600 text-sm mb-4">For UK delivery accounts</p>
               <p className="text-amber-600 font-black text-4xl mb-1">£{FEES.uk.toLocaleString()}</p>
-              <p className="text-slate-300 text-sm mb-6">per year</p>
+              <p className="text-slate-500 text-sm mb-6">per year</p>
               <ul className="space-y-2">
                 {PERKS.map(p => (
                   <li key={p.label} className="flex items-center gap-2 text-sm text-slate-600">
@@ -436,7 +436,7 @@ export default function PriorityPartnerPage() {
               <h3 className="text-2xl font-black mb-1">International Partner</h3>
               <p className="text-slate-600 text-sm mb-4">For accounts shipping internationally</p>
               <p className="text-amber-600 font-black text-4xl mb-1">£{FEES.international.toLocaleString()}</p>
-              <p className="text-slate-300 text-sm mb-6">per year</p>
+              <p className="text-slate-500 text-sm mb-6">per year</p>
               <ul className="space-y-2">
                 {PERKS.map(p => (
                   <li key={p.label} className="flex items-center gap-2 text-sm text-slate-600">
@@ -492,7 +492,7 @@ export default function PriorityPartnerPage() {
 
             <div className="space-y-5">
               {error && (
-                <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-300 text-sm">{error}</div>
+                <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-red-700 text-sm">{error}</div>
               )}
 
               {/* Contact fields */}
@@ -530,7 +530,7 @@ export default function PriorityPartnerPage() {
                     <button key={opt} type="button" onClick={() => setForm(p => ({ ...p, industry_sector: opt }))}
                       className={`text-sm px-4 py-2 rounded-xl border font-semibold transition-all ${
                         form.industry_sector === opt
-                          ? 'bg-amber-400/20 border-amber-400/50 text-amber-300'
+                          ? 'bg-amber-100 border-amber-300 text-amber-800'
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-700 hover:border-slate-300'
                       }`}>{opt}</button>
                   ))}
@@ -545,7 +545,7 @@ export default function PriorityPartnerPage() {
                     <button key={opt} type="button" onClick={() => setForm(p => ({ ...p, delivery_frequency: opt }))}
                       className={`text-sm px-4 py-2 rounded-xl border font-semibold transition-all ${
                         form.delivery_frequency === opt
-                          ? 'bg-amber-400/20 border-amber-400/50 text-amber-300'
+                          ? 'bg-amber-100 border-amber-300 text-amber-800'
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-700 hover:border-slate-300'
                       }`}>{opt}</button>
                   ))}
@@ -560,7 +560,7 @@ export default function PriorityPartnerPage() {
                     <button key={opt} type="button" onClick={() => setForm(p => ({ ...p, typical_destinations: opt }))}
                       className={`text-sm px-4 py-2 rounded-xl border font-semibold transition-all ${
                         form.typical_destinations === opt
-                          ? 'bg-amber-400/20 border-amber-400/50 text-amber-300'
+                          ? 'bg-amber-100 border-amber-300 text-amber-800'
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-700 hover:border-slate-300'
                       }`}>{opt}</button>
                   ))}
@@ -571,7 +571,7 @@ export default function PriorityPartnerPage() {
               <div>
                 <label className="text-xs text-slate-600 block mb-2 flex items-center gap-1.5">
                   <Briefcase className="h-3.5 w-3.5" /> What are you typically moving?
-                  <span className="text-slate-300 normal-case">Select all that apply</span>
+                  <span className="text-slate-500 normal-case">Select all that apply</span>
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {WHAT_MOVING_OPTIONS.map(({ key, sub }) => (
@@ -595,7 +595,7 @@ export default function PriorityPartnerPage() {
                     <span className="text-slate-600">— £{fee?.toLocaleString()}/year</span>
                   </div>
                   <button onClick={() => setForm(p => ({ ...p, delivery_type: '' }))}
-                    className="text-slate-300 hover:text-slate-600 text-xs transition-colors">Change</button>
+                    className="text-slate-500 hover:text-slate-600 text-xs transition-colors">Change</button>
                 </div>
               )}
 
@@ -613,7 +613,7 @@ export default function PriorityPartnerPage() {
                 {loading ? 'Processing…' : fee ? `Proceed to payment — £${fee.toLocaleString()}` : 'Proceed to payment'}
               </button>
 
-              <p className="text-slate-300 text-xs text-center">
+              <p className="text-slate-500 text-xs text-center">
                 Payment via bank transfer on the next step · Account activated within 1 week of payment clearing
               </p>
             </div>

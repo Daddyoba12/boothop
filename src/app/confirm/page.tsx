@@ -67,12 +67,12 @@ function ConfirmContent() {
           </Link>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-slate-900/80 p-10 shadow-2xl backdrop-blur text-center">
+        <div className="rounded-3xl border border-slate-200 bg-white p-10 shadow-xl text-center">
 
           {status === 'loading' && (
             <>
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-500/20 border border-blue-500/30">
-                <Loader2 className="h-8 w-8 text-blue-400 animate-spin" />
+                <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
               </div>
               <h1 className="text-xl font-bold text-slate-900 mb-2">
                 {ACTION_LABELS[actionType] || 'Processing…'}
@@ -84,14 +84,14 @@ function ConfirmContent() {
           {status === 'success' && (
             <>
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-green-500/20 border border-green-500/30">
-                <CheckCircle className="h-8 w-8 text-green-400" />
+                <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
               <h1 className="text-xl font-bold text-slate-900 mb-2">Done!</h1>
-              <p className="text-sm text-slate-300 mb-6">{message}</p>
+              <p className="text-sm text-slate-600 mb-6">{message}</p>
               <p className="text-xs text-slate-600 mb-4">Redirecting you now…</p>
               <Link
                 href={redirectTo}
-                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-slate-900 text-sm font-semibold px-6 py-3 rounded-xl transition-all"
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-all"
               >
                 Continue <ArrowRight className="h-4 w-4" />
               </Link>
@@ -101,13 +101,13 @@ function ConfirmContent() {
           {status === 'error' && (
             <>
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/20 border border-red-500/30">
-                <AlertCircle className="h-8 w-8 text-red-400" />
+                <AlertCircle className="h-8 w-8 text-red-600" />
               </div>
               <h1 className="text-xl font-bold text-slate-900 mb-2">Link invalid</h1>
               <p className="text-sm text-slate-600 mb-6">{message}</p>
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-slate-900 text-sm font-semibold px-6 py-3 rounded-xl transition-all"
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-all"
               >
                 Go to login <ArrowRight className="h-4 w-4" />
               </Link>

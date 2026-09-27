@@ -477,11 +477,11 @@ function RegisterForm() {
       {/* ══════════════════════════════════════════
           RIGHT PANEL — form (40%)
       ══════════════════════════════════════════ */}
-      <div className="flex-1 lg:w-2/5 overflow-y-auto flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative">
+      <div className="flex-1 lg:w-2/5 overflow-y-auto flex flex-col bg-gradient-to-br from-white to-slate-50 relative">
 
         {/* Background blobs */}
-        <div className="fixed top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '4s' }} />
-        <div className="fixed bottom-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '6s', animationDelay: '2s' }} />
+        <div className="fixed top-0 right-0 w-80 h-80 bg-cyan-500/8 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="fixed bottom-0 right-0 w-80 h-80 bg-blue-500/8 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '6s', animationDelay: '2s' }} />
 
 
         <div className="relative z-10 flex-1 flex items-center justify-center px-6 py-12">
@@ -489,19 +489,19 @@ function RegisterForm() {
 
             {/* ── SUCCESS STATE — trip registered ── */}
             {step === 'success' && successData && (
-              <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 backdrop-blur-xl p-10 shadow-2xl text-center">
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative overflow-hidden rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-cyan-50 p-10 shadow-xl text-center">
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-100 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-cyan-100 rounded-full blur-3xl pointer-events-none" />
                 <div className="relative">
-                  <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-400 shadow-xl shadow-emerald-500/50">
+                  <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-400 shadow-lg shadow-emerald-500/30">
                     <CheckCircle className="h-8 w-8 text-white" />
                   </div>
-                  <h2 className="text-2xl font-black text-white mb-2">Your trip is live!</h2>
-                  <p className="text-slate-300 text-sm mb-6">Your listing has been registered and is now live on BootHop Journeys.</p>
+                  <h2 className="text-2xl font-black text-slate-900 mb-2">Your trip is live!</h2>
+                  <p className="text-slate-600 text-sm mb-6">Your listing has been registered and is now live on BootHop Journeys.</p>
 
                   {/* Trip summary */}
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm space-y-2 mb-6 text-left">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${successData.type === 'travel' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}`}>
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm space-y-2 mb-6 text-left">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${successData.type === 'travel' ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
                       {successData.type === 'travel' ? <><Plane className="h-3 w-3" /> Travelling</> : <><Package className="h-3 w-3" /> Sending</>}
                     </span>
                     <p className="text-slate-900 font-bold text-base">{successData.from} → {successData.to}</p>
@@ -510,11 +510,11 @@ function RegisterForm() {
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-center gap-2 text-emerald-400 text-sm font-semibold mb-2">
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                  <div className="flex items-center justify-center gap-2 text-emerald-600 text-sm font-semibold mb-2">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                     Redirecting to Live Journeys…
                   </div>
-                  <p className="text-slate-600 text-xs">You'll be taken there automatically in a moment.</p>
+                  <p className="text-slate-500 text-xs">You'll be taken there automatically in a moment.</p>
 
                   <button
                     onClick={() => { window.location.href = successData.redirectTo; }}
@@ -528,19 +528,19 @@ function RegisterForm() {
 
             {/* ── SENT STATE — code input ── */}
             {step === 'sent' && (
-              <div className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-xl p-10 shadow-2xl">
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative overflow-hidden rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-10 shadow-xl">
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-100 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-cyan-100 rounded-full blur-3xl pointer-events-none" />
                 <div className="relative">
-                  <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 shadow-xl shadow-blue-500/50">
+                  <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 shadow-lg shadow-blue-500/30">
                     <Mail className="h-8 w-8 text-white" />
                   </div>
-                  <h2 className="text-2xl font-black text-white mb-1 text-center">Enter your code</h2>
-                  <p className="text-slate-300 text-sm mb-1 text-center">We sent a 5-character code to</p>
-                  <p className="text-cyan-600 font-bold mb-6 text-center">{form.email}</p>
+                  <h2 className="text-2xl font-black text-slate-900 mb-1 text-center">Enter your code</h2>
+                  <p className="text-slate-600 text-sm mb-1 text-center">We sent a 5-character code to</p>
+                  <p className="text-cyan-700 font-bold mb-6 text-center">{form.email}</p>
 
                   {error && (
-                    <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300 flex items-center gap-2">
+                    <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2">
                       <AlertCircle className="h-4 w-4 shrink-0" />{error}
                     </div>
                   )}
@@ -562,7 +562,7 @@ function RegisterForm() {
                   </form>
 
                   <button onClick={() => { setStep('email'); setCodeInput(''); setError(null); }}
-                    className="mt-4 w-full text-sm text-slate-300 hover:text-white transition text-center">
+                    className="mt-4 w-full text-sm text-slate-500 hover:text-slate-900 transition text-center">
                     ← Resend code
                   </button>
                 </div>
@@ -590,7 +590,7 @@ function RegisterForm() {
 
                 {/* Trip summary */}
                 <div className="relative mb-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm space-y-2 backdrop-blur-sm">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${mode === 'travel' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}`}>
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${mode === 'travel' ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
                     {mode === 'travel' ? <><Plane className="h-3 w-3" /> Travelling</> : <><Package className="h-3 w-3" /> Sending</>}
                   </span>
                   <p className="text-slate-900 font-bold text-base">{form.from} → {form.to}</p>
@@ -602,9 +602,9 @@ function RegisterForm() {
                 </div>
 
                 {error && (
-                  <div className="mb-4 flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 p-3">
-                    <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-red-300 text-sm">{error}</p>
+                  <div className="mb-4 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3">
+                    <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-red-700 text-sm">{error}</p>
                   </div>
                 )}
 
@@ -656,16 +656,16 @@ function RegisterForm() {
                 </div>
 
                 {error && (
-                  <div className="mb-5 flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 p-3">
-                    <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-red-300 text-sm">{error}</p>
+                  <div className="mb-5 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3">
+                    <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-red-700 text-sm">{error}</p>
                   </div>
                 )}
 
                 {countryBlocked && (
-                  <div className="mb-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-center">
-                    <AlertCircle className="h-7 w-7 text-red-400 mx-auto mb-2" />
-                    <p className="text-red-300 font-bold text-sm mb-1">Service unavailable in your region</p>
+                  <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-center">
+                    <AlertCircle className="h-7 w-7 text-red-600 mx-auto mb-2" />
+                    <p className="text-red-700 font-bold text-sm mb-1">Service unavailable in your region</p>
                     <p className="text-slate-600 text-xs">BootHop cannot process deliveries from your country due to international shipping restrictions. Please contact us for assistance.</p>
                   </div>
                 )}
@@ -722,7 +722,7 @@ function RegisterForm() {
                         ))}
                       </div>
                     )}
-                    {fromQuery && !fromOk && !fromAirportData && <p className="absolute -bottom-5 left-1 text-xs text-amber-400 animate-pulse">Select from list</p>}
+                    {fromQuery && !fromOk && !fromAirportData && <p className="absolute -bottom-5 left-1 text-xs text-amber-700 animate-pulse">Select from list</p>}
                   </div>
 
                   {/* From terminal picker — shown after airport with terminals selected */}
@@ -790,7 +790,7 @@ function RegisterForm() {
                         ))}
                       </div>
                     )}
-                    {toQuery && !toOk && !toAirportData && <p className="absolute -bottom-5 left-1 text-xs text-amber-400 animate-pulse">Select from list</p>}
+                    {toQuery && !toOk && !toAirportData && <p className="absolute -bottom-5 left-1 text-xs text-amber-700 animate-pulse">Select from list</p>}
                   </div>
 
                   {/* To terminal picker */}
@@ -813,9 +813,9 @@ function RegisterForm() {
                     const rt = classifyRoute();
                     if (rt === 'unknown') return null;
                     const cfg: Record<string, { label: string; cls: string; dot: string }> = {
-                      domestic:      { label: 'Domestic route — no restrictions',      cls: 'text-emerald-300 border-emerald-500/30 bg-emerald-500/10', dot: 'bg-emerald-400' },
-                      eu_internal:   { label: 'EU internal — free movement applies',   cls: 'text-blue-300 border-blue-500/30 bg-blue-500/10',     dot: 'bg-blue-400'    },
-                      international: { label: 'International route',                   cls: 'text-amber-300 border-amber-500/30 bg-amber-500/10',   dot: 'bg-amber-400'   },
+                      domestic:      { label: 'Domestic route — no restrictions',      cls: 'text-emerald-700 border-emerald-200 bg-emerald-50', dot: 'bg-emerald-500' },
+                      eu_internal:   { label: 'EU internal — free movement applies',   cls: 'text-blue-700 border-blue-200 bg-blue-50',     dot: 'bg-blue-500'    },
+                      international: { label: 'International route',                   cls: 'text-amber-700 border-amber-200 bg-amber-50',   dot: 'bg-amber-500'   },
                     };
                     const c = cfg[rt];
                     return (
@@ -823,7 +823,7 @@ function RegisterForm() {
                         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${c.dot}`} />
                         {c.label}
                         {rt === 'international' && contactFirst && (
-                          <span className="ml-auto text-amber-400/70 text-[10px]">Contact us required →</span>
+                          <span className="ml-auto text-amber-700 text-[10px]">Contact us required →</span>
                         )}
                       </div>
                     );
@@ -874,8 +874,8 @@ function RegisterForm() {
       {showContactModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
           <div className="w-full max-w-sm rounded-3xl border border-amber-500/30 bg-gradient-to-br from-white to-slate-50 p-8 shadow-2xl">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/20">
-              <AlertCircle className="h-7 w-7 text-amber-400" />
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100">
+              <AlertCircle className="h-7 w-7 text-amber-600" />
             </div>
             <h2 className="text-xl font-black text-slate-900 text-center mb-2">Contact us first</h2>
             <p className="text-slate-600 text-sm text-center mb-6">

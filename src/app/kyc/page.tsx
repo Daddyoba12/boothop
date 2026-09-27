@@ -429,7 +429,7 @@ function KycContent() {
               {myKycStatus === 'pending' && (
                 <button
                   onClick={loadData}
-                  className="w-full mt-3 flex items-center justify-center gap-2 text-sm text-slate-600 hover:text-slate-600 transition-colors"
+                  className="w-full mt-3 flex items-center justify-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   <RefreshCw className="h-3.5 w-3.5" /> Check verification status
                 </button>

@@ -38,9 +38,11 @@ export async function GET() {
       priceGbp:        summary?.cheapest_price_gbp  ?? null,
       airlineName:     summary?.cheapest_airline_name ?? null,
       savingGbp:       summary?.saving_vs_yesterday_gbp ?? null,
-      opportunityScore: stat?.opportunity_score ?? 50,
-      recommendation:  stat?.recommendation    ?? 'HOLD',
-      trend:           stat?.trend             ?? 'stable',
+      // null (not a fake default) when we have no real stat row — the frontend
+      // must not show a score/recommendation next to an admitted "no data" price.
+      opportunityScore: stat?.opportunity_score ?? null,
+      recommendation:  stat?.recommendation    ?? null,
+      trend:           stat?.trend             ?? null,
     };
   }).filter(Boolean);
 

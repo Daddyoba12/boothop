@@ -232,7 +232,7 @@ export default function ExpressPage() {
                       {(['uk', 'international'] as const).map(t => (
                         <button key={t} type="button" onClick={() => setQ('type', t)}
                           className={`p-3 rounded-xl border text-sm font-bold transition-all ${
-                            quote.type === t ? 'bg-emerald-500/15 border-emerald-400/50 text-emerald-300' : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
+                            quote.type === t ? 'bg-emerald-100 border-emerald-300 text-emerald-800' : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
                           }`}>
                           {t === 'uk' ? '🇬🇧 UK' : '🌍 International'}
                         </button>
@@ -246,11 +246,11 @@ export default function ExpressPage() {
                       {Object.entries(SIZE_LABELS).map(([val, lbl]) => (
                         <button key={val} type="button" onClick={() => setQ('size', val)}
                           className={`p-3 rounded-xl border text-left transition-all ${
-                            quote.size === val ? 'bg-emerald-500/15 border-emerald-400/50' : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                            quote.size === val ? 'bg-emerald-100 border-emerald-300' : 'bg-slate-50 border-slate-200 hover:border-slate-300'
                           }`}>
-                          <p className={`text-sm font-bold ${quote.size === val ? 'text-emerald-300' : 'text-slate-600'}`}>{lbl}</p>
+                          <p className={`text-sm font-bold ${quote.size === val ? 'text-emerald-800' : 'text-slate-600'}`}>{lbl}</p>
                           {quote.type && (
-                            <p className="text-xs text-slate-300 mt-0.5">From £{PRICES[quote.type][val].toLocaleString()}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">From £{PRICES[quote.type][val].toLocaleString()}</p>
                           )}
                         </button>
                       ))}
@@ -302,7 +302,7 @@ export default function ExpressPage() {
                   className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-black text-base px-8 py-4 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-emerald-500/25 mb-4">
                   Confirm &amp; Book <ArrowRight className="h-5 w-5" />
                 </button>
-                <button onClick={() => setStep(1)} className="text-slate-300 text-sm hover:text-slate-600 transition-colors">
+                <button onClick={() => setStep(1)} className="text-slate-500 text-sm hover:text-slate-800 transition-colors">
                   ← Change details
                 </button>
               </div>
@@ -320,7 +320,7 @@ export default function ExpressPage() {
                   </div>
                   <h2 className="text-2xl font-black mb-2">Enter your business email</h2>
                   <p className="text-slate-600 text-sm">to confirm your booking.</p>
-                  <p className="text-slate-300 text-xs mt-2">Personal addresses not accepted.</p>
+                  <p className="text-slate-500 text-xs mt-2">Personal addresses not accepted.</p>
                 </div>
 
                 <input
@@ -342,7 +342,7 @@ export default function ExpressPage() {
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
                   {loading ? 'Sending…' : 'Send Verification Code →'}
                 </button>
-                <p className="text-center text-slate-300 text-xs">
+                <p className="text-center text-slate-500 text-xs">
                   Already have an account? <a href="/business" className="text-slate-600 hover:text-slate-900 underline">Sign in here →</a>
                 </p>
               </div>
@@ -379,10 +379,10 @@ export default function ExpressPage() {
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
                   {loading ? 'Verifying…' : 'Confirm Code →'}
                 </button>
-                <button onClick={() => { setStep(3); setOtp(''); }} className="text-slate-300 text-sm hover:text-slate-600 transition-colors block mx-auto">
+                <button onClick={() => { setStep(3); setOtp(''); }} className="text-slate-500 text-sm hover:text-slate-800 transition-colors block mx-auto">
                   ← Back
                 </button>
-                <button onClick={sendOtp} className="text-slate-300 text-xs hover:text-slate-600 transition-colors mt-3 block mx-auto">
+                <button onClick={sendOtp} className="text-slate-500 text-xs hover:text-slate-800 transition-colors mt-3 block mx-auto">
                   Didn't get it? Resend code
                 </button>
               </div>
@@ -480,7 +480,7 @@ export default function ExpressPage() {
                 A verified carrier will be assigned within 15 minutes.
               </p>
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-left max-w-sm mx-auto mb-8">
-                <p className="text-xs font-black text-slate-300 uppercase tracking-widest mb-3">You'll receive</p>
+                <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">You'll receive</p>
                 {['SMS confirmation shortly', 'Live tracking link by email', 'Delivery confirmation when done'].map(t => (
                   <div key={t} className="flex items-center gap-2 text-sm text-slate-600 mb-2">
                     <CheckCircle className="h-3.5 w-3.5 text-emerald-600 shrink-0" /> {t}
@@ -497,8 +497,8 @@ export default function ExpressPage() {
                   Back to Business
                 </a>
               </div>
-              <p className="text-slate-300 text-xs mt-6">
-                Need to speak to someone? <a href="tel:+441156612825" className="text-slate-600 hover:text-slate-600 underline">+44 115 661 2825</a>
+              <p className="text-slate-500 text-xs mt-6">
+                Need to speak to someone? <a href="tel:+441156612825" className="text-slate-700 hover:text-slate-900 underline">+44 115 661 2825</a>
               </p>
             </motion.div>
           )}

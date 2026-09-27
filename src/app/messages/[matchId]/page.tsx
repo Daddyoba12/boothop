@@ -216,7 +216,7 @@ export default function ChatPage() {
             <div className="text-center py-16">
               <CheckCircle className="h-12 w-12 text-slate-300 mx-auto mb-3" />
               <p className="text-slate-600 text-sm">No messages yet — say hello!</p>
-              <p className="text-slate-300 text-xs mt-1">All messages stay within BootHop for your protection.</p>
+              <p className="text-slate-400 text-xs mt-1">All messages stay within BootHop for your protection.</p>
             </div>
           )}
 

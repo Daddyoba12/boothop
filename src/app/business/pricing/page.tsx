@@ -15,10 +15,10 @@ export default function BusinessPricingPage() {
       className="min-h-screen text-slate-900"
       style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)', backgroundAttachment: 'fixed' }}
     >
-      <BusinessNav />
+      <BusinessNav showDefaultNav />
 
       {/* Hero */}
-      <div className="max-w-5xl mx-auto px-8 pt-20 pb-12 text-center">
+      <div className="max-w-5xl mx-auto px-8 pt-32 pb-12 text-center">
         <motion.div {...FADE} transition={{ delay: 0.05 }}
           className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-xs font-semibold px-4 py-2 rounded-full mb-8 uppercase tracking-widest">
           <Zap className="h-3.5 w-3.5" /> Transparent Pricing
@@ -80,7 +80,7 @@ export default function BusinessPricingPage() {
                   </div>
                 ))}
               </div>
-              <p className="text-slate-300 text-xs mt-3">Extra mileage: £3–£6.50/mile</p>
+              <p className="text-slate-500 text-xs mt-3">Extra mileage: £3–£6.50/mile</p>
             </div>
 
             {/* UK ↔ EU */}
@@ -109,7 +109,7 @@ export default function BusinessPricingPage() {
                   </div>
                 ))}
               </div>
-              <p className="text-slate-300 text-xs mt-3">Extra mileage billed separately</p>
+              <p className="text-slate-500 text-xs mt-3">Extra mileage billed separately</p>
             </div>
 
             {/* UK → Global */}
@@ -138,7 +138,7 @@ export default function BusinessPricingPage() {
                   </div>
                 ))}
               </div>
-              <p className="text-slate-300 text-xs mt-3">Insurance: 8% of declared value</p>
+              <p className="text-slate-500 text-xs mt-3">Insurance: 8% of declared value</p>
             </div>
           </div>
         </motion.div>
@@ -154,7 +154,7 @@ export default function BusinessPricingPage() {
               <ShieldCheck className="h-5 w-5 text-emerald-600" />
             </div>
             <div>
-              <p className="text-slate-900 font-black group-hover:text-emerald-300 transition-colors">Insurance</p>
+              <p className="text-slate-900 font-black group-hover:text-emerald-600 transition-colors">Insurance</p>
               <p className="text-slate-600 text-xs">Included on every delivery</p>
             </div>
           </div>
@@ -188,7 +188,7 @@ export default function BusinessPricingPage() {
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <p className="text-slate-900 font-black group-hover:text-amber-300 transition-colors">Priority Partner</p>
+                <p className="text-slate-900 font-black group-hover:text-amber-600 transition-colors">Priority Partner</p>
                 <span className="text-xs font-bold bg-amber-500/20 text-amber-600 px-2 py-0.5 rounded-full uppercase tracking-widest">Exclusive</span>
               </div>
               <p className="text-slate-600 text-sm mb-4 leading-relaxed">

@@ -2,7 +2,16 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import type { MissionControlData } from '@/lib/bfi/types';
+
+type Severity = 'red' | 'yellow' | 'blue';
+
+const ISSUE_STYLES: Record<Severity, { border: string; bg: string; hoverBorder: string; text: string }> = {
+  red:    { border: 'border-red-200',    bg: 'bg-red-50',    hoverBorder: 'hover:border-red-300',    text: 'text-red-700' },
+  yellow: { border: 'border-yellow-200', bg: 'bg-yellow-50', hoverBorder: 'hover:border-yellow-300', text: 'text-yellow-700' },
+  blue:   { border: 'border-blue-200',   bg: 'bg-blue-50',   hoverBorder: 'hover:border-blue-300',   text: 'text-blue-700' },
+};
 
 function TodayClicks() {
   const [clicks, setClicks] = useState<number | null>(null);
@@ -85,6 +94,44 @@ export default function MissionControl() {
   }
 
   const d = data;
+
+  // Real, live operational signals — replaces a static "build checklist" that
+  // used to sit here and always showed 20 green checkmarks regardless of
+  // actual system state.
+  const issues: { label: string; detail: string; href: string; severity: Severity }[] = [];
+  if (d?.providersOffline) {
+    issues.push({
+      label:    `${d.providersOffline} data provider${d.providersOffline > 1 ? 's' : ''} offline`,
+      detail:   'Live pricing may be stale for routes served by the affected provider(s)',
+      href:     '/bfi/providers',
+      severity: 'red',
+    });
+  }
+  if (d?.routesAttention) {
+    issues.push({
+      label:    `${d.routesAttention} route${d.routesAttention > 1 ? 's' : ''} need attention`,
+      detail:   'No recent offers scanned, or a pricing anomaly was detected',
+      href:     '/bfi/routes',
+      severity: 'yellow',
+    });
+  }
+  if (d?.unreadAlerts) {
+    issues.push({
+      label:    `${d.unreadAlerts} unread alert${d.unreadAlerts > 1 ? 's' : ''}`,
+      detail:   'Review flagged pricing or scan events',
+      href:     '/bfi/alerts',
+      severity: 'blue',
+    });
+  }
+  const scanAgeHours = d?.lastScanAt ? (Date.now() - new Date(d.lastScanAt).getTime()) / 3_600_000 : null;
+  if (scanAgeHours !== null && scanAgeHours > 12) {
+    issues.push({
+      label:    'Scan data is stale',
+      detail:   `Last successful scan was ${Math.round(scanAgeHours)}h ago — expected every few hours`,
+      href:     '/bfi/logs',
+      severity: 'yellow',
+    });
+  }
 
   return (
     <div className="space-y-8">
@@ -203,23 +250,33 @@ export default function MissionControl() {
         </div>
       </div>
 
-      {/* Sprint status */}
+      {/* Needs Attention — real live signals, not a static checklist */}
       <div className="bg-white border border-slate-200 rounded-xl p-5">
-        <p className="text-xs text-slate-600 uppercase tracking-wider mb-4">Sprint 1 — Infrastructure</p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-          {[
-            'Database schema', 'Airport table', 'Airline table', 'Route table',
-            'Flight offers table', 'Search runs', 'Daily summaries', 'Route statistics',
-            'Alerts engine', 'Provider architecture', 'Mock provider', 'Search engine',
-            'Intelligence engine', 'Statistics engine', 'Admin dashboard', 'Mission Control',
-            'Route manager', 'Scan logs', 'Alerts page', 'Flight ticker',
-          ].map(item => (
-            <div key={item} className="flex items-center gap-2 text-slate-600">
-              <span className="text-green-600">✓</span>
-              <span className="text-xs">{item}</span>
-            </div>
-          ))}
-        </div>
+        <p className="text-xs text-slate-600 uppercase tracking-wider mb-4">Needs Attention</p>
+        {issues.length === 0 ? (
+          <div className="flex items-center gap-2 text-sm text-green-600 py-1">
+            <CheckCircle2 className="h-4 w-4" /> All systems nominal — no action needed
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {issues.map(issue => {
+              const style = ISSUE_STYLES[issue.severity];
+              return (
+                <Link
+                  key={issue.label}
+                  href={issue.href}
+                  className={`flex items-center justify-between gap-3 rounded-lg border ${style.border} ${style.bg} ${style.hoverBorder} px-4 py-3 transition-colors`}
+                >
+                  <div>
+                    <p className={`text-sm font-semibold ${style.text}`}>{issue.label}</p>
+                    <p className="text-xs text-slate-600 mt-0.5">{issue.detail}</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-slate-400 shrink-0" />
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
     </div>

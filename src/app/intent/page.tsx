@@ -41,13 +41,13 @@ export default function IntentPage() {
       {/* ── Top bar ── */}
       <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200">
         <Link href="/" className="text-2xl font-bold text-slate-900 tracking-tight">
-          Boot<span className="text-blue-400">Hop</span>
+          Boot<span className="text-blue-600">Hop</span>
         </Link>
         <div className="flex items-center gap-4">
           <span className="hidden sm:block text-sm text-slate-600">{email}</span>
           <button
             onClick={signOut}
-            className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-600 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition-colors"
           >
             <LogOut className="h-3.5 w-3.5" /> Sign out
           </button>
@@ -58,9 +58,9 @@ export default function IntentPage() {
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-16">
 
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 mb-5 px-4 py-1.5 rounded-full bg-blue-500/20 border border-blue-500/30">
-            <CheckCircle className="h-4 w-4 text-blue-400" />
-            <span className="text-xs font-semibold uppercase tracking-widest text-blue-300">Logged in</span>
+          <div className="inline-flex items-center gap-2 mb-5 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200">
+            <CheckCircle className="h-4 w-4 text-blue-600" />
+            <span className="text-xs font-semibold uppercase tracking-widest text-blue-700">Logged in</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-4 leading-tight">
             What are you doing today?
@@ -80,14 +80,14 @@ export default function IntentPage() {
             onMouseLeave={() => setHover(null)}
             className={`group relative rounded-3xl border p-8 text-left transition-all duration-300 cursor-pointer ${
               hover === 'send'
-                ? 'border-blue-400 bg-blue-500/20 shadow-2xl shadow-blue-500/20 scale-[1.02]'
-                : 'border-slate-200 bg-slate-50 hover:border-blue-500/50'
+                ? 'border-blue-400 bg-blue-50 shadow-xl shadow-blue-500/10 scale-[1.02]'
+                : 'border-slate-200 bg-white hover:border-blue-300'
             }`}
           >
             <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all ${
-              hover === 'send' ? 'bg-blue-500' : 'bg-blue-500/20'
+              hover === 'send' ? 'bg-blue-500' : 'bg-blue-100'
             }`}>
-              <Package className={`h-8 w-8 transition-all ${hover === 'send' ? 'text-slate-900' : 'text-blue-400'}`} />
+              <Package className={`h-8 w-8 transition-all ${hover === 'send' ? 'text-white' : 'text-blue-600'}`} />
             </div>
 
             <h2 className="text-2xl font-black text-slate-900 mb-2">Send a Package</h2>
@@ -98,14 +98,12 @@ export default function IntentPage() {
             <ul className="space-y-2 mb-8">
               {['Post item details', 'Get matched automatically', 'Pay into secure escrow', 'Confirm delivery & rate'].map((s) => (
                 <li key={s} className="flex items-center gap-2 text-sm text-slate-600">
-                  <CheckCircle className="h-3.5 w-3.5 text-blue-400 shrink-0" /> {s}
+                  <CheckCircle className="h-3.5 w-3.5 text-blue-600 shrink-0" /> {s}
                 </li>
               ))}
             </ul>
 
-            <div className={`flex items-center gap-2 font-semibold text-sm transition-all ${
-              hover === 'send' ? 'text-blue-300' : 'text-blue-400'
-            }`}>
+            <div className="flex items-center gap-2 font-semibold text-sm text-blue-700 transition-all">
               Post a delivery request <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </button>
@@ -117,14 +115,14 @@ export default function IntentPage() {
             onMouseLeave={() => setHover(null)}
             className={`group relative rounded-3xl border p-8 text-left transition-all duration-300 cursor-pointer ${
               hover === 'travel'
-                ? 'border-cyan-400 bg-cyan-500/20 shadow-2xl shadow-cyan-500/20 scale-[1.02]'
-                : 'border-slate-200 bg-slate-50 hover:border-cyan-500/50'
+                ? 'border-cyan-400 bg-cyan-50 shadow-xl shadow-cyan-500/10 scale-[1.02]'
+                : 'border-slate-200 bg-white hover:border-cyan-300'
             }`}
           >
             <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all ${
-              hover === 'travel' ? 'bg-cyan-500' : 'bg-cyan-500/20'
+              hover === 'travel' ? 'bg-cyan-500' : 'bg-cyan-100'
             }`}>
-              <Plane className={`h-8 w-8 transition-all ${hover === 'travel' ? 'text-slate-900' : 'text-cyan-400'}`} />
+              <Plane className={`h-8 w-8 transition-all ${hover === 'travel' ? 'text-white' : 'text-cyan-700'}`} />
             </div>
 
             <h2 className="text-2xl font-black text-slate-900 mb-2">I&apos;m Travelling</h2>
@@ -135,14 +133,12 @@ export default function IntentPage() {
             <ul className="space-y-2 mb-8">
               {['Post your route & dates', 'Accept matched requests', 'Complete ID verification', 'Get paid on delivery'].map((s) => (
                 <li key={s} className="flex items-center gap-2 text-sm text-slate-600">
-                  <CheckCircle className="h-3.5 w-3.5 text-cyan-400 shrink-0" /> {s}
+                  <CheckCircle className="h-3.5 w-3.5 text-cyan-700 shrink-0" /> {s}
                 </li>
               ))}
             </ul>
 
-            <div className={`flex items-center gap-2 font-semibold text-sm transition-all ${
-              hover === 'travel' ? 'text-cyan-300' : 'text-cyan-400'
-            }`}>
+            <div className="flex items-center gap-2 font-semibold text-sm text-cyan-700 transition-all">
               Post my trip <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </button>

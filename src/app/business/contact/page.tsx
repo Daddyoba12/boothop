@@ -41,10 +41,10 @@ export default function BusinessContactPage() {
 
   return (
     <div className="min-h-screen text-slate-900 bg-white">
-      <BusinessNav />
+      <BusinessNav showDefaultNav />
 
       {/* Hero */}
-      <div className="max-w-5xl mx-auto px-8 pt-20 pb-12 text-center">
+      <div className="max-w-5xl mx-auto px-8 pt-32 pb-12 text-center">
         <motion.div
           {...FADE}
           transition={{ delay: 0.05 }}
@@ -239,7 +239,7 @@ export default function BusinessContactPage() {
               )}
             </div>
 
-            <p className="text-center text-slate-300 text-sm mt-6">
+            <p className="text-center text-slate-500 text-sm mt-6">
               or{' '}
               <a href="/business" className="text-slate-600 hover:text-slate-900 transition-colors font-semibold">
                 sign in directly

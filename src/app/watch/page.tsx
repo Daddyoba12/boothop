@@ -60,7 +60,7 @@ export default function WatchPage() {
 
         <p className="text-slate-600 text-xs mt-6 text-center">
           Get started at{' '}
-          <a href="https://www.boothop.com" className="text-blue-400 hover:underline">
+          <a href="https://www.boothop.com" className="text-blue-600 hover:underline">
             www.boothop.com
           </a>
         </p>

@@ -365,7 +365,7 @@ export default function DashboardPage() {
 
             <button
               onClick={() => { localStorage.removeItem('boothop_pending_journey'); setPendingJourney(null); }}
-              className="mt-4 text-xs text-slate-600 hover:text-slate-600 transition-colors"
+              className="mt-4 text-xs text-slate-500 hover:text-slate-900 transition-colors"
             >
               Dismiss
             </button>

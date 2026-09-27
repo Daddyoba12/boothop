@@ -136,14 +136,14 @@ function ProgressBar({ step }: { step: Step }) {
           <div key={label} className="flex items-center gap-1">
             <div className="flex flex-col items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all ${
-                done   ? 'bg-blue-400 text-black'
-                : active ? 'bg-blue-400/20 border-2 border-blue-400 text-blue-300'
-                         : 'bg-slate-50 border border-slate-200 text-slate-300'
+                done   ? 'bg-blue-500 text-white'
+                : active ? 'bg-blue-100 border-2 border-blue-500 text-blue-700'
+                         : 'bg-slate-50 border border-slate-200 text-slate-500'
               }`}>
                 {done ? <CheckCircle className="h-4 w-4" /> : num}
               </div>
               <span className={`text-[10px] mt-1 font-bold uppercase tracking-wider ${
-                active ? 'text-blue-300' : done ? 'text-blue-300/60' : 'text-slate-300'
+                active ? 'text-blue-700' : done ? 'text-blue-500' : 'text-slate-500'
               }`}>{label}</span>
             </div>
             {i < 3 && <div className={`w-10 h-px mb-5 transition-all ${done ? 'bg-blue-400/50' : 'bg-slate-100'}`} />}
@@ -186,7 +186,7 @@ function RadioGrid({ options, value, onChange }: {
         <button key={opt.value} type="button" onClick={() => onChange(opt.value)}
           className={`text-left p-3.5 rounded-xl border transition-all ${
             value === opt.value
-              ? 'bg-blue-500/15 border-blue-400/50 text-blue-300'
+              ? 'bg-blue-500/15 border-blue-400/50 text-blue-700'
               : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-200 hover:bg-slate-50'
           }`}>
           <p className="text-sm font-bold">{opt.label}</p>
@@ -204,7 +204,7 @@ function Field({ label, required, children, hint }: { label: string; required?: 
         {label}{required && <span className="text-blue-600 ml-1">*</span>}
       </label>
       {children}
-      {hint && <p className="text-xs text-slate-300 mt-1.5">{hint}</p>}
+      {hint && <p className="text-xs text-slate-500 mt-1.5">{hint}</p>}
     </div>
   );
 }
@@ -294,7 +294,7 @@ export default function CarrierNetworkPage() {
             <a href="/business" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-slate-900 text-sm font-semibold transition-colors">
               <ChevronLeft className="h-4 w-4" /> Business
             </a>
-            <span className="text-xs font-semibold bg-blue-500/15 border border-blue-400/25 text-blue-300 px-2.5 py-1 rounded-full uppercase tracking-widest">
+            <span className="text-xs font-semibold bg-blue-500/15 border border-blue-400/25 text-blue-700 px-2.5 py-1 rounded-full uppercase tracking-widest">
               Carrier Network
             </span>
           </>
@@ -306,18 +306,18 @@ export default function CarrierNetworkPage() {
         <div className="pointer-events-none absolute inset-0"
           style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(59,130,246,0.12) 0%, transparent 70%)' }} />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="inline-flex items-center gap-2 bg-blue-500/12 border border-blue-400/25 text-blue-300 text-xs font-bold px-4 py-2 rounded-full mb-6 uppercase tracking-widest">
+          className="inline-flex items-center gap-2 bg-blue-500/12 border border-blue-400/25 text-blue-700 text-xs font-bold px-4 py-2 rounded-full mb-6 uppercase tracking-widest">
           <Users className="h-3.5 w-3.5" /> Couriers &amp; Transport Operators
         </motion.div>
         <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight leading-[1.05] mb-6 max-w-4xl mx-auto">
-          More jobs.<br /><span className="text-blue-300">Less searching.</span>
+          More jobs.<br /><span className="text-blue-700">Less searching.</span>
         </motion.h1>
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
           className="text-slate-600 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-4">
           Join the BootHop Carrier Network — AOG, same-day, specialist cargo. Earn per job.
           Paid within <strong className="text-slate-900">1 week</strong> of each delivery.
-          One-time registration fee: <span className="text-blue-300 font-bold">£250</span>.
+          One-time registration fee: <span className="text-blue-700 font-bold">£250</span>.
         </motion.p>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
           className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-600/80 text-xs font-semibold px-4 py-2 rounded-full">
@@ -339,7 +339,7 @@ export default function CarrierNetworkPage() {
 
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                  <Building2 className="h-5 w-5 text-blue-300" />
+                  <Building2 className="h-5 w-5 text-blue-700" />
                 </div>
                 <div>
                   <h2 className="text-xl font-black">Company Identity</h2>
@@ -392,7 +392,7 @@ export default function CarrierNetworkPage() {
                     <button key={r} type="button" onClick={() => set('your_role', r)}
                       className={`text-sm px-4 py-2 rounded-xl border font-semibold transition-all ${
                         form.your_role === r
-                          ? 'bg-blue-400/20 border-blue-400/50 text-blue-300'
+                          ? 'bg-blue-400/20 border-blue-400/50 text-blue-700'
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-700 hover:border-slate-300'
                       }`}>{r}</button>
                   ))}
@@ -414,7 +414,7 @@ export default function CarrierNetworkPage() {
 
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                  <Truck className="h-5 w-5 text-blue-300" />
+                  <Truck className="h-5 w-5 text-blue-700" />
                 </div>
                 <h2 className="text-xl font-black">Fleet &amp; Operations</h2>
               </div>
@@ -426,7 +426,7 @@ export default function CarrierNetworkPage() {
                     <button key={s} type="button" onClick={() => set('fleet_size', s)}
                       className={`text-sm px-4 py-2 rounded-xl border font-semibold transition-all ${
                         form.fleet_size === s
-                          ? 'bg-blue-400/20 border-blue-400/50 text-blue-300'
+                          ? 'bg-blue-400/20 border-blue-400/50 text-blue-700'
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-700 hover:border-slate-300'
                       }`}>{s}</button>
                   ))}
@@ -436,14 +436,14 @@ export default function CarrierNetworkPage() {
               <div>
                 <p className="text-xs text-slate-600 uppercase tracking-widest font-bold mb-3">
                   Vehicle types <span className="text-blue-600">*</span>
-                  <span className="text-slate-300 normal-case ml-2">Select all that apply</span>
+                  <span className="text-slate-500 normal-case ml-2">Select all that apply</span>
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {VEHICLE_TYPES.map(v => (
                     <button key={v} type="button" onClick={() => toggleVehicle(v)}
                       className={`text-sm px-4 py-2 rounded-xl border font-semibold transition-all ${
                         form.vehicle_types.includes(v)
-                          ? 'bg-blue-400/20 border-blue-400/50 text-blue-300'
+                          ? 'bg-blue-400/20 border-blue-400/50 text-blue-700'
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-700 hover:border-slate-300'
                       }`}>{v}</button>
                   ))}
@@ -471,7 +471,7 @@ export default function CarrierNetworkPage() {
               <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                    <Shield className="h-5 w-5 text-blue-300" />
+                    <Shield className="h-5 w-5 text-blue-700" />
                   </div>
                   <div>
                     <h2 className="text-xl font-black">Certifications</h2>
@@ -488,7 +488,7 @@ export default function CarrierNetworkPage() {
 
               <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8">
                 <h2 className="text-xl font-black mb-2 flex items-center gap-2">
-                  <Truck className="h-5 w-5 text-blue-300" /> Cargo types
+                  <Truck className="h-5 w-5 text-blue-700" /> Cargo types
                 </h2>
                 <p className="text-slate-600 text-sm mb-6">What do you regularly move?</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -501,7 +501,7 @@ export default function CarrierNetworkPage() {
 
               <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8">
                 <h2 className="text-xl font-black mb-2 flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-blue-300" /> Service capabilities
+                  <Clock className="h-5 w-5 text-blue-700" /> Service capabilities
                 </h2>
                 <p className="text-slate-600 text-sm mb-6">What service types can you offer?</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -515,7 +515,7 @@ export default function CarrierNetworkPage() {
               {/* Insurance upload */}
               <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8">
                 <h2 className="text-xl font-black mb-2 flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-blue-300" /> Insurance certificate
+                  <FileText className="h-5 w-5 text-blue-700" /> Insurance certificate
                 </h2>
                 <p className="text-slate-600 text-sm mb-6">
                   Public liability minimum £1,000,000. PDF only, max 5MB.
@@ -530,25 +530,25 @@ export default function CarrierNetworkPage() {
                 {insuranceFile ? (
                   <div className="flex items-center justify-between bg-blue-500/10 border border-blue-400/25 rounded-xl px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <FileText className="h-5 w-5 text-blue-300 shrink-0" />
+                      <FileText className="h-5 w-5 text-blue-700 shrink-0" />
                       <div>
                         <p className="text-sm font-bold text-slate-900">{insuranceFile.name}</p>
                         <p className="text-xs text-slate-600">{(insuranceFile.size / 1024).toFixed(0)} KB</p>
                       </div>
                     </div>
-                    <button onClick={() => setInsuranceFile(null)} className="text-slate-300 hover:text-slate-600 transition-colors">
+                    <button onClick={() => setInsuranceFile(null)} className="text-slate-500 hover:text-slate-600 transition-colors">
                       <X className="h-4 w-4" />
                     </button>
                   </div>
                 ) : (
                   <button onClick={() => fileRef.current?.click()}
-                    className="w-full flex flex-col items-center justify-center gap-3 border-2 border-dashed border-slate-200 hover:border-blue-400/30 rounded-2xl py-8 text-slate-300 hover:text-blue-300 transition-all">
+                    className="w-full flex flex-col items-center justify-center gap-3 border-2 border-dashed border-slate-200 hover:border-blue-300 rounded-2xl py-8 text-slate-500 hover:text-blue-600 transition-all">
                     <Upload className="h-8 w-8" />
                     <span className="text-sm font-semibold">Click to upload insurance certificate</span>
                     <span className="text-xs">PDF only · Max 5MB</span>
                   </button>
                 )}
-                <p className="text-xs text-slate-300 mt-3">
+                <p className="text-xs text-slate-500 mt-3">
                   Don&apos;t have it to hand? Email it to{' '}
                   <span className="text-slate-600">carriers@boothop.com</span> after registering — use your company name as the subject.
                 </p>
@@ -566,7 +566,7 @@ export default function CarrierNetworkPage() {
               <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 space-y-5">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                    <CreditCard className="h-5 w-5 text-blue-300" />
+                    <CreditCard className="h-5 w-5 text-blue-700" />
                   </div>
                   <div>
                     <h2 className="text-xl font-black">Banking details</h2>
@@ -601,7 +601,7 @@ export default function CarrierNetworkPage() {
                     <button key={o} type="button" onClick={() => set('how_did_you_hear', o)}
                       className={`text-sm px-4 py-2 rounded-xl border font-semibold transition-all ${
                         form.how_did_you_hear === o
-                          ? 'bg-blue-400/20 border-blue-400/50 text-blue-300'
+                          ? 'bg-blue-400/20 border-blue-400/50 text-blue-700'
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-700 hover:border-slate-300'
                       }`}>{o}</button>
                   ))}
@@ -632,7 +632,7 @@ export default function CarrierNetworkPage() {
                     '70% of the client rate per job',
                   ].map(t => (
                     <span key={t} className="flex items-center gap-1.5">
-                      <CheckCircle className="h-3.5 w-3.5 text-blue-300" /> {t}
+                      <CheckCircle className="h-3.5 w-3.5 text-blue-700" /> {t}
                     </span>
                   ))}
                 </div>
@@ -652,7 +652,7 @@ export default function CarrierNetworkPage() {
                 </div>
                 <p className="text-sm text-slate-600 leading-relaxed">
                   I confirm the information above is accurate and I agree to the{' '}
-                  <span className="text-blue-300 underline">BootHop Carrier Agreement</span>.
+                  <span className="text-blue-700 underline">BootHop Carrier Agreement</span>.
                   I understand BootHop operates a 70/30 model — I receive 70% of the client rate for each completed job,
                   paid within 1 week of verified delivery.
                 </p>

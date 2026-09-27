@@ -683,7 +683,7 @@ export default function MatchPage() {
                 {sendingMsg ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </button>
             </div>
-            <p className="text-xs text-slate-300 mt-2">Do not share phone numbers or contact details outside BootHop.</p>
+            <p className="text-xs text-slate-500 mt-2">Do not share phone numbers or contact details outside BootHop.</p>
           </div>
         )}
 
@@ -827,7 +827,7 @@ export default function MatchPage() {
                   <span className={`absolute -left-[7px] mt-[3px] h-3.5 w-3.5 rounded-full border-2 ${i === timeline.length - 1 ? 'border-blue-500 bg-blue-500' : 'border-slate-300 bg-white'}`} />
                   <p className="text-slate-900 text-sm font-semibold leading-snug">{ev.label}</p>
                   <p className="text-slate-600 text-xs mt-0.5 leading-relaxed">{ev.description}</p>
-                  <p className="text-slate-300 text-xs mt-1">
+                  <p className="text-slate-400 text-xs mt-1">
                     {new Date(ev.timestamp).toLocaleString('en-GB', {
                       day: 'numeric', month: 'short', year: 'numeric',
                       hour: '2-digit', minute: '2-digit',
@@ -837,7 +837,7 @@ export default function MatchPage() {
                 </li>
               ))}
             </ol>
-            <p className="text-slate-300 text-xs mt-5">
+            <p className="text-slate-400 text-xs mt-5">
               Some milestones may take a few minutes to appear. All times are in your local timezone.
             </p>
           </div>

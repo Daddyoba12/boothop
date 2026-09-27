@@ -334,7 +334,7 @@ export default function ComplianceMatchDetail({
                 <span className="font-semibold text-slate-800">Item Declaration</span>
                 <span className="text-xs text-slate-600">v{declaration.version}</span>
                 {declaration.declaration_text_version && (
-                  <span className="text-xs text-slate-300">· form {declaration.declaration_text_version}</span>
+                  <span className="text-xs text-slate-400">· form {declaration.declaration_text_version}</span>
                 )}
               </div>
               <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
@@ -413,7 +413,7 @@ export default function ComplianceMatchDetail({
                         ticked && level === 'high'   ? 'bg-red-50 border-red-200 text-red-700 font-semibold' :
                         ticked && level === 'warn'   ? 'bg-amber-50 border-amber-200 text-amber-700 font-medium' :
                         ticked                       ? 'bg-slate-100 border-slate-200 text-slate-700' :
-                        'bg-slate-50 border-slate-100 text-slate-300'
+                        'bg-slate-50 border-slate-100 text-slate-400'
                       }`}
                     >
                       {ticked && level === 'high'

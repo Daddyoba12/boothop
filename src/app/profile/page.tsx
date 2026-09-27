@@ -170,7 +170,7 @@ export default function ProfilePage() {
             <div className="flex items-center gap-6">
               {/* Avatar */}
               <div className="relative">
-                <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-slate-900 text-3xl font-bold">
+                <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
                   {profile.full_name.charAt(0).toUpperCase()}
                 </div>
                 <button className="absolute bottom-0 right-0 w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition">
@@ -423,7 +423,7 @@ export default function ProfilePage() {
                 <div key={rating.id} className="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-slate-900 font-semibold">
+                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
                         {rating.reviewer_profile.full_name.charAt(0)}
                       </div>
                       <div>

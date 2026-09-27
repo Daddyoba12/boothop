@@ -84,9 +84,9 @@ export default function ExpressSignInPage() {
 
   return (
     <div className="min-h-screen text-slate-900 bg-white">
-      <BusinessNav />
+      <BusinessNav showDefaultNav />
 
-      <div className="min-h-screen flex items-center justify-center px-6 py-24">
+      <div className="min-h-screen flex items-center justify-center px-6 pt-32 pb-16">
         <div className="w-full max-w-4xl grid md:grid-cols-2 gap-8 items-center">
 
           {/* Left — feature panel */}
@@ -150,7 +150,7 @@ export default function ExpressSignInPage() {
                       <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-red-600 text-sm">{error}</div>
                     )}
                     <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                       <input
                         type="email" value={email}
                         onChange={e => { setEmail(e.target.value); setError(null); }}
@@ -159,7 +159,7 @@ export default function ExpressSignInPage() {
                         className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 text-sm"
                       />
                     </div>
-                    <p className="text-slate-300 text-xs text-center">Business email only — personal addresses not accepted.</p>
+                    <p className="text-slate-500 text-xs text-center">Business email only — personal addresses not accepted.</p>
                     <button
                       onClick={sendOtp} disabled={loading || !email.trim()}
                       className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-black bg-gradient-to-r from-emerald-500 to-teal-500 text-white disabled:opacity-40 hover:scale-[1.02] transition-all">
@@ -207,7 +207,7 @@ export default function ExpressSignInPage() {
                       Use a different email
                     </button>
                     <button onClick={sendOtp}
-                      className="w-full text-center text-slate-300 text-xs hover:text-slate-600 transition-colors">
+                      className="w-full text-center text-slate-500 text-xs hover:text-slate-600 transition-colors">
                       Didn't get it? Resend code
                     </button>
                   </div>

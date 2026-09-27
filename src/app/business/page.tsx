@@ -215,14 +215,14 @@ export default function BoothopBusiness() {
                 <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 w-56 h-56 bg-blue-500/15 rounded-full blur-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
 
                 <div className="absolute top-6 right-6">
-                  <span className="text-[10px] font-black bg-blue-400/20 border border-blue-400/30 text-blue-300 px-3 py-1 rounded-full uppercase tracking-widest">
+                  <span className="text-[10px] font-black bg-blue-400/20 border border-blue-400/30 text-blue-700 px-3 py-1 rounded-full uppercase tracking-widest">
                     Join the Network
                   </span>
                 </div>
 
                 <div className="mb-6">
                   <div className="w-12 h-12 rounded-2xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center mb-5">
-                    <Users className="h-6 w-6 text-blue-300" />
+                    <Users className="h-6 w-6 text-blue-700" />
                   </div>
                   <span className="text-[10px] font-black text-blue-600/70 uppercase tracking-widest">Couriers &amp; Operators</span>
                   <h3 className="text-2xl font-black text-slate-900 mt-1 mb-3">Carrier Network</h3>
@@ -247,12 +247,12 @@ export default function BoothopBusiness() {
                 </ul>
 
                 <div className="mt-auto">
-                  <p className="text-blue-300/60 text-xs font-semibold mb-4">Free to register · Earn per job accepted</p>
+                  <p className="text-blue-700/60 text-xs font-semibold mb-4">Free to register · Earn per job accepted</p>
                   <a href="/business/carrier-network"
                     className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-slate-900 font-black text-sm px-5 py-3.5 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-blue-500/25">
                     Join the Network <ArrowRight className="h-4 w-4" />
                   </a>
-                  <p className="text-slate-300 text-xs text-center mt-3">
+                  <p className="text-slate-500 text-xs text-center mt-3">
                     Capability profile required · Certifications verified
                   </p>
                 </div>
@@ -296,7 +296,7 @@ export default function BoothopBusiness() {
                     className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-orange-400 text-black font-black text-sm px-5 py-3.5 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-amber-500/20">
                     Apply for Access <ArrowRight className="h-4 w-4" />
                   </a>
-                  <p className="text-slate-300 text-xs text-center mt-3">
+                  <p className="text-slate-500 text-xs text-center mt-3">
                     Your account manager calls within 2 hours
                   </p>
                 </div>
@@ -310,7 +310,7 @@ export default function BoothopBusiness() {
         {/* ── INDUSTRY STRIP ────────────────────────────────────── */}
         <div className="relative z-10 border-y border-slate-100 bg-slate-50 py-10 px-6">
           <div className="max-w-5xl mx-auto">
-            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] text-center mb-6">Serving critical industries</p>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] text-center mb-6">Serving critical industries</p>
             <div className="flex flex-wrap justify-center gap-3">
               {['⚙️ Engineering & Manufacturing', '✈️ Aerospace & AOG', '⚖️ Legal & Finance', '🎬 Events & Production', '🏥 Healthcare & Pharma'].map(ind => (
                 <span key={ind} className="text-xs text-slate-600 font-semibold bg-slate-50 border border-slate-200 rounded-full px-4 py-2">
@@ -407,7 +407,7 @@ export default function BoothopBusiness() {
                   <p className="text-[10px] font-black text-emerald-600/60 uppercase tracking-widest mb-1">{n}</p>
                   <p className="text-slate-900 font-black text-sm mb-2">{title}</p>
                   <p className="text-slate-600 text-xs leading-relaxed">{desc}</p>
-                  {n !== '04' && <div className="hidden lg:block absolute -right-2 top-1/2 -translate-y-1/2 text-slate-300 text-lg font-black z-10">→</div>}
+                  {n !== '04' && <div className="hidden lg:block absolute -right-2 top-1/2 -translate-y-1/2 text-slate-500 text-lg font-black z-10">→</div>}
                 </div>
               ))}
             </div>
@@ -423,9 +423,9 @@ export default function BoothopBusiness() {
             </div>
             <div className="rounded-3xl border border-slate-200 bg-slate-50 backdrop-blur-sm overflow-hidden">
               <div className="grid grid-cols-4 border-b border-slate-200">
-                <div className="p-4 text-xs font-black text-slate-300 uppercase tracking-wider">Feature</div>
+                <div className="p-4 text-xs font-black text-slate-500 uppercase tracking-wider">Feature</div>
                 {['BootHop', 'DHL Same-Day', 'Traditional Courier'].map(h => (
-                  <div key={h} className={`p-4 text-xs font-black uppercase tracking-wider text-center ${h === 'BootHop' ? 'text-emerald-600 bg-emerald-500/8' : 'text-slate-300'}`}>{h}</div>
+                  <div key={h} className={`p-4 text-xs font-black uppercase tracking-wider text-center ${h === 'BootHop' ? 'text-emerald-600 bg-emerald-500/8' : 'text-slate-500'}`}>{h}</div>
                 ))}
               </div>
               {[
@@ -449,7 +449,7 @@ export default function BoothopBusiness() {
         </section>
 
         {/* ── FOOTER LINKS ──────────────────────────────────────── */}
-        <div className="relative z-10 max-w-5xl mx-auto px-8 pb-16 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-300">
+        <div className="relative z-10 max-w-5xl mx-auto px-8 pb-16 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-500">
           <a href="/business/how-it-works"    className="hover:text-slate-600 transition-colors">How It Works</a>
           <a href="/business/carrier-network" className="hover:text-blue-600 transition-colors text-blue-600/40">Carrier Network</a>
           <a href="/business/pricing"         className="hover:text-emerald-600 transition-colors text-emerald-600/40">Pricing</a>

@@ -126,7 +126,7 @@ function VerifyContent() {
           </Link>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-slate-900/80 p-8 shadow-2xl backdrop-blur">
+        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Verify your email</h1>
           <p className="text-sm text-slate-600 mb-8">
             Enter the 5-character code we sent to your email.
@@ -134,24 +134,24 @@ function VerifyContent() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
+              <label className="block text-sm font-medium text-slate-600 mb-2">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-800 px-4 py-3 text-slate-900 placeholder-slate-500 outline-none focus:ring-2 focus:ring-blue-500 transition"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500 transition"
                 placeholder="you@example.com"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Verification code</label>
+              <label className="block text-sm font-medium text-slate-600 mb-2">Verification code</label>
               <input
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
-                className="w-full rounded-xl border border-slate-200 bg-slate-800 px-4 py-3 text-center text-2xl font-bold tracking-[0.35em] uppercase text-slate-900 placeholder-slate-600 outline-none focus:ring-2 focus:ring-blue-500 transition"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-2xl font-bold tracking-[0.35em] uppercase text-slate-900 placeholder-slate-300 outline-none focus:ring-2 focus:ring-blue-500 transition"
                 placeholder="4827A"
                 maxLength={5}
                 required
@@ -159,7 +159,7 @@ function VerifyContent() {
             </div>
 
             {message && (
-              <div className="flex items-center gap-2 rounded-xl bg-blue-500/10 border border-blue-500/20 px-4 py-3 text-sm text-blue-300">
+              <div className="flex items-center gap-2 rounded-xl bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-700">
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin shrink-0" />
                 ) : (
@@ -170,7 +170,7 @@ function VerifyContent() {
             )}
 
             {error && (
-              <div className="flex items-center gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-300">
+              <div className="flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 {error}
               </div>
@@ -179,7 +179,7 @@ function VerifyContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-slate-900 font-semibold py-3 px-4 rounded-xl transition-all"
+              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-semibold py-3 px-4 rounded-xl transition-all"
             >
               {loading ? (
                 <>
@@ -194,7 +194,7 @@ function VerifyContent() {
 
           <p className="text-center text-sm text-slate-600 mt-6">
             Didn&apos;t get a code?{' '}
-            <Link href="/login" className="text-blue-400 hover:text-blue-300 font-medium">
+            <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
               Back to login
             </Link>
           </p>

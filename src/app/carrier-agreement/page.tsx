@@ -23,7 +23,7 @@ export default function CarrierAgreementPage() {
 
         {/* Header */}
         <div className="mb-12">
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold px-4 py-2 rounded-full mb-6 uppercase tracking-widest">
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold px-4 py-2 rounded-full mb-6 uppercase tracking-widest">
             <Shield className="h-3.5 w-3.5" /> Legal
           </div>
           <h1 className="text-4xl md:text-5xl font-black mb-4">Carrier & Traveller Agreement</h1>
@@ -35,7 +35,7 @@ export default function CarrierAgreementPage() {
           <a
             href="/docs/carrier-agreement.pdf"
             download
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-slate-900 font-bold px-6 py-3 rounded-xl hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 transition-all duration-300"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold px-6 py-3 rounded-xl hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 transition-all duration-300"
           >
             <Download className="h-4 w-4" /> Download Full Agreement (.pdf)
           </a>
@@ -49,7 +49,7 @@ export default function CarrierAgreementPage() {
         </div>
 
         {/* Content */}
-        <div className="space-y-8 text-slate-300 leading-relaxed">
+        <div className="space-y-8 text-slate-700 leading-relaxed">
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-8">
             <p className="text-slate-900 font-semibold mb-4">Overview</p>
@@ -93,13 +93,13 @@ export default function CarrierAgreementPage() {
           ))}
 
           <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8">
-            <p className="text-amber-300 font-semibold mb-2">Full Agreement</p>
+            <p className="text-amber-800 font-semibold mb-2">Full Agreement</p>
             <p className="text-sm">The above is a summary. The full legally binding agreement is available for download above. By using the BootHop platform as a carrier or traveller, you confirm you have read, understood, and agreed to the full terms.</p>
           </div>
 
           <div className="text-sm text-slate-600 pt-4 border-t border-slate-200">
             <p>Questions about this agreement? Contact us at{' '}
-              <a href="mailto:info@boothop.com" className="text-blue-400 hover:underline">info@boothop.com</a>
+              <a href="mailto:info@boothop.com" className="text-blue-600 hover:underline">info@boothop.com</a>
             </p>
           </div>
         </div>
