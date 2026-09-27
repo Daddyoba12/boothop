@@ -439,6 +439,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
             <Link href="/admin/hub"      className="px-3 py-1.5 bg-slate-100 hover:bg-slate-100 text-slate-700 hover:text-slate-900 rounded-xl transition-all text-xs font-semibold">Hub</Link>
             <Link href="/admin/customs"  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-100 text-slate-700 hover:text-slate-900 rounded-xl transition-all text-xs font-semibold">Customs</Link>
             <Link href="/admin/business" className="px-3 py-1.5 bg-slate-100 hover:bg-slate-100 text-slate-700 hover:text-slate-900 rounded-xl transition-all text-xs font-semibold">Business</Link>
+            <Link href="/admin/downloads" className="px-3 py-1.5 bg-slate-100 hover:bg-slate-100 text-slate-700 hover:text-slate-900 rounded-xl transition-all text-xs font-semibold">Downloads</Link>
             <button onClick={loadDashboardData} className="p-2 bg-slate-100 hover:bg-slate-100 rounded-xl transition-all" title="Refresh">
               <RefreshCw className="w-4 h-4 text-slate-900" />
             </button>
