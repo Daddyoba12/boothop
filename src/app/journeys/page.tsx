@@ -21,7 +21,9 @@ const WEIGHT_LABELS: Record<string, string> = {
 };
 function weightLabel(raw: string | null): string {
   if (!raw) return '';
-  return WEIGHT_LABELS[raw.toLowerCase()] ?? raw;
+  if (WEIGHT_LABELS[raw.toLowerCase()]) return WEIGHT_LABELS[raw.toLowerCase()];
+  // Fall back for raw numeric capacity values that don't match a preset tier
+  return /^\d+(\.\d+)?$/.test(raw.trim()) ? `${raw.trim()} kg capacity` : raw;
 }
 
 /* ── New listing banner + auto-open handler ── */
