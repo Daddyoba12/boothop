@@ -46,34 +46,34 @@ export default function AdminLoginPage() {
     setSuccess('A temporary password has been sent to the recovery inbox.');
   }
 
-  const input = "w-full rounded-xl border border-white/12 bg-white/5 px-4 py-3 text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500/40 transition-all text-sm";
-  const label = "block text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1.5";
+  const input = "w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500/40 transition-all text-sm";
+  const label = "block text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-1.5";
 
   return (
-    <div className="min-h-screen bg-[#07111f] flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
           <BootHopLogo size="md" />
           <div className="mt-3 flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/25">BootHop</span>
-            <span className="w-1 h-1 rounded-full bg-white/20" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-orange-400">Admin</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-600">BootHop</span>
+            <span className="w-1 h-1 rounded-full bg-slate-100" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-orange-600">Admin</span>
           </div>
         </div>
 
         {/* Tab bar */}
-        <div className="flex bg-white/[0.04] border border-white/8 rounded-xl p-1 mb-6 gap-1">
+        <div className="flex bg-white/[0.04] border border-slate-200 rounded-xl p-1 mb-6 gap-1">
           {(['login', 'reset'] as Tab[]).map(t => (
             <button key={t} onClick={() => switchTab(t)}
               className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all capitalize ${
-                tab === t ? 'bg-orange-500 text-black shadow-md' : 'text-white/35 hover:text-white/60'
+                tab === t ? 'bg-orange-500 text-black shadow-md' : 'text-slate-600 hover:text-slate-600'
               }`}>
               {t === 'login' ? 'Sign In' : 'Forgot Password'}
             </button>
           ))}
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-8 shadow-[0_32px_80px_rgba(0,0,0,0.5)]">
+        <div className="rounded-2xl border border-slate-200 bg-white/[0.03] backdrop-blur-xl p-8 shadow-[0_32px_80px_rgba(0,0,0,0.5)]">
 
           {/* ── SIGN IN ── */}
           {tab === 'login' && (
@@ -89,16 +89,16 @@ export default function AdminLoginPage() {
                   placeholder="Your password" autoComplete="current-password" className={input} required />
               </div>
               {error && (
-                <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{error}</p>
+                <p className="text-sm text-red-600 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{error}</p>
               )}
               <button type="submit" disabled={loading}
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-black font-bold text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(249,115,22,0.4)] disabled:opacity-60">
                 {loading ? 'Signing in…' : 'Sign in →'}
               </button>
-              <p className="text-center text-xs text-white/25 pt-1">
+              <p className="text-center text-xs text-slate-600 pt-1">
                 Forgot password?{' '}
                 <button type="button" onClick={() => switchTab('reset')}
-                  className="text-orange-400 hover:text-orange-300 transition-colors">
+                  className="text-orange-600 hover:text-orange-700 transition-colors">
                   Reset it →
                 </button>
               </p>
@@ -108,7 +108,7 @@ export default function AdminLoginPage() {
           {/* ── FORGOT PASSWORD ── */}
           {tab === 'reset' && (
             <form onSubmit={handleReset} className="space-y-4">
-              <p className="text-sm text-white/45 mb-2">
+              <p className="text-sm text-slate-600 mb-2">
                 Enter your admin email and a temporary password will be sent to the recovery inbox.
               </p>
               <div>
@@ -116,8 +116,8 @@ export default function AdminLoginPage() {
                 <input type="email" value={resetEmail} onChange={e => setResetEmail(e.target.value)}
                   placeholder="admin@boothop.com" autoComplete="email" className={input} required />
               </div>
-              {error   && <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{error}</p>}
-              {success && <p className="text-sm text-green-400 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">{success}</p>}
+              {error   && <p className="text-sm text-red-600 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{error}</p>}
+              {success && <p className="text-sm text-green-600 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">{success}</p>}
               {!success && (
                 <button type="submit" disabled={loading}
                   className="w-full py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-black font-bold text-sm transition-all hover:-translate-y-0.5 disabled:opacity-60">

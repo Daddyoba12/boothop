@@ -247,8 +247,8 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center">
-        <Package className="w-16 h-16 text-blue-400 animate-bounce" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Package className="w-16 h-16 text-blue-500 animate-bounce" />
       </div>
     );
   }
@@ -256,16 +256,16 @@ export default function DashboardPage() {
 
   const statusBadge = (s: string) => {
     const map: Record<string, string> = {
-      active:   'bg-blue-500/20 text-blue-300 border-blue-500/30',
-      matched:  'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-      cancelled:'bg-red-500/20 text-red-400 border-red-500/30',
+      active:   'bg-blue-50 text-blue-700 border-blue-200',
+      matched:  'bg-emerald-50 text-emerald-700 border-emerald-200',
+      cancelled:'bg-red-50 text-red-600 border-red-200',
     };
     const label: Record<string, string> = {
       active:   'Looking for match',
       matched:  'Matched',
       cancelled:'Cancelled',
     };
-    const cls = map[s] ?? 'bg-white/10 text-white/50 border-white/10';
+    const cls = map[s] ?? 'bg-slate-100 text-slate-600 border-slate-200';
     return (
       <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${cls}`}>
         {label[s] ?? s}
@@ -274,22 +274,22 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-[#0c1e3d] to-slate-950">
+    <div className="min-h-screen bg-slate-50">
 
       <PushPermissionBanner />
 
       {/* NAV */}
-      <nav className="bg-white/5 backdrop-blur-xl border-b border-white/8 sticky top-0 z-20">
+      <nav className="bg-white/90 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-20">
         <div className="max-w-4xl mx-auto px-5 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <Plane className="w-5 h-5 text-blue-400" />
-            <span className="font-bold text-white text-sm">Boot<span className="text-blue-400">Hop</span></span>
+            <Plane className="w-5 h-5 text-blue-500" />
+            <span className="font-bold text-slate-900 text-sm">Boot<span className="text-blue-500">Hop</span></span>
           </Link>
           <div className="flex items-center gap-3">
-            <span className="text-white/40 text-xs hidden sm:block truncate max-w-[200px]">{user?.email}</span>
+            <span className="text-slate-600 text-xs hidden sm:block truncate max-w-[200px]">{user?.email}</span>
             <button
               onClick={async () => { await fetch('/api/auth/logout', { method: 'POST' }); router.push('/'); }}
-              className="text-xs text-white/60 hover:text-white transition-colors border border-white/15 px-3 py-1.5 rounded-lg hover:bg-white/5"
+              className="text-xs text-slate-600 hover:text-slate-900 transition-colors border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-100"
             >
               Logout
             </button>
@@ -301,15 +301,15 @@ export default function DashboardPage() {
 
           {/* £20 signup credit banner — shown until redeemed */}
           {credit && !credit.redeemed && (
-            <div className="relative overflow-hidden rounded-2xl border border-amber-500/35 bg-gradient-to-r from-amber-950/60 via-amber-900/30 to-transparent backdrop-blur-xl p-5 flex items-center gap-5 shadow-[0_0_60px_rgba(245,158,11,0.08)]">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/20 flex items-center justify-center shrink-0 text-2xl">🎁</div>
+            <div className="relative overflow-hidden rounded-2xl border border-amber-200 bg-amber-50 p-5 flex items-center gap-5">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center shrink-0 text-2xl">🎁</div>
               <div className="flex-1 min-w-0">
-                <p className="text-amber-200 font-bold text-base mb-0.5">
+                <p className="text-amber-700 font-bold text-base mb-0.5">
                   You have £{(credit.amount_pence / 100).toFixed(0)} credit waiting
                 </p>
-                <p className="text-white/40 text-xs">Automatically applied on your first delivery payment. No action needed.</p>
+                <p className="text-slate-600 text-xs">Automatically applied on your first delivery payment. No action needed.</p>
               </div>
-              <Link href="/start?role=sender" className="shrink-0 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 text-xs transition-all hover:shadow-[0_8px_24px_rgba(245,158,11,0.35)]">
+              <Link href="/start?role=sender" className="shrink-0 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 text-xs transition-all">
                 Send now →
               </Link>
             </div>
@@ -317,19 +317,19 @@ export default function DashboardPage() {
 
         {/* ── PENDING JOURNEY CARD ── */}
         {pendingJourney && !justPublished && (
-          <div className="relative overflow-hidden rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-950/70 to-[#0c1e3d]/80 backdrop-blur-xl p-6 shadow-[0_0_60px_rgba(59,130,246,0.10)]">
+          <div className="relative overflow-hidden rounded-2xl border border-blue-200 bg-blue-50/60 p-6">
             <div className="flex items-center gap-2 mb-4">
               <span className="text-lg">{pendingJourney.role === 'sender' ? '📦' : '✈️'}</span>
-              <p className="text-white font-bold text-base">One last step — set your budget to go live</p>
+              <p className="text-slate-900 font-bold text-base">One last step — set your budget to go live</p>
             </div>
 
             {/* Journey summary */}
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-white font-semibold text-lg">{pendingJourney.from.split(',')[0]}</span>
-              <ArrowRight className="h-4 w-4 text-white/30 shrink-0" />
-              <span className="text-white font-semibold text-lg">{pendingJourney.to.split(',')[0]}</span>
+              <span className="text-slate-900 font-semibold text-lg">{pendingJourney.from.split(',')[0]}</span>
+              <ArrowRight className="h-4 w-4 text-slate-300 shrink-0" />
+              <span className="text-slate-900 font-semibold text-lg">{pendingJourney.to.split(',')[0]}</span>
             </div>
-            <p className="text-white/45 text-sm mb-5">
+            <p className="text-slate-600 text-sm mb-5">
               {new Date(pendingJourney.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
               {pendingJourney.size && <> · {SIZE_LABEL[pendingJourney.size] ?? pendingJourney.size}</>}
             </p>
@@ -337,11 +337,11 @@ export default function DashboardPage() {
             {/* Price input */}
             <div className="flex gap-3 items-start">
               <div className="flex-1">
-                <label className="block text-xs text-white/40 mb-1.5">
+                <label className="block text-xs text-slate-600 mb-1.5">
                   {pendingJourney.role === 'sender' ? 'Your budget (£) — what you\'re willing to pay' : 'Your price (£) — what you charge to carry'}
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-semibold">£</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-semibold">£</span>
                   <input
                     type="number"
                     min="1"
@@ -349,15 +349,15 @@ export default function DashboardPage() {
                     value={pendingPrice}
                     onChange={e => { setPendingPrice(e.target.value); setPendingPriceError(''); }}
                     onKeyDown={e => e.key === 'Enter' && publishPendingJourney()}
-                    className="w-full rounded-xl border border-white/15 bg-white/[0.06] pl-8 pr-4 py-3 text-white text-base placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                    className="w-full rounded-xl border border-slate-200 bg-white pl-8 pr-4 py-3 text-slate-900 text-base placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 transition-all"
                   />
                 </div>
-                {pendingPriceError && <p className="mt-1 text-xs text-red-400">{pendingPriceError}</p>}
+                {pendingPriceError && <p className="mt-1 text-xs text-red-500">{pendingPriceError}</p>}
               </div>
               <button
                 onClick={publishPendingJourney}
                 disabled={publishingPending}
-                className="mt-6 shrink-0 flex items-center gap-2 rounded-xl bg-blue-500 hover:bg-blue-400 disabled:opacity-60 text-white font-bold px-5 py-3 text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(59,130,246,0.4)]"
+                className="mt-6 shrink-0 flex items-center gap-2 rounded-xl bg-blue-500 hover:bg-blue-400 disabled:opacity-60 text-white font-bold px-5 py-3 text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(59,130,246,0.3)]"
               >
                 {publishingPending ? 'Publishing...' : <><Rocket className="w-4 h-4" /> Publish now</>}
               </button>
@@ -365,7 +365,7 @@ export default function DashboardPage() {
 
             <button
               onClick={() => { localStorage.removeItem('boothop_pending_journey'); setPendingJourney(null); }}
-              className="mt-4 text-xs text-white/25 hover:text-white/45 transition-colors"
+              className="mt-4 text-xs text-slate-600 hover:text-slate-600 transition-colors"
             >
               Dismiss
             </button>
@@ -374,13 +374,13 @@ export default function DashboardPage() {
 
         {/* ── JUST PUBLISHED SUCCESS ── */}
         {justPublished && (
-          <div className="rounded-2xl border border-green-500/30 bg-green-950/40 p-5 flex items-center gap-4">
-            <CheckCircle className="w-6 h-6 text-green-400 shrink-0" />
+          <div className="rounded-2xl border border-green-200 bg-green-50 p-5 flex items-center gap-4">
+            <CheckCircle className="w-6 h-6 text-green-600 shrink-0" />
             <div>
-              <p className="text-white font-semibold text-sm">
+              <p className="text-slate-900 font-semibold text-sm">
                 {role === 'sender' ? 'Your request is live.' : 'Your trip is live.'}
               </p>
-              <p className="text-white/40 text-xs mt-0.5">
+              <p className="text-slate-600 text-xs mt-0.5">
                 {role === 'sender'
                   ? 'We\'re matching you with verified travellers heading that way.'
                   : 'We\'ll notify you as soon as senders match your journey.'}
@@ -392,10 +392,10 @@ export default function DashboardPage() {
         {/* PAGE HEADER */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-black text-white">
+            <h1 className="text-2xl font-black text-slate-900">
               {role === 'sender' ? 'My Packages' : 'My Trips'}
             </h1>
-            <p className="text-slate-500 text-sm mt-0.5">
+            <p className="text-slate-600 text-sm mt-0.5">
               {role === 'sender' ? 'Your delivery requests and matches' : 'Your journeys and parcel requests'}
             </p>
           </div>
@@ -409,30 +409,30 @@ export default function DashboardPage() {
 
         {/* DRAFTS BANNER */}
         {drafts.length > 0 && (
-          <div className="p-4 bg-amber-500/10 border border-amber-500/25 rounded-2xl flex items-start gap-3">
-            <FileEdit className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3">
+            <FileEdit className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
-              <p className="text-amber-300 text-sm font-semibold mb-1">You have {drafts.length} unpublished draft{drafts.length > 1 ? 's' : ''}</p>
-              <p className="text-amber-400/70 text-xs">Publish them below to go live and start matching.</p>
+              <p className="text-amber-700 text-sm font-semibold mb-1">You have {drafts.length} unpublished draft{drafts.length > 1 ? 's' : ''}</p>
+              <p className="text-amber-600/80 text-xs">Publish them below to go live and start matching.</p>
             </div>
           </div>
         )}
 
         {/* ── MY LISTINGS ─────────────────────────────────────────────── */}
         <section>
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">My Listings</h2>
+          <h2 className="text-xs font-semibold text-slate-600 uppercase tracking-widest mb-3">My Listings</h2>
 
           {/* Drafts inline */}
           {drafts.map(draft => (
-            <div key={draft.id} className="mb-3 bg-amber-500/8 border border-amber-500/20 rounded-2xl p-4 flex items-center gap-4">
-              <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${draft.type === 'travel' ? 'bg-blue-500/20' : 'bg-purple-500/20'}`}>
-                {draft.type === 'travel' ? <Plane className="w-4 h-4 text-blue-400" /> : <Package className="w-4 h-4 text-purple-400" />}
+            <div key={draft.id} className="mb-3 bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-4">
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${draft.type === 'travel' ? 'bg-blue-100' : 'bg-purple-100'}`}>
+                {draft.type === 'travel' ? <Plane className="w-4 h-4 text-blue-600" /> : <Package className="w-4 h-4 text-purple-600" />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white font-medium text-sm">{draft.from_city} → {draft.to_city}</p>
-                <p className="text-slate-500 text-xs">{draft.travel_date ? new Date(draft.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'} · {draft.type === 'travel' ? 'Travelling' : 'Sending'}{draft.price ? ` · £${Number(draft.price).toFixed(2)}` : ''}</p>
+                <p className="text-slate-900 font-medium text-sm">{draft.from_city} → {draft.to_city}</p>
+                <p className="text-slate-600 text-xs">{draft.travel_date ? new Date(draft.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'} · {draft.type === 'travel' ? 'Travelling' : 'Sending'}{draft.price ? ` · £${Number(draft.price).toFixed(2)}` : ''}</p>
               </div>
-              <span className="text-xs font-semibold text-amber-400 bg-amber-500/15 border border-amber-500/25 px-2.5 py-1 rounded-full shrink-0">Draft</span>
+              <span className="text-xs font-semibold text-amber-700 bg-amber-100 border border-amber-200 px-2.5 py-1 rounded-full shrink-0">Draft</span>
               <button
                 onClick={() => publishDraft(draft.id)}
                 disabled={publishingDraft === draft.id}
@@ -446,14 +446,14 @@ export default function DashboardPage() {
 
           {/* Active trips */}
           {trips.length === 0 && drafts.length === 0 ? (
-            <div className="bg-white/4 border border-white/8 rounded-2xl p-10 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center mx-auto mb-4">
-                {role === 'sender' ? <Package className="w-7 h-7 text-blue-400" /> : <Plane className="w-7 h-7 text-blue-400" />}
+            <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center mx-auto mb-4">
+                {role === 'sender' ? <Package className="w-7 h-7 text-blue-600" /> : <Plane className="w-7 h-7 text-blue-600" />}
               </div>
-              <h3 className="text-white font-semibold mb-1">
+              <h3 className="text-slate-900 font-semibold mb-1">
                 {role === 'sender' ? 'No packages yet' : 'No trips yet'}
               </h3>
-              <p className="text-slate-500 text-sm mb-5">
+              <p className="text-slate-600 text-sm mb-5">
                 {role === 'sender'
                   ? 'Post your first delivery request to get matched with a verified traveller.'
                   : 'Post your first trip to start receiving parcel requests from senders.'}
@@ -470,18 +470,18 @@ export default function DashboardPage() {
               {trips.map(trip => {
                 const isPast = trip.travel_date < today;
                 return (
-                  <div key={trip.id} className={`rounded-2xl border transition-all ${isPast ? 'bg-white/3 border-white/6 opacity-60' : 'bg-white/6 border-white/10 hover:bg-white/8'}`}>
+                  <div key={trip.id} className={`rounded-2xl border transition-all ${isPast ? 'bg-slate-50 border-slate-100 opacity-60' : 'bg-white border-slate-200 hover:shadow-sm'}`}>
                     <div className="flex items-center gap-4 p-4">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${trip.type === 'travel' ? 'bg-blue-500/20' : 'bg-purple-500/20'}`}>
-                        {trip.type === 'travel' ? <Plane className="w-4 h-4 text-blue-400" /> : <Package className="w-4 h-4 text-purple-400" />}
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${trip.type === 'travel' ? 'bg-blue-100' : 'bg-purple-100'}`}>
+                        {trip.type === 'travel' ? <Plane className="w-4 h-4 text-blue-600" /> : <Package className="w-4 h-4 text-purple-600" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className="text-white font-medium text-sm">{trip.from_city} → {trip.to_city}</p>
+                          <p className="text-slate-900 font-medium text-sm">{trip.from_city} → {trip.to_city}</p>
                           {statusBadge(isPast ? 'cancelled' : (trip.status ?? 'active'))}
                           {isPast && <span className="text-xs text-slate-600">Past</span>}
                         </div>
-                        <p className="text-slate-500 text-xs mt-0.5">
+                        <p className="text-slate-600 text-xs mt-0.5">
                           {trip.travel_date ? new Date(trip.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
                           {' · '}{trip.type === 'travel' ? 'Travelling' : 'Sending'}
                           {trip.price ? ` · £${Number(trip.price).toFixed(2)}` : ''}
@@ -491,7 +491,7 @@ export default function DashboardPage() {
                         {!isPast && ['active', 'pending'].includes(trip.status ?? '') && (
                           <button
                             onClick={() => { setEditingTripId(trip.id); setEditDate(trip.travel_date ?? ''); setEditDateError(''); }}
-                            className="p-1.5 rounded-lg text-slate-600 hover:text-blue-400 hover:bg-blue-500/10 transition-all"
+                            className="p-1.5 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-all"
                             title="Change date"
                           >
                             <CalendarDays className="w-4 h-4" />
@@ -500,7 +500,7 @@ export default function DashboardPage() {
                         <button
                           onClick={() => deleteTrip(trip.id)}
                           disabled={deletingTrip === trip.id}
-                          className="p-1.5 rounded-lg text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-50"
+                          className="p-1.5 rounded-lg text-slate-600 hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-50"
                           title="Delete listing"
                         >
                           {deletingTrip === trip.id ? <Clock className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
@@ -509,8 +509,8 @@ export default function DashboardPage() {
                     </div>
                     {/* Inline date editor */}
                     {editingTripId === trip.id && (
-                      <div className="px-4 pb-4 pt-0 border-t border-white/8 mt-0">
-                        <p className="text-xs text-white/50 mb-2 mt-3">Change your travel date (must be future)</p>
+                      <div className="px-4 pb-4 pt-0 border-t border-slate-100 mt-0">
+                        <p className="text-xs text-slate-600 mb-2 mt-3">Change your travel date (must be future)</p>
                         <div className="flex gap-2 items-start">
                           <div className="flex-1">
                             <input
@@ -518,9 +518,9 @@ export default function DashboardPage() {
                               value={editDate}
                               min={(() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; })()}
                               onChange={e => { setEditDate(e.target.value); setEditDateError(''); }}
-                              className="w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 transition-all"
                             />
-                            {editDateError && <p className="mt-1 text-xs text-red-400">{editDateError}</p>}
+                            {editDateError && <p className="mt-1 text-xs text-red-500">{editDateError}</p>}
                           </div>
                           <button
                             onClick={() => saveDate(trip.id)}
@@ -531,7 +531,7 @@ export default function DashboardPage() {
                           </button>
                           <button
                             onClick={() => { setEditingTripId(null); setEditDate(''); setEditDateError(''); }}
-                            className="shrink-0 rounded-xl border border-white/15 text-white/40 hover:text-white/70 px-4 py-2 text-xs transition-all"
+                            className="shrink-0 rounded-xl border border-slate-200 text-slate-600 hover:text-slate-800 px-4 py-2 text-xs transition-all"
                           >
                             Cancel
                           </button>
@@ -547,12 +547,12 @@ export default function DashboardPage() {
 
         {/* ── MY MATCHES ──────────────────────────────────────────────── */}
         <section>
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">
+          <h2 className="text-xs font-semibold text-slate-600 uppercase tracking-widest mb-3">
             My Matches {matches.length > 0 && <span className="text-slate-600 normal-case">({matches.length})</span>}
           </h2>
 
           {matches.length === 0 ? (
-            <div className="bg-white/4 border border-white/8 rounded-2xl p-6 text-center">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 text-center">
               <p className="text-slate-600 text-sm">No matches yet — your listings are being searched every few minutes.</p>
             </div>
           ) : (
@@ -575,25 +575,25 @@ export default function DashboardPage() {
                 if (['declined', 'cancelled', 'completed'].includes(match.status)) return null;
 
                 return (
-                  <div key={match.id} className="bg-white/6 border border-white/10 rounded-2xl p-4 hover:bg-white/8 transition-all">
+                  <div key={match.id} className="bg-white border border-slate-200 rounded-2xl p-4 hover:shadow-sm transition-all">
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div>
-                        <p className="text-white font-medium text-sm">
+                        <p className="text-slate-900 font-medium text-sm">
                           {displayTrip.from_city} → {displayTrip.to_city}
                         </p>
-                        <p className="text-slate-500 text-xs mt-0.5">
+                        <p className="text-slate-600 text-xs mt-0.5">
                           {tripDate ? new Date(tripDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
                           {(match.agreed_price ?? match.offered_price) ? ` · £${Number(match.agreed_price ?? match.offered_price).toFixed(2)}` : ''}
                           {senderTrip?.weight ? ` · ${senderTrip.weight} kg` : ''}
                         </p>
                       </div>
                       <div className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border shrink-0 ${
-                        st.color === 'green'  ? 'bg-green-500/15 text-green-300 border-green-500/25' :
-                        st.color === 'blue'   ? 'bg-blue-500/15 text-blue-300 border-blue-500/25' :
-                        st.color === 'yellow' ? 'bg-yellow-500/15 text-yellow-300 border-yellow-500/25' :
-                        st.color === 'violet' ? 'bg-violet-500/15 text-violet-300 border-violet-500/25' :
-                        st.color === 'red'    ? 'bg-red-500/15 text-red-300 border-red-500/25' :
-                        'bg-white/8 text-white/50 border-white/10'
+                        st.color === 'green'  ? 'bg-green-50 text-green-700 border-green-200' :
+                        st.color === 'blue'   ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                        st.color === 'yellow' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                        st.color === 'violet' ? 'bg-violet-50 text-violet-700 border-violet-200' :
+                        st.color === 'red'    ? 'bg-red-50 text-red-700 border-red-200' :
+                        'bg-slate-100 text-slate-600 border-slate-200'
                       }`}>
                         <StatusIcon className="w-3 h-3" />
                         {st.label}
@@ -617,33 +617,33 @@ export default function DashboardPage() {
                             <button
                               onClick={() => respondToMatch(match.id, 'accept')}
                               disabled={respondingMatch === match.id}
-                              className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold rounded-xl transition-all disabled:opacity-50"
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-xl transition-all disabled:opacity-50"
                             >
                               <ThumbsUp className="w-3.5 h-3.5" /> Accept
                             </button>
                             <button
                               onClick={() => respondToMatch(match.id, 'decline')}
                               disabled={respondingMatch === match.id}
-                              className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/25 text-red-400 text-xs font-bold rounded-xl transition-all disabled:opacity-50"
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 text-xs font-bold rounded-xl transition-all disabled:opacity-50"
                             >
                               <ThumbsDown className="w-3.5 h-3.5" /> Decline
                             </button>
                           </div>
                         ) : (
-                          <p className="text-xs text-white/30 text-center mb-2">Waiting for listing owner to respond…</p>
+                          <p className="text-xs text-slate-600 text-center mb-2">Waiting for listing owner to respond…</p>
                         )
                     })()}
                     <div className="flex gap-2">
                       <Link
                         href={`/matches/${match.id}`}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white/6 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold rounded-xl transition-all"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-900 text-xs font-semibold rounded-xl transition-all"
                       >
                         View details <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                       {['escrowed', 'active'].includes(match.status) && (
                         <Link
                           href={`/track/${match.id}`}
-                          className="flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/30 text-blue-300 text-xs font-semibold rounded-xl transition-all shrink-0"
+                          className="flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-semibold rounded-xl transition-all shrink-0"
                         >
                           <Rocket className="w-3.5 h-3.5" /> Track
                         </Link>

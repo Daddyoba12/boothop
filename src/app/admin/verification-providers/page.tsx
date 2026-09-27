@@ -136,7 +136,7 @@ export default function VerificationProvidersPage() {
       <div className="bg-white border-b border-slate-200 px-6 py-5">
         <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Link href="/admin/compliance" className="text-slate-400 hover:text-slate-700">
+            <Link href="/admin/compliance" className="text-slate-600 hover:text-slate-700">
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <h1 className="text-lg font-bold text-slate-900">Verification Providers</h1>
@@ -173,9 +173,9 @@ export default function VerificationProvidersPage() {
 
         {/* Provider list */}
         {loading ? (
-          <div className="text-slate-400 text-sm">Loading…</div>
+          <div className="text-slate-600 text-sm">Loading…</div>
         ) : providers.length === 0 ? (
-          <div className="text-center py-16 text-slate-400">
+          <div className="text-center py-16 text-slate-600">
             <Globe className="h-10 w-10 mx-auto mb-3 opacity-30" />
             <p className="font-medium">No providers found</p>
             <p className="text-sm mt-1">Add your first verification provider using the button above.</p>
@@ -191,25 +191,25 @@ export default function VerificationProvidersPage() {
                       <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
                         {p.provider_type.replace(/_/g, ' ')}
                       </span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${p.active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${p.active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}`}>
                         {p.active ? 'Active' : 'Inactive'}
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500 mt-1">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-600 mt-1">
                       <span className="flex items-center gap-1"><Globe className="h-3.5 w-3.5" /> {p.country}{p.city ? `, ${p.city}` : ''}</span>
                       {p.address && <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {p.address}</span>}
                       {p.email   && <span className="flex items-center gap-1"><Mail  className="h-3.5 w-3.5" /> {p.email}</span>}
                       {p.phone   && <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5" /> {p.phone}</span>}
                     </div>
                     {p.instructions && (
-                      <p className="text-xs text-slate-400 mt-2 line-clamp-2">{p.instructions}</p>
+                      <p className="text-xs text-slate-600 mt-2 line-clamp-2">{p.instructions}</p>
                     )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => toggleActive(p)}
                       title={p.active ? 'Deactivate' : 'Activate'}
-                      className="text-slate-400 hover:text-slate-700"
+                      className="text-slate-600 hover:text-slate-700"
                     >
                       {p.active ? <ToggleRight className="h-5 w-5 text-green-500" /> : <ToggleLeft className="h-5 w-5" />}
                     </button>
@@ -233,45 +233,45 @@ export default function VerificationProvidersPage() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
               <h2 className="font-bold text-slate-900">{editing ? 'Edit provider' : 'Add provider'}</h2>
-              <button onClick={() => setShowForm(false)} className="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+              <button onClick={() => setShowForm(false)} className="text-slate-600 hover:text-slate-700 text-2xl leading-none">&times;</button>
             </div>
             <div className="px-6 py-6 space-y-4">
               <div>
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Name *</label>
+                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider block mb-1">Name *</label>
                 <input className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Provider type *</label>
+                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider block mb-1">Provider type *</label>
                 <select className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" value={form.provider_type} onChange={e => setForm(f => ({ ...f, provider_type: e.target.value as ProviderType }))}>
                   {PROVIDER_TYPES.map(t => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Country *</label>
+                  <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider block mb-1">Country *</label>
                   <input className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" value={form.country} onChange={e => setForm(f => ({ ...f, country: e.target.value }))} placeholder="e.g. Nigeria" />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">City</label>
+                  <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider block mb-1">City</label>
                   <input className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} placeholder="e.g. Lagos" />
                 </div>
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Address</label>
+                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider block mb-1">Address</label>
                 <input className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Email</label>
+                  <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider block mb-1">Email</label>
                   <input type="email" className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Phone</label>
+                  <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider block mb-1">Phone</label>
                   <input className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+234…" />
                 </div>
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Instructions</label>
+                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider block mb-1">Instructions</label>
                 <textarea rows={3} className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" value={form.instructions} onChange={e => setForm(f => ({ ...f, instructions: e.target.value }))} placeholder="What should the sender bring / expect…" />
               </div>
               <label className="flex items-center gap-3 cursor-pointer">
@@ -282,7 +282,7 @@ export default function VerificationProvidersPage() {
             </div>
             <div className="px-6 pb-6 flex gap-3">
               <button onClick={() => setShowForm(false)} className="flex-1 py-3 text-sm font-semibold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition">Cancel</button>
-              <button onClick={save} disabled={saving} className="flex-1 py-3 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition disabled:opacity-50">
+              <button onClick={save} disabled={saving} className="flex-1 py-3 text-sm font-semibold text-slate-900 bg-blue-600 hover:bg-blue-700 rounded-xl transition disabled:opacity-50">
                 {saving ? 'Saving…' : editing ? 'Save changes' : 'Add provider'}
               </button>
             </div>

@@ -27,22 +27,22 @@ export default function CommanderNav({ company, slug, isSuper }: Props) {
   ];
 
   return (
-    <nav className="border-b border-slate-800 bg-slate-900/95 backdrop-blur-xl sticky top-0 z-40">
+    <nav className="border-b border-slate-200 bg-white/95 backdrop-blur-xl sticky top-0 z-40">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
         {/* Brand */}
         <div className="flex items-center gap-3">
           <Link href="/commander/dashboard" className="flex items-center gap-2.5 group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/boothop-icon-512.png" alt="" className="h-7 w-auto rounded-lg" style={{ mixBlendMode: 'screen' }} />
+            <img src="/images/boothopimage-transparent.png" alt="" className="h-7 w-auto rounded-lg" />
             <div className="hidden sm:block leading-tight">
-              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.15em]">Pipeline</p>
-              <p className="text-xs font-bold text-orange-400 uppercase tracking-[0.1em]">Commander</p>
+              <p className="text-[9px] font-bold text-slate-600 uppercase tracking-[0.15em]">Pipeline</p>
+              <p className="text-xs font-bold text-orange-500 uppercase tracking-[0.1em]">Commander</p>
             </div>
           </Link>
-          <span className="hidden sm:block text-slate-700 text-sm">/</span>
-          <span className="hidden sm:block text-xs font-semibold text-slate-400 truncate max-w-[140px]">{company}</span>
+          <span className="hidden sm:block text-slate-300 text-sm">/</span>
+          <span className="hidden sm:block text-xs font-semibold text-slate-600 truncate max-w-[140px]">{company}</span>
           {isSuper && (
-            <span className="hidden sm:block text-[9px] font-bold px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400 uppercase tracking-wider">Admin</span>
+            <span className="hidden sm:block text-[9px] font-bold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700 uppercase tracking-wider">Admin</span>
           )}
         </div>
 
@@ -52,8 +52,8 @@ export default function CommanderNav({ company, slug, isSuper }: Props) {
             <Link key={href} href={href}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 pathname === href
-                  ? 'bg-slate-800 text-white'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'bg-slate-100 text-slate-900'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}>
               {label}
             </Link>
@@ -64,7 +64,7 @@ export default function CommanderNav({ company, slug, isSuper }: Props) {
         <div className="flex items-center gap-3">
           <span className="hidden sm:block text-[10px] font-mono text-slate-600">{slug}</span>
           <button onClick={handleLogout} disabled={loggingOut}
-            className="text-xs text-slate-500 hover:text-white transition-colors disabled:opacity-40 font-medium">
+            className="text-xs text-slate-600 hover:text-slate-900 transition-colors disabled:opacity-40 font-medium">
             {loggingOut ? 'Signing out…' : 'Sign out'}
           </button>
         </div>

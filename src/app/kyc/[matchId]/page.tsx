@@ -17,8 +17,8 @@ export default function KycRedirect() {
   }, [matchId, router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center">
-      <Loader2 className="h-10 w-10 text-blue-400 animate-spin" />
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
     </div>
   );
 }

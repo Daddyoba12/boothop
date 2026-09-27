@@ -63,7 +63,7 @@ interface ComplianceRequest {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const riskColor = (score: number | null) => {
-  if (!score) return 'text-slate-500 bg-slate-100';
+  if (!score) return 'text-slate-600 bg-slate-100';
   if (score >= 80) return 'text-red-600 bg-red-50';
   if (score >= 50) return 'text-amber-600 bg-amber-50';
   return 'text-green-600 bg-green-50';
@@ -74,9 +74,9 @@ const statusPill = (status: string) => {
     locked_pending_compliance: 'bg-yellow-100 text-yellow-700',
     compliance_in_progress:    'bg-blue-100 text-blue-700',
     compliance_rejected:       'bg-red-100 text-red-700',
-    compliance_timeout:        'bg-slate-100 text-slate-500',
+    compliance_timeout:        'bg-slate-100 text-slate-600',
   };
-  return map[status] ?? 'bg-slate-100 text-slate-500';
+  return map[status] ?? 'bg-slate-100 text-slate-600';
 };
 
 const flags = (d: ItemDeclaration) =>
@@ -191,10 +191,10 @@ export default function ComplianceClient() {
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div>
             <h1 className="text-xl font-bold text-slate-900">Compliance</h1>
-            <p className="text-sm text-slate-500 mt-0.5">Shipment declarations and item checks</p>
+            <p className="text-sm text-slate-600 mt-0.5">Shipment declarations and item checks</p>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="text-sm text-slate-500 hover:text-slate-800">← Admin</Link>
+            <Link href="/admin" className="text-sm text-slate-600 hover:text-slate-800">← Admin</Link>
             <button onClick={load} className="flex items-center gap-2 text-sm text-slate-600 border border-slate-200 rounded-xl px-4 py-2 hover:bg-slate-50 transition">
               <RefreshCw className="h-4 w-4" />Refresh
             </button>
@@ -208,7 +208,7 @@ export default function ComplianceClient() {
           <button
             onClick={() => setTab('shipments')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition ${
-              tab === 'shipments' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'
+              tab === 'shipments' ? 'bg-white shadow text-slate-900' : 'text-slate-600 hover:text-slate-700'
             }`}
           >
             <Package className="h-4 w-4" />
@@ -222,7 +222,7 @@ export default function ComplianceClient() {
           <button
             onClick={() => setTab('items')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition ${
-              tab === 'items' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'
+              tab === 'items' ? 'bg-white shadow text-slate-900' : 'text-slate-600 hover:text-slate-700'
             }`}
           >
             <ShieldAlert className="h-4 w-4" />
@@ -237,7 +237,7 @@ export default function ComplianceClient() {
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -248,12 +248,12 @@ export default function ComplianceClient() {
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <RefreshCw className="h-6 w-6 text-slate-400 animate-spin" />
+            <RefreshCw className="h-6 w-6 text-slate-600 animate-spin" />
           </div>
         ) : tab === 'shipments' ? (
           /* ── Shipment Queue ─────────────────────────────────────────────── */
           filteredShipments.length === 0 ? (
-            <div className="text-center py-20 text-slate-400">
+            <div className="text-center py-20 text-slate-600">
               <ShieldCheck className="h-10 w-10 mx-auto mb-3 opacity-30" />
               <p className="font-medium">No shipments in compliance queue</p>
             </div>
@@ -271,12 +271,12 @@ export default function ComplianceClient() {
                     {/* Card header */}
                     <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                       <div className="flex items-center gap-3">
-                        <Package className="h-5 w-5 text-slate-400" />
+                        <Package className="h-5 w-5 text-slate-600" />
                         <div>
                           <p className="font-semibold text-slate-900">
                             {trip?.from_city ?? '?'} → {trip?.to_city ?? '?'}
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-slate-600">
                             {m.sender_email} · locked {m.compliance_locked_at ? new Date(m.compliance_locked_at).toLocaleString('en-GB') : '—'}
                           </p>
                         </div>
@@ -303,21 +303,21 @@ export default function ComplianceClient() {
                     {decl ? (
                       <div className="px-5 py-4 grid sm:grid-cols-3 gap-4 text-sm">
                         <div>
-                          <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Item</p>
+                          <p className="text-xs text-slate-600 uppercase tracking-wider mb-1">Item</p>
                           <p className="font-medium text-slate-800">{decl.item_description || '—'}</p>
-                          <p className="text-xs text-slate-500">{decl.item_category || '—'}</p>
+                          <p className="text-xs text-slate-600">{decl.item_category || '—'}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Value / Weight</p>
+                          <p className="text-xs text-slate-600 uppercase tracking-wider mb-1">Value / Weight</p>
                           <p className="font-medium text-slate-800">
                             {decl.declared_value != null ? `${decl.declared_currency ?? 'GBP'} ${decl.declared_value}` : '—'}
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-slate-600">
                             {decl.declared_weight_kg != null ? `${decl.declared_weight_kg} kg` : '—'}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Flags</p>
+                          <p className="text-xs text-slate-600 uppercase tracking-wider mb-1">Flags</p>
                           {itemFlags.length > 0 ? (
                             <div className="flex flex-wrap gap-1">
                               {itemFlags.map((f) => (
@@ -334,7 +334,7 @@ export default function ComplianceClient() {
                         </div>
                       </div>
                     ) : (
-                      <div className="px-5 py-4 text-sm text-slate-400 flex items-center gap-2">
+                      <div className="px-5 py-4 text-sm text-slate-600 flex items-center gap-2">
                         <Clock className="h-4 w-4" />
                         Awaiting declaration from sender
                       </div>
@@ -387,7 +387,7 @@ export default function ComplianceClient() {
         ) : (
           /* ── Item Checks (legacy compliance_requests) ───────────────────── */
           filteredItems.length === 0 ? (
-            <div className="text-center py-20 text-slate-400">
+            <div className="text-center py-20 text-slate-600">
               <ShieldCheck className="h-10 w-10 mx-auto mb-3 opacity-30" />
               <p className="font-medium">No item check requests</p>
             </div>
@@ -402,7 +402,7 @@ export default function ComplianceClient() {
                        <ShieldCheck className="h-4 w-4 text-green-500" />}
                       <div>
                         <p className="font-semibold text-slate-900 capitalize">{req.item}</p>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-slate-600">
                           {req.country} · {req.category} · {new Date(req.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                         </p>
                       </div>
@@ -427,13 +427,13 @@ export default function ComplianceClient() {
                   </div>
                   <div className="px-5 py-4 grid md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-xs text-slate-400 uppercase tracking-wider font-medium mb-1">User</p>
+                      <p className="text-xs text-slate-600 uppercase tracking-wider font-medium mb-1">User</p>
                       <p className="font-medium text-slate-800">{req.profiles?.full_name ?? 'Unknown'}</p>
-                      <p className="text-xs text-slate-500">{req.profiles?.email ?? req.user_id}</p>
+                      <p className="text-xs text-slate-600">{req.profiles?.email ?? req.user_id}</p>
                     </div>
                     {req.admin_note && (
                       <div>
-                        <p className="text-xs text-slate-400 uppercase tracking-wider font-medium mb-1">Admin Note</p>
+                        <p className="text-xs text-slate-600 uppercase tracking-wider font-medium mb-1">Admin Note</p>
                         <p className="text-sm text-slate-700 italic">"{req.admin_note}"</p>
                       </div>
                     )}

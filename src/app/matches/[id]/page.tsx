@@ -54,28 +54,28 @@ type TimelineEvent = {
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  matched:                   { label: 'Matched',                 color: 'text-blue-400' },
-  agreed:                    { label: 'Price agreed',            color: 'text-blue-400' },
-  committed:                 { label: 'Terms signed',            color: 'text-blue-400' },
-  kyc_pending:               { label: 'Verifying identity',      color: 'text-amber-400' },
-  kyc_complete:              { label: 'Identity verified',       color: 'text-green-400' },
-  payment_pending:           { label: 'Payment pending',         color: 'text-amber-400' },
-  payment_processing:        { label: 'Payment processing',      color: 'text-amber-400' },
-  locked_pending_compliance: { label: 'Declaration required',    color: 'text-amber-400' },
-  compliance_in_progress:    { label: 'Compliance review',       color: 'text-amber-400' },
-  inspection_pending:                { label: 'Inspection required',          color: 'text-amber-400' },
-  seal_pending:                      { label: 'SecureSeal required',          color: 'text-blue-400'  },
-  external_verification_required:    { label: 'External verification required', color: 'text-orange-400' },
-  compliance_rejected:               { label: 'Compliance rejected',            color: 'text-red-400' },
-  compliance_timeout:        { label: 'Declaration expired',     color: 'text-red-400' },
-  suspended_pending_review:  { label: 'Suspended — under review', color: 'text-red-400' },
-  active:                    { label: 'Active — live',           color: 'text-green-400' },
-  delivery_confirmed:        { label: 'Delivery confirmed',      color: 'text-green-400' },
-  completed:                 { label: 'Completed',               color: 'text-green-400' },
-  cancelled:                 { label: 'Cancelled',               color: 'text-red-400' },
-  declined:                  { label: 'Declined',                color: 'text-red-400' },
-  disputed:                  { label: 'Disputed',                color: 'text-red-400' },
-  cancellation_requested:    { label: 'Cancellation requested',  color: 'text-orange-400' },
+  matched:                   { label: 'Matched',                 color: 'text-blue-600' },
+  agreed:                    { label: 'Price agreed',            color: 'text-blue-600' },
+  committed:                 { label: 'Terms signed',            color: 'text-blue-600' },
+  kyc_pending:               { label: 'Verifying identity',      color: 'text-amber-600' },
+  kyc_complete:              { label: 'Identity verified',       color: 'text-green-600' },
+  payment_pending:           { label: 'Payment pending',         color: 'text-amber-600' },
+  payment_processing:        { label: 'Payment processing',      color: 'text-amber-600' },
+  locked_pending_compliance: { label: 'Declaration required',    color: 'text-amber-600' },
+  compliance_in_progress:    { label: 'Compliance review',       color: 'text-amber-600' },
+  inspection_pending:                { label: 'Inspection required',          color: 'text-amber-600' },
+  seal_pending:                      { label: 'SecureSeal required',          color: 'text-blue-600'  },
+  external_verification_required:    { label: 'External verification required', color: 'text-orange-600' },
+  compliance_rejected:               { label: 'Compliance rejected',            color: 'text-red-600' },
+  compliance_timeout:        { label: 'Declaration expired',     color: 'text-red-600' },
+  suspended_pending_review:  { label: 'Suspended — under review', color: 'text-red-600' },
+  active:                    { label: 'Active — live',           color: 'text-green-600' },
+  delivery_confirmed:        { label: 'Delivery confirmed',      color: 'text-green-600' },
+  completed:                 { label: 'Completed',               color: 'text-green-600' },
+  cancelled:                 { label: 'Cancelled',               color: 'text-red-600' },
+  declined:                  { label: 'Declined',                color: 'text-red-600' },
+  disputed:                  { label: 'Disputed',                color: 'text-red-600' },
+  cancellation_requested:    { label: 'Cancellation requested',  color: 'text-orange-600' },
 };
 
 const CANCELLABLE = ['matched', 'agreed', 'committed', 'kyc_pending', 'kyc_complete'];
@@ -105,7 +105,7 @@ function StarRating({ value, onChange }: { value: number; onChange: (n: number) 
           className="transition-colors"
         >
           <Star
-            className={`h-8 w-8 ${(hovered || value) >= n ? 'text-amber-400 fill-amber-400' : 'text-white/20'}`}
+            className={`h-8 w-8 ${(hovered || value) >= n ? 'text-amber-600 fill-amber-400' : 'text-slate-300'}`}
           />
         </button>
       ))}
@@ -271,20 +271,20 @@ export default function MatchPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center">
-        <Loader2 className="h-10 w-10 text-blue-400 animate-spin" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
       </div>
     );
   }
 
   if (error && !data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center px-6">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6">
         <div className="text-center max-w-sm">
-          <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
-          <p className="text-white text-lg font-semibold mb-2">Could not load match</p>
-          <p className="text-white/50 mb-6">{error}</p>
-          <Link href="/dashboard" className="text-blue-400 underline text-sm">Back to dashboard</Link>
+          <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
+          <p className="text-slate-900 text-lg font-semibold mb-2">Could not load match</p>
+          <p className="text-slate-600 mb-6">{error}</p>
+          <Link href="/dashboard" className="text-blue-600 underline text-sm">Back to dashboard</Link>
         </div>
       </div>
     );
@@ -302,18 +302,18 @@ export default function MatchPage() {
   const canMessage  = MESSAGING_STATUSES.includes(match.status);
   const canDispute  = DISPUTE_STATUSES.includes(match.status) && match.status !== 'disputed';
   const canRate     = ['completed', 'delivery_confirmed'].includes(match.status);
-  const statusInfo  = STATUS_LABELS[match.status] ?? { label: match.status, color: 'text-white/50' };
+  const statusInfo  = STATUS_LABELS[match.status] ?? { label: match.status, color: 'text-slate-600' };
 
   const otherEmail    = userRole === 'sender' ? match.traveler_email : match.sender_email;
   const myKyc         = userRole === 'sender' ? match.sender_kyc_status   : match.traveler_kyc_status;
   const theirKyc      = userRole === 'sender' ? match.traveler_kyc_status : match.sender_kyc_status;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
+    <div className="min-h-screen bg-slate-50">
       {/* Nav */}
-      <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold text-white">Boot<span className="text-blue-400">Hop</span></Link>
-        <Link href="/dashboard" className="text-sm text-white/50 hover:text-white flex items-center gap-1.5 transition-colors">
+      <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+        <Link href="/" className="text-xl font-bold text-slate-900">Boot<span className="text-blue-600">Hop</span></Link>
+        <Link href="/dashboard" className="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition-colors">
           <ArrowLeft className="h-4 w-4" /> Dashboard
         </Link>
       </div>
@@ -321,16 +321,16 @@ export default function MatchPage() {
       <div className="max-w-2xl mx-auto px-6 py-10 space-y-5">
 
         {/* Header card */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
               {userRole === 'sender'
-                ? <Package className="h-6 w-6 text-blue-400 shrink-0" />
-                : <Plane   className="h-6 w-6 text-cyan-400 shrink-0" />}
+                ? <Package className="h-6 w-6 text-blue-600 shrink-0" />
+                : <Plane   className="h-6 w-6 text-cyan-600 shrink-0" />}
               <div>
-                <p className="text-white font-bold text-lg">{route}</p>
+                <p className="text-slate-900 font-bold text-lg">{route}</p>
                 {trip?.travel_date && (
-                  <p className="text-white/40 text-xs mt-0.5">
+                  <p className="text-slate-600 text-xs mt-0.5">
                     {new Date(trip.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </p>
                 )}
@@ -339,48 +339,48 @@ export default function MatchPage() {
             <span className={`text-xs font-bold uppercase tracking-wide ${statusInfo.color}`}>{statusInfo.label}</span>
           </div>
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-xl bg-white/5 px-4 py-3">
-              <p className="text-white/40 text-xs mb-1">Your role</p>
-              <p className="text-white font-semibold capitalize">{userRole === 'sender' ? 'Hooper (sender)' : 'Booter (carrier)'}</p>
+            <div className="rounded-xl bg-slate-50 px-4 py-3">
+              <p className="text-slate-600 text-xs mb-1">Your role</p>
+              <p className="text-slate-900 font-semibold capitalize">{userRole === 'sender' ? 'Hooper (sender)' : 'Booter (carrier)'}</p>
             </div>
-            <div className="rounded-xl bg-white/5 px-4 py-3">
-              <p className="text-white/40 text-xs mb-1">Delivery fee</p>
-              <p className="text-white font-bold">£{(match.agreed_price ?? 0).toFixed(2)}</p>
+            <div className="rounded-xl bg-slate-50 px-4 py-3">
+              <p className="text-slate-600 text-xs mb-1">Delivery fee</p>
+              <p className="text-slate-900 font-bold">£{(match.agreed_price ?? 0).toFixed(2)}</p>
             </div>
             {match.sender_trip?.weight != null && (
-              <div className="rounded-xl bg-white/5 px-4 py-3">
-                <p className="text-white/40 text-xs mb-1">Item weight</p>
-                <p className="text-white font-semibold">{match.sender_trip.weight} kg</p>
+              <div className="rounded-xl bg-slate-50 px-4 py-3">
+                <p className="text-slate-600 text-xs mb-1">Item weight</p>
+                <p className="text-slate-900 font-semibold">{match.sender_trip.weight} kg</p>
               </div>
             )}
             {match.traveler_trip?.weight != null && (
-              <div className="rounded-xl bg-white/5 px-4 py-3">
-                <p className="text-white/40 text-xs mb-1">Carrier capacity</p>
-                <p className="text-white font-semibold">{match.traveler_trip.weight} kg</p>
+              <div className="rounded-xl bg-slate-50 px-4 py-3">
+                <p className="text-slate-600 text-xs mb-1">Carrier capacity</p>
+                <p className="text-slate-900 font-semibold">{match.traveler_trip.weight} kg</p>
               </div>
             )}
           </div>
         </div>
 
         {error && (
-          <div className="flex items-center gap-3 rounded-xl bg-red-500/20 border border-red-500/30 px-5 py-4">
-            <AlertCircle className="h-5 w-5 text-red-400 shrink-0" />
-            <p className="text-red-200 text-sm">{error}</p>
+          <div className="flex items-center gap-3 rounded-xl bg-red-50 border border-red-200 px-5 py-4">
+            <AlertCircle className="h-5 w-5 text-red-600 shrink-0" />
+            <p className="text-red-700 text-sm">{error}</p>
           </div>
         )}
 
         {/* ── CONTACT DETAILS (only when active or beyond) ── */}
         {(isActive || isComplete) && (
-          <div className="rounded-2xl border border-green-500/30 bg-green-500/10 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-green-400 mb-3 flex items-center gap-2">
+          <div className="rounded-2xl border border-green-200 bg-green-50 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-green-600 mb-3 flex items-center gap-2">
               <Lock className="h-3.5 w-3.5" /> Contact details unlocked
             </p>
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <Mail className="h-4 w-4 text-white/40 shrink-0" />
+                <Mail className="h-4 w-4 text-slate-600 shrink-0" />
                 <div>
-                  <p className="text-xs text-white/40">{userRole === 'sender' ? 'Carrier (Booter)' : 'Sender (Hooper)'}</p>
-                  <p className="text-white font-semibold">{otherEmail}</p>
+                  <p className="text-xs text-slate-600">{userRole === 'sender' ? 'Carrier (Booter)' : 'Sender (Hooper)'}</p>
+                  <p className="text-slate-900 font-semibold">{otherEmail}</p>
                 </div>
               </div>
             </div>
@@ -389,12 +389,12 @@ export default function MatchPage() {
 
         {/* ── COMPLIANCE DECLARATION CTA (sender, locked_pending_compliance) ── */}
         {match.status === 'locked_pending_compliance' && userRole === 'sender' && (
-          <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-amber-400 mb-2 flex items-center gap-2">
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-2 flex items-center gap-2">
               <Shield className="h-3.5 w-3.5" /> Action required
             </p>
-            <p className="text-white font-bold mb-1">Complete your item declaration</p>
-            <p className="text-white/50 text-sm mb-5">
+            <p className="text-slate-900 font-bold mb-1">Complete your item declaration</p>
+            <p className="text-slate-600 text-sm mb-5">
               Payment has been secured. Before contact details are released, BootHop requires you to declare what you are sending.
               You have 48 hours from payment confirmation.
             </p>
@@ -409,11 +409,11 @@ export default function MatchPage() {
 
         {/* ── COMPLIANCE WAITING (traveller, locked_pending_compliance) ── */}
         {match.status === 'locked_pending_compliance' && userRole === 'traveler' && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2 flex items-center gap-2">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-2">
               <Clock className="h-3.5 w-3.5" /> Waiting on sender
             </p>
-            <p className="text-white/60 text-sm">
+            <p className="text-slate-600 text-sm">
               The sender is completing their item declaration. Contact details will be released once BootHop Safety &amp; Compliance approves the shipment.
             </p>
           </div>
@@ -421,12 +421,12 @@ export default function MatchPage() {
 
         {/* ── INSPECTION PENDING (traveller) ── */}
         {match.status === 'inspection_pending' && userRole === 'traveler' && (
-          <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-amber-400 mb-2 flex items-center gap-2">
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-2 flex items-center gap-2">
               <Shield className="h-3.5 w-3.5" /> Action required
             </p>
-            <p className="text-white font-bold mb-1">Inspect the item before accepting</p>
-            <p className="text-white/50 text-sm mb-5">
+            <p className="text-slate-900 font-bold mb-1">Inspect the item before accepting</p>
+            <p className="text-slate-600 text-sm mb-5">
               The sender&apos;s declaration has been approved. Before contact details are released, please complete the quick handover inspection checklist.
             </p>
             <Link
@@ -440,12 +440,12 @@ export default function MatchPage() {
 
         {/* ── INSPECTION PENDING (sender) ── */}
         {match.status === 'inspection_pending' && userRole === 'sender' && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2 flex items-center gap-2">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-2">
               <Clock className="h-3.5 w-3.5" /> Waiting for inspection
             </p>
-            <p className="text-white font-semibold">Your declaration was approved</p>
-            <p className="text-white/50 text-sm mt-1">
+            <p className="text-slate-900 font-semibold">Your declaration was approved</p>
+            <p className="text-slate-600 text-sm mt-1">
               The carrier is completing a brief handover inspection before contact details are released. This usually takes a few hours.
             </p>
           </div>
@@ -453,12 +453,12 @@ export default function MatchPage() {
 
         {/* ── SEAL PENDING (traveller) ── */}
         {match.status === 'seal_pending' && userRole === 'traveler' && (
-          <div className="rounded-2xl border border-blue-500/40 bg-blue-500/10 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-blue-400 mb-2 flex items-center gap-2">
+          <div className="rounded-2xl border border-blue-200 bg-blue-50 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-2 flex items-center gap-2">
               <Shield className="h-3.5 w-3.5" /> Action required — apply SecureSeal
             </p>
-            <p className="text-white font-bold mb-1">Seal the package before departure</p>
-            <p className="text-white/50 text-sm mb-5">
+            <p className="text-slate-900 font-bold mb-1">Seal the package before departure</p>
+            <p className="text-slate-600 text-sm mb-5">
               Inspection passed. Generate the BootHop SecureSeal label, print it, apply it across the package opening,
               then activate it here with a photo and weight confirmation.
             </p>
@@ -473,12 +473,12 @@ export default function MatchPage() {
 
         {/* ── SEAL PENDING (sender) ── */}
         {match.status === 'seal_pending' && userRole === 'sender' && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2 flex items-center gap-2">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-2">
               <Clock className="h-3.5 w-3.5" /> Waiting for SecureSeal activation
             </p>
-            <p className="text-white font-semibold">Inspection passed</p>
-            <p className="text-white/50 text-sm mt-1">
+            <p className="text-slate-900 font-semibold">Inspection passed</p>
+            <p className="text-slate-600 text-sm mt-1">
               The carrier is applying the BootHop SecureSeal to your package. Contact details will be released once the seal is activated.
             </p>
           </div>
@@ -486,31 +486,31 @@ export default function MatchPage() {
 
         {/* ── EXTERNAL VERIFICATION REQUIRED ── */}
         {match.status === 'external_verification_required' && (
-          <div className="rounded-2xl border border-orange-500/40 bg-orange-500/10 p-6 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-orange-400 flex items-center gap-2">
+          <div className="rounded-2xl border border-orange-200 bg-orange-50 p-6 space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-orange-600 flex items-center gap-2">
               <Shield className="h-3.5 w-3.5" /> External verification required
             </p>
-            <p className="text-white font-semibold leading-snug">
+            <p className="text-slate-900 font-semibold leading-snug">
               This item cannot proceed through the standard BootHop handover process.
               Independent verification is required before transportation.
             </p>
             {userRole === 'sender' && data?.verificationProviders && data.verificationProviders.length > 0 && (
               <div className="mt-4 space-y-3">
-                <p className="text-white/60 text-sm">Please visit one of the approved verification facilities below and obtain a reference number. BootHop will enter the result once we hear from the provider.</p>
+                <p className="text-slate-600 text-sm">Please visit one of the approved verification facilities below and obtain a reference number. BootHop will enter the result once we hear from the provider.</p>
                 <div className="space-y-2">
                   {data.verificationProviders.map((p: any) => (
-                    <div key={p.id} className="rounded-xl border border-orange-500/20 bg-black/20 p-4">
+                    <div key={p.id} className="rounded-xl border border-orange-200 bg-slate-50 p-4">
                       <div className="flex items-start justify-between gap-3 mb-1">
-                        <p className="text-white font-semibold text-sm">{p.name}</p>
-                        <span className="text-xs text-orange-300 bg-orange-500/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+                        <p className="text-slate-900 font-semibold text-sm">{p.name}</p>
+                        <span className="text-xs text-orange-700 bg-orange-100 px-2 py-0.5 rounded-full whitespace-nowrap">
                           {p.provider_type.replace(/_/g, ' ')}
                         </span>
                       </div>
-                      {p.address && <p className="text-white/50 text-sm">{p.address}{p.city ? `, ${p.city}` : ''}</p>}
-                      {p.email   && <p className="text-white/50 text-sm">{p.email}</p>}
-                      {p.phone   && <p className="text-white/50 text-sm">{p.phone}</p>}
+                      {p.address && <p className="text-slate-600 text-sm">{p.address}{p.city ? `, ${p.city}` : ''}</p>}
+                      {p.email   && <p className="text-slate-600 text-sm">{p.email}</p>}
+                      {p.phone   && <p className="text-slate-600 text-sm">{p.phone}</p>}
                       {p.instructions && (
-                        <p className="text-white/40 text-xs mt-2 leading-relaxed">{p.instructions}</p>
+                        <p className="text-slate-600 text-xs mt-2 leading-relaxed">{p.instructions}</p>
                       )}
                     </div>
                   ))}
@@ -518,7 +518,7 @@ export default function MatchPage() {
               </div>
             )}
             {userRole === 'traveler' && (
-              <p className="text-white/50 text-sm">
+              <p className="text-slate-600 text-sm">
                 The sender has been notified. You will receive an email once external verification is complete and the handover inspection is unlocked.
               </p>
             )}
@@ -527,11 +527,11 @@ export default function MatchPage() {
 
         {/* ── COMPLIANCE IN PROGRESS ── */}
         {match.status === 'compliance_in_progress' && (
-          <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-blue-400 mb-2 flex items-center gap-2">
+          <div className="rounded-2xl border border-blue-200 bg-blue-50 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-2 flex items-center gap-2">
               <Shield className="h-3.5 w-3.5" /> Compliance review in progress
             </p>
-            <p className="text-white/60 text-sm">
+            <p className="text-slate-600 text-sm">
               {userRole === 'sender'
                 ? 'Your item declaration has been submitted and is under review. You will receive an email once approved — usually within a few hours.'
                 : 'The sender\'s item declaration is being reviewed by BootHop Safety & Compliance. Contact details will be released once approved.'}
@@ -541,11 +541,11 @@ export default function MatchPage() {
 
         {/* ── COMPLIANCE REJECTED ── */}
         {match.status === 'compliance_rejected' && (
-          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-red-400 mb-2 flex items-center gap-2">
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-red-600 mb-2 flex items-center gap-2">
               <AlertCircle className="h-3.5 w-3.5" /> Compliance rejected
             </p>
-            <p className="text-white/60 text-sm">
+            <p className="text-slate-600 text-sm">
               {userRole === 'sender'
                 ? 'Your item declaration was rejected. A refund will be issued within 3–5 business days. Contact support if you have questions.'
                 : 'The sender\'s item declaration was rejected. This match has been closed. Your trip remains available for new matches.'}
@@ -555,11 +555,11 @@ export default function MatchPage() {
 
         {/* ── COMPLIANCE TIMEOUT ── */}
         {match.status === 'compliance_timeout' && (
-          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-red-400 mb-2 flex items-center gap-2">
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-red-600 mb-2 flex items-center gap-2">
               <AlertCircle className="h-3.5 w-3.5" /> Declaration window expired
             </p>
-            <p className="text-white/60 text-sm">
+            <p className="text-slate-600 text-sm">
               {userRole === 'sender'
                 ? 'The 48-hour declaration window has passed. This booking has been cancelled and a refund will be issued within 3–5 business days.'
                 : 'The sender did not complete their item declaration in time. This match has been closed. Your trip remains available.'}
@@ -569,8 +569,8 @@ export default function MatchPage() {
 
         {/* ── PENDING STAGES ── */}
         {!isActive && !isComplete && !isCancelled && !['locked_pending_compliance', 'compliance_in_progress', 'inspection_pending', 'seal_pending', 'compliance_rejected', 'compliance_timeout', 'suspended_pending_review'].includes(match.status) && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-4 flex items-center gap-2">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-4 flex items-center gap-2">
               <Shield className="h-3.5 w-3.5" /> Progress
             </p>
             <div className="space-y-3">
@@ -584,9 +584,9 @@ export default function MatchPage() {
               ].map(({ done, label }) => (
                 <div key={label} className="flex items-center gap-3 text-sm">
                   {done
-                    ? <CheckCircle className="h-4 w-4 text-green-400 shrink-0" />
-                    : <Clock       className="h-4 w-4 text-white/20 shrink-0" />}
-                  <span className={done ? 'text-white/70' : 'text-white/30'}>{label}</span>
+                    ? <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
+                    : <Clock       className="h-4 w-4 text-slate-300 shrink-0" />}
+                  <span className={done ? 'text-slate-700' : 'text-slate-600'}>{label}</span>
                 </div>
               ))}
             </div>
@@ -604,29 +604,29 @@ export default function MatchPage() {
 
         {/* ── DELIVERY CONFIRMATION (when active) ── */}
         {isActive && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-4 flex items-center gap-2">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-4 flex items-center gap-2">
               <Truck className="h-3.5 w-3.5" /> Delivery confirmation
             </p>
             <div className="space-y-3 mb-2">
               <div className="flex items-center gap-3 text-sm">
                 {match.booter_confirmed_delivery
-                  ? <CheckCircle className="h-4 w-4 text-green-400 shrink-0" />
-                  : <Clock       className="h-4 w-4 text-white/20 shrink-0" />}
-                <span className={match.booter_confirmed_delivery ? 'text-white/70' : 'text-white/30'}>
+                  ? <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
+                  : <Clock       className="h-4 w-4 text-slate-300 shrink-0" />}
+                <span className={match.booter_confirmed_delivery ? 'text-slate-700' : 'text-slate-600'}>
                   Carrier confirmed delivery
                 </span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 {match.hooper_confirmed_receipt
-                  ? <CheckCircle className="h-4 w-4 text-green-400 shrink-0" />
-                  : <Clock       className="h-4 w-4 text-white/20 shrink-0" />}
-                <span className={match.hooper_confirmed_receipt ? 'text-white/70' : 'text-white/30'}>
+                  ? <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
+                  : <Clock       className="h-4 w-4 text-slate-300 shrink-0" />}
+                <span className={match.hooper_confirmed_receipt ? 'text-slate-700' : 'text-slate-600'}>
                   Sender confirmed receipt
                 </span>
               </div>
             </div>
-            <p className="text-xs text-white/30 mt-3">
+            <p className="text-xs text-slate-600 mt-3">
               You will receive a confirmation email with a one-click link when it is time to confirm your side.
             </p>
           </div>
@@ -634,23 +634,23 @@ export default function MatchPage() {
 
         {/* ── MESSAGING ── */}
         {canMessage && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-4 flex items-center gap-2">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-4 flex items-center gap-2">
               <MessageSquare className="h-3.5 w-3.5" /> Messages
             </p>
 
             {/* Message list */}
             <div className="space-y-3 max-h-72 overflow-y-auto mb-4 pr-1">
               {messages.length === 0 && (
-                <p className="text-white/30 text-xs text-center py-6">No messages yet. Say hello!</p>
+                <p className="text-slate-600 text-xs text-center py-6">No messages yet. Say hello!</p>
               )}
               {messages.map(msg => {
                 const isMe = msg.sender_email === userEmail;
                 return (
                   <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'bg-blue-600 text-white' : 'bg-white/10 text-white/80'}`}>
+                    <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}>
                       <p>{msg.content}</p>
-                      <p className={`text-xs mt-1 ${isMe ? 'text-blue-200' : 'text-white/30'}`}>
+                      <p className={`text-xs mt-1 ${isMe ? 'text-blue-200' : 'text-slate-600'}`}>
                         {new Date(msg.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
@@ -661,7 +661,7 @@ export default function MatchPage() {
             </div>
 
             {msgError && (
-              <p className="text-red-400 text-xs mb-2">{msgError}</p>
+              <p className="text-red-600 text-xs mb-2">{msgError}</p>
             )}
 
             {/* Compose */}
@@ -673,7 +673,7 @@ export default function MatchPage() {
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                 maxLength={1000}
                 placeholder="Type a message..."
-                className="flex-1 bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 bg-white border border-slate-200 text-slate-900 rounded-xl px-4 py-2.5 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 onClick={sendMessage}
@@ -683,47 +683,47 @@ export default function MatchPage() {
                 {sendingMsg ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </button>
             </div>
-            <p className="text-xs text-white/20 mt-2">Do not share phone numbers or contact details outside BootHop.</p>
+            <p className="text-xs text-slate-300 mt-2">Do not share phone numbers or contact details outside BootHop.</p>
           </div>
         )}
 
         {/* ── DISPUTE ── */}
         {canDispute && (
-          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
             {!showDispute ? (
               <button
                 onClick={() => setShowDispute(true)}
-                className="text-orange-400 hover:text-orange-300 text-sm font-semibold transition-colors flex items-center gap-2"
+                className="text-orange-600 hover:text-orange-700 text-sm font-semibold transition-colors flex items-center gap-2"
               >
                 <AlertTriangle className="h-4 w-4" /> Raise a dispute →
               </button>
             ) : (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-orange-400 mb-4 flex items-center gap-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-orange-600 mb-4 flex items-center gap-2">
                   <Scale className="h-3.5 w-3.5" /> Raise a dispute
                 </p>
 
-                {disputeError && <p className="text-red-400 text-xs mb-3">{disputeError}</p>}
+                {disputeError && <p className="text-red-600 text-xs mb-3">{disputeError}</p>}
 
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs text-white/50 font-semibold uppercase tracking-wider block mb-1.5">Reason</label>
+                    <label className="text-xs text-slate-600 font-semibold uppercase tracking-wider block mb-1.5">Reason</label>
                     <select
                       value={disputeReason}
                       onChange={e => setDisputeReason(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full bg-white border border-slate-200 text-slate-900 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       {DISPUTE_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs text-white/50 font-semibold uppercase tracking-wider block mb-1.5">Description</label>
+                    <label className="text-xs text-slate-600 font-semibold uppercase tracking-wider block mb-1.5">Description</label>
                     <textarea
                       value={disputeDesc}
                       onChange={e => setDisputeDesc(e.target.value)}
                       rows={3}
                       placeholder="Explain what happened..."
-                      className="w-full bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full bg-white border border-slate-200 text-slate-900 rounded-xl px-4 py-2.5 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -739,7 +739,7 @@ export default function MatchPage() {
                   </button>
                   <button
                     onClick={() => { setShowDispute(false); setDisputeError(null); }}
-                    className="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl text-sm transition-all"
+                    className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-sm transition-all"
                   >
                     Cancel
                   </button>
@@ -750,18 +750,18 @@ export default function MatchPage() {
         )}
 
         {disputeSent && (
-          <div className="flex items-center gap-3 rounded-xl bg-orange-500/20 border border-orange-500/30 px-5 py-4">
-            <Scale className="h-5 w-5 text-orange-400 shrink-0" />
-            <p className="text-orange-200 text-sm">Your dispute has been raised. Our team will review it and contact both parties within 48 hours.</p>
+          <div className="flex items-center gap-3 rounded-xl bg-orange-50 border border-orange-200 px-5 py-4">
+            <Scale className="h-5 w-5 text-orange-600 shrink-0" />
+            <p className="text-orange-700 text-sm">Your dispute has been raised. Our team will review it and contact both parties within 48 hours.</p>
           </div>
         )}
 
         {/* ── COMPLETE ── */}
         {isComplete && (
-          <div className="rounded-2xl border border-green-500/30 bg-green-500/10 p-6 text-center">
-            <CheckCircle className="h-10 w-10 text-green-400 mx-auto mb-3" />
-            <h3 className="text-white font-bold text-lg mb-1">Delivery complete!</h3>
-            <p className="text-white/50 text-sm">
+          <div className="rounded-2xl border border-green-200 bg-green-50 p-6 text-center">
+            <CheckCircle className="h-10 w-10 text-green-600 mx-auto mb-3" />
+            <h3 className="text-slate-900 font-bold text-lg mb-1">Delivery complete!</h3>
+            <p className="text-slate-600 text-sm">
               {userRole === 'sender'
                 ? 'Your goods have been delivered. Thank you for using BootHop.'
                 : 'Payment is being processed to your account. Thank you!'}
@@ -771,34 +771,34 @@ export default function MatchPage() {
 
         {/* ── RATING ── */}
         {canRate && (
-          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-amber-400 mb-4 flex items-center gap-2">
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-4 flex items-center gap-2">
               <Star className="h-3.5 w-3.5" /> Rate your experience
             </p>
 
             {ratingSent ? (
               <div className="text-center py-4">
-                <CheckCircle className="h-8 w-8 text-green-400 mx-auto mb-2" />
-                <p className="text-white font-semibold">Rating submitted. Thank you!</p>
+                <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                <p className="text-slate-900 font-semibold">Rating submitted. Thank you!</p>
               </div>
             ) : (
               <div className="space-y-4">
-                {ratingError && <p className="text-red-400 text-xs">{ratingError}</p>}
+                {ratingError && <p className="text-red-600 text-xs">{ratingError}</p>}
 
                 <div>
-                  <p className="text-white/50 text-xs mb-2">How was your experience?</p>
+                  <p className="text-slate-600 text-xs mb-2">How was your experience?</p>
                   <StarRating value={ratingValue} onChange={setRatingValue} />
                 </div>
 
                 <div>
-                  <label className="text-xs text-white/50 font-semibold uppercase tracking-wider block mb-1.5">Comment (optional)</label>
+                  <label className="text-xs text-slate-600 font-semibold uppercase tracking-wider block mb-1.5">Comment (optional)</label>
                   <textarea
                     value={ratingComment}
                     onChange={e => setRatingComment(e.target.value)}
                     rows={2}
                     maxLength={500}
                     placeholder="Share your experience..."
-                    className="w-full bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full bg-white border border-slate-200 text-slate-900 rounded-xl px-4 py-2.5 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -817,17 +817,17 @@ export default function MatchPage() {
 
         {/* ── SHIPMENT PROGRESS (chain-of-custody timeline) ── */}
         {timeline.length > 0 && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-5 flex items-center gap-2">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-5 flex items-center gap-2">
               <Clock className="h-3.5 w-3.5" /> Shipment progress
             </p>
-            <ol className="relative border-l border-white/10 ml-1.5 space-y-5">
+            <ol className="relative border-l border-slate-200 ml-1.5 space-y-5">
               {timeline.map((ev, i) => (
                 <li key={ev.id} className="ml-5">
-                  <span className={`absolute -left-[7px] mt-[3px] h-3.5 w-3.5 rounded-full border-2 ${i === timeline.length - 1 ? 'border-blue-400 bg-blue-400' : 'border-white/20 bg-slate-900'}`} />
-                  <p className="text-white text-sm font-semibold leading-snug">{ev.label}</p>
-                  <p className="text-white/40 text-xs mt-0.5 leading-relaxed">{ev.description}</p>
-                  <p className="text-white/20 text-xs mt-1">
+                  <span className={`absolute -left-[7px] mt-[3px] h-3.5 w-3.5 rounded-full border-2 ${i === timeline.length - 1 ? 'border-blue-500 bg-blue-500' : 'border-slate-300 bg-white'}`} />
+                  <p className="text-slate-900 text-sm font-semibold leading-snug">{ev.label}</p>
+                  <p className="text-slate-600 text-xs mt-0.5 leading-relaxed">{ev.description}</p>
+                  <p className="text-slate-300 text-xs mt-1">
                     {new Date(ev.timestamp).toLocaleString('en-GB', {
                       day: 'numeric', month: 'short', year: 'numeric',
                       hour: '2-digit', minute: '2-digit',
@@ -837,7 +837,7 @@ export default function MatchPage() {
                 </li>
               ))}
             </ol>
-            <p className="text-white/20 text-xs mt-5">
+            <p className="text-slate-300 text-xs mt-5">
               Some milestones may take a few minutes to appear. All times are in your local timezone.
             </p>
           </div>
@@ -845,21 +845,21 @@ export default function MatchPage() {
 
         {/* ── CANCELLED ── */}
         {isCancelled && (
-          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center">
-            <XCircle className="h-10 w-10 text-red-400 mx-auto mb-3" />
-            <h3 className="text-white font-bold text-lg mb-1">Match cancelled</h3>
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
+            <XCircle className="h-10 w-10 text-red-600 mx-auto mb-3" />
+            <h3 className="text-slate-900 font-bold text-lg mb-1">Match cancelled</h3>
             {match.cancellation_reason && (
-              <p className="text-white/50 text-sm">{match.cancellation_reason}</p>
+              <p className="text-slate-600 text-sm">{match.cancellation_reason}</p>
             )}
           </div>
         )}
 
         {/* ── CANCEL BUTTON ── */}
         {canCancel && !isCancelled && (
-          <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-5">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
             {cancelConfirm ? (
               <div>
-                <p className="text-white text-sm font-semibold mb-3">Are you sure you want to cancel this match?</p>
+                <p className="text-slate-900 text-sm font-semibold mb-3">Are you sure you want to cancel this match?</p>
                 <div className="flex gap-3">
                   <button
                     onClick={cancelMatch}
@@ -871,7 +871,7 @@ export default function MatchPage() {
                   </button>
                   <button
                     onClick={() => setCancelConfirm(false)}
-                    className="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl text-sm transition-all"
+                    className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-sm transition-all"
                   >
                     Keep match
                   </button>
@@ -880,7 +880,7 @@ export default function MatchPage() {
             ) : (
               <button
                 onClick={() => setCancelConfirm(true)}
-                className="text-red-400 hover:text-red-300 text-sm font-semibold transition-colors"
+                className="text-red-600 hover:text-red-700 text-sm font-semibold transition-colors"
               >
                 Cancel this match →
               </button>
@@ -891,7 +891,7 @@ export default function MatchPage() {
         {/* Refresh */}
         <button
           onClick={load}
-          className="w-full flex items-center justify-center gap-2 text-sm text-white/30 hover:text-white/60 transition-colors py-2"
+          className="w-full flex items-center justify-center gap-2 text-sm text-slate-600 hover:text-slate-600 transition-colors py-2"
         >
           <RefreshCw className="h-3.5 w-3.5" /> Refresh status
         </button>

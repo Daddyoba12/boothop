@@ -29,10 +29,10 @@ type Partner = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  payment_pending: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  active:          'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  rejected:        'bg-red-500/20 text-red-400 border-red-500/30',
-  cancelled:       'bg-white/10 text-white/40 border-white/10',
+  payment_pending: 'bg-amber-500/20 text-amber-600 border-amber-500/30',
+  active:          'bg-emerald-500/20 text-emerald-600 border-emerald-500/30',
+  rejected:        'bg-red-500/20 text-red-600 border-red-500/30',
+  cancelled:       'bg-slate-100 text-slate-600 border-slate-200',
 };
 
 function fmt(ts: string | null) {
@@ -76,16 +76,16 @@ export default function AdminPriorityPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white">
-      <div className="border-b border-white/8 px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-lg font-black">Boot<span className="text-amber-400">Hop</span></span>
-          <span className="text-xs font-bold bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-full uppercase tracking-widest">Priority Partners</span>
+          <span className="text-lg font-black">Boot<span className="text-amber-600">Hop</span></span>
+          <span className="text-xs font-bold bg-amber-500/20 text-amber-600 px-2.5 py-1 rounded-full uppercase tracking-widest">Priority Partners</span>
         </div>
         <div className="flex items-center gap-3">
-          <a href="/admin/business/carriers" className="text-xs text-white/30 hover:text-white">Carriers →</a>
-          <a href="/admin/business/ops" className="text-xs text-white/30 hover:text-white">Ops →</a>
-          <button onClick={load} disabled={loading} className="text-white/30 hover:text-white transition-colors">
+          <a href="/admin/business/carriers" className="text-xs text-slate-600 hover:text-slate-900">Carriers →</a>
+          <a href="/admin/business/ops" className="text-xs text-slate-600 hover:text-slate-900">Ops →</a>
+          <button onClick={load} disabled={loading} className="text-slate-600 hover:text-slate-900 transition-colors">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
@@ -100,16 +100,16 @@ export default function AdminPriorityPage() {
             { key: 'active',          label: 'Active',           count: counts.active },
           ].map(t => (
             <button key={t.key} onClick={() => setFilter(t.key)}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${filter === t.key ? 'border-amber-500/40 bg-amber-500/10 text-amber-400' : 'border-white/8 bg-white/3 text-white/50 hover:bg-white/5'}`}>
+              className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${filter === t.key ? 'border-amber-500/40 bg-amber-500/10 text-amber-600' : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-50'}`}>
               {t.label} {t.count > 0 && <span className="ml-1 opacity-60">({t.count})</span>}
             </button>
           ))}
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-24"><Loader2 className="h-8 w-8 text-amber-400 animate-spin" /></div>
+          <div className="flex justify-center py-24"><Loader2 className="h-8 w-8 text-amber-600 animate-spin" /></div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-24 text-white/20">
+          <div className="text-center py-24 text-slate-600">
             <Star className="h-12 w-12 mx-auto mb-4 opacity-30" />
             <p>No priority partner applications yet.</p>
           </div>
@@ -126,38 +126,38 @@ export default function AdminPriorityPage() {
                   uncalled                         ? 'border-red-500/30 bg-red-500/5' :
                   p.status === 'payment_pending'   ? 'border-amber-500/20 bg-amber-500/5' :
                   p.status === 'active'            ? 'border-emerald-500/15 bg-emerald-500/3' :
-                  'border-white/8 bg-white/3'
+                  'border-slate-200 bg-slate-50'
                 }`}>
                   <button className="w-full text-left px-6 py-4 flex items-start gap-4" onClick={() => setExpanded(isOpen ? null : p.id)}>
                     <div className="mt-1">
-                      {isIntl ? <Globe className="h-4 w-4 text-amber-400" /> : <Truck className="h-4 w-4 text-amber-400" />}
+                      {isIntl ? <Globe className="h-4 w-4 text-amber-600" /> : <Truck className="h-4 w-4 text-amber-600" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="font-bold text-white">{p.company_name || p.email}</span>
+                        <span className="font-bold text-slate-900">{p.company_name || p.email}</span>
                         <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${STATUS_COLORS[p.status] ?? STATUS_COLORS.cancelled}`}>
                           {p.status.replace('_', ' ')}
                         </span>
                         {uncalled && (
-                          <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full font-bold animate-pulse">AM call needed</span>
+                          <span className="text-xs bg-red-500/20 text-red-600 px-2 py-0.5 rounded-full font-bold animate-pulse">AM call needed</span>
                         )}
                       </div>
-                      <p className="text-white/50 text-sm">{p.job_title || '—'} · {p.industry_sector || '—'}</p>
+                      <p className="text-slate-600 text-sm">{p.job_title || '—'} · {p.industry_sector || '—'}</p>
                       <div className="flex items-center gap-4 mt-1">
-                        {p.phone && <span className="text-white/30 text-xs flex items-center gap-1"><Phone className="h-3 w-3" />{p.phone}</span>}
-                        <span className="text-white/30 text-xs flex items-center gap-1"><Mail className="h-3 w-3" />{p.email}</span>
+                        {p.phone && <span className="text-slate-600 text-xs flex items-center gap-1"><Phone className="h-3 w-3" />{p.phone}</span>}
+                        <span className="text-slate-600 text-xs flex items-center gap-1"><Mail className="h-3 w-3" />{p.email}</span>
                       </div>
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="text-amber-400 font-black text-xl">£{fee.toLocaleString()}</p>
-                      <p className="text-white/30 text-xs mt-0.5">{isIntl ? 'International' : 'UK'} · /yr</p>
-                      <p className="text-white/20 text-xs mt-0.5">Applied {fmt(p.created_at)}</p>
-                      {isOpen ? <ChevronUp className="h-3.5 w-3.5 text-white/20 ml-auto mt-1" /> : <ChevronDown className="h-3.5 w-3.5 text-white/20 ml-auto mt-1" />}
+                      <p className="text-amber-600 font-black text-xl">£{fee.toLocaleString()}</p>
+                      <p className="text-slate-600 text-xs mt-0.5">{isIntl ? 'International' : 'UK'} · /yr</p>
+                      <p className="text-slate-600 text-xs mt-0.5">Applied {fmt(p.created_at)}</p>
+                      {isOpen ? <ChevronUp className="h-3.5 w-3.5 text-slate-600 ml-auto mt-1" /> : <ChevronDown className="h-3.5 w-3.5 text-slate-600 ml-auto mt-1" />}
                     </div>
                   </button>
 
                   {isOpen && (
-                    <div className="px-6 pb-6 border-t border-white/5 pt-4 space-y-4">
+                    <div className="px-6 pb-6 border-t border-slate-200 pt-4 space-y-4">
                       {/* Details grid */}
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
                         {[
@@ -171,9 +171,9 @@ export default function AdminPriorityPage() {
                           { l: 'Membership expires',  v: fmt(p.membership_expires_at) },
                           { l: 'Last updated',        v: fmt(p.updated_at) },
                         ].map(f => (
-                          <div key={f.l} className="bg-white/3 rounded-xl px-4 py-3">
-                            <p className="text-white/30 text-xs mb-0.5">{f.l}</p>
-                            <p className="text-white text-sm font-semibold">{f.v}</p>
+                          <div key={f.l} className="bg-slate-50 rounded-xl px-4 py-3">
+                            <p className="text-slate-600 text-xs mb-0.5">{f.l}</p>
+                            <p className="text-slate-900 text-sm font-semibold">{f.v}</p>
                           </div>
                         ))}
                       </div>
@@ -182,7 +182,7 @@ export default function AdminPriorityPage() {
                       <div className="flex gap-3 flex-wrap">
                         {p.status === 'payment_pending' && !p.am_called_at && (
                           <button onClick={() => patch(p.id, { am_called_at: new Date().toISOString() })} disabled={updating === p.id}
-                            className="flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30 text-blue-300 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all">
+                            className="flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30 text-blue-700 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all">
                             {updating === p.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Phone className="h-4 w-4" />}
                             Mark AM called
                           </button>
@@ -192,21 +192,21 @@ export default function AdminPriorityPage() {
                             status: 'active',
                             membership_expires_at: new Date(Date.now() + 365 * 86400000).toISOString(),
                           })} disabled={updating === p.id}
-                            className="flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 hover:bg-amber-500/30 text-amber-300 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all">
+                            className="flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 hover:bg-amber-500/30 text-amber-700 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all">
                             {updating === p.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
                             Activate account
                           </button>
                         )}
                         {p.status === 'active' && (
                           <button onClick={() => patch(p.id, { status: 'payment_pending' })} disabled={updating === p.id}
-                            className="flex items-center gap-2 bg-white/5 border border-white/10 hover:bg-white/8 text-white/40 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all">
+                            className="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all">
                             <Clock className="h-4 w-4" /> Suspend
                           </button>
                         )}
-                        <a href={`tel:${p.phone}`} className={`flex items-center gap-2 bg-white/5 border border-white/10 text-white/50 hover:text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all ${!p.phone ? 'pointer-events-none opacity-30' : ''}`}>
+                        <a href={`tel:${p.phone}`} className={`flex items-center gap-2 bg-white border border-slate-200 text-slate-600 hover:text-slate-900 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all ${!p.phone ? 'pointer-events-none opacity-30' : ''}`}>
                           <Phone className="h-4 w-4" /> {p.phone || 'No phone'}
                         </a>
-                        <a href={`mailto:${p.email}`} className="flex items-center gap-2 bg-white/5 border border-white/10 text-white/50 hover:text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all">
+                        <a href={`mailto:${p.email}`} className="flex items-center gap-2 bg-white border border-slate-200 text-slate-600 hover:text-slate-900 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all">
                           <Mail className="h-4 w-4" /> Email
                         </a>
                       </div>

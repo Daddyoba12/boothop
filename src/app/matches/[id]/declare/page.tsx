@@ -231,8 +231,8 @@ export default function DeclarePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center">
-        <Loader2 className="h-10 w-10 text-blue-400 animate-spin" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
       </div>
     );
   }
@@ -240,20 +240,20 @@ export default function DeclarePage() {
   // Submitted — show confirmation
   if (submitDone) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
-        <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-white">Boot<span className="text-blue-400">Hop</span></Link>
-          <Link href={`/matches/${matchId}`} className="text-sm text-white/50 hover:text-white flex items-center gap-1.5 transition-colors">
+      <div className="min-h-screen bg-slate-50">
+        <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="text-xl font-bold text-slate-900">Boot<span className="text-blue-600">Hop</span></Link>
+          <Link href={`/matches/${matchId}`} className="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition-colors">
             <ArrowLeft className="h-4 w-4" /> Back to match
           </Link>
         </div>
         <div className="max-w-lg mx-auto px-6 py-16 text-center">
-          <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="h-8 w-8 text-green-400" />
+          <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="h-8 w-8 text-green-600" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-3">Declaration submitted</h1>
-          <p className="text-white/60 mb-2">BootHop Safety &amp; Compliance is now reviewing your item declaration.</p>
-          <p className="text-white/40 text-sm mb-8">You will receive an email once the review is complete — usually within a few hours.</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-3">Declaration submitted</h1>
+          <p className="text-slate-600 mb-2">BootHop Safety &amp; Compliance is now reviewing your item declaration.</p>
+          <p className="text-slate-600 text-sm mb-8">You will receive an email once the review is complete — usually within a few hours.</p>
           <Link
             href={`/matches/${matchId}`}
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3 rounded-2xl transition-all text-sm"
@@ -268,18 +268,18 @@ export default function DeclarePage() {
   // Wrong status (e.g. already active, rejected)
   if (matchStatus && matchStatus !== 'locked_pending_compliance') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
-        <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-white">Boot<span className="text-blue-400">Hop</span></Link>
-          <Link href={`/matches/${matchId}`} className="text-sm text-white/50 hover:text-white flex items-center gap-1.5 transition-colors">
+      <div className="min-h-screen bg-slate-50">
+        <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="text-xl font-bold text-slate-900">Boot<span className="text-blue-600">Hop</span></Link>
+          <Link href={`/matches/${matchId}`} className="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition-colors">
             <ArrowLeft className="h-4 w-4" /> Back to match
           </Link>
         </div>
         <div className="max-w-lg mx-auto px-6 py-16 text-center">
-          <Clock className="h-12 w-12 text-amber-400 mx-auto mb-4" />
-          <p className="text-white font-semibold">Declaration not available</p>
-          <p className="text-white/50 text-sm mt-2">This declaration form is only available while your shipment is awaiting your item declaration.</p>
-          <Link href={`/matches/${matchId}`} className="inline-block mt-6 text-blue-400 text-sm hover:underline">
+          <Clock className="h-12 w-12 text-amber-600 mx-auto mb-4" />
+          <p className="text-slate-900 font-semibold">Declaration not available</p>
+          <p className="text-slate-600 text-sm mt-2">This declaration form is only available while your shipment is awaiting your item declaration.</p>
+          <Link href={`/matches/${matchId}`} className="inline-block mt-6 text-blue-600 text-sm hover:underline">
             View match →
           </Link>
         </div>
@@ -288,11 +288,11 @@ export default function DeclarePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
+    <div className="min-h-screen bg-slate-50">
       {/* Nav */}
-      <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold text-white">Boot<span className="text-blue-400">Hop</span></Link>
-        <Link href={`/matches/${matchId}`} className="text-sm text-white/50 hover:text-white flex items-center gap-1.5 transition-colors">
+      <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+        <Link href="/" className="text-xl font-bold text-slate-900">Boot<span className="text-blue-600">Hop</span></Link>
+        <Link href={`/matches/${matchId}`} className="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition-colors">
           <ArrowLeft className="h-4 w-4" /> Back to match
         </Link>
       </div>
@@ -300,25 +300,25 @@ export default function DeclarePage() {
       <div className="max-w-2xl mx-auto px-6 py-10 space-y-5">
 
         {/* Header */}
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6">
-          <p className="text-xs font-semibold uppercase tracking-wider text-amber-400 mb-2 flex items-center gap-2">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+          <p className="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-2 flex items-center gap-2">
             <Shield className="h-3.5 w-3.5" /> Item declaration required
           </p>
-          <p className="text-white font-bold text-lg mb-1">Tell us what you are sending</p>
-          <p className="text-white/50 text-sm">
+          <p className="text-slate-900 font-bold text-lg mb-1">Tell us what you are sending</p>
+          <p className="text-slate-600 text-sm">
             BootHop is required to verify the contents of every shipment before releasing contact details.
             Complete your declaration to proceed.
           </p>
         </div>
 
         {/* Section 1 — Basic info */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/40">Item details</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-600">Item details</p>
 
           <div>
-            <label className="block text-sm text-white/60 mb-1.5">Item name <span className="text-red-400">*</span></label>
+            <label className="block text-sm text-slate-600 mb-1.5">Item name <span className="text-red-600">*</span></label>
             <input
-              className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:border-blue-500 focus:bg-white/15"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50"
               placeholder="e.g. Nike Air Force 1 Low"
               value={form.item_name}
               onChange={e => set('item_name', e.target.value)}
@@ -327,23 +327,23 @@ export default function DeclarePage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm text-white/60 mb-1.5">Category <span className="text-red-400">*</span></label>
+              <label className="block text-sm text-slate-600 mb-1.5">Category <span className="text-red-600">*</span></label>
               <select
-                className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 focus:bg-white/15"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50"
                 value={form.item_category}
                 onChange={e => set('item_category', e.target.value)}
               >
                 <option value="">Select…</option>
                 {CATEGORIES.map(c => (
-                  <option key={c} value={c} className="bg-slate-900">{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+                  <option key={c} value={c} className="bg-white">{c.charAt(0).toUpperCase() + c.slice(1)}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm text-white/60 mb-1.5">Quantity <span className="text-red-400">*</span></label>
+              <label className="block text-sm text-slate-600 mb-1.5">Quantity <span className="text-red-600">*</span></label>
               <input
                 type="number" min="1"
-                className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 focus:bg-white/15"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50"
                 value={form.quantity}
                 onChange={e => set('quantity', e.target.value)}
               />
@@ -352,18 +352,18 @@ export default function DeclarePage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm text-white/60 mb-1.5">Brand <span className="text-white/30 text-xs">(optional)</span></label>
+              <label className="block text-sm text-slate-600 mb-1.5">Brand <span className="text-slate-600 text-xs">(optional)</span></label>
               <input
-                className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:border-blue-500 focus:bg-white/15"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50"
                 placeholder="e.g. Nike"
                 value={form.brand}
                 onChange={e => set('brand', e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm text-white/60 mb-1.5">Country of origin <span className="text-red-400">*</span></label>
+              <label className="block text-sm text-slate-600 mb-1.5">Country of origin <span className="text-red-600">*</span></label>
               <input
-                className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:border-blue-500 focus:bg-white/15"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50"
                 placeholder="e.g. United States"
                 value={form.country_of_origin}
                 onChange={e => set('country_of_origin', e.target.value)}
@@ -373,37 +373,37 @@ export default function DeclarePage() {
         </div>
 
         {/* Section 2 — Value & weight */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/40">Value &amp; weight</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-600">Value &amp; weight</p>
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2">
-              <label className="block text-sm text-white/60 mb-1.5">Declared value <span className="text-red-400">*</span></label>
+              <label className="block text-sm text-slate-600 mb-1.5">Declared value <span className="text-red-600">*</span></label>
               <input
                 type="number" min="0" step="0.01"
-                className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:border-blue-500 focus:bg-white/15"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50"
                 placeholder="0.00"
                 value={form.declared_value}
                 onChange={e => set('declared_value', e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm text-white/60 mb-1.5">Currency</label>
+              <label className="block text-sm text-slate-600 mb-1.5">Currency</label>
               <select
-                className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 focus:bg-white/15"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50"
                 value={form.declared_currency}
                 onChange={e => set('declared_currency', e.target.value)}
               >
                 {['GBP', 'USD', 'EUR', 'NGN'].map(c => (
-                  <option key={c} value={c} className="bg-slate-900">{c}</option>
+                  <option key={c} value={c} className="bg-white">{c}</option>
                 ))}
               </select>
             </div>
           </div>
           <div>
-            <label className="block text-sm text-white/60 mb-1.5">Declared weight (kg) <span className="text-red-400">*</span></label>
+            <label className="block text-sm text-slate-600 mb-1.5">Declared weight (kg) <span className="text-red-600">*</span></label>
             <input
               type="number" min="0" step="0.1"
-              className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:border-blue-500 focus:bg-white/15"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50"
               placeholder="e.g. 1.5"
               value={form.declared_weight_kg}
               onChange={e => set('declared_weight_kg', e.target.value)}
@@ -412,30 +412,30 @@ export default function DeclarePage() {
         </div>
 
         {/* Section 3 — Description */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/40">Detailed description</p>
-          <p className="text-xs text-white/40">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-600">Detailed description</p>
+          <p className="text-xs text-slate-600">
             Be specific — include brand, model, size, colour, condition, and purpose.
             Vague descriptions like "clothes" or "electronics" will be rejected.
           </p>
           <textarea
             rows={4}
-            className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:border-blue-500 focus:bg-white/15 resize-none"
+            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 resize-none"
             placeholder='e.g. "Nike Air Force 1 Low, size UK 10, white leather upper, bought at JD Sports 2023, worn twice"'
             value={form.item_description}
             onChange={e => set('item_description', e.target.value)}
           />
           <div className="flex justify-end">
-            <span className={`text-xs ${form.item_description.trim().length < 20 ? 'text-amber-400' : 'text-white/30'}`}>
+            <span className={`text-xs ${form.item_description.trim().length < 20 ? 'text-amber-600' : 'text-slate-600'}`}>
               {form.item_description.trim().length} / 20 min
             </span>
           </div>
         </div>
 
         {/* Section 4 — Content flags */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/40">Contents</p>
-          <p className="text-xs text-white/40">Tick everything that applies, even if not the main item.</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-600">Contents</p>
+          <p className="text-xs text-slate-600">Tick everything that applies, even if not the main item.</p>
           <div className="grid grid-cols-2 gap-2">
             {CONTENT_FLAGS.map(({ key, label, risk }) => (
               <label key={key} className="flex items-center gap-2.5 cursor-pointer group">
@@ -446,15 +446,15 @@ export default function DeclarePage() {
                   onChange={e => set(key as keyof FormState, e.target.checked)}
                 />
                 <span className={`text-sm ${
-                  risk === 'high'   ? 'text-red-300' :
-                  risk === 'warn'   ? 'text-amber-300' :
-                                      'text-white/70'
+                  risk === 'high'   ? 'text-red-700' :
+                  risk === 'warn'   ? 'text-amber-700' :
+                                      'text-slate-700'
                 }`}>{label}</span>
               </label>
             ))}
           </div>
 
-          <div className="pt-2 border-t border-white/10">
+          <div className="pt-2 border-t border-slate-200">
             <label className="flex items-center gap-2.5 cursor-pointer">
               <input
                 type="checkbox"
@@ -462,17 +462,17 @@ export default function DeclarePage() {
                 checked={form.item_modified}
                 onChange={e => set('item_modified', e.target.checked)}
               />
-              <span className="text-sm text-amber-300">This item has been modified, altered, or opened since purchase</span>
+              <span className="text-sm text-amber-700">This item has been modified, altered, or opened since purchase</span>
             </label>
           </div>
         </div>
 
         {/* Section 5 — Ownership */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/40">Ownership</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-600">Ownership</p>
 
           <div>
-            <label className="block text-sm text-white/60 mb-2">Do you own this item? <span className="text-red-400">*</span></label>
+            <label className="block text-sm text-slate-600 mb-2">Do you own this item? <span className="text-red-600">*</span></label>
             <div className="flex gap-3">
               {[{ val: 'true', label: 'Yes, I own it' }, { val: 'false', label: 'No (e.g. sending for someone else)' }].map(opt => (
                 <label key={opt.val} className="flex items-center gap-2 cursor-pointer">
@@ -483,36 +483,36 @@ export default function DeclarePage() {
                     checked={form.sender_owns_item === opt.val}
                     onChange={() => set('sender_owns_item', opt.val)}
                   />
-                  <span className="text-sm text-white/70">{opt.label}</span>
+                  <span className="text-sm text-slate-700">{opt.label}</span>
                 </label>
               ))}
             </div>
           </div>
 
           {proofRequired && (
-            <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4 space-y-3">
-              <p className="text-xs font-semibold text-amber-400">
+            <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 space-y-3">
+              <p className="text-xs font-semibold text-amber-600">
                 Proof of ownership required — item value exceeds £250 or category requires verification.
               </p>
               <div>
-                <label className="block text-sm text-white/60 mb-1.5">Evidence URL <span className="text-white/30 text-xs">(after uploading below)</span></label>
+                <label className="block text-sm text-slate-600 mb-1.5">Evidence URL <span className="text-slate-600 text-xs">(after uploading below)</span></label>
                 <input
-                  className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:border-blue-500 focus:bg-white/15"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50"
                   placeholder="Paste URL here or upload a file below"
                   value={form.proof_of_ownership_url}
                   onChange={e => set('proof_of_ownership_url', e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-sm text-white/60 mb-1.5">Or explain why you don&apos;t have proof</label>
+                <label className="block text-sm text-slate-600 mb-1.5">Or explain why you don&apos;t have proof</label>
                 <textarea
                   rows={2}
-                  className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:border-blue-500 focus:bg-white/15 resize-none"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 resize-none"
                   placeholder="e.g. Gift from family — no receipt available"
                   value={form.proof_of_ownership_explanation}
                   onChange={e => set('proof_of_ownership_explanation', e.target.value)}
                 />
-                <p className="text-xs text-white/30 mt-1">
+                <p className="text-xs text-slate-600 mt-1">
                   A written explanation flags this for manual review rather than blocking submission.
                 </p>
               </div>
@@ -521,19 +521,19 @@ export default function DeclarePage() {
         </div>
 
         {/* Section 6 — Evidence upload */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/40">Evidence <span className="text-white/20 font-normal normal-case">(photos, receipts, documents)</span></p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-600">Evidence <span className="text-slate-300 font-normal normal-case">(photos, receipts, documents)</span></p>
 
           {!declId && (
-            <p className="text-xs text-white/40 italic">Save your draft first to enable file uploads.</p>
+            <p className="text-xs text-slate-600 italic">Save your draft first to enable file uploads.</p>
           )}
 
           {evidence.length > 0 && (
             <div className="space-y-2">
               {evidence.map(e => (
-                <div key={e.id} className="flex items-center gap-3 rounded-xl bg-white/5 px-4 py-2.5">
-                  <FileText className="h-4 w-4 text-blue-400 shrink-0" />
-                  <a href={e.file_url} target="_blank" rel="noopener noreferrer" className="text-sm text-white/70 hover:text-white truncate flex-1">
+                <div key={e.id} className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-2.5">
+                  <FileText className="h-4 w-4 text-blue-600 shrink-0" />
+                  <a href={e.file_url} target="_blank" rel="noopener noreferrer" className="text-sm text-slate-700 hover:text-slate-900 truncate flex-1">
                     {e.evidence_type} — {new Date(e.created_at).toLocaleDateString('en-GB')}
                   </a>
                 </div>
@@ -544,28 +544,28 @@ export default function DeclarePage() {
           {declId && (
             <>
               {uploadError && (
-                <div className="flex items-center gap-2 text-red-300 text-sm">
+                <div className="flex items-center gap-2 text-red-700 text-sm">
                   <X className="h-4 w-4" /> {uploadError}
                 </div>
               )}
               <label className={`flex items-center gap-3 justify-center rounded-xl border-2 border-dashed px-6 py-4 transition-colors cursor-pointer ${
-                uploadingFile ? 'border-blue-500/50 bg-blue-500/5' : 'border-white/20 hover:border-blue-500/50 hover:bg-white/5'
+                uploadingFile ? 'border-blue-300 bg-blue-50' : 'border-slate-300 hover:border-blue-300 hover:bg-slate-50'
               }`}>
                 {uploadingFile
-                  ? <Loader2 className="h-5 w-5 text-blue-400 animate-spin" />
-                  : <Upload className="h-5 w-5 text-white/40" />}
-                <span className="text-sm text-white/50">{uploadingFile ? 'Uploading…' : 'Upload photo, receipt, or document'}</span>
+                  ? <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
+                  : <Upload className="h-5 w-5 text-slate-600" />}
+                <span className="text-sm text-slate-600">{uploadingFile ? 'Uploading…' : 'Upload photo, receipt, or document'}</span>
                 <input ref={fileInputRef} type="file" className="hidden" accept="image/*,application/pdf,video/mp4,video/quicktime" onChange={uploadEvidence} disabled={uploadingFile} />
               </label>
-              <p className="text-xs text-white/30">JPEG, PNG, PDF, MP4 — max 20 MB</p>
+              <p className="text-xs text-slate-600">JPEG, PNG, PDF, MP4 — max 20 MB</p>
             </>
           )}
         </div>
 
         {/* Section 7 — Acknowledgements */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/40">Declarations</p>
-          <p className="text-xs text-white/40">All boxes must be checked before you can submit.</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-600">Declarations</p>
+          <p className="text-xs text-slate-600">All boxes must be checked before you can submit.</p>
           <div className="space-y-3">
             {ACKNOWLEDGEMENTS.map(({ key, text }) => (
               <label key={key} className="flex items-start gap-3 cursor-pointer group">
@@ -575,7 +575,7 @@ export default function DeclarePage() {
                   checked={(form as any)[key]}
                   onChange={e => set(key as keyof FormState, e.target.checked)}
                 />
-                <span className={`text-sm ${(form as any)[key] ? 'text-white/70' : 'text-white/40'}`}>{text}</span>
+                <span className={`text-sm ${(form as any)[key] ? 'text-slate-700' : 'text-slate-600'}`}>{text}</span>
               </label>
             ))}
           </div>
@@ -583,28 +583,28 @@ export default function DeclarePage() {
 
         {/* Validation errors */}
         {errors.length > 0 && (
-          <div className="rounded-xl bg-red-500/20 border border-red-500/30 p-4 space-y-1">
+          <div className="rounded-xl bg-red-50 border border-red-200 p-4 space-y-1">
             <div className="flex items-center gap-2 mb-2">
-              <AlertCircle className="h-4 w-4 text-red-400 shrink-0" />
-              <p className="text-sm font-semibold text-red-300">Please fix the following before submitting:</p>
+              <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
+              <p className="text-sm font-semibold text-red-700">Please fix the following before submitting:</p>
             </div>
             {errors.map((e, i) => (
-              <p key={i} className="text-sm text-red-200 pl-6">• {e}</p>
+              <p key={i} className="text-sm text-red-700 pl-6">• {e}</p>
             ))}
           </div>
         )}
 
         {saveError && (
-          <div className="flex items-center gap-2 rounded-xl bg-red-500/20 border border-red-500/30 px-4 py-3">
-            <AlertCircle className="h-4 w-4 text-red-400 shrink-0" />
-            <p className="text-sm text-red-300">{saveError}</p>
+          <div className="flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3">
+            <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
+            <p className="text-sm text-red-700">{saveError}</p>
           </div>
         )}
 
         {draftSaved && !saveError && (
-          <div className="flex items-center gap-2 rounded-xl bg-green-500/20 border border-green-500/30 px-4 py-3">
-            <CheckCircle className="h-4 w-4 text-green-400 shrink-0" />
-            <p className="text-sm text-green-300">Draft saved.</p>
+          <div className="flex items-center gap-2 rounded-xl bg-green-50 border border-green-200 px-4 py-3">
+            <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
+            <p className="text-sm text-green-700">Draft saved.</p>
           </div>
         )}
 
@@ -613,7 +613,7 @@ export default function DeclarePage() {
           <button
             onClick={saveDraft}
             disabled={saving}
-            className="flex-1 flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 text-white font-semibold py-3 rounded-2xl transition-all text-sm disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-2xl transition-all text-sm disabled:opacity-50"
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             {saving ? 'Saving…' : 'Save Draft'}

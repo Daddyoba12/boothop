@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { trackEvent } from '@/lib/analytics';
 import { Mail, MessageCircle, Clock, CheckCircle, AlertCircle, ArrowRight, Sparkles, Shield, Phone } from 'lucide-react';
-import BootHopLogo from '@/components/BootHopLogo';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 const topics = [
@@ -49,10 +50,10 @@ export default function ContactPage() {
     }
   };
 
-  const inputCls = 'w-full rounded-xl border border-white/20 bg-white/5 backdrop-blur-sm px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:bg-white/10';
+  const inputCls = 'w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:bg-white';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
 
       {/* ANIMATED BACKGROUND BLOBS */}
       <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
@@ -61,17 +62,7 @@ export default function ContactPage() {
         <div className="absolute bottom-40 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s',animationDelay:'1s'}} />
       </div>
 
-      {/* NAV */}
-      <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/">
-            <BootHopLogo size="sm" />
-          </Link>
-          <Link href="/" className="text-sm text-slate-400 hover:text-white flex items-center gap-2 transition-all duration-300 hover:gap-3">
-            ← Back
-          </Link>
-        </div>
-      </nav>
+      <NavBar />
 
       {/* HERO — background image with parallax */}
       <section className="relative min-h-[55vh] flex items-center justify-center text-center overflow-hidden">
@@ -98,7 +89,7 @@ export default function ContactPage() {
             <Sparkles className="w-4 h-4 text-cyan-400" />
             <span className="text-sm text-cyan-300 font-medium">Contact Us</span>
           </div>
-          <h1 className="text-6xl md:text-7xl font-black mb-6 leading-tight">
+          <h1 className="text-6xl md:text-7xl font-black mb-6 leading-tight text-white">
             Get in{' '}
             <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent animate-pulse">
               touch
@@ -116,84 +107,84 @@ export default function ContactPage() {
         {/* INFO SIDEBAR */}
         <div className="md:col-span-2 space-y-5">
 
-          <div className="reveal d1 group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:border-blue-500/50 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/15 active:scale-[0.98] cursor-pointer touch-blue">
-            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-blue-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative flex items-center gap-3 mb-3">
+          <div className="reveal d1 group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 active:scale-[0.98] cursor-pointer touch-blue">
+            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-blue-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative flex items-center gap-3 mb-3 p-6 pb-0">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/50 transition-transform duration-300 group-hover:scale-110">
                 <Mail className="h-4 w-4 text-white" />
               </div>
-              <h3 className="font-bold text-white group-hover:text-cyan-400 transition-colors duration-300">Email Support</h3>
+              <h3 className="font-bold text-slate-900 group-hover:text-cyan-600 transition-colors duration-300">Email Support</h3>
             </div>
-            <p className="relative text-sm text-slate-400 leading-relaxed">
+            <p className="relative text-sm text-slate-600 leading-relaxed p-6 pt-0">
               Reach us directly at{' '}
-              <a href="mailto:info@boothop.com" className="text-cyan-400 font-medium hover:underline">
+              <a href="mailto:info@boothop.com" className="text-cyan-600 font-medium hover:underline">
                 info@boothop.com
               </a>
             </p>
           </div>
 
-          <div className="reveal d1b group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:border-green-500/50 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-green-500/15 active:scale-[0.98] cursor-pointer">
-            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-green-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="reveal d1b group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-green-300 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-green-500/10 active:scale-[0.98] cursor-pointer p-6">
+            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-green-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-green-500/50 transition-transform duration-300 group-hover:scale-110">
                 <Phone className="h-4 w-4 text-white" />
               </div>
-              <h3 className="font-bold text-white group-hover:text-green-400 transition-colors duration-300">Call Us</h3>
+              <h3 className="font-bold text-slate-900 group-hover:text-green-600 transition-colors duration-300">Call Us</h3>
             </div>
-            <p className="relative text-sm text-slate-400 leading-relaxed mb-2">
+            <p className="relative text-sm text-slate-600 leading-relaxed mb-2">
               Speak directly with the BootHop team.
             </p>
-            <a href="tel:+441156612825" className="text-green-400 font-bold text-base hover:text-green-300 transition-colors hover:underline">
+            <a href="tel:+441156612825" className="text-green-600 font-bold text-base hover:text-green-700 transition-colors hover:underline">
               +44 115 661 2825
             </a>
             <p className="text-xs text-slate-500 mt-1">Mon – Fri, 9am – 6pm GMT</p>
           </div>
 
-          <div className="reveal d2 group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:border-emerald-500/50 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/15 active:scale-[0.98] cursor-pointer touch-emerald">
-            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="reveal d2 group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98] cursor-pointer touch-emerald p-6">
+            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/50 transition-transform duration-300 group-hover:scale-110">
                 <Clock className="h-4 w-4 text-white" />
               </div>
-              <h3 className="font-bold text-white group-hover:text-emerald-400 transition-colors duration-300">Response Times</h3>
+              <h3 className="font-bold text-slate-900 group-hover:text-emerald-600 transition-colors duration-300">Response Times</h3>
             </div>
-            <ul className="relative space-y-2 text-sm text-slate-400">
-              <li className="flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />General queries: within 24 hrs</li>
-              <li className="flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />Active delivery issues: within 6 hrs</li>
-              <li className="flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />Urgent safety reports: within 2 hrs</li>
+            <ul className="relative space-y-2 text-sm text-slate-600">
+              <li className="flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />General queries: within 24 hrs</li>
+              <li className="flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />Active delivery issues: within 6 hrs</li>
+              <li className="flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />Urgent safety reports: within 2 hrs</li>
             </ul>
           </div>
 
-          <div className="reveal d3 group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-6 hover:border-violet-500/50 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-violet-500/15 active:scale-[0.98] cursor-pointer touch-violet">
-            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-violet-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="reveal d3 group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-violet-300 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-violet-500/10 active:scale-[0.98] cursor-pointer touch-violet p-6">
+            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-violet-500/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-400 flex items-center justify-center shadow-lg shadow-purple-500/50 transition-transform duration-300 group-hover:scale-110">
                   <Clock className="h-4 w-4 text-white" />
                 </div>
-                <h3 className="font-bold text-white group-hover:text-violet-400 transition-colors duration-300">Support Hours</h3>
+                <h3 className="font-bold text-slate-900 group-hover:text-violet-600 transition-colors duration-300">Support Hours</h3>
               </div>
-              <p className="text-sm text-slate-400">Monday – Friday: 9am – 6pm GMT</p>
-              <p className="text-sm text-slate-400 mt-1">Weekend: Limited support</p>
+              <p className="text-sm text-slate-600">Monday – Friday: 9am – 6pm GMT</p>
+              <p className="text-sm text-slate-600 mt-1">Weekend: Limited support</p>
               <p className="text-xs text-slate-500 mt-3">For urgent delivery issues, we monitor messages 7 days a week.</p>
             </div>
           </div>
 
-          <div className="reveal d4 group relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-900/10 backdrop-blur-sm p-6 hover:border-amber-500/60 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/15 active:scale-[0.98] cursor-pointer touch-amber">
-            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-amber-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="reveal d4 group relative overflow-hidden rounded-2xl border border-amber-200 bg-amber-50 hover:border-amber-300 hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 active:scale-[0.98] cursor-pointer touch-amber p-6">
+            <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-amber-200 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="flex items-center gap-3 mb-2">
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-400 flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110">
                 <Shield className="h-4 w-4 text-white" />
               </div>
-              <h3 className="font-bold text-white group-hover:text-amber-400 transition-colors duration-300">Before you contact us</h3>
+              <h3 className="font-bold text-slate-900 group-hover:text-amber-700 transition-colors duration-300">Before you contact us</h3>
             </div>
-            <p className="text-sm text-amber-200/80 leading-relaxed">
+            <p className="text-sm text-amber-900 leading-relaxed">
               Many questions are answered in our{' '}
-              <Link href="/help" className="font-semibold text-amber-300 underline">Help Centre</Link>.
+              <Link href="/help" className="font-semibold text-amber-700 underline">Help Centre</Link>.
               Check there first for a faster answer.
             </p>
           </div>
@@ -202,37 +193,37 @@ export default function ContactPage() {
         {/* CONTACT FORM */}
         <div className="md:col-span-3">
           {status === 'awaiting_verification' ? (
-            <div className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-sm p-12 text-center">
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl" />
+            <div className="relative overflow-hidden rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-12 text-center">
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full blur-3xl" />
               <div className="relative">
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 shadow-lg shadow-blue-500/50">
                   <Mail className="h-8 w-8 text-white" />
                 </div>
-                <h2 className="text-3xl font-black text-white mb-2">Check your inbox</h2>
-                <p className="text-slate-300 text-sm mb-2">
-                  We&apos;ve sent a verification link to <span className="text-cyan-400 font-semibold">{form.email}</span>.
+                <h2 className="text-3xl font-black text-slate-900 mb-2">Check your inbox</h2>
+                <p className="text-slate-700 text-sm mb-2">
+                  We&apos;ve sent a verification link to <span className="text-cyan-700 font-semibold">{form.email}</span>.
                 </p>
-                <p className="text-slate-400 text-sm mb-8">Click the link in that email to submit your message to our support team.</p>
+                <p className="text-slate-600 text-sm mb-8">Click the link in that email to submit your message to our support team.</p>
                 <button
                   onClick={() => { setForm({ name: '', email: '', topic: '', message: '', _hp: '' }); setStatus('idle'); }}
-                  className="rounded-xl border border-white/20 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-all duration-300 hover:scale-105"
+                  className="rounded-xl border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-all duration-300 hover:scale-105"
                 >
                   Use a different email
                 </button>
               </div>
             </div>
           ) : status === 'sent' ? (
-            <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-sm p-12 text-center">
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-full blur-3xl" />
+            <div className="relative overflow-hidden rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-12 text-center">
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full blur-3xl" />
               <div className="relative">
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-400 shadow-lg shadow-emerald-500/50">
                   <CheckCircle className="h-8 w-8 text-white" />
                 </div>
-                <h2 className="text-3xl font-black text-white mb-2">Message sent!</h2>
-                <p className="text-slate-400 text-sm mb-8">We'll be in touch within 24 hours on business days.</p>
+                <h2 className="text-3xl font-black text-slate-900 mb-2">Message sent!</h2>
+                <p className="text-slate-600 text-sm mb-8">We'll be in touch within 24 hours on business days.</p>
                 <button
                   onClick={() => { setForm({ name: '', email: '', topic: '', message: '', _hp: '' }); setStatus('idle'); }}
-                  className="rounded-xl border border-white/20 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-all duration-300 hover:scale-105"
+                  className="rounded-xl border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-all duration-300 hover:scale-105"
                 >
                   Send another message
                 </button>
@@ -241,20 +232,20 @@ export default function ContactPage() {
           ) : (
             <form
               onSubmit={handleSubmit}
-              className="relative overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-8 space-y-5"
+              className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 space-y-5"
             >
               {/* Glow corner */}
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full blur-3xl pointer-events-none" />
 
               <div className="relative">
-                <h2 className="text-2xl font-black text-white mb-1">Send a message</h2>
-                <p className="text-sm text-slate-400">All fields are required.</p>
+                <h2 className="text-2xl font-black text-slate-900 mb-1">Send a message</h2>
+                <p className="text-sm text-slate-600">All fields are required.</p>
               </div>
 
               {status === 'error' && (
-                <div className="flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
-                  <AlertCircle className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-red-300">Something went wrong. Please email us directly at info@boothop.com</p>
+                <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-4">
+                  <AlertCircle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-red-700">Something went wrong. Please email us directly at info@boothop.com</p>
                 </div>
               )}
 
@@ -266,29 +257,28 @@ export default function ContactPage() {
 
               <div className="grid sm:grid-cols-2 gap-4 relative">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wide">Full name</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Full name</label>
                   <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
                     placeholder="Jane Smith" className={inputCls} />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wide">Email address</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Email address</label>
                   <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
                     placeholder="jane@example.com" className={inputCls} />
                 </div>
               </div>
 
               <div className="relative">
-                <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wide">Topic</label>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Topic</label>
                 <select required value={form.topic} onChange={(e) => setForm({ ...form, topic: e.target.value })}
-                  className={`${inputCls} cursor-pointer`}
-                  style={{colorScheme:'dark'}}>
-                  <option value="" className="bg-slate-900 text-slate-400">Select a topic...</option>
-                  {topics.map((t) => <option key={t} value={t} className="bg-slate-900 text-white">{t}</option>)}
+                  className={`${inputCls} cursor-pointer`}>
+                  <option value="" className="bg-white text-slate-500">Select a topic...</option>
+                  {topics.map((t) => <option key={t} value={t} className="bg-white text-slate-900">{t}</option>)}
                 </select>
               </div>
 
               <div className="relative">
-                <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wide">Message</label>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Message</label>
                 <textarea required value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })}
                   rows={6} placeholder="Describe your question or issue in as much detail as possible..."
                   className={`${inputCls} resize-none`} />
@@ -300,23 +290,15 @@ export default function ContactPage() {
                   <>Send message <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" /></>
                 )}
               </button>
-              <p className="text-xs text-slate-500 text-center">
-                By submitting you agree to our <Link href="/privacy" className="text-slate-400 underline hover:text-white transition">Privacy Policy</Link>.
+              <p className="text-xs text-slate-600 text-center">
+                By submitting you agree to our <Link href="/privacy" className="text-slate-600 underline hover:text-slate-900 transition">Privacy Policy</Link>.
               </p>
             </form>
           )}
         </div>
       </main>
 
-      {/* FOOTER */}
-      <footer className="relative z-10 border-t border-slate-800 px-6 py-12 text-center text-sm text-slate-500">
-        <p>© {new Date().getFullYear()} BootHop. All rights reserved.</p>
-        <div className="mt-3 flex justify-center gap-5">
-          {[['Terms', '/terms'], ['Privacy', '/privacy'], ['Help', '/help']].map(([label, href]) => (
-            <Link key={href} href={href} className="hover:text-white transition">{label}</Link>
-          ))}
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

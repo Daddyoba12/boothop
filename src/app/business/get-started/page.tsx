@@ -6,16 +6,14 @@ import { Zap, Truck, Star, ArrowRight } from 'lucide-react';
 import { BusinessNav } from '@/components/business/BusinessNav';
 import BusinessFooter from '@/components/business/BusinessFooter';
 
-const BG = 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)';
-
 const PATHS = [
   {
-    icon: <Zap className="h-7 w-7 text-emerald-400" />,
-    bg: 'bg-emerald-500/15',
-    border: 'border-emerald-500/25',
-    accent: 'text-emerald-400',
-    ring: 'hover:border-emerald-500/50 focus:ring-emerald-400',
-    badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    icon: <Zap className="h-7 w-7 text-emerald-600" />,
+    bg: 'bg-emerald-100',
+    border: 'border-emerald-200',
+    accent: 'text-emerald-600',
+    ring: 'hover:border-emerald-300 focus:ring-emerald-400',
+    badge: 'bg-emerald-100 text-emerald-700 border-emerald-200',
     badgeText: 'Instant',
     title: 'Express Delivery',
     description: 'Book a same-day or international delivery in minutes. No account needed — get a live quote, confirm, and we dispatch.',
@@ -24,12 +22,12 @@ const PATHS = [
     detail: 'Prices from £300 · UK & International · 24/7',
   },
   {
-    icon: <Truck className="h-7 w-7 text-blue-400" />,
-    bg: 'bg-blue-500/15',
-    border: 'border-blue-500/25',
-    accent: 'text-blue-400',
-    ring: 'hover:border-blue-500/50 focus:ring-blue-400',
-    badge: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+    icon: <Truck className="h-7 w-7 text-blue-600" />,
+    bg: 'bg-blue-100',
+    border: 'border-blue-200',
+    accent: 'text-blue-600',
+    ring: 'hover:border-blue-300 focus:ring-blue-400',
+    badge: 'bg-blue-100 text-blue-700 border-blue-200',
     badgeText: 'Earn with us',
     title: 'Carrier Partner',
     description: 'Join the BootHop carrier network. Receive job alerts, accept deliveries in your area, and get paid 70% of the job rate.',
@@ -38,12 +36,12 @@ const PATHS = [
     detail: 'Earn 70% per job · Weekly payouts · Flexible',
   },
   {
-    icon: <Star className="h-7 w-7 text-amber-400" />,
-    bg: 'bg-amber-500/15',
-    border: 'border-amber-500/25',
-    accent: 'text-amber-400',
-    ring: 'hover:border-amber-500/50 focus:ring-amber-400',
-    badge: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    icon: <Star className="h-7 w-7 text-amber-600" />,
+    bg: 'bg-amber-100',
+    border: 'border-amber-200',
+    accent: 'text-amber-600',
+    ring: 'hover:border-amber-300 focus:ring-amber-400',
+    badge: 'bg-amber-100 text-amber-700 border-amber-200',
     badgeText: 'VIP Access',
     title: 'Priority Partnership',
     description: 'For organisations with regular freight needs. Dedicated account management, volume discounts, and priority dispatch.',
@@ -55,7 +53,7 @@ const PATHS = [
 
 export default function GetStartedPage() {
   return (
-    <div className="min-h-screen text-white" style={{ background: BG }}>
+    <div className="min-h-screen text-slate-900 bg-white">
       <BusinessNav showDefaultNav />
 
       <div className="min-h-screen flex flex-col items-center justify-center px-6 pt-32 pb-16">
@@ -68,9 +66,9 @@ export default function GetStartedPage() {
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-black mb-4">
               How do you want to<br />
-              <span className="text-emerald-400">work with us?</span>
+              <span className="text-emerald-600">work with us?</span>
             </h1>
-            <p className="text-white/45 text-lg max-w-lg mx-auto">
+            <p className="text-slate-600 text-lg max-w-lg mx-auto">
               Choose the path that fits your business. Each is a separate, purpose-built experience.
             </p>
           </div>
@@ -85,7 +83,7 @@ export default function GetStartedPage() {
               >
                 <Link
                   href={path.href}
-                  className={`flex flex-col h-full p-6 rounded-2xl bg-white/5 border ${path.border} ${path.ring} hover:bg-white/8 transition-all focus:outline-none focus:ring-2 group`}
+                  className={`flex flex-col h-full p-6 rounded-2xl bg-slate-50 border ${path.border} ${path.ring} hover:bg-white hover:shadow-md transition-all focus:outline-none focus:ring-2 group`}
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className={`w-12 h-12 rounded-xl ${path.bg} border ${path.border} flex items-center justify-center`}>
@@ -97,10 +95,10 @@ export default function GetStartedPage() {
                   </div>
 
                   <h2 className="text-lg font-black mb-2">{path.title}</h2>
-                  <p className="text-sm text-white/45 leading-relaxed mb-5 flex-1">{path.description}</p>
+                  <p className="text-sm text-slate-600 leading-relaxed mb-5 flex-1">{path.description}</p>
 
                   <div>
-                    <p className="text-xs text-white/25 mb-3">{path.detail}</p>
+                    <p className="text-xs text-slate-600 mb-3">{path.detail}</p>
                     <div className={`flex items-center gap-1.5 text-sm font-bold ${path.accent} group-hover:gap-2.5 transition-all`}>
                       {path.cta} <ArrowRight className="h-4 w-4" />
                     </div>
@@ -111,17 +109,17 @@ export default function GetStartedPage() {
           </div>
 
           <div className="mt-10 text-center">
-            <p className="text-sm text-white/30 mb-4">Already have an account?</p>
+            <p className="text-sm text-slate-600 mb-4">Already have an account?</p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
-              <a href="/business/sign-in" className="text-sm text-white/50 hover:text-white transition-colors font-semibold">
+              <a href="/business/sign-in" className="text-sm text-slate-600 hover:text-slate-900 transition-colors font-semibold">
                 ⚡ Business Client Sign In
               </a>
-              <span className="text-white/15">·</span>
-              <a href="/business/carrier-sign-in" className="text-sm text-white/50 hover:text-white transition-colors font-semibold">
+              <span className="text-slate-200">·</span>
+              <a href="/business/carrier-sign-in" className="text-sm text-slate-600 hover:text-slate-900 transition-colors font-semibold">
                 🚚 Carrier Sign In
               </a>
-              <span className="text-white/15">·</span>
-              <a href="/business/priority-partner" className="text-sm text-white/50 hover:text-white transition-colors font-semibold">
+              <span className="text-slate-200">·</span>
+              <a href="/business/priority-partner" className="text-sm text-slate-600 hover:text-slate-900 transition-colors font-semibold">
                 🏆 Priority Client Sign In
               </a>
             </div>

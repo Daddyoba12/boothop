@@ -27,15 +27,15 @@ function buildGoUrl(offer: BFIFlightOffer): string {
 }
 
 function scoreColor(score: number) {
-  if (score >= 70) return 'text-green-400';
-  if (score >= 45) return 'text-yellow-400';
-  return 'text-red-400';
+  if (score >= 70) return 'text-green-600';
+  if (score >= 45) return 'text-amber-600';
+  return 'text-red-600';
 }
 
 function recBadge(r: string) {
-  if (r === 'BUY')  return 'bg-green-900 text-green-300 border-green-700';
-  if (r === 'WAIT') return 'bg-red-900   text-red-300   border-red-700';
-  return                   'bg-gray-800  text-gray-300  border-gray-700';
+  if (r === 'BUY')  return 'bg-green-100 text-green-700 border-green-200';
+  if (r === 'WAIT') return 'bg-red-100   text-red-700   border-red-200';
+  return                   'bg-white     text-slate-600 border-slate-300';
 }
 
 function trendArrow(trend: string) {
@@ -49,7 +49,7 @@ function trendArrow(trend: string) {
 function PriceChart({ points }: { points: PricePoint[] }) {
   if (points.length < 2) {
     return (
-      <div className="flex items-center justify-center h-48 text-gray-600 text-sm bg-gray-900 rounded-xl">
+      <div className="flex items-center justify-center h-48 text-slate-600 text-sm bg-white rounded-xl">
         Not enough scan history yet — data builds up after a few days of scans.
       </div>
     );
@@ -134,7 +134,7 @@ function FareCalendar({
 }) {
   if (!days.length) {
     return (
-      <div className="flex items-center justify-center h-32 text-gray-600 text-sm bg-gray-900 rounded-xl">
+      <div className="flex items-center justify-center h-32 text-slate-600 text-sm bg-white rounded-xl">
         No forward-looking fare data yet — check back after the next scan.
       </div>
     );
@@ -143,18 +143,18 @@ function FareCalendar({
   const baseline = avg ?? (days.reduce((s, d) => s + d.price_gbp, 0) / days.length);
 
   function dayClass(price: number) {
-    if (price <= baseline * 0.92) return 'bg-green-900/60 border-green-700/50 text-green-300';
-    if (price <= baseline * 1.05) return 'bg-gray-800/60 border-gray-700/50 text-gray-300';
-    return 'bg-red-900/30 border-red-800/30 text-red-400';
+    if (price <= baseline * 0.92) return 'bg-green-100 border-green-200 text-green-700';
+    if (price <= baseline * 1.05) return 'bg-slate-50 border-slate-200 text-slate-600';
+    return 'bg-red-50 border-red-200 text-red-600';
   }
 
   return (
     <div>
-      <div className="flex items-center gap-4 mb-4 text-xs text-gray-500 flex-wrap">
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-green-900 border border-green-700" /> Cheap (≤ avg)</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-gray-800 border border-gray-700" /> Average</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-red-900/30 border border-red-800/30" /> Above avg</span>
-        {avg && <span>Avg: <span className="text-white font-medium">£{avg.toFixed(0)}</span></span>}
+      <div className="flex items-center gap-4 mb-4 text-xs text-slate-600 flex-wrap">
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-green-100 border border-green-200" /> Cheap (≤ avg)</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-white border border-slate-300" /> Average</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-red-50 border border-red-200" /> Above avg</span>
+        {avg && <span>Avg: <span className="text-slate-900 font-medium">£{avg.toFixed(0)}</span></span>}
       </div>
       <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-2">
         {days.map(d => {
@@ -203,12 +203,12 @@ function MatchLayer({
     : '£150–£350';
 
   return (
-    <div className="bg-gradient-to-br from-[#080f1f] via-gray-900 to-[#071810] border border-blue-800/30 rounded-2xl p-6 md:p-8">
+    <div className="bg-gradient-to-br from-blue-50 via-white to-emerald-50 border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm">
 
       {/* Live header */}
       <div className="flex items-center gap-2 mb-5">
-        <span className="h-2 w-2 bg-green-400 rounded-full animate-pulse shrink-0" />
-        <p className="text-sm text-green-400 font-semibold">
+        <span className="h-2 w-2 bg-green-500 rounded-full animate-pulse shrink-0" />
+        <p className="text-sm text-green-700 font-semibold">
           {data?.travelers
             ? `${data.travelers} verified BootHop traveller${data.travelers !== 1 ? 's' : ''} flying this route this week`
             : 'BootHop travellers active on this route'
@@ -216,10 +216,10 @@ function MatchLayer({
         </p>
       </div>
 
-      <h2 className="text-xl md:text-2xl font-bold text-white mb-2">
+      <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">
         Don&apos;t just book a flight. Turn it into income.
       </h2>
-      <p className="text-gray-400 text-sm mb-6 max-w-xl">
+      <p className="text-slate-600 text-sm mb-6 max-w-xl">
         Every traveller on this route can earn {earningEstimate} carrying verified BootHop packages.
         Every sender saves 60–80% vs traditional couriers.
       </p>
@@ -227,23 +227,23 @@ function MatchLayer({
       <div className="grid md:grid-cols-2 gap-4">
 
         {/* Traveller panel */}
-        <div className="bg-blue-950/50 border border-blue-800/40 rounded-xl p-5 flex flex-col">
+        <div className="bg-white border border-blue-200 rounded-xl p-5 flex flex-col shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-xl">✈️</span>
-            <p className="text-blue-300 font-semibold text-sm">Travelling on this route?</p>
+            <p className="text-blue-700 font-semibold text-sm">Travelling on this route?</p>
           </div>
-          <p className="text-gray-200 text-sm mb-1 flex-1">
+          <p className="text-slate-600 text-sm mb-1 flex-1">
             Earn up to{' '}
-            <span className="text-green-400 font-bold text-base">{earningEstimate}</span>{' '}
+            <span className="text-green-600 font-bold text-base">{earningEstimate}</span>{' '}
             carrying verified BootHop packages on your trip.
           </p>
           {cheapestPrice && (
-            <p className="text-gray-500 text-xs mb-3">
+            <p className="text-slate-600 text-xs mb-3">
               Your £{cheapestPrice.toFixed(0)} flight could pay for itself — and more.
             </p>
           )}
           {data?.travelers ? (
-            <p className="text-xs text-blue-400/70 mb-4">
+            <p className="text-xs text-blue-500 mb-4">
               {data.travelers} traveller{data.travelers !== 1 ? 's' : ''} already doing this this month
             </p>
           ) : null}
@@ -256,23 +256,23 @@ function MatchLayer({
         </div>
 
         {/* Sender panel */}
-        <div className="bg-emerald-950/50 border border-emerald-800/40 rounded-xl p-5 flex flex-col">
+        <div className="bg-white border border-emerald-200 rounded-xl p-5 flex flex-col shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-xl">📦</span>
-            <p className="text-emerald-300 font-semibold text-sm">Need to send something?</p>
+            <p className="text-emerald-700 font-semibold text-sm">Need to send something?</p>
           </div>
-          <p className="text-gray-200 text-sm mb-1 flex-1">
+          <p className="text-slate-600 text-sm mb-1 flex-1">
             Skip the £200+ courier bill. Send packages with verified travellers on this route —{' '}
-            <span className="text-emerald-400 font-bold text-base">from £25</span>.
+            <span className="text-emerald-600 font-bold text-base">from £25</span>.
           </p>
-          <p className="text-gray-500 text-xs mb-3">
+          <p className="text-slate-600 text-xs mb-3">
             {data?.travelers
               ? `${data.travelers} traveller${data.travelers !== 1 ? 's' : ''} available for direct match.`
               : 'Post your delivery and match with a verified traveller today.'
             }
           </p>
           {data?.senders ? (
-            <p className="text-xs text-emerald-400/70 mb-4">
+            <p className="text-xs text-emerald-500 mb-4">
               {data.senders} active sender{data.senders !== 1 ? 's' : ''} on the reverse route right now
             </p>
           ) : null}
@@ -305,7 +305,7 @@ function AirlinesTab({ offers, origin, destination }: { offers: BFIFlightOffer[]
     .sort((a, b) => a.min - b.min);
 
   if (!rows.length) {
-    return <p className="text-gray-500 text-sm">No airline data for today.</p>;
+    return <p className="text-slate-600 text-sm">No airline data for today.</p>;
   }
 
   return (
@@ -313,24 +313,24 @@ function AirlinesTab({ offers, origin, destination }: { offers: BFIFlightOffer[]
       {rows.map(r => (
         <div
           key={r.code}
-          className="flex items-center justify-between bg-gray-900 border border-gray-800 rounded-xl px-5 py-3 hover:border-gray-700 transition-colors"
+          className="flex items-center justify-between bg-white border border-slate-200 rounded-xl px-5 py-3 hover:border-slate-300 transition-colors"
         >
           <div>
             <Link
               href={`/flights/airlines/${r.code.toLowerCase()}`}
-              className="font-semibold text-white hover:text-blue-400 transition-colors"
+              className="font-semibold text-slate-900 hover:text-blue-600 transition-colors"
             >
               {r.name}
             </Link>
-            <p className="text-xs text-gray-500 mt-0.5">{r.code} · {r.count} fare{r.count !== 1 ? 's' : ''} found today</p>
+            <p className="text-xs text-slate-600 mt-0.5">{r.code} · {r.count} fare{r.count !== 1 ? 's' : ''} found today</p>
           </div>
           <div className="text-right">
-            <p className="font-bold text-white">From £{r.min.toFixed(0)}</p>
-            <p className="text-xs text-gray-500">Avg £{r.avg.toFixed(0)}</p>
+            <p className="font-bold text-slate-900">From £{r.min.toFixed(0)}</p>
+            <p className="text-xs text-slate-600">Avg £{r.avg.toFixed(0)}</p>
           </div>
         </div>
       ))}
-      <p className="text-xs text-gray-600 pt-2 text-center">
+      <p className="text-xs text-slate-600 pt-2 text-center">
         Click an airline to see full route stats →
       </p>
     </div>
@@ -349,20 +349,20 @@ function BestMonthsPanel({ months, originCity, destCity }: {
   const lowest = top[0];
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+    <div className="bg-white border border-slate-200 rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <div>
-          <h3 className="text-white font-semibold">Best months to fly</h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <h3 className="text-slate-900 font-semibold">Best months to fly</h3>
+          <p className="text-xs text-slate-600 mt-0.5">
             {originCity} → {destCity} · Ranked cheapest to most expensive
           </p>
         </div>
-        <div className="bg-green-900/50 border border-green-700/50 rounded-xl px-4 py-2 text-center">
-          <p className="text-[10px] text-green-400 font-semibold uppercase tracking-wide">Best month</p>
-          <p className="text-lg font-bold text-white">
+        <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-2 text-center">
+          <p className="text-[10px] text-green-700 font-semibold uppercase tracking-wide">Best month</p>
+          <p className="text-lg font-bold text-slate-900">
             {new Date(lowest.month + '-01').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
           </p>
-          <p className="text-green-400 font-bold">From £{lowest.price}</p>
+          <p className="text-green-600 font-bold">From £{lowest.price}</p>
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -371,23 +371,23 @@ function BestMonthsPanel({ months, originCity, destCity }: {
             key={m.month}
             className={`rounded-xl border p-3 text-center ${
               i === 0
-                ? 'bg-green-900/40 border-green-700/50'
-                : 'bg-gray-800/50 border-gray-700/50'
+                ? 'bg-green-50 border-green-200'
+                : 'bg-slate-50 border-slate-200'
             }`}
           >
             {i === 0 && (
-              <p className="text-[9px] text-green-400 font-bold uppercase tracking-widest mb-0.5">Cheapest</p>
+              <p className="text-[9px] text-green-700 font-bold uppercase tracking-widest mb-0.5">Cheapest</p>
             )}
-            <p className="text-sm font-semibold text-white">
+            <p className="text-sm font-semibold text-slate-900">
               {new Date(m.month + '-01').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
             </p>
-            <p className={`text-base font-bold mt-0.5 ${i === 0 ? 'text-green-400' : 'text-white'}`}>
+            <p className={`text-base font-bold mt-0.5 ${i === 0 ? 'text-green-600' : 'text-slate-900'}`}>
               £{m.price}
             </p>
           </div>
         ))}
       </div>
-      <p className="text-[10px] text-gray-600 mt-3 text-center">
+      <p className="text-[10px] text-slate-600 mt-3 text-center">
         Source: TravelPayouts live data · Prices are lowest fares found per month
       </p>
     </div>
@@ -424,25 +424,25 @@ export default function RouteDetail({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-4xl px-4 py-10 space-y-8">
 
         {/* Breadcrumb */}
-        <div className="text-sm text-gray-500 flex items-center gap-1.5 flex-wrap">
-          <Link href="/" className="hover:text-white transition-colors">BootHop</Link>
+        <div className="text-sm text-slate-600 flex items-center gap-1.5 flex-wrap">
+          <Link href="/" className="hover:text-slate-900 transition-colors">BootHop</Link>
           <span>/</span>
-          <Link href="/flights" className="hover:text-white transition-colors">Flights</Link>
+          <Link href="/flights" className="hover:text-slate-900 transition-colors">Flights</Link>
           <span>/</span>
           <Link
             href={`/flights/airports/${route.origin.toLowerCase()}`}
-            className="hover:text-blue-400 transition-colors"
+            className="hover:text-blue-600 transition-colors"
           >
             {origin.city}
           </Link>
           <span>/</span>
           <Link
             href={`/flights/airports/${route.destination.toLowerCase()}`}
-            className="hover:text-blue-400 transition-colors"
+            className="hover:text-blue-600 transition-colors"
           >
             {destination.city}
           </Link>
@@ -450,32 +450,32 @@ export default function RouteDetail({
 
         {/* Header */}
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
             {origin.city} → {destination.city}
           </h1>
-          <p className="text-gray-400 mt-1.5 text-sm">
+          <p className="text-slate-600 mt-1.5 text-sm">
             {origin.name} ({route.origin})&nbsp;→&nbsp;{destination.name} ({route.destination})
           </p>
         </div>
 
         {/* Cheapest hero */}
         {cheapest ? (
-          <div className="bg-gradient-to-br from-blue-950 to-gray-900 border border-blue-800/60 rounded-2xl p-6">
+          <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-200 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between gap-2 mb-3">
-              <p className="text-xs text-blue-400 uppercase tracking-widest font-semibold">
+              <p className="text-xs text-blue-600 uppercase tracking-widest font-semibold">
                 Today&apos;s Cheapest
               </p>
               {todayViews > 0 && (
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-slate-600">
                   {todayViews} views{todayClicks > 0 ? ` · ${todayClicks} booked` : ''} today
                 </p>
               )}
             </div>
             <div className="flex items-end justify-between gap-4 flex-wrap">
               <div>
-                <p className="text-5xl font-bold text-white">£{cheapest.price_gbp.toFixed(0)}</p>
-                <p className="text-gray-300 mt-1 font-medium">{cheapest.airline_name}</p>
-                <p className="text-gray-500 text-sm mt-0.5">
+                <p className="text-5xl font-bold text-slate-900">£{cheapest.price_gbp.toFixed(0)}</p>
+                <p className="text-slate-600 mt-1 font-medium">{cheapest.airline_name}</p>
+                <p className="text-slate-600 text-sm mt-0.5">
                   {cheapest.stops === 0 ? 'Direct' : `${cheapest.stops} stop${cheapest.stops > 1 ? 's' : ''}`}
                   {cheapest.travel_time_mins ? ` · ${fmt(cheapest.travel_time_mins)}` : ''}
                   {cheapest.baggage_included ? ' · Bags included' : ''}
@@ -490,7 +490,7 @@ export default function RouteDetail({
             </div>
           </div>
         ) : (
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center text-gray-500">
+          <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-600">
             No fares scanned today. Check back after the next scheduled scan.
           </div>
         )}
@@ -512,10 +512,10 @@ export default function RouteDetail({
               { label: 'Opportunity',      value: `${stats.opportunity_score}/100`, valueClass: scoreColor(stats.opportunity_score),
                 badge: stats.recommendation, badgeClass: recBadge(stats.recommendation) },
             ].map(col => (
-              <div key={col.label} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-                <p className="text-xs text-gray-500 mb-1.5">{col.label}</p>
+              <div key={col.label} className="bg-white border border-slate-200 rounded-xl p-4">
+                <p className="text-xs text-slate-600 mb-1.5">{col.label}</p>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <p className={`text-xl font-bold capitalize ${col.valueClass ?? 'text-white'}`}>
+                  <p className={`text-xl font-bold capitalize ${col.valueClass ?? 'text-slate-900'}`}>
                     {col.value}
                   </p>
                   {col.badge && (
@@ -524,7 +524,7 @@ export default function RouteDetail({
                     </span>
                   )}
                 </div>
-                {col.sub && <p className="text-[10px] text-gray-600 mt-1">{col.sub}</p>}
+                {col.sub && <p className="text-[10px] text-slate-600 mt-1">{col.sub}</p>}
               </div>
             ))}
           </div>
@@ -541,15 +541,15 @@ export default function RouteDetail({
 
         {/* Tabs */}
         <div>
-          <div className="flex gap-1 border-b border-gray-800 mb-6 overflow-x-auto">
+          <div className="flex gap-1 border-b border-slate-200 mb-6 overflow-x-auto">
             {TABS.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-2.5 text-sm whitespace-nowrap transition-colors ${
                   activeTab === tab.id
-                    ? 'text-white border-b-2 border-blue-500 font-medium'
-                    : 'text-gray-500 hover:text-gray-300'
+                    ? 'text-slate-900 border-b-2 border-blue-500 font-medium'
+                    : 'text-slate-600 hover:text-slate-700'
                 }`}
               >
                 {tab.label}
@@ -560,16 +560,16 @@ export default function RouteDetail({
           {activeTab === 'today' && (
             <div className="space-y-2.5">
               {!offers.length ? (
-                <p className="text-gray-500 text-sm">No offers available yet — check back after the next scan.</p>
+                <p className="text-slate-600 text-sm">No offers available yet — check back after the next scan.</p>
               ) : (
                 offers.slice(0, 15).map(offer => (
                   <div
                     key={offer.id}
-                    className="flex items-center justify-between bg-gray-900 border border-gray-800 rounded-xl px-5 py-4 hover:border-gray-700 transition-colors"
+                    className="flex items-center justify-between bg-white border border-slate-200 rounded-xl px-5 py-4 hover:border-slate-300 transition-colors"
                   >
                     <div>
-                      <p className="font-semibold text-white">{offer.airline_name}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="font-semibold text-slate-900">{offer.airline_name}</p>
+                      <p className="text-xs text-slate-600 mt-0.5">
                         {offer.flight_number ?? ''}
                         {' · '}
                         {offer.stops === 0 ? 'Direct' : `${offer.stops} stop${offer.stops > 1 ? 's' : ''}`}
@@ -579,7 +579,7 @@ export default function RouteDetail({
                       </p>
                     </div>
                     <div className="flex items-center gap-4 shrink-0">
-                      <p className="text-xl font-bold text-white">£{offer.price_gbp.toFixed(0)}</p>
+                      <p className="text-xl font-bold text-slate-900">£{offer.price_gbp.toFixed(0)}</p>
                       <a
                         href={buildGoUrl(offer)}
                         className="text-sm px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium"
@@ -602,7 +602,7 @@ export default function RouteDetail({
 
           {activeTab === 'history' && (
             <div>
-              <p className="text-xs text-gray-500 mb-4">
+              <p className="text-xs text-slate-600 mb-4">
                 Daily cheapest fare scanned over the last 30 days
               </p>
               <PriceChart points={priceHistory} />
@@ -613,9 +613,9 @@ export default function RouteDetail({
                     { label: 'Highest recorded', value: `£${Math.max(...priceHistory.map(p => p.cheapest_price_gbp)).toFixed(0)}` },
                     { label: 'Data points',      value: `${priceHistory.length} days` },
                   ].map(s => (
-                    <div key={s.label} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-                      <p className="text-xs text-gray-500 mb-1">{s.label}</p>
-                      <p className="text-lg font-bold text-white">{s.value}</p>
+                    <div key={s.label} className="bg-white border border-slate-200 rounded-xl p-4">
+                      <p className="text-xs text-slate-600 mb-1">{s.label}</p>
+                      <p className="text-lg font-bold text-slate-900">{s.value}</p>
                     </div>
                   ))}
                 </div>
@@ -629,12 +629,12 @@ export default function RouteDetail({
         </div>
 
         {/* Airport hub links */}
-        <div className="border-t border-gray-800 pt-6 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+        <div className="border-t border-slate-200 pt-6 flex flex-wrap items-center gap-4 text-sm text-slate-600">
           <span>Explore hubs:</span>
-          <Link href={`/flights/airports/${route.origin.toLowerCase()}`} className="hover:text-blue-400 transition-colors">
+          <Link href={`/flights/airports/${route.origin.toLowerCase()}`} className="hover:text-blue-600 transition-colors">
             All flights from {origin.city} →
           </Link>
-          <Link href={`/flights/airports/${route.destination.toLowerCase()}`} className="hover:text-blue-400 transition-colors">
+          <Link href={`/flights/airports/${route.destination.toLowerCase()}`} className="hover:text-blue-600 transition-colors">
             All flights to {destination.city} →
           </Link>
         </div>

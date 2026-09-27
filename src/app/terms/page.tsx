@@ -14,15 +14,15 @@ function Section({ id, title, icon: Icon, children }: {
 }) {
   return (
     <section id={id} className="mb-10 scroll-mt-28">
-      <div className="group relative overflow-hidden rounded-2xl border border-white/8 bg-white/3 hover:bg-white/5 hover:border-blue-500/20 transition-all duration-300 p-7">
+      <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-50 hover:border-blue-500/20 transition-all duration-300 p-7">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none" />
         <div className="flex items-center gap-3 mb-5">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/40 group-hover:scale-110 transition-transform duration-300">
-            <Icon className="h-5 w-5 text-white" />
+            <Icon className="h-5 w-5 text-slate-900" />
           </div>
-          <h2 className="text-lg font-black text-white">{title}</h2>
+          <h2 className="text-lg font-black text-slate-900">{title}</h2>
         </div>
-        <div className="relative space-y-4 text-sm text-slate-400 leading-relaxed">{children}</div>
+        <div className="relative space-y-4 text-sm text-slate-700 leading-relaxed">{children}</div>
       </div>
     </section>
   );
@@ -37,7 +37,7 @@ function Ul({ items }: { items: string[] }) {
     <ul className="space-y-2 pl-2">
       {items.map((item, i) => (
         <li key={i} className="flex items-start gap-2.5">
-          <CheckCircle className="h-3.5 w-3.5 text-cyan-400 shrink-0 mt-0.5" />
+          <CheckCircle className="h-3.5 w-3.5 text-cyan-600 shrink-0 mt-0.5" />
           <span>{item}</span>
         </li>
       ))}
@@ -47,8 +47,8 @@ function Ul({ items }: { items: string[] }) {
 
 function Warn({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-xl bg-red-500/10 border border-red-500/30 px-5 py-4 text-sm text-red-300 leading-relaxed">
-      <span className="font-semibold text-red-400">⚠️ Important: </span>{children}
+    <div className="rounded-xl bg-red-500/10 border border-red-500/30 px-5 py-4 text-sm text-red-800 leading-relaxed">
+      <span className="font-semibold text-red-700">⚠️ Important: </span>{children}
     </div>
   );
 }
@@ -107,7 +107,7 @@ export default function TermsPage() {
   const lastUpdated = '31 March 2026';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-900 font-sans overflow-x-hidden">
 
       {/* ANIMATED BACKGROUND BLOBS */}
       <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
@@ -130,26 +130,26 @@ export default function TermsPage() {
           />
         </div>
         <div className="inline-flex items-center gap-2 mb-6 px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/30 backdrop-blur-xl">
-          <Scale className="h-4 w-4 text-cyan-400" />
-          <span className="text-xs font-semibold tracking-widest uppercase text-cyan-300">Legal</span>
+          <Scale className="h-4 w-4 text-cyan-700" />
+          <span className="text-xs font-semibold tracking-widest uppercase text-cyan-700">Legal</span>
         </div>
-        <h1 className="text-5xl md:text-6xl font-black text-white mb-4">
+        <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-4">
           Terms &amp;{' '}
           <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
             Conditions
           </span>
         </h1>
-        <p className="text-slate-400 text-base max-w-xl mx-auto">
+        <p className="text-slate-600 text-base max-w-xl mx-auto">
           By using BootHop you agree to these terms in full. Please read them carefully before posting or accepting any delivery.
         </p>
-        <p className="text-xs text-slate-500 mt-4">Last updated: {lastUpdated} · BootHop Ltd, United Kingdom</p>
+        <p className="text-xs text-slate-600 mt-4">Last updated: {lastUpdated} · BootHop Ltd, United Kingdom</p>
       </section>
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 pb-24">
 
         {/* TOC */}
-        <div className="rounded-2xl border border-white/8 bg-white/3 backdrop-blur-sm p-6 mb-12">
-          <p className="text-xs uppercase tracking-widest font-semibold text-slate-500 mb-4">Contents</p>
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 backdrop-blur-sm p-6 mb-12">
+          <p className="text-xs uppercase tracking-widest font-semibold text-slate-600 mb-4">Contents</p>
           <div className="grid md:grid-cols-2 gap-2 text-sm">
             {[
               ['#definitions',     '1. Definitions'],
@@ -169,7 +169,7 @@ export default function TermsPage() {
               ['#termination',     '15. Termination'],
               ['#governing',       '16. Governing Law'],
             ].map(([href, label]) => (
-              <a key={href} href={href} className="text-cyan-400 hover:text-cyan-300 hover:underline transition-colors">
+              <a key={href} href={href} className="text-cyan-700 hover:text-cyan-800 hover:underline transition-colors">
                 {label}
               </a>
             ))}
@@ -178,15 +178,15 @@ export default function TermsPage() {
 
         {/* 1. DEFINITIONS */}
         <Section id="definitions" title="1. Definitions" icon={FileText}>
-          <P><strong className="text-white">"BootHop"</strong>, <strong className="text-white">"we"</strong>, <strong className="text-white">"us"</strong> or <strong className="text-white">"our"</strong> refers to BootHop Ltd, a company registered in England and Wales.</P>
-          <P><strong className="text-white">"Platform"</strong> means the BootHop website, mobile application, and all related services.</P>
-          <P><strong className="text-white">"Sender"</strong> (also referred to as <em>Hooper</em> on our platform) means a user who posts a delivery request — i.e. a person who wishes to have an item transported.</P>
-          <P><strong className="text-white">"Traveller"</strong> (also referred to as <em>Booter</em> on our platform) means a user who accepts a delivery request — i.e. a person who carries an item as part of an existing journey.</P>
-          <P><strong className="text-white">"Match"</strong> means a confirmed pairing between a Sender and a Traveller for a specific delivery.</P>
-          <P><strong className="text-white">"Escrow"</strong> means the secure holding of funds by Stripe on behalf of both parties, pending confirmation of delivery.</P>
-          <P><strong className="text-white">"KYC"</strong> means Know Your Customer identity verification, carried out via Stripe Identity.</P>
-          <P><strong className="text-white">"Goods"</strong> means any item or items posted for delivery on the Platform.</P>
-          <P><strong className="text-white">"Insurance"</strong> means the optional but default-selected cover charged at 7.5% of the declared goods value, as described in Section 8.</P>
+          <P><strong className="text-slate-900">"BootHop"</strong>, <strong className="text-slate-900">"we"</strong>, <strong className="text-slate-900">"us"</strong> or <strong className="text-slate-900">"our"</strong> refers to BootHop Ltd, a company registered in England and Wales.</P>
+          <P><strong className="text-slate-900">"Platform"</strong> means the BootHop website, mobile application, and all related services.</P>
+          <P><strong className="text-slate-900">"Sender"</strong> (also referred to as <em>Hooper</em> on our platform) means a user who posts a delivery request — i.e. a person who wishes to have an item transported.</P>
+          <P><strong className="text-slate-900">"Traveller"</strong> (also referred to as <em>Booter</em> on our platform) means a user who accepts a delivery request — i.e. a person who carries an item as part of an existing journey.</P>
+          <P><strong className="text-slate-900">"Match"</strong> means a confirmed pairing between a Sender and a Traveller for a specific delivery.</P>
+          <P><strong className="text-slate-900">"Escrow"</strong> means the secure holding of funds by Stripe on behalf of both parties, pending confirmation of delivery.</P>
+          <P><strong className="text-slate-900">"KYC"</strong> means Know Your Customer identity verification, carried out via Stripe Identity.</P>
+          <P><strong className="text-slate-900">"Goods"</strong> means any item or items posted for delivery on the Platform.</P>
+          <P><strong className="text-slate-900">"Insurance"</strong> means the optional but default-selected cover charged at 7.5% of the declared goods value, as described in Section 8.</P>
         </Section>
 
         {/* 2. PLATFORM */}
@@ -210,7 +210,7 @@ export default function TermsPage() {
         {/* 4. PROHIBITED ITEMS */}
         <Section id="prohibited" title="4. Prohibited Items" icon={AlertTriangle}>
           <Warn>Attempting to send prohibited items is a serious breach of these Terms. It may result in permanent account suspension, forfeiture of escrowed funds, and referral to law enforcement.</Warn>
-          <P>The following items are <strong className="text-white">strictly prohibited</strong> on the BootHop platform under any circumstances:</P>
+          <P>The following items are <strong className="text-slate-900">strictly prohibited</strong> on the BootHop platform under any circumstances:</P>
           <Ul items={prohibited} />
           <P>This list is not exhaustive. BootHop reserves the right to refuse any listing at its sole discretion. If you are unsure whether an item is permitted, contact us before posting.</P>
           <P>Travellers who discover prohibited items in goods they have accepted have the right to refuse carriage without penalty and will receive a full escrow refund. They should report the incident immediately via the Platform.</P>
@@ -233,19 +233,19 @@ export default function TermsPage() {
 
         {/* 7. CUSTOMS */}
         <Section id="customs" title="7. Customs & Import Duties" icon={Globe}>
-          <P><strong className="text-white">The Sender is solely and exclusively responsible for all customs duties, import taxes, VAT, excise duties, and any other charges levied by customs authorities</strong> in the destination country (and in any transit country).</P>
+          <P><strong className="text-slate-900">The Sender is solely and exclusively responsible for all customs duties, import taxes, VAT, excise duties, and any other charges levied by customs authorities</strong> in the destination country (and in any transit country).</P>
           <P>BootHop does not facilitate customs declarations on behalf of users. It is the Sender's responsibility to ensure that appropriate customs documentation is prepared and provided to the Traveller before handover.</P>
           <P>Common customs thresholds users must be aware of (these are indicative and subject to change — always verify with official customs authorities):</P>
-          <div className="rounded-xl border border-white/10 overflow-hidden text-xs">
+          <div className="rounded-xl border border-slate-200 overflow-hidden text-xs">
             <table className="w-full">
-              <thead className="bg-white/5">
+              <thead className="bg-slate-50">
                 <tr>
-                  <th className="text-left p-3 font-semibold text-slate-300">Destination</th>
-                  <th className="text-left p-3 font-semibold text-slate-300">Duty-Free Threshold (Gifts)</th>
-                  <th className="text-left p-3 font-semibold text-slate-300">Notes</th>
+                  <th className="text-left p-3 font-semibold text-slate-900">Destination</th>
+                  <th className="text-left p-3 font-semibold text-slate-900">Duty-Free Threshold (Gifts)</th>
+                  <th className="text-left p-3 font-semibold text-slate-900">Notes</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-slate-200">
                 {[
                   ['United Kingdom', '£39 (gifts); £135 (general)', 'Import VAT applies above £135; customs duty on higher values'],
                   ['European Union', '€45 (gifts); €150 (general)', 'VAT payable above €22 threshold removed; all imports now liable'],
@@ -262,10 +262,10 @@ export default function TermsPage() {
                   ['India', 'INR 5,000 (gifts)', 'Customs duty on electronics strictly enforced'],
                   ['China', 'CNY 50 (duty-free)', 'Strict prohibited list; VPN equipment, religious material restricted'],
                 ].map(([country, threshold, notes]) => (
-                  <tr key={country} className="hover:bg-white/3 transition-colors">
-                    <td className="p-3 font-medium text-slate-300">{country}</td>
-                    <td className="p-3 text-slate-400">{threshold}</td>
-                    <td className="p-3 text-slate-500">{notes}</td>
+                  <tr key={country} className="hover:bg-slate-50 transition-colors">
+                    <td className="p-3 font-medium text-slate-700">{country}</td>
+                    <td className="p-3 text-slate-700">{threshold}</td>
+                    <td className="p-3 text-slate-600">{notes}</td>
                   </tr>
                 ))}
               </tbody>
@@ -277,7 +277,7 @@ export default function TermsPage() {
 
         {/* 8. INSURANCE */}
         <Section id="insurance" title="8. Insurance" icon={Shield}>
-          <P>BootHop offers an optional delivery protection cover for Senders. This cover is <strong className="text-white">selected by default</strong> at checkout and is charged at <strong className="text-white">7.5% of the declared goods value</strong>.</P>
+          <P>BootHop offers an optional delivery protection cover for Senders. This cover is <strong className="text-slate-900">selected by default</strong> at checkout and is charged at <strong className="text-slate-900">7.5% of the declared goods value</strong>.</P>
           <P>By accepting the insurance at checkout, the Sender acknowledges:</P>
           <Ul items={[
             'The insurance premium of 7.5% of the declared goods value is non-refundable once the delivery has been accepted by both parties.',
@@ -286,7 +286,7 @@ export default function TermsPage() {
             'Claims must be raised via the BootHop Platform within 48 hours of the confirmed delivery date.',
             'Photographic evidence of the item\'s condition at handover and receipt must be submitted with any claim.',
           ]} />
-          <P><strong className="text-white">Insurance exclusions — the following are NOT covered:</strong></P>
+          <P><strong className="text-slate-900">Insurance exclusions — the following are NOT covered:</strong></P>
           <Ul items={[
             'Any item that is prohibited under these Terms (Section 4)',
             'Items whose declared value is materially understated',
@@ -318,7 +318,7 @@ export default function TermsPage() {
         <Section id="communication" title="10. Communication Standards" icon={CheckCircle}>
           <P>BootHop serves a global, diverse community of Senders and Travellers from all backgrounds, cultures, and beliefs. We expect every user to treat others with dignity, respect, and professionalism.</P>
           <Ul items={communicationRules} />
-          <P>The following behaviours will result in <strong className="text-white">immediate permanent account termination</strong> and may be reported to law enforcement:</P>
+          <P>The following behaviours will result in <strong className="text-slate-900">immediate permanent account termination</strong> and may be reported to law enforcement:</P>
           <Ul items={[
             'Racial, ethnic, religious, or gender-based abuse or discrimination of any kind',
             'Threats of violence, intimidation, or blackmail',
@@ -460,9 +460,9 @@ export default function TermsPage() {
               ],
             },
           ].map(({ country, notes }) => (
-            <div key={country} className="rounded-xl border border-white/8 bg-white/3 p-5">
-              <h3 className="font-bold text-white mb-3 flex items-center gap-2">
-                <Globe className="h-4 w-4 text-cyan-400" /> {country}
+            <div key={country} className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+              <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
+                <Globe className="h-4 w-4 text-cyan-700" /> {country}
               </h3>
               <Ul items={notes} />
             </div>
@@ -484,10 +484,10 @@ export default function TermsPage() {
 
         {/* 16. GOVERNING LAW */}
         <Section id="governing" title="16. Governing Law & Jurisdiction" icon={Scale}>
-          <P>These Terms are governed by and construed in accordance with the laws of <strong className="text-white">England and Wales</strong>. Any disputes arising out of or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts of England and Wales, without prejudice to any mandatory consumer protection laws applicable in your country of residence.</P>
+          <P>These Terms are governed by and construed in accordance with the laws of <strong className="text-slate-900">England and Wales</strong>. Any disputes arising out of or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts of England and Wales, without prejudice to any mandatory consumer protection laws applicable in your country of residence.</P>
           <P>If any provision of these Terms is found to be unenforceable, the remaining provisions shall continue in full force and effect.</P>
           <P>BootHop Ltd is registered in England and Wales. Registered address: [BootHop Ltd, England, UK].</P>
-          <P>For questions about these Terms, contact us at <a href="mailto:legal@boothop.com" className="text-cyan-400 hover:text-cyan-300 underline transition-colors">legal@boothop.com</a>.</P>
+          <P>For questions about these Terms, contact us at <a href="mailto:legal@boothop.com" className="text-cyan-700 hover:text-cyan-800 underline transition-colors">legal@boothop.com</a>.</P>
         </Section>
 
       </div>

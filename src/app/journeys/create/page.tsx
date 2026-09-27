@@ -222,16 +222,16 @@ export default function CreateJourneyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <nav className="bg-white border-b">
+      <nav className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center space-x-2">
               <Package className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">BootHop</span>
+              <span className="text-2xl font-bold text-slate-900">BootHop</span>
             </Link>
-            <Link href="/booter-dashboard" className="text-gray-600 hover:text-gray-900">
+            <Link href="/booter-dashboard" className="text-slate-600 hover:text-slate-900">
               ← Back to Dashboard
             </Link>
           </div>
@@ -248,8 +248,8 @@ export default function CreateJourneyPage() {
                 <Package className="h-12 w-12 text-blue-600" />
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Post Your Journey</h1>
-            <p className="text-gray-600">Share your travel plans and earn money by delivering items</p>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Post Your Journey</h1>
+            <p className="text-slate-600">Share your travel plans and earn money by delivering items</p>
           </div>
 
           {/* Error Message */}
@@ -263,7 +263,7 @@ export default function CreateJourneyPage() {
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Route Section */}
             <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
                 <MapPin className="h-6 w-6 text-blue-600" />
                 Your Route
               </h2>
@@ -271,7 +271,7 @@ export default function CreateJourneyPage() {
               <div className="grid md:grid-cols-2 gap-6">
                 {/* From */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     From City *
                   </label>
                   <input
@@ -280,7 +280,7 @@ export default function CreateJourneyPage() {
                     onChange={(e) => { setFormData({ ...formData, fromCity: e.target.value }); setLocationWarnings(p => ({ ...p, from: undefined })); }}
                     onBlur={validateFromCity}
                     placeholder="e.g., London"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   />
                   {locationWarnings.from && (
@@ -291,14 +291,14 @@ export default function CreateJourneyPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     From Country *
                   </label>
                   <select
                     value={formData.fromCountry}
                     onChange={(e) => { setFormData({ ...formData, fromCountry: e.target.value }); setLocationWarnings(p => ({ ...p, from: undefined })); }}
                     onBlur={validateFromCity}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   >
                     <option value="">Select country</option>
@@ -310,7 +310,7 @@ export default function CreateJourneyPage() {
 
                 {/* To */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     To City *
                   </label>
                   <input
@@ -319,7 +319,7 @@ export default function CreateJourneyPage() {
                     onChange={(e) => { setFormData({ ...formData, toCity: e.target.value }); setLocationWarnings(p => ({ ...p, to: undefined })); }}
                     onBlur={validateToCity}
                     placeholder="e.g., Paris"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   />
                   {locationWarnings.to && (
@@ -330,14 +330,14 @@ export default function CreateJourneyPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     To Country *
                   </label>
                   <select
                     value={formData.toCountry}
                     onChange={(e) => { setFormData({ ...formData, toCountry: e.target.value }); setLocationWarnings(p => ({ ...p, to: undefined })); }}
                     onBlur={validateToCity}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   >
                     <option value="">Select country</option>
@@ -425,7 +425,7 @@ export default function CreateJourneyPage() {
                           <p className={`text-sm font-bold mb-1 ${s.text}`}>
                             {s.icon} {aiResult.verdictLabel}
                           </p>
-                          <p className="text-xs text-gray-700 leading-relaxed">{aiResult.explanation}</p>
+                          <p className="text-xs text-slate-700 leading-relaxed">{aiResult.explanation}</p>
                           {aiResult.tips.length > 0 && (
                             <ul className="mt-2 space-y-1">
                               {aiResult.tips.map((tip, i) => (
@@ -435,7 +435,7 @@ export default function CreateJourneyPage() {
                               ))}
                             </ul>
                           )}
-                          <p className="mt-2 text-xs text-gray-400">
+                          <p className="mt-2 text-xs text-slate-300">
                             Advisory only — final decisions rest with border authorities.
                           </p>
                         </div>
@@ -452,14 +452,14 @@ export default function CreateJourneyPage() {
 
             {/* Dates Section */}
             <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
                 <Calendar className="h-6 w-6 text-blue-600" />
                 Travel Dates
               </h2>
 
               <div className="grid md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     Departure Date *
                   </label>
                   <input
@@ -467,13 +467,13 @@ export default function CreateJourneyPage() {
                     value={formData.departureDate}
                     onChange={(e) => setFormData({ ...formData, departureDate: e.target.value })}
                     min={(() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; })()}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     Arrival Date *
                   </label>
                   <input
@@ -481,13 +481,13 @@ export default function CreateJourneyPage() {
                     value={formData.arrivalDate}
                     onChange={(e) => setFormData({ ...formData, arrivalDate: e.target.value })}
                     min={formData.departureDate || new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     Flexible Until (Optional)
                   </label>
                   <input
@@ -495,23 +495,23 @@ export default function CreateJourneyPage() {
                     value={formData.flexibleUntil}
                     onChange={(e) => setFormData({ ...formData, flexibleUntil: e.target.value })}
                     min={formData.arrivalDate || new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Can deliver up until this date</p>
+                  <p className="text-xs text-slate-600 mt-1">Can deliver up until this date</p>
                 </div>
               </div>
             </div>
 
             {/* Capacity Section */}
             <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
                 <Weight className="h-6 w-6 text-blue-600" />
                 Available Space
               </h2>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     Available Space (kg) *
                   </label>
                   <input
@@ -521,14 +521,14 @@ export default function CreateJourneyPage() {
                     value={formData.availableSpaceKg}
                     onChange={(e) => setFormData({ ...formData, availableSpaceKg: e.target.value })}
                     placeholder="e.g., 5"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   />
-                  <p className="text-xs text-gray-500 mt-1">Total weight you can carry</p>
+                  <p className="text-xs text-slate-600 mt-1">Total weight you can carry</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     Max Dimensions (Optional)
                   </label>
                   <input
@@ -536,26 +536,26 @@ export default function CreateJourneyPage() {
                     value={formData.maxDimensions}
                     onChange={(e) => setFormData({ ...formData, maxDimensions: e.target.value })}
                     placeholder="e.g., 40x30x20 cm"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Maximum package size</p>
+                  <p className="text-xs text-slate-600 mt-1">Maximum package size</p>
                 </div>
               </div>
             </div>
 
             {/* Pricing Section */}
             <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
                 <DollarSign className="h-6 w-6 text-blue-600" />
                 Pricing (Optional)
               </h2>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Price Per Delivery
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">£</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600">£</span>
                   <input
                     type="number"
                     step="1"
@@ -563,10 +563,10 @@ export default function CreateJourneyPage() {
                     value={formData.pricePerDelivery}
                     onChange={(e) => setFormData({ ...formData, pricePerDelivery: e.target.value })}
                     placeholder="e.g., 50"
-                    className="w-full pl-8 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-8 pr-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-slate-600 mt-1">
                   Leave blank to negotiate with Hoopers. You'll receive 95% after 5% service fee.
                 </p>
               </div>
@@ -574,12 +574,12 @@ export default function CreateJourneyPage() {
 
             {/* Description Section */}
             <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
                 <Package className="h-6 w-6 text-blue-600" />
                 Description *
               </h2>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   What are you willing to carry? *
                 </label>
                 <textarea
@@ -587,20 +587,20 @@ export default function CreateJourneyPage() {
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Tell senders what items you'll carry, any restrictions, packaging requirements, etc."
                   rows={4}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">Required — senders need this to decide if you're a good match.</p>
+                <p className="text-xs text-slate-600 mt-1">Required — senders need this to decide if you're a good match.</p>
               </div>
             </div>
 
             {/* Restrictions Section */}
             <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Item Restrictions (Optional)</h2>
+              <h2 className="text-xl font-bold text-slate-900 mb-4">Item Restrictions (Optional)</h2>
 
               {/* Excludes */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Items You Won't Carry
                 </label>
                 <div className="flex gap-2 mb-3">
@@ -610,12 +610,12 @@ export default function CreateJourneyPage() {
                     onChange={(e) => setNewExclude(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddExclude())}
                     placeholder="e.g., Electronics, Liquids"
-                    className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1 px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <button
                     type="button"
                     onClick={handleAddExclude}
-                    className="px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+                    className="px-4 py-3 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
                   >
                     <Plus className="h-5 w-5" />
                   </button>
@@ -644,7 +644,7 @@ export default function CreateJourneyPage() {
 
               {/* Accepts Only */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Only Accept (Leave empty to accept all)
                 </label>
                 <div className="flex gap-2 mb-3">
@@ -654,12 +654,12 @@ export default function CreateJourneyPage() {
                     onChange={(e) => setNewAccept(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAccept())}
                     placeholder="e.g., Documents, Letters"
-                    className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1 px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <button
                     type="button"
                     onClick={handleAddAccept}
-                    className="px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+                    className="px-4 py-3 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
                   >
                     <Plus className="h-5 w-5" />
                   </button>

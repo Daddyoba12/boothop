@@ -37,13 +37,13 @@ const FADE = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, ex
 
 const STATUS_COLORS: Record<string, string> = {
   pending_payment: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
-  pending:    'text-amber-400 bg-amber-500/10 border-amber-500/20',
-  review:     'text-purple-400 bg-purple-500/10 border-purple-500/20',
-  assigned:   'text-blue-400 bg-blue-500/10 border-blue-500/20',
+  pending:    'text-amber-600 bg-amber-500/10 border-amber-500/20',
+  review:     'text-purple-600 bg-purple-500/10 border-purple-500/20',
+  assigned:   'text-blue-600 bg-blue-500/10 border-blue-500/20',
   in_transit: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
-  delivered:  'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
-  cancelled:  'text-red-400 bg-red-500/10 border-red-500/20',
-  failed:     'text-orange-400 bg-orange-500/10 border-orange-500/20',
+  delivered:  'text-emerald-600 bg-emerald-500/10 border-emerald-500/20',
+  cancelled:  'text-red-600 bg-red-500/10 border-red-500/20',
+  failed:     'text-orange-600 bg-orange-500/10 border-orange-500/20',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -164,12 +164,12 @@ export default function BusinessPortalPage() {
 
   // ── Render ───────────────────────────────────────────────────────────────────
 
-  const BG = 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)';
+  const BG = 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)';
 
   if (stage === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: BG }}>
-        <Loader2 className="h-8 w-8 text-emerald-400 animate-spin" />
+        <Loader2 className="h-8 w-8 text-emerald-600 animate-spin" />
       </div>
     );
   }
@@ -187,7 +187,7 @@ export default function BusinessPortalPage() {
   }
 
   return (
-    <div className="relative min-h-screen text-white" style={{ background: BG }}>
+    <div className="relative min-h-screen text-slate-900" style={{ background: BG }}>
 
       {/* Premium ambient orbs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
@@ -200,8 +200,8 @@ export default function BusinessPortalPage() {
       <BusinessNav
           rightSlot={
             <>
-              <span className="text-white/30 text-sm hidden sm:block">{bizEmail}</span>
-              <button onClick={logout} className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white transition-colors">
+              <span className="text-slate-300 text-sm hidden sm:block">{bizEmail}</span>
+              <button onClick={logout} className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-slate-900 transition-colors">
                 <LogOut className="h-3.5 w-3.5" /> Sign out
               </button>
             </>
@@ -217,20 +217,20 @@ export default function BusinessPortalPage() {
             {/* Payment cancelled banner */}
             {paymentCancelled && (
               <div className="mb-8 flex items-start gap-3 bg-orange-500/10 border border-orange-500/20 rounded-2xl px-5 py-4">
-                <AlertCircle className="h-5 w-5 text-orange-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-orange-400">Payment cancelled</p>
-                  <p className="text-xs text-white/35 mt-0.5">Your booking was not completed. No charge was made — you can try again whenever you're ready.</p>
+                  <p className="text-sm font-bold text-orange-600">Payment cancelled</p>
+                  <p className="text-xs text-slate-600 mt-0.5">Your booking was not completed. No charge was made — you can try again whenever you're ready.</p>
                 </div>
-                <button onClick={() => setPaymentCancelled(false)} className="ml-auto text-white/20 hover:text-white transition-colors"><X className="h-4 w-4" /></button>
+                <button onClick={() => setPaymentCancelled(false)} className="ml-auto text-slate-300 hover:text-slate-900 transition-colors"><X className="h-4 w-4" /></button>
               </div>
             )}
 
             {/* Welcome */}
             <div className="mb-10">
-              <p className="text-white/30 text-sm mb-1">Welcome back{companyName ? `, ${companyName}` : ''}</p>
-              <h1 className="text-4xl font-black tracking-tight">Time-critical logistics,<br /><span className="text-emerald-400">on demand.</span></h1>
-              <p className="text-white/35 mt-3 max-w-xl leading-relaxed">
+              <p className="text-slate-300 text-sm mb-1">Welcome back{companyName ? `, ${companyName}` : ''}</p>
+              <h1 className="text-4xl font-black tracking-tight">Time-critical logistics,<br /><span className="text-emerald-600">on demand.</span></h1>
+              <p className="text-slate-600 mt-3 max-w-xl leading-relaxed">
                 BootHop moves high-value, time-sensitive components directly — no depots, no delays.
                 Hours, not days.
               </p>
@@ -246,7 +246,7 @@ export default function BusinessPortalPage() {
                 <div key={label} className="relative overflow-hidden rounded-xl h-28 group cursor-pointer" onClick={() => setStage('wizard')}>
                   <Image src={src} alt={label} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                  <p className="absolute bottom-2 left-2 right-2 text-[10px] font-bold text-white/80 uppercase tracking-wider leading-tight">{label}</p>
+                  <p className="absolute bottom-2 left-2 right-2 text-[10px] font-bold text-slate-700 uppercase tracking-wider leading-tight">{label}</p>
                 </div>
               ))}
             </div>
@@ -261,7 +261,7 @@ export default function BusinessPortalPage() {
               </button>
               <button
                 onClick={() => { setStage('jobs'); loadMyJobs(); }}
-                className="inline-flex items-center gap-2 bg-white/8 hover:bg-white/12 text-white font-semibold text-sm px-6 py-3 rounded-xl border border-white/10 hover:border-white/20 transition-all"
+                className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-100 text-slate-900 font-semibold text-sm px-6 py-3 rounded-xl border border-slate-200 hover:border-slate-200 transition-all"
               >
                 View my jobs <ArrowRight className="h-4 w-4" />
               </button>
@@ -269,21 +269,21 @@ export default function BusinessPortalPage() {
 
             {/* Service lanes pricing */}
             <div className="mb-10">
-              <p className="text-xs font-black text-white/25 uppercase tracking-widest mb-4">Service lanes & pricing</p>
+              <p className="text-xs font-black text-slate-300 uppercase tracking-widest mb-4">Service lanes & pricing</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {LANES.map(lane => (
                   <div
                     key={lane.label}
-                    className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-5 transition-all hover:border-emerald-500/25 hover:bg-white/5 hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer"
+                    className="group relative overflow-hidden bg-slate-50 border border-slate-200 rounded-2xl p-5 transition-all hover:border-emerald-500/25 hover:bg-slate-50 hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer"
                     onClick={() => setStage('wizard')}
                   >
                     <div className="pointer-events-none absolute -top-6 -right-6 w-20 h-20 bg-emerald-500/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="flex items-start justify-between mb-3">
                       <span className="text-3xl">{lane.flag}</span>
-                      <span className="text-emerald-400 font-black text-lg">{lane.from}</span>
+                      <span className="text-emerald-600 font-black text-lg">{lane.from}</span>
                     </div>
-                    <p className="font-black text-white mb-1">{lane.label}</p>
-                    <p className="text-white/35 text-xs leading-relaxed">{lane.desc}</p>
+                    <p className="font-black text-slate-900 mb-1">{lane.label}</p>
+                    <p className="text-slate-600 text-xs leading-relaxed">{lane.desc}</p>
                   </div>
                 ))}
               </div>
@@ -297,47 +297,47 @@ export default function BusinessPortalPage() {
                 { icon: Shield, label: 'Trust',     sub: 'Verified operators' },
                 { icon: Truck,  label: 'Flexibility',sub: 'UK, EU, global' },
               ].map(({ icon: Icon, label, sub }) => (
-                <div key={label} className="bg-white/3 border border-white/8 rounded-2xl p-4 text-center">
-                  <Icon className="h-5 w-5 text-emerald-400 mx-auto mb-2" />
-                  <p className="font-bold text-white text-sm">{label}</p>
-                  <p className="text-white/30 text-xs mt-0.5">{sub}</p>
+                <div key={label} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
+                  <Icon className="h-5 w-5 text-emerald-600 mx-auto mb-2" />
+                  <p className="font-bold text-slate-900 text-sm">{label}</p>
+                  <p className="text-slate-300 text-xs mt-0.5">{sub}</p>
                 </div>
               ))}
             </div>
 
             {/* Pricing detail */}
-            <div className="bg-white/3 border border-white/8 rounded-2xl p-6">
-              <p className="text-xs font-black text-white/25 uppercase tracking-widest mb-4">How pricing works</p>
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+              <p className="text-xs font-black text-slate-300 uppercase tracking-widest mb-4">How pricing works</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                 <div>
-                  <p className="font-bold text-emerald-400 mb-2">UK → UK</p>
-                  <div className="space-y-1 text-white/40 text-xs">
+                  <p className="font-bold text-emerald-600 mb-2">UK → UK</p>
+                  <div className="space-y-1 text-slate-600 text-xs">
                     <p>Express (3–6 hr)  — from £300</p>
                     <p>Priority (1–3 hr) — from £700</p>
                     <p>Critical (immed.) — from £1,200</p>
-                    <p className="text-white/25 mt-2">First 50 miles included.<br/>Extra: £3–£6.50/mile.</p>
+                    <p className="text-slate-300 mt-2">First 50 miles included.<br/>Extra: £3–£6.50/mile.</p>
                   </div>
                 </div>
                 <div>
-                  <p className="font-bold text-blue-400 mb-2">UK ↔ EU</p>
-                  <div className="space-y-1 text-white/40 text-xs">
+                  <p className="font-bold text-blue-600 mb-2">UK ↔ EU</p>
+                  <div className="space-y-1 text-slate-600 text-xs">
                     <p>Next-day  — from £1,000</p>
                     <p>Same-day  — from £1,500</p>
                     <p>Critical  — from £2,500</p>
-                    <p className="text-white/25 mt-2">Airport-to-airport base.<br/>Extra mileage billed separately.</p>
+                    <p className="text-slate-300 mt-2">Airport-to-airport base.<br/>Extra mileage billed separately.</p>
                   </div>
                 </div>
                 <div>
-                  <p className="font-bold text-rose-400 mb-2">UK → Global</p>
-                  <div className="space-y-1 text-white/40 text-xs">
+                  <p className="font-bold text-rose-600 mb-2">UK → Global</p>
+                  <div className="space-y-1 text-slate-600 text-xs">
                     <p>Standard  — from £2,000</p>
                     <p>Priority  — from £4,000</p>
                     <p>Critical  — from £7,000</p>
-                    <p className="text-white/25 mt-2">Multi-leg air + road.<br/>Insurance 8% of declared value.</p>
+                    <p className="text-slate-300 mt-2">Multi-leg air + road.<br/>Insurance 8% of declared value.</p>
                   </div>
                 </div>
               </div>
-              <p className="text-xs text-white/20 mt-4 pt-4 border-t border-white/8">
+              <p className="text-xs text-slate-300 mt-4 pt-4 border-t border-slate-200">
                 Add-ons: Night service +£200 · Immediate dispatch +£200 · Weekend +20% · Dedicated driver +£300 · Airport meet &amp; greet £175/end
               </p>
             </div>
@@ -349,7 +349,7 @@ export default function BusinessPortalPage() {
           <motion.div key="jobs" {...FADE} className="max-w-3xl mx-auto px-6 pt-24 pb-12">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <button onClick={() => setStage('hub')} className="flex items-center gap-1.5 text-white/30 hover:text-white text-sm font-semibold transition-colors mb-2">
+                <button onClick={() => setStage('hub')} className="flex items-center gap-1.5 text-slate-300 hover:text-slate-900 text-sm font-semibold transition-colors mb-2">
                   ← Back
                 </button>
                 <h2 className="text-2xl font-black">My deliveries</h2>
@@ -363,12 +363,12 @@ export default function BusinessPortalPage() {
             </div>
 
             {jobsLoading ? (
-              <div className="flex justify-center py-16"><Loader2 className="h-7 w-7 text-emerald-400 animate-spin" /></div>
+              <div className="flex justify-center py-16"><Loader2 className="h-7 w-7 text-emerald-600 animate-spin" /></div>
             ) : myJobs.length === 0 ? (
               <div className="text-center py-16">
-                <Package className="h-10 w-10 text-white/10 mx-auto mb-4" />
-                <p className="text-white/30">No deliveries yet.</p>
-                <button onClick={() => setStage('wizard')} className="mt-4 text-emerald-400 hover:text-emerald-300 text-sm font-bold transition-colors flex items-center gap-2 mx-auto">
+                <Package className="h-10 w-10 text-slate-200 mx-auto mb-4" />
+                <p className="text-slate-300">No deliveries yet.</p>
+                <button onClick={() => setStage('wizard')} className="mt-4 text-emerald-600 hover:text-emerald-300 text-sm font-bold transition-colors flex items-center gap-2 mx-auto">
                   Book your first delivery <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -378,15 +378,15 @@ export default function BusinessPortalPage() {
                 {myJobs.filter(j => j.status === 'pending_payment').length > 0 && (
                   <div className="bg-yellow-500/8 border border-yellow-500/20 rounded-2xl p-5 mb-2">
                     <p className="text-yellow-400 font-bold text-sm mb-1">Incomplete bookings</p>
-                    <p className="text-white/35 text-xs mb-4">These bookings were not paid. Start a new booking to proceed — your previous reference will not be charged.</p>
+                    <p className="text-slate-600 text-xs mb-4">These bookings were not paid. Start a new booking to proceed — your previous reference will not be charged.</p>
                     <div className="space-y-2">
                       {myJobs.filter(j => j.status === 'pending_payment').map(job => (
-                        <div key={job.id} className="flex items-center justify-between gap-4 bg-white/3 border border-white/8 rounded-xl px-4 py-3">
+                        <div key={job.id} className="flex items-center justify-between gap-4 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
                           <div>
                             <span className="font-mono text-xs text-yellow-400 font-bold">{job.job_ref}</span>
-                            <p className="text-white/40 text-xs mt-0.5">{job.pickup} → {job.dropoff}</p>
+                            <p className="text-slate-600 text-xs mt-0.5">{job.pickup} → {job.dropoff}</p>
                           </div>
-                          <button onClick={() => setStage('wizard')} className="text-xs text-emerald-400 hover:text-emerald-300 font-bold whitespace-nowrap transition-colors">
+                          <button onClick={() => setStage('wizard')} className="text-xs text-emerald-600 hover:text-emerald-300 font-bold whitespace-nowrap transition-colors">
                             New booking →
                           </button>
                         </div>
@@ -399,21 +399,21 @@ export default function BusinessPortalPage() {
                   return (
                     <div
                       key={job.id}
-                      className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 transition-all hover:border-emerald-500/25 hover:bg-white/5 hover:-translate-y-0.5"
+                      className="group relative overflow-hidden bg-slate-50 border border-slate-200 rounded-2xl p-6 transition-all hover:border-emerald-500/25 hover:bg-slate-50 hover:-translate-y-0.5"
                     >
                       <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-24 bg-emerald-500/12 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                       <div className="flex items-start justify-between gap-4 flex-wrap">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 flex-wrap mb-2">
-                            <span className="font-mono font-black text-emerald-400 text-sm">{job.job_ref}</span>
-                            <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border ${STATUS_COLORS[job.status] ?? 'text-white/40 bg-white/5 border-white/10'}`}>
+                            <span className="font-mono font-black text-emerald-600 text-sm">{job.job_ref}</span>
+                            <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border ${STATUS_COLORS[job.status] ?? 'text-slate-600 bg-slate-50 border-slate-200'}`}>
                               {STATUS_LABELS[job.status] ?? job.status}
                             </span>
-                            {job.urgency === 'critical' && <span className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-full font-bold">🔴 Critical</span>}
-                            {job.urgency === 'priority' && <span className="text-xs text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full font-bold">⚡ Priority</span>}
+                            {job.urgency === 'critical' && <span className="text-xs text-red-600 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-full font-bold">🔴 Critical</span>}
+                            {job.urgency === 'priority' && <span className="text-xs text-blue-600 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full font-bold">⚡ Priority</span>}
                           </div>
-                          <p className="text-white font-semibold text-sm mb-1">{job.pickup} → {job.dropoff}</p>
-                          <p className="text-white/25 text-xs">
+                          <p className="text-slate-900 font-semibold text-sm mb-1">{job.pickup} → {job.dropoff}</p>
+                          <p className="text-slate-300 text-xs">
                             {new Date(job.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </p>
                           {job.driver_name && (
@@ -424,26 +424,26 @@ export default function BusinessPortalPage() {
                           )}
                           {(job.assigned_at || job.picked_up_at || job.delivered_at) && (
                             <div className="mt-3 space-y-1">
-                              {job.assigned_at  && <p className="text-xs text-white/25">Assigned: {fmt(job.assigned_at)}</p>}
-                              {job.picked_up_at && <p className="text-xs text-white/25">Collected: {fmt(job.picked_up_at)}</p>}
-                              {job.delivered_at && <p className="text-xs text-emerald-400/60">Delivered: {fmt(job.delivered_at)}</p>}
+                              {job.assigned_at  && <p className="text-xs text-slate-300">Assigned: {fmt(job.assigned_at)}</p>}
+                              {job.picked_up_at && <p className="text-xs text-slate-300">Collected: {fmt(job.picked_up_at)}</p>}
+                              {job.delivered_at && <p className="text-xs text-emerald-600/60">Delivered: {fmt(job.delivered_at)}</p>}
                             </div>
                           )}
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
                           {job.estimated_price !== null && (
-                            <span className="text-emerald-400 font-black text-lg">£{job.estimated_price.toLocaleString()}</span>
+                            <span className="text-emerald-600 font-black text-lg">£{job.estimated_price.toLocaleString()}</span>
                           )}
                           {canAct && (
                             <button onClick={() => openEdit(job)}
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/35 hover:text-emerald-400 bg-white/5 border border-white/10 hover:border-emerald-500/20 hover:bg-emerald-500/8 px-3 py-2 rounded-xl transition-all"
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-emerald-600 bg-slate-50 border border-slate-200 hover:border-emerald-500/20 hover:bg-emerald-500/8 px-3 py-2 rounded-xl transition-all"
                             >
                               <Pencil className="h-3.5 w-3.5" /> Amend
                             </button>
                           )}
                           {canAct && (
                             <button onClick={() => cancelJob(job.id)} disabled={cancellingId === job.id}
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/25 hover:text-red-400 bg-white/5 border border-white/10 hover:border-red-500/20 hover:bg-red-500/8 px-3 py-2 rounded-xl transition-all disabled:opacity-50"
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-red-600 bg-slate-50 border border-slate-200 hover:border-red-500/20 hover:bg-red-500/8 px-3 py-2 rounded-xl transition-all disabled:opacity-50"
                             >
                               {cancellingId === job.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XCircle className="h-3.5 w-3.5" />}
                               Cancel
@@ -464,31 +464,31 @@ export default function BusinessPortalPage() {
           <motion.div key="success" {...FADE} className="max-w-lg mx-auto px-6 pt-24 pb-12">
             <div className="text-center mb-8">
               <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="h-10 w-10 text-emerald-400" />
+                <CheckCircle className="h-10 w-10 text-emerald-600" />
               </div>
               {isPaid ? (
                 <>
                   <h2 className="text-4xl font-black mb-3">Payment received</h2>
-                  <p className="text-white/40 mb-2 leading-relaxed">Your payment has been received. Your job is now under review — we'll confirm dispatch and send you full details by email.</p>
-                  <p className="text-emerald-400/70 text-sm mb-6">Usually confirmed within 2–4 hours during business hours.</p>
+                  <p className="text-slate-600 mb-2 leading-relaxed">Your payment has been received. Your job is now under review — we'll confirm dispatch and send you full details by email.</p>
+                  <p className="text-emerald-600/70 text-sm mb-6">Usually confirmed within 2–4 hours during business hours.</p>
                 </>
               ) : (
                 <>
                   <h2 className="text-4xl font-black mb-3">Submitted for review</h2>
-                  <p className="text-white/40 mb-6 leading-relaxed">Your delivery request requires manual review. Our team will be in touch within 2 hours to confirm pricing and dispatch.</p>
+                  <p className="text-slate-600 mb-6 leading-relaxed">Your delivery request requires manual review. Our team will be in touch within 2 hours to confirm pricing and dispatch.</p>
                 </>
               )}
               <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-8 py-5 inline-block mb-4">
-                <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-1">Reference</p>
-                <p className="text-emerald-400 font-mono font-black text-2xl tracking-widest">{jobRef}</p>
+                <p className="text-slate-300 text-xs font-bold uppercase tracking-widest mb-1">Reference</p>
+                <p className="text-emerald-600 font-mono font-black text-2xl tracking-widest">{jobRef}</p>
               </div>
-              <p className="text-white/20 text-sm">Confirmation sent to <span className="text-white/35">{bizEmail}</span></p>
+              <p className="text-slate-300 text-sm">Confirmation sent to <span className="text-slate-600">{bizEmail}</span></p>
             </div>
 
             {/* Document upload */}
-            <div className="bg-white/3 border border-white/8 rounded-2xl p-6 mb-8">
-              <p className="text-xs font-black text-white/25 uppercase tracking-widest mb-1">Supporting documents</p>
-              <p className="text-white/30 text-xs mb-5">Optional — attach commercial invoice, packing list, or other paperwork. PDF, JPG, PNG or Word · max 10 MB.</p>
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 mb-8">
+              <p className="text-xs font-black text-slate-300 uppercase tracking-widest mb-1">Supporting documents</p>
+              <p className="text-slate-300 text-xs mb-5">Optional — attach commercial invoice, packing list, or other paperwork. PDF, JPG, PNG or Word · max 10 MB.</p>
               <div className="space-y-2.5">
                 {[
                   { key: 'commercial_invoice',    label: 'Commercial Invoice' },
@@ -498,16 +498,16 @@ export default function BusinessPortalPage() {
                 ].map(({ key, label }) => {
                   const u = uploads[key];
                   return (
-                    <label key={key} className="flex items-center justify-between gap-3 bg-white/4 hover:bg-white/6 border border-white/8 hover:border-emerald-500/20 rounded-xl px-4 py-3 cursor-pointer transition-all group">
-                      <span className="text-xs font-semibold text-white/50 group-hover:text-white/70 transition-colors">{label}</span>
+                    <label key={key} className="flex items-center justify-between gap-3 bg-slate-50 hover:bg-slate-50 border border-slate-200 hover:border-emerald-500/20 rounded-xl px-4 py-3 cursor-pointer transition-all group">
+                      <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-600 transition-colors">{label}</span>
                       {u?.done ? (
-                        <span className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold shrink-0"><CheckCircle className="h-3.5 w-3.5" /> Uploaded</span>
+                        <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-bold shrink-0"><CheckCircle className="h-3.5 w-3.5" /> Uploaded</span>
                       ) : u?.uploading ? (
-                        <Spin className="h-4 w-4 text-emerald-400 animate-spin shrink-0" />
+                        <Spin className="h-4 w-4 text-emerald-600 animate-spin shrink-0" />
                       ) : u?.error ? (
-                        <span className="text-xs text-red-400 shrink-0 max-w-[140px] text-right">{u.error}</span>
+                        <span className="text-xs text-red-600 shrink-0 max-w-[140px] text-right">{u.error}</span>
                       ) : (
-                        <span className="text-xs text-white/20 font-semibold shrink-0">Choose file</span>
+                        <span className="text-xs text-slate-300 font-semibold shrink-0">Choose file</span>
                       )}
                       <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
                         onChange={e => {
@@ -534,10 +534,10 @@ export default function BusinessPortalPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button onClick={() => setStage('hub')} className="text-emerald-400 hover:text-emerald-300 text-sm font-bold transition-colors">
+              <button onClick={() => setStage('hub')} className="text-emerald-600 hover:text-emerald-300 text-sm font-bold transition-colors">
                 Back to portal →
               </button>
-              <button onClick={() => { setStage('jobs'); loadMyJobs(); }} className="text-white/35 hover:text-white text-sm font-semibold transition-colors">
+              <button onClick={() => { setStage('jobs'); loadMyJobs(); }} className="text-slate-600 hover:text-slate-900 text-sm font-semibold transition-colors">
                 View all jobs →
               </button>
             </div>
@@ -547,40 +547,40 @@ export default function BusinessPortalPage() {
       </AnimatePresence>
 
       {/* WhatsApp FAB */}
-      <a href="/api/whatsapp" className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-2xl shadow-[#25D366]/40 hover:scale-110 active:scale-95 transition-all" aria-label="Chat on WhatsApp">
+      <a href="/api/whatsapp" className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] text-slate-900 rounded-full shadow-2xl shadow-[#25D366]/40 hover:scale-110 active:scale-95 transition-all" aria-label="Chat on WhatsApp">
         <MessageCircle className="h-7 w-7" />
       </a>
 
       {/* ── Edit modal ── */}
       {editingJob && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative w-full max-w-lg bg-[#0d1117] border border-white/10 rounded-2xl p-6 shadow-2xl">
-            <button onClick={() => setEditingJob(null)} className="absolute top-4 right-4 text-white/30 hover:text-white transition-colors"><X className="h-5 w-5" /></button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative w-full max-w-lg bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl">
+            <button onClick={() => setEditingJob(null)} className="absolute top-4 right-4 text-slate-300 hover:text-slate-900 transition-colors"><X className="h-5 w-5" /></button>
             <h3 className="text-lg font-black mb-1">Amend job</h3>
-            <p className="text-white/25 text-xs mb-6 font-mono">{editingJob.job_ref}</p>
+            <p className="text-slate-300 text-xs mb-6 font-mono">{editingJob.job_ref}</p>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-white/35 uppercase tracking-wider mb-1.5">Pickup</label>
-                <input type="text" value={editForm.pickup} onChange={e => setEditForm(f => ({ ...f, pickup: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/40 transition-colors" />
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Pickup</label>
+                <input type="text" value={editForm.pickup} onChange={e => setEditForm(f => ({ ...f, pickup: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-emerald-500/40 transition-colors" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-white/35 uppercase tracking-wider mb-1.5">Drop-off</label>
-                <input type="text" value={editForm.dropoff} onChange={e => setEditForm(f => ({ ...f, dropoff: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/40 transition-colors" />
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Drop-off</label>
+                <input type="text" value={editForm.dropoff} onChange={e => setEditForm(f => ({ ...f, dropoff: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-emerald-500/40 transition-colors" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-white/35 uppercase tracking-wider mb-1.5">Collection date</label>
-                  <input type="date" value={editForm.delivery_date} onChange={e => setEditForm(f => ({ ...f, delivery_date: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/40 transition-colors" />
+                  <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Collection date</label>
+                  <input type="date" value={editForm.delivery_date} onChange={e => setEditForm(f => ({ ...f, delivery_date: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-emerald-500/40 transition-colors" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-white/35 uppercase tracking-wider mb-1.5">Must arrive by</label>
-                  <input type="date" value={editForm.expected_delivery_date} onChange={e => setEditForm(f => ({ ...f, expected_delivery_date: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/40 transition-colors" />
+                  <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Must arrive by</label>
+                  <input type="date" value={editForm.expected_delivery_date} onChange={e => setEditForm(f => ({ ...f, expected_delivery_date: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-emerald-500/40 transition-colors" />
                 </div>
               </div>
             </div>
-            {editError && <p className="mt-4 text-xs text-red-400 flex items-center gap-2"><AlertCircle className="h-4 w-4 flex-shrink-0" />{editError}</p>}
+            {editError && <p className="mt-4 text-xs text-red-600 flex items-center gap-2"><AlertCircle className="h-4 w-4 flex-shrink-0" />{editError}</p>}
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setEditingJob(null)} className="flex-1 text-sm font-semibold text-white/30 hover:text-white bg-white/5 border border-white/10 px-4 py-3 rounded-xl transition-all">Cancel</button>
+              <button onClick={() => setEditingJob(null)} className="flex-1 text-sm font-semibold text-slate-300 hover:text-slate-900 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl transition-all">Cancel</button>
               <button onClick={saveEdit} disabled={editLoading} className="flex-1 text-sm font-black text-black bg-emerald-400 hover:bg-emerald-300 px-4 py-3 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                 {editLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save changes'}
               </button>

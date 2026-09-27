@@ -34,10 +34,10 @@ function PlatformBadges({ platforms }: { platforms: Record<string, boolean> | nu
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    active:   'bg-green-500/15 text-green-400 border-green-500/25',
-    pending:  'bg-amber-500/15 text-amber-400 border-amber-500/25',
+    active:   'bg-green-500/15 text-green-600 border-green-500/25',
+    pending:  'bg-amber-500/15 text-amber-600 border-amber-500/25',
     paused:   'bg-gray-500/15 text-gray-400 border-gray-500/25',
-    inactive: 'bg-red-500/15 text-red-400 border-red-500/25',
+    inactive: 'bg-red-500/15 text-red-600 border-red-500/25',
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wide ${map[status] ?? map.pending}`}>
@@ -65,15 +65,15 @@ export default function PipelineAdminClient({ clients }: { clients: PipelineClie
   };
 
   return (
-    <div className="min-h-screen bg-[#07111f] text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Header */}
-      <div className="border-b border-white/[0.07] bg-[#07111f]/95 backdrop-blur-xl sticky top-0 z-20">
+      <div className="border-b border-slate-200 bg-white/95 backdrop-blur-xl sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="text-white/30 hover:text-white/60 transition-colors text-sm">← Admin</Link>
-            <span className="text-white/15">/</span>
-            <h1 className="text-base font-bold text-white">Pipeline Clients</h1>
-            <span className="text-xs font-semibold text-white/30 bg-white/8 px-2 py-0.5 rounded-full">{counts.all}</span>
+            <Link href="/admin" className="text-slate-600 hover:text-slate-600 transition-colors text-sm">← Admin</Link>
+            <span className="text-slate-300">/</span>
+            <h1 className="text-base font-bold text-slate-900">Pipeline Clients</h1>
+            <span className="text-xs font-semibold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-full">{counts.all}</span>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -91,13 +91,13 @@ export default function PipelineAdminClient({ clients }: { clients: PipelineClie
         {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           {[
-            { label: 'Total',   value: counts.all,     color: 'text-white' },
-            { label: 'Active',  value: counts.active,  color: 'text-green-400' },
-            { label: 'Pending', value: counts.pending, color: 'text-amber-400' },
+            { label: 'Total',   value: counts.all,     color: 'text-slate-900' },
+            { label: 'Active',  value: counts.active,  color: 'text-green-600' },
+            { label: 'Pending', value: counts.pending, color: 'text-amber-600' },
             { label: 'Paused',  value: counts.paused,  color: 'text-gray-400' },
           ].map(s => (
-            <div key={s.label} className="rounded-xl border border-white/8 bg-white/[0.03] px-5 py-4">
-              <p className="text-xs text-white/35 font-medium uppercase tracking-wider mb-1">{s.label}</p>
+            <div key={s.label} className="rounded-xl border border-slate-200 bg-white/[0.03] px-5 py-4">
+              <p className="text-xs text-slate-600 font-medium uppercase tracking-wider mb-1">{s.label}</p>
               <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
             </div>
           ))}
@@ -105,13 +105,13 @@ export default function PipelineAdminClient({ clients }: { clients: PipelineClie
 
         {/* Filters + search */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-          <div className="flex items-center gap-1 bg-white/5 border border-white/8 rounded-lg p-1">
+          <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg p-1">
             {(['all', 'active', 'pending', 'paused'] as const).map(f => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all capitalize ${
-                  filter === f ? 'bg-white/12 text-white' : 'text-white/35 hover:text-white/60'
+                  filter === f ? 'bg-slate-100 text-slate-900' : 'text-slate-600 hover:text-slate-600'
                 }`}
               >
                 {f}
@@ -123,17 +123,17 @@ export default function PipelineAdminClient({ clients }: { clients: PipelineClie
             placeholder="Search company, slug, email…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-1 focus:ring-orange-500/50 transition-all"
+            className="flex-1 rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-orange-500/50 transition-all"
           />
         </div>
 
         {/* Table */}
         {filtered.length === 0 ? (
-          <div className="text-center py-24 text-white/25">
+          <div className="text-center py-24 text-slate-600">
             {clients.length === 0 ? (
               <>
                 <p className="text-4xl mb-4">📋</p>
-                <p className="font-semibold text-white/40 mb-2">No pipeline clients yet</p>
+                <p className="font-semibold text-slate-600 mb-2">No pipeline clients yet</p>
                 <p className="text-sm mb-6">Clients appear here once they complete the onboarding form.</p>
                 <Link href="/client-onboarding" className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-400 text-black font-bold px-5 py-2.5 rounded-lg text-sm transition-colors">
                   Onboard first client →
@@ -144,43 +144,43 @@ export default function PipelineAdminClient({ clients }: { clients: PipelineClie
             )}
           </div>
         ) : (
-          <div className="rounded-xl border border-white/8 overflow-hidden">
+          <div className="rounded-xl border border-slate-200 overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                  <th className="text-left px-5 py-3 text-[10px] font-bold text-white/30 uppercase tracking-wider">Company</th>
-                  <th className="text-left px-5 py-3 text-[10px] font-bold text-white/30 uppercase tracking-wider hidden sm:table-cell">Slug / Login</th>
-                  <th className="text-left px-5 py-3 text-[10px] font-bold text-white/30 uppercase tracking-wider hidden md:table-cell">Contact</th>
-                  <th className="text-left px-5 py-3 text-[10px] font-bold text-white/30 uppercase tracking-wider hidden lg:table-cell">Platforms</th>
-                  <th className="text-left px-5 py-3 text-[10px] font-bold text-white/30 uppercase tracking-wider">Plan</th>
-                  <th className="text-left px-5 py-3 text-[10px] font-bold text-white/30 uppercase tracking-wider">Status</th>
-                  <th className="text-left px-5 py-3 text-[10px] font-bold text-white/30 uppercase tracking-wider hidden sm:table-cell">Onboarded</th>
+                <tr className="border-b border-slate-200 bg-white/[0.02]">
+                  <th className="text-left px-5 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-wider">Company</th>
+                  <th className="text-left px-5 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-wider hidden sm:table-cell">Slug / Login</th>
+                  <th className="text-left px-5 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-wider hidden md:table-cell">Contact</th>
+                  <th className="text-left px-5 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-wider hidden lg:table-cell">Platforms</th>
+                  <th className="text-left px-5 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-wider">Plan</th>
+                  <th className="text-left px-5 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-wider">Status</th>
+                  <th className="text-left px-5 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-wider hidden sm:table-cell">Onboarded</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/[0.04]">
                 {filtered.map(c => (
                   <tr key={c.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="px-5 py-4">
-                      <p className="font-semibold text-white">{c.company}</p>
-                      {c.location && <p className="text-[11px] text-white/30 mt-0.5">{c.location}</p>}
+                      <p className="font-semibold text-slate-900">{c.company}</p>
+                      {c.location && <p className="text-[11px] text-slate-600 mt-0.5">{c.location}</p>}
                     </td>
                     <td className="px-5 py-4 hidden sm:table-cell">
-                      <code className="text-[11px] bg-white/5 px-2 py-0.5 rounded text-orange-300/80">{c.slug}</code>
+                      <code className="text-[11px] bg-slate-50 px-2 py-0.5 rounded text-orange-700/80">{c.slug}</code>
                     </td>
                     <td className="px-5 py-4 hidden md:table-cell">
-                      <p className="text-white/70">{c.contact_name ?? '—'}</p>
-                      {c.email && <p className="text-[11px] text-white/30 mt-0.5">{c.email}</p>}
+                      <p className="text-slate-700">{c.contact_name ?? '—'}</p>
+                      {c.email && <p className="text-[11px] text-slate-600 mt-0.5">{c.email}</p>}
                     </td>
                     <td className="px-5 py-4 hidden lg:table-cell">
                       <PlatformBadges platforms={c.platforms} />
                     </td>
                     <td className="px-5 py-4">
-                      <span className="text-xs capitalize text-white/50">{c.plan ?? '—'}</span>
+                      <span className="text-xs capitalize text-slate-600">{c.plan ?? '—'}</span>
                     </td>
                     <td className="px-5 py-4">
                       <StatusBadge status={c.status} />
                     </td>
-                    <td className="px-5 py-4 hidden sm:table-cell text-[11px] text-white/30">
+                    <td className="px-5 py-4 hidden sm:table-cell text-[11px] text-slate-600">
                       {new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </td>
                   </tr>

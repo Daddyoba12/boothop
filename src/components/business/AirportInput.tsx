@@ -90,31 +90,31 @@ export function AirportInput({ label, value, onSelect, onClear, placeholder = 'C
 
   return (
     <div ref={containerRef} className="relative">
-      <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-1.5">{label}</p>
+      <p className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-1.5">{label}</p>
       <div className="relative flex items-center">
-        <Plane className="absolute left-3.5 h-4 w-4 text-white/30 pointer-events-none" />
+        <Plane className="absolute left-3.5 h-4 w-4 text-slate-300 pointer-events-none" />
         <input
           value={query}
           onChange={e => search(e.target.value)}
           onFocus={() => { if (results.length > 0) setOpen(true); }}
           placeholder={placeholder}
           autoComplete="off"
-          className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-9 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-colors"
+          className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-9 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 transition-colors"
         />
         {loading && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <div className="h-3.5 w-3.5 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
+            <div className="h-3.5 w-3.5 border-2 border-slate-200 border-t-slate-500 rounded-full animate-spin" />
           </div>
         )}
         {!loading && query && (
-          <button type="button" onClick={clear} className="absolute right-3 text-white/25 hover:text-white transition-colors">
+          <button type="button" onClick={clear} className="absolute right-3 text-slate-300 hover:text-slate-700 transition-colors">
             <X className="h-4 w-4" />
           </button>
         )}
       </div>
 
       {open && results.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full bg-[#0d1117] border border-white/15 rounded-xl shadow-2xl overflow-hidden">
+        <div className="absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden">
           {results.map(a => {
             const disabled = disabledIata === a.iata;
             return (
@@ -123,16 +123,16 @@ export function AirportInput({ label, value, onSelect, onClear, placeholder = 'C
                 type="button"
                 disabled={disabled}
                 onClick={() => !disabled && select(a)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${disabled ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white/5'}`}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${disabled ? 'opacity-30 cursor-not-allowed' : 'hover:bg-slate-50'}`}
               >
-                <span className="font-mono font-black text-emerald-400 text-xs w-9 shrink-0">{a.iata}</span>
+                <span className="font-mono font-black text-emerald-600 text-xs w-9 shrink-0">{a.iata}</span>
                 <div className="min-w-0">
-                  <p className="text-sm text-white font-semibold truncate">{a.city}</p>
-                  <p className="text-xs text-white/35 truncate">{a.name} · {a.country}</p>
+                  <p className="text-sm text-slate-900 font-semibold truncate">{a.city}</p>
+                  <p className="text-xs text-slate-600 truncate">{a.name} · {a.country}</p>
                 </div>
-                {disabled && <span className="text-xs text-white/25 ml-auto shrink-0">selected</span>}
+                {disabled && <span className="text-xs text-slate-300 ml-auto shrink-0">selected</span>}
                 {!disabled && a.terminals?.length && (
-                  <span className="text-xs text-white/30 ml-auto shrink-0">Select terminal →</span>
+                  <span className="text-xs text-slate-600 ml-auto shrink-0">Select terminal →</span>
                 )}
               </button>
             );
@@ -142,15 +142,15 @@ export function AirportInput({ label, value, onSelect, onClear, placeholder = 'C
 
       {/* Terminal picker — shown inline after airport chosen */}
       {pendingAirport && (
-        <div className="mt-2 p-3 bg-white/5 border border-white/10 rounded-xl">
-          <p className="text-xs text-white/40 uppercase tracking-widest mb-2">Select terminal</p>
+        <div className="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+          <p className="text-xs text-slate-600 uppercase tracking-widest mb-2">Select terminal</p>
           <div className="flex flex-wrap gap-2">
             {pendingAirport.terminals!.map(t => (
               <button
                 key={t}
                 type="button"
                 onClick={() => applyAirport(pendingAirport, t)}
-                className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-blue-500/30 border border-white/10 hover:border-blue-400/50 text-xs text-white/70 hover:text-white transition-all"
+                className="px-3 py-1.5 rounded-lg bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-xs text-slate-600 hover:text-slate-900 transition-all"
               >
                 {t}
               </button>

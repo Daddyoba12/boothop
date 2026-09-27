@@ -125,27 +125,27 @@ export default function JourneyDetail({
   const extraFields = Object.entries(trip).filter(([k]) => !SKIP_KEYS.has(k));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
+    <div className="min-h-screen bg-slate-50">
 
       {/* ── HEADER ─────────────────────────────────────────────────────── */}
-      <nav className="bg-gradient-to-r from-red-600/20 via-orange-600/20 to-red-600/20 backdrop-blur-xl border-b border-red-400/30 sticky top-0 z-30">
+      <nav className="bg-gradient-to-r from-red-50 via-orange-50 to-red-50 backdrop-blur-xl border-b border-red-200 sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => router.push('/admin')}
-              className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all shrink-0 flex items-center gap-2 text-white text-sm font-medium"
+              className="p-2 bg-slate-100 hover:bg-slate-100 rounded-xl transition-all shrink-0 flex items-center gap-2 text-slate-900 text-sm font-medium"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Back to Admin</span>
             </button>
             <div className="hidden md:flex w-10 h-10 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl items-center justify-center shrink-0">
-              <Shield className="text-white w-5 h-5" />
+              <Shield className="text-slate-900 w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="font-bold text-white text-base md:text-xl leading-tight truncate">
+              <h1 className="font-bold text-slate-900 text-base md:text-xl leading-tight truncate">
                 {trip.from_city} → {trip.to_city}
               </h1>
-              <p className="text-white/50 text-xs truncate">{trip.email}</p>
+              <p className="text-slate-600 text-xs truncate">{trip.email}</p>
             </div>
           </div>
 
@@ -153,10 +153,10 @@ export default function JourneyDetail({
           <div className="flex items-center gap-2 shrink-0">
             {isLiveActive && <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />}
             <span className={`px-3 py-1.5 rounded-full text-xs font-bold border ${
-              isLiveActive ? 'bg-green-500/20 text-green-300 border-green-400/30' :
-              isPast       ? 'bg-red-500/20 text-red-300 border-red-400/30'       :
-              trip.status === 'matched' ? 'bg-blue-500/20 text-blue-300 border-blue-400/30' :
-              'bg-white/10 text-white/60 border-white/10'
+              isLiveActive ? 'bg-green-500/20 text-green-700 border-green-400/30' :
+              isPast       ? 'bg-red-500/20 text-red-700 border-red-400/30'       :
+              trip.status === 'matched' ? 'bg-blue-500/20 text-blue-700 border-blue-400/30' :
+              'bg-slate-100 text-slate-600 border-slate-200'
             }`}>
               {isPast && trip.status === 'active' ? 'expired' : (trip.status || 'unknown')}
             </span>
@@ -170,10 +170,10 @@ export default function JourneyDetail({
         {/* action result */}
         {actionResult && (
           <div className={`px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-between ${
-            actionResult.startsWith('✅') ? 'bg-green-500/20 text-green-300 border border-green-400/30' : 'bg-red-500/20 text-red-300 border border-red-400/30'
+            actionResult.startsWith('✅') ? 'bg-green-500/20 text-green-700 border border-green-400/30' : 'bg-red-500/20 text-red-700 border border-red-400/30'
           }`}>
             <span>{actionResult}</span>
-            <button onClick={() => setActionResult(null)} className="text-white/40 hover:text-white ml-3">
+            <button onClick={() => setActionResult(null)} className="text-slate-600 hover:text-slate-900 ml-3">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -185,10 +185,10 @@ export default function JourneyDetail({
           <div className="space-y-6">
 
             {/* core fields */}
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-white/10 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-cyan-400" />
-                <h2 className="text-white font-bold text-sm uppercase tracking-wide">Journey Details</h2>
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-200 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-cyan-600" />
+                <h2 className="text-slate-900 font-bold text-sm uppercase tracking-wide">Journey Details</h2>
               </div>
               <div className="divide-y divide-white/5">
                 {[
@@ -204,8 +204,8 @@ export default function JourneyDetail({
                   ...(trip.updated_at ? [{ label: 'Updated', value: fmtTs(trip.updated_at) }] : []),
                 ].map(row => (
                   <div key={row.label} className="flex items-center justify-between px-6 py-3">
-                    <span className="text-white/50 text-sm">{row.label}</span>
-                    <span className="text-white text-sm font-medium text-right max-w-[260px]">{row.value}</span>
+                    <span className="text-slate-600 text-sm">{row.label}</span>
+                    <span className="text-slate-900 text-sm font-medium text-right max-w-[260px]">{row.value}</span>
                   </div>
                 ))}
               </div>
@@ -213,15 +213,15 @@ export default function JourneyDetail({
 
             {/* extra DB fields */}
             {extraFields.length > 0 && (
-              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
-                <div className="px-6 py-4 border-b border-white/10">
-                  <h2 className="text-white/50 font-bold text-xs uppercase tracking-wide">Additional Fields</h2>
+              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+                <div className="px-6 py-4 border-b border-slate-200">
+                  <h2 className="text-slate-600 font-bold text-xs uppercase tracking-wide">Additional Fields</h2>
                 </div>
                 <div className="divide-y divide-white/5">
                   {extraFields.map(([k, v]) => (
                     <div key={k} className="flex items-center justify-between px-6 py-3">
-                      <span className="text-white/40 text-sm capitalize">{k.replace(/_/g, ' ')}</span>
-                      <span className="text-white/70 text-sm text-right max-w-[260px] truncate">{String(v ?? '—')}</span>
+                      <span className="text-slate-600 text-sm capitalize">{k.replace(/_/g, ' ')}</span>
+                      <span className="text-slate-700 text-sm text-right max-w-[260px] truncate">{String(v ?? '—')}</span>
                     </div>
                   ))}
                 </div>
@@ -231,34 +231,34 @@ export default function JourneyDetail({
 
           {/* ── RIGHT: match history ────────────────────────────────────── */}
           <div>
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Package className="w-4 h-4 text-purple-400" />
-                  <h2 className="text-white font-bold text-sm uppercase tracking-wide">Match History</h2>
+                  <Package className="w-4 h-4 text-purple-600" />
+                  <h2 className="text-slate-900 font-bold text-sm uppercase tracking-wide">Match History</h2>
                 </div>
-                <span className="px-2 py-0.5 bg-white/10 text-white/60 rounded-full text-xs font-bold">{matches.length}</span>
+                <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-xs font-bold">{matches.length}</span>
               </div>
 
               {matches.length === 0 ? (
                 <div className="px-6 py-12 text-center">
-                  <Package className="w-10 h-10 text-white/20 mx-auto mb-3" />
-                  <p className="text-white/40 text-sm">No matches for this journey yet</p>
+                  <Package className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+                  <p className="text-slate-600 text-sm">No matches for this journey yet</p>
                 </div>
               ) : (
                 <div className="divide-y divide-white/5">
                   {matches.map(m => {
                     const statusColor =
-                      m.status === 'completed'                 ? 'bg-green-500/20 text-green-300'   :
+                      m.status === 'completed'                 ? 'bg-green-500/20 text-green-700'   :
                       m.status === 'cancelled' || m.status === 'cancellation_requested'
-                                                               ? 'bg-red-500/20 text-red-300'        :
+                                                               ? 'bg-red-500/20 text-red-700'        :
                       m.status === 'payment_processing' || m.status === 'delivery_confirmed'
-                                                               ? 'bg-purple-500/20 text-purple-300'  :
+                                                               ? 'bg-purple-500/20 text-purple-700'  :
                       m.status === 'kyc_pending' || m.status === 'kyc_complete' || m.status === 'awaiting_authorisation'
-                                                               ? 'bg-amber-500/20 text-amber-300'    :
+                                                               ? 'bg-amber-500/20 text-amber-700'    :
                       m.status === 'agreed' || m.status === 'committed'
-                                                               ? 'bg-blue-500/20 text-blue-300'      :
-                      'bg-yellow-500/20 text-yellow-300';
+                                                               ? 'bg-blue-500/20 text-blue-700'      :
+                      'bg-yellow-500/20 text-yellow-700';
 
                     return (
                       <div key={m.id} className="px-6 py-5 space-y-3">
@@ -268,36 +268,36 @@ export default function JourneyDetail({
                           <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${statusColor}`}>
                             {m.status?.replace(/_/g, ' ')}
                           </span>
-                          <span className="text-white/35 text-xs">{fmtTs(m.created_at)}</span>
+                          <span className="text-slate-600 text-xs">{fmtTs(m.created_at)}</span>
                         </div>
 
                         {/* Parties */}
                         <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div className="bg-white/5 rounded-lg px-3 py-2">
-                            <p className="text-white/40 mb-0.5">Sender</p>
-                            <p className="text-white/80 truncate">{m.sender_email || '—'}</p>
+                          <div className="bg-slate-50 rounded-lg px-3 py-2">
+                            <p className="text-slate-600 mb-0.5">Sender</p>
+                            <p className="text-slate-700 truncate">{m.sender_email || '—'}</p>
                           </div>
-                          <div className="bg-white/5 rounded-lg px-3 py-2">
-                            <p className="text-white/40 mb-0.5">Traveller</p>
-                            <p className="text-white/80 truncate">{m.traveler_email || '—'}</p>
+                          <div className="bg-slate-50 rounded-lg px-3 py-2">
+                            <p className="text-slate-600 mb-0.5">Traveller</p>
+                            <p className="text-slate-700 truncate">{m.traveler_email || '—'}</p>
                           </div>
                         </div>
 
                         {/* Price */}
                         {(m.agreed_price || m.proposed_price) && (
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-white/40">{m.agreed_price ? 'Agreed price' : 'Proposed price'}</span>
-                            <span className="text-white font-bold">£{Number(m.agreed_price || m.proposed_price).toFixed(2)}</span>
+                            <span className="text-slate-600">{m.agreed_price ? 'Agreed price' : 'Proposed price'}</span>
+                            <span className="text-slate-900 font-bold">£{Number(m.agreed_price || m.proposed_price).toFixed(2)}</span>
                           </div>
                         )}
 
                         {/* KYC */}
                         {(m.sender_kyc_status || m.traveler_kyc_status) && (
                           <div className="flex gap-3 text-xs">
-                            <span className={`flex items-center gap-1 ${m.sender_kyc_status === 'approved' ? 'text-green-400' : 'text-white/30'}`}>
+                            <span className={`flex items-center gap-1 ${m.sender_kyc_status === 'approved' ? 'text-green-600' : 'text-slate-600'}`}>
                               <CheckCircle className="w-3 h-3" /> Sender KYC: {m.sender_kyc_status || 'pending'}
                             </span>
-                            <span className={`flex items-center gap-1 ${m.traveler_kyc_status === 'approved' ? 'text-green-400' : 'text-white/30'}`}>
+                            <span className={`flex items-center gap-1 ${m.traveler_kyc_status === 'approved' ? 'text-green-600' : 'text-slate-600'}`}>
                               <CheckCircle className="w-3 h-3" /> Traveller KYC: {m.traveler_kyc_status || 'pending'}
                             </span>
                           </div>
@@ -305,11 +305,11 @@ export default function JourneyDetail({
 
                         {/* Delivery confirmations */}
                         <div className="flex gap-4 text-xs">
-                          <span className={`flex items-center gap-1 ${m.booter_confirmed_delivery ? 'text-green-400' : 'text-white/25'}`}>
+                          <span className={`flex items-center gap-1 ${m.booter_confirmed_delivery ? 'text-green-600' : 'text-slate-600'}`}>
                             {m.booter_confirmed_delivery ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
                             Booter confirmed
                           </span>
-                          <span className={`flex items-center gap-1 ${m.hooper_confirmed_receipt ? 'text-green-400' : 'text-white/25'}`}>
+                          <span className={`flex items-center gap-1 ${m.hooper_confirmed_receipt ? 'text-green-600' : 'text-slate-600'}`}>
                             {m.hooper_confirmed_receipt ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
                             Hooper confirmed
                           </span>
@@ -317,14 +317,14 @@ export default function JourneyDetail({
 
                         {/* Cancellation reason */}
                         {m.cancellation_reason && (
-                          <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-xs text-red-300">
+                          <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-xs text-red-700">
                             <span className="font-semibold">Reason: </span>{m.cancellation_reason}
                           </div>
                         )}
 
                         <Link
                           href={`/matches/${m.id}`}
-                          className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 w-fit"
+                          className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1 w-fit"
                         >
                           <Eye className="w-3 h-3" /> View full match
                         </Link>
@@ -340,7 +340,7 @@ export default function JourneyDetail({
 
       {/* ── STICKY ACTION BAR ──────────────────────────────────────────── */}
       {trip.status !== 'cancelled' && (
-        <div className="sticky bottom-0 z-20 bg-slate-900/95 backdrop-blur-xl border-t border-white/10">
+        <div className="sticky bottom-0 z-20 bg-white/95 backdrop-blur-xl border-t border-slate-200">
           <div className="max-w-5xl mx-auto px-4 md:px-6 py-4 flex gap-3">
             <button
               onClick={openUpdate}
@@ -364,19 +364,19 @@ export default function JourneyDetail({
       {showUpdate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowUpdate(false)} />
-          <div className="relative w-full max-w-lg bg-gradient-to-br from-slate-900 to-blue-950/60 border border-blue-400/30 rounded-3xl shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="relative w-full max-w-lg bg-white border border-blue-200 rounded-3xl shadow-2xl flex flex-col max-h-[90vh]">
 
             {/* header */}
-            <div className="px-8 py-5 border-b border-white/10 flex items-center gap-3 shrink-0">
+            <div className="px-8 py-5 border-b border-slate-200 flex items-center gap-3 shrink-0">
               <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                <Edit2 className="w-5 h-5 text-blue-400" />
+                <Edit2 className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-white font-bold text-lg">Edit Journey</h3>
-                <p className="text-white/50 text-xs">{trip.from_city} → {trip.to_city}</p>
+                <h3 className="text-slate-900 font-bold text-lg">Edit Journey</h3>
+                <p className="text-slate-600 text-xs">{trip.from_city} → {trip.to_city}</p>
               </div>
-              <button onClick={() => setShowUpdate(false)} className="ml-auto p-1.5 hover:bg-white/10 rounded-lg">
-                <X className="w-5 h-5 text-white/50" />
+              <button onClick={() => setShowUpdate(false)} className="ml-auto p-1.5 hover:bg-slate-100 rounded-lg">
+                <X className="w-5 h-5 text-slate-600" />
               </button>
             </div>
 
@@ -386,9 +386,9 @@ export default function JourneyDetail({
               {/* Status + Type */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Status</label>
+                  <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Status</label>
                   <select value={editForm.status ?? ''} onChange={e => setEditForm(f => ({ ...f, status: e.target.value }))}
-                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm appearance-none cursor-pointer">
+                    className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm appearance-none cursor-pointer">
                     <option value="active">Active</option>
                     <option value="matched">Matched</option>
                     <option value="awaiting_authorisation">Awaiting Authorisation</option>
@@ -399,9 +399,9 @@ export default function JourneyDetail({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Type</label>
+                  <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Type</label>
                   <select value={editForm.type ?? ''} onChange={e => setEditForm(f => ({ ...f, type: e.target.value }))}
-                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm appearance-none cursor-pointer">
+                    className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm appearance-none cursor-pointer">
                     <option value="travel">Traveller</option>
                     <option value="traveller">Traveller (alt)</option>
                     <option value="send">Sender</option>
@@ -411,101 +411,101 @@ export default function JourneyDetail({
 
               {/* Email */}
               <div>
-                <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Email</label>
+                <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Email</label>
                 <input type="email" value={editForm.email ?? ''} onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))}
-                  className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                  className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
               </div>
 
               {/* From + To City */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">From City</label>
+                  <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">From City</label>
                   <input type="text" value={editForm.from_city ?? ''} onChange={e => setEditForm(f => ({ ...f, from_city: e.target.value }))}
-                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                    className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">To City</label>
+                  <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">To City</label>
                   <input type="text" value={editForm.to_city ?? ''} onChange={e => setEditForm(f => ({ ...f, to_city: e.target.value }))}
-                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                    className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
                 </div>
               </div>
 
               {/* From + To City (English) */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">From (English)</label>
+                  <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">From (English)</label>
                   <input type="text" value={editForm.from_city_en ?? ''} onChange={e => setEditForm(f => ({ ...f, from_city_en: e.target.value }))}
                     placeholder="English name"
-                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                    className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">To (English)</label>
+                  <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">To (English)</label>
                   <input type="text" value={editForm.to_city_en ?? ''} onChange={e => setEditForm(f => ({ ...f, to_city_en: e.target.value }))}
                     placeholder="English name"
-                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                    className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
                 </div>
               </div>
 
               {/* Travel Date */}
               <div>
-                <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Travel Date</label>
+                <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Travel Date</label>
                 <input type="date" value={editForm.travel_date ?? ''} onChange={e => setEditForm(f => ({ ...f, travel_date: e.target.value }))}
-                  className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                  className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
               </div>
 
               {/* Weight + Capacity */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Weight (kg)</label>
+                  <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Weight (kg)</label>
                   <input type="number" min="0" step="0.1" value={editForm.weight ?? ''} onChange={e => setEditForm(f => ({ ...f, weight: e.target.value }))}
                     placeholder="0"
-                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                    className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Capacity (kg)</label>
+                  <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Capacity (kg)</label>
                   <input type="number" min="0" step="0.1" value={editForm.weight_capacity ?? ''} onChange={e => setEditForm(f => ({ ...f, weight_capacity: e.target.value }))}
                     placeholder="0"
-                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                    className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
                 </div>
               </div>
 
               {/* Price + Asking Price */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Price (£)</label>
+                  <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Price (£)</label>
                   <input type="number" min="0" step="0.01" value={editForm.price ?? ''} onChange={e => setEditForm(f => ({ ...f, price: e.target.value }))}
                     placeholder="0.00"
-                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                    className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-white/60 text-xs font-semibold uppercase tracking-wide mb-1.5">Asking Price (£)</label>
+                  <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Asking Price (£)</label>
                   <input type="number" min="0" step="0.01" value={editForm.asking_price ?? ''} onChange={e => setEditForm(f => ({ ...f, asking_price: e.target.value }))}
                     placeholder="0.00"
-                    className="w-full px-3 py-2.5 bg-white/10 border border-white/20 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
+                    className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm" />
                 </div>
               </div>
 
               {/* Reason */}
               <div>
-                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-1.5">
-                  Reason for change <span className="text-red-400">*</span>
+                <label className="block text-slate-700 text-xs font-semibold uppercase tracking-wide mb-1.5">
+                  Reason for change <span className="text-red-600">*</span>
                 </label>
                 <textarea
                   rows={2}
                   value={updateReason}
                   onChange={e => setUpdateReason(e.target.value)}
                   placeholder="Why is this being changed?..."
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none text-sm"
+                  className="w-full px-4 py-3 bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none text-sm"
                 />
-                <p className={`text-xs mt-1 ${updateReason.trim().length >= 10 ? 'text-green-400' : 'text-red-400'}`}>
+                <p className={`text-xs mt-1 ${updateReason.trim().length >= 10 ? 'text-green-600' : 'text-red-600'}`}>
                   {updateReason.trim().length} / 10 min characters
                 </p>
               </div>
             </div>
 
             {/* footer */}
-            <div className="px-8 py-4 border-t border-white/10 flex gap-3 shrink-0">
-              <button onClick={() => setShowUpdate(false)} className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all">
+            <div className="px-8 py-4 border-t border-slate-200 flex gap-3 shrink-0">
+              <button onClick={() => setShowUpdate(false)} className="flex-1 px-6 py-3 bg-slate-100 text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-all">
                 Cancel
               </button>
               <button
@@ -527,43 +527,43 @@ export default function JourneyDetail({
       {showDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowDelete(false)} />
-          <div className="relative w-full max-w-md bg-gradient-to-br from-slate-900 to-red-950/60 border border-red-400/30 rounded-3xl shadow-2xl overflow-hidden">
-            <div className="px-8 py-5 border-b border-white/10 flex items-center gap-3">
+          <div className="relative w-full max-w-md bg-white border border-red-200 rounded-3xl shadow-2xl overflow-hidden">
+            <div className="px-8 py-5 border-b border-slate-200 flex items-center gap-3">
               <div className="w-10 h-10 bg-red-500/20 rounded-xl flex items-center justify-center">
-                <Trash2 className="w-5 h-5 text-red-400" />
+                <Trash2 className="w-5 h-5 text-red-600" />
               </div>
               <div>
-                <h3 className="text-white font-bold text-lg">Cancel Journey</h3>
-                <p className="text-white/50 text-xs">{trip.from_city} → {trip.to_city}</p>
+                <h3 className="text-slate-900 font-bold text-lg">Cancel Journey</h3>
+                <p className="text-slate-600 text-xs">{trip.from_city} → {trip.to_city}</p>
               </div>
-              <button onClick={() => setShowDelete(false)} className="ml-auto p-1.5 hover:bg-white/10 rounded-lg">
-                <X className="w-5 h-5 text-white/50" />
+              <button onClick={() => setShowDelete(false)} className="ml-auto p-1.5 hover:bg-slate-100 rounded-lg">
+                <X className="w-5 h-5 text-slate-600" />
               </button>
             </div>
             <div className="px-8 py-6 space-y-5">
               <div className="bg-red-500/10 border border-red-400/30 rounded-xl p-4">
                 <p className="text-red-200 text-sm leading-relaxed">
                   This cancels the journey and all linked active matches, and emails every affected party.{' '}
-                  <strong className="text-red-300">Cannot be undone.</strong> You will be taken back to the admin dashboard.
+                  <strong className="text-red-700">Cannot be undone.</strong> You will be taken back to the admin dashboard.
                 </p>
               </div>
               <div>
-                <label className="block text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">
-                  Reason <span className="text-red-400">*</span>
+                <label className="block text-slate-700 text-xs font-semibold uppercase tracking-wide mb-2">
+                  Reason <span className="text-red-600">*</span>
                 </label>
                 <textarea
                   rows={4}
                   value={deleteReason}
                   onChange={e => setDeleteReason(e.target.value)}
                   placeholder="Enter reason (sent to all affected parties)..."
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder:text-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400 resize-none text-sm leading-relaxed"
+                  className="w-full px-4 py-3 bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400 resize-none text-sm leading-relaxed"
                 />
-                <p className={`text-xs mt-1.5 ${deleteReason.trim().length >= 10 ? 'text-green-400' : 'text-red-400'}`}>
+                <p className={`text-xs mt-1.5 ${deleteReason.trim().length >= 10 ? 'text-green-600' : 'text-red-600'}`}>
                   {deleteReason.trim().length} / 10 min characters
                 </p>
               </div>
               <div className="flex gap-3 pt-1">
-                <button onClick={() => setShowDelete(false)} className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all">
+                <button onClick={() => setShowDelete(false)} className="flex-1 px-6 py-3 bg-slate-100 text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-all">
                   Back
                 </button>
                 <button

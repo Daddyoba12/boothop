@@ -19,27 +19,27 @@ export const metadata: Metadata = {
 
 export default function CustomsClearancePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+    <div className="min-h-screen bg-white text-slate-900">
       <NavBar />
 
       <main className="max-w-3xl mx-auto px-6 pt-32 pb-24">
 
-        <Link href="/blog" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-10 group">
+        <Link href="/blog" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors mb-10 group">
           <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-300" />
           All posts
         </Link>
 
         <div className="flex flex-wrap gap-2 mb-5">
           {['Customs & Compliance', 'Cross-Border Delivery', 'AI Logistics'].map(label => (
-            <span key={label} className="text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full">{label}</span>
+            <span key={label} className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1 rounded-full">{label}</span>
           ))}
         </div>
 
-        <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
+        <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4 text-slate-900">
           Beyond the Border: Why AI is the Secret to Seamless Customs Clearance
         </h1>
 
-        <div className="flex items-center gap-2 text-sm text-slate-500 mb-10 pb-8 border-b border-white/8">
+        <div className="flex items-center gap-2 text-sm text-slate-400 mb-10 pb-8 border-b border-slate-200">
           <span>BootHop Team</span>
           <span>·</span>
           <span>19 May 2026</span>
@@ -47,7 +47,7 @@ export default function CustomsClearancePage() {
           <span>6 min read</span>
         </div>
 
-        <div className="prose prose-invert prose-lg max-w-none prose-headings:font-black prose-headings:text-white prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-slate-300 prose-p:leading-relaxed prose-p:mb-5 prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-white prose-li:text-slate-300">
+        <div className="prose prose-lg max-w-none prose-headings:font-black prose-headings:text-slate-900 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-5 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 prose-li:text-slate-600">
 
           <p>
             Customs clearance services are one of the biggest pain points in international shipping. Every parcel that crosses a border needs to pass through customs — and most people find the process opaque, unpredictable, and expensive. Parcels get held. Documentation goes missing. Duties arrive as a surprise weeks later.
@@ -106,17 +106,17 @@ export default function CustomsClearancePage() {
             { n: '04', title: 'Chain of custody records', body: 'A digital audit trail from sender to recipient, available for compliance, insurance, and dispute resolution.' },
             { n: '05', title: 'Faster clearance', body: 'Properly documented parcels clear customs faster. Customs officials have everything they need on arrival — no back-and-forth.' },
           ].map(({ n, title, body }) => (
-            <div key={n} className="flex items-start gap-4 rounded-xl border border-white/10 bg-white/3 p-5">
-              <span className="text-xs font-bold text-white/25 pt-0.5 w-5 shrink-0">{n}</span>
+            <div key={n} className="flex items-start gap-4 rounded-xl border border-slate-200 bg-slate-50 p-5">
+              <span className="text-xs font-bold text-slate-300 pt-0.5 w-5 shrink-0">{n}</span>
               <div>
-                <p className="text-white font-semibold text-sm mb-1">{title}</p>
-                <p className="text-slate-400 text-sm leading-relaxed">{body}</p>
+                <p className="text-slate-900 font-semibold text-sm mb-1">{title}</p>
+                <p className="text-slate-500 text-sm leading-relaxed">{body}</p>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="prose prose-invert prose-lg max-w-none prose-p:text-slate-300 prose-p:leading-relaxed prose-p:mb-5 prose-strong:text-white prose-a:text-blue-400 hover:prose-a:underline">
+        <div className="prose prose-lg max-w-none prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-5 prose-strong:text-slate-900 prose-a:text-blue-600 hover:prose-a:underline">
           <h2>For Businesses: Compliance Is Non-Negotiable</h2>
           <p>
             For businesses sending time-sensitive items — pharmaceutical samples, legal documents, engineering parts, luxury retail — proper customs clearance services are not a convenience. They are a legal requirement and a competitive differentiator.
@@ -134,15 +134,15 @@ export default function CustomsClearancePage() {
           </p>
         </div>
 
-        <div className="mt-16 pt-10 border-t border-white/8">
-          <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-8 text-center">
-            <h3 className="text-xl font-bold text-white mb-3">Ready for compliant cross-border delivery?</h3>
-            <p className="text-slate-400 text-sm mb-6 max-w-md mx-auto">Every BootHop shipment includes customs pre-screening, chain of custody documentation, and escrow-secured payment.</p>
+        <div className="mt-16 pt-10 border-t border-slate-200">
+          <div className="rounded-2xl border border-blue-200 bg-blue-50 p-8 text-center">
+            <h3 className="text-xl font-bold text-slate-900 mb-3">Ready for compliant cross-border delivery?</h3>
+            <p className="text-slate-500 text-sm mb-6 max-w-md mx-auto">Every BootHop shipment includes customs pre-screening, chain of custody documentation, and escrow-secured payment.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link href="/" className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold px-7 py-3 rounded-full text-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)]">
                 Send a Package <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/business" className="inline-flex items-center gap-2 border border-white/20 text-white/70 hover:text-white px-7 py-3 rounded-full text-sm transition-all">
+              <Link href="/business" className="inline-flex items-center gap-2 border border-slate-300 bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 px-7 py-3 rounded-full text-sm transition-all">
                 Business Portal →
               </Link>
             </div>

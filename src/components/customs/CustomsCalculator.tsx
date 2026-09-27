@@ -62,7 +62,7 @@ const riskConfig: Record<string, { border: string; bg: string; text: string; lab
 };
 
 function RiskIcon({ level }: { level: string }) {
-  const cls = riskConfig[level]?.text ?? 'text-slate-500';
+  const cls = riskConfig[level]?.text ?? 'text-slate-600';
   if (level === 'critical') return <ShieldX className={`h-5 w-5 ${cls}`} />;
   if (level === 'high')     return <ShieldX className={`h-5 w-5 ${cls}`} />;
   if (level === 'medium')   return <ShieldAlert className={`h-5 w-5 ${cls}`} />;
@@ -119,7 +119,7 @@ export default function CustomsCalculator() {
       <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden max-w-3xl mx-auto">
         <div className="p-8">
           <h3 className="text-lg font-bold text-slate-900 mb-1">Duties &amp; Import Cost Estimator</h3>
-          <p className="text-sm text-slate-500 mb-6">
+          <p className="text-sm text-slate-600 mb-6">
             AI-powered landed cost estimation for international BootHop shipments.
           </p>
 
@@ -241,7 +241,7 @@ export default function CustomsCalculator() {
               className={`w-full py-3.5 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 ${
                 canSubmit && !loading
                   ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                  : 'bg-slate-100 text-slate-600 cursor-not-allowed'
               }`}
             >
               {loading ? (
@@ -269,23 +269,23 @@ export default function CustomsCalculator() {
             {/* AI Category Badge */}
             <div className="px-8 py-5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
               <div>
-                <p className="text-xs text-slate-400 uppercase tracking-wide mb-0.5">
+                <p className="text-xs text-slate-600 uppercase tracking-wide mb-0.5">
                   AI Detected Category
                 </p>
                 <p className="font-semibold text-slate-900 capitalize">
                   {result.category.detected.replace(/_/g, ' ')}
                   {result.category.hsSuggestion && (
-                    <span className="text-xs text-slate-400 ml-2 font-normal">
+                    <span className="text-xs text-slate-600 ml-2 font-normal">
                       HS: {result.category.hsSuggestion}xx
                     </span>
                   )}
                 </p>
                 {result.category.reasoning && (
-                  <p className="text-xs text-slate-500 mt-0.5">{result.category.reasoning}</p>
+                  <p className="text-xs text-slate-600 mt-0.5">{result.category.reasoning}</p>
                 )}
               </div>
               <div className="text-right">
-                <p className="text-xs text-slate-400">AI Confidence</p>
+                <p className="text-xs text-slate-600">AI Confidence</p>
                 <p className="text-xl font-bold text-slate-900">
                   {Math.round(result.category.confidence * 100)}%
                 </p>
@@ -295,33 +295,33 @@ export default function CustomsCalculator() {
             <div className="px-8 py-6 space-y-4">
               {/* Duty Breakdown Table */}
               <div className="rounded-2xl border border-slate-200 overflow-hidden">
-                <div className="bg-slate-900 text-white px-5 py-3 flex items-center justify-between">
+                <div className="bg-slate-800 text-white px-5 py-3 flex items-center justify-between">
                   <p className="font-semibold text-sm">Estimated Import Charges</p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-300">
                     {form.originCountry} to {form.destinationCountry}
                   </p>
                 </div>
                 <div className="divide-y divide-slate-100">
                   <div className="flex justify-between px-5 py-3 text-sm">
-                    <span className="text-slate-500">Declared Value (GBP equivalent)</span>
+                    <span className="text-slate-600">Declared Value (GBP equivalent)</span>
                     <span className="font-medium">
                       £{result.estimate.breakdown.baseValue.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between px-5 py-3 text-sm">
-                    <span className="text-slate-500">
+                    <span className="text-slate-600">
                       Import Duty ({result.estimate.breakdown.dutyRate}%)
                     </span>
                     <span className="font-medium">£{result.estimate.duty.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between px-5 py-3 text-sm">
-                    <span className="text-slate-500">
+                    <span className="text-slate-600">
                       VAT ({result.estimate.breakdown.vatRate}%)
                     </span>
                     <span className="font-medium">£{result.estimate.vat.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between px-5 py-3 text-sm">
-                    <span className="text-slate-500">Handling Fee</span>
+                    <span className="text-slate-600">Handling Fee</span>
                     <span className="font-medium">
                       £{result.estimate.handling.toLocaleString()}
                     </span>
@@ -386,7 +386,7 @@ export default function CustomsCalculator() {
               </div>
 
               {/* Disclaimer */}
-              <p className="text-xs text-slate-400 leading-relaxed border-t border-slate-100 pt-4">
+              <p className="text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-4">
                 {result.estimate.disclaimer}
               </p>
             </div>

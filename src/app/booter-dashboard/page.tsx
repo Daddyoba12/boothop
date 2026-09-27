@@ -40,8 +40,8 @@ function StatCard({
         {icon}
       </div>
       <div className="text-3xl font-bold text-slate-900 mb-0.5">{value}</div>
-      <div className="text-slate-500 text-sm">{label}</div>
-      {sub && <div className="text-xs text-slate-400 mt-1">{sub}</div>}
+      <div className="text-slate-600 text-sm">{label}</div>
+      {sub && <div className="text-xs text-slate-600 mt-1">{sub}</div>}
     </div>
   );
 }
@@ -89,7 +89,7 @@ export default function BooterDashboard() {
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-500 text-sm">Loading your dashboard…</p>
+          <p className="text-slate-600 text-sm">Loading your dashboard…</p>
         </div>
       </div>
     );
@@ -162,7 +162,7 @@ export default function BooterDashboard() {
             <h1 className="text-2xl font-bold text-slate-900">
               Welcome back, {profile?.full_name?.split(' ')[0]} 👋
             </h1>
-            <p className="text-slate-500 mt-1 text-sm">Manage your journeys and track your earnings</p>
+            <p className="text-slate-600 mt-1 text-sm">Manage your journeys and track your earnings</p>
           </div>
           <Link
             href="/journeys/create"
@@ -224,10 +224,10 @@ export default function BooterDashboard() {
           {activeJourneys.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center px-4">
               <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
-                <Plane className="h-8 w-8 text-slate-400" />
+                <Plane className="h-8 w-8 text-slate-600" />
               </div>
               <p className="text-slate-600 font-medium mb-1">No active journeys yet</p>
-              <p className="text-slate-400 text-sm mb-5">Post your first journey to start earning</p>
+              <p className="text-slate-600 text-sm mb-5">Post your first journey to start earning</p>
               <Link href="/journeys/create"
                 className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition">
                 <Plus className="h-4 w-4" /> Post Journey
@@ -247,7 +247,7 @@ export default function BooterDashboard() {
                       <p className="font-medium text-slate-900 text-sm truncate">
                         {j.from_city} → {j.to_city}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-600">
                         {new Date(j.departure_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                         &nbsp;·&nbsp;{j.available_space_kg}kg space
                       </p>
@@ -255,7 +255,7 @@ export default function BooterDashboard() {
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0 ml-4">
                     <Badge status={j.status} />
-                    <span className="text-xs text-slate-400 hidden sm:block">{j.delivery_matches} match{j.delivery_matches !== 1 ? 'es' : ''}</span>
+                    <span className="text-xs text-slate-600 hidden sm:block">{j.delivery_matches} match{j.delivery_matches !== 1 ? 'es' : ''}</span>
                     <ArrowRight className="h-4 w-4 text-slate-300" />
                   </div>
                 </div>
@@ -276,10 +276,10 @@ export default function BooterDashboard() {
           {matches.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center px-4">
               <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
-                <Clock className="h-8 w-8 text-slate-400" />
+                <Clock className="h-8 w-8 text-slate-600" />
               </div>
               <p className="text-slate-600 font-medium mb-1">No matches yet</p>
-              <p className="text-slate-400 text-sm">Matches appear when Hoopers request deliveries on your route</p>
+              <p className="text-slate-600 text-sm">Matches appear when Hoopers request deliveries on your route</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-100">
@@ -293,14 +293,14 @@ export default function BooterDashboard() {
                     </div>
                     <div>
                       <p className="font-medium text-slate-900 text-sm">Delivery Match</p>
-                      <p className="text-xs text-slate-500">Agreed £{Number(m.agreed_price).toFixed(2)}</p>
+                      <p className="text-xs text-slate-600">Agreed £{Number(m.agreed_price).toFixed(2)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0 ml-4">
                     <Badge status={m.status} />
                     <div className="text-right hidden sm:block">
                       <div className="text-sm font-bold text-green-600">£{Number(m.booter_receives).toFixed(2)}</div>
-                      <div className="text-xs text-slate-400">you receive</div>
+                      <div className="text-xs text-slate-600">you receive</div>
                     </div>
                     <ArrowRight className="h-4 w-4 text-slate-300" />
                   </div>

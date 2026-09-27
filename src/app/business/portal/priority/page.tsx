@@ -35,13 +35,13 @@ const EMPTY_EDIT: EditForm = { pickup: '', dropoff: '', description: '', urgency
 const FADE = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -12 } };
 
 const STATUS_COLORS: Record<string, string> = {
-  pending:    'text-amber-400 bg-amber-500/10 border-amber-500/20',
-  review:     'text-purple-400 bg-purple-500/10 border-purple-500/20',
-  assigned:   'text-blue-400 bg-blue-500/10 border-blue-500/20',
+  pending:    'text-amber-600 bg-amber-500/10 border-amber-500/20',
+  review:     'text-purple-600 bg-purple-500/10 border-purple-500/20',
+  assigned:   'text-blue-600 bg-blue-500/10 border-blue-500/20',
   in_transit: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
-  delivered:  'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
-  cancelled:  'text-red-400 bg-red-500/10 border-red-500/20',
-  failed:     'text-orange-400 bg-orange-500/10 border-orange-500/20',
+  delivered:  'text-emerald-600 bg-emerald-500/10 border-emerald-500/20',
+  cancelled:  'text-red-600 bg-red-500/10 border-red-500/20',
+  failed:     'text-orange-600 bg-orange-500/10 border-orange-500/20',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -150,8 +150,8 @@ export default function PriorityPortalPage() {
 
   if (stage === 'loading') {
     return (
-      <div className="min-h-screen bg-[#080c10] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 text-amber-400 animate-spin" />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 className="h-8 w-8 text-amber-600 animate-spin" />
       </div>
     );
   }
@@ -169,16 +169,16 @@ export default function PriorityPortalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080c10] text-white">
+    <div className="min-h-screen bg-white text-slate-900">
 
       <BusinessNav
         rightSlot={
           <>
-            <span className="text-xs font-semibold bg-amber-500/20 border border-amber-500/30 text-amber-400 px-2.5 py-1 rounded-full uppercase tracking-widest hidden sm:inline-flex items-center gap-1.5">
+            <span className="text-xs font-semibold bg-amber-500/20 border border-amber-500/30 text-amber-600 px-2.5 py-1 rounded-full uppercase tracking-widest hidden sm:inline-flex items-center gap-1.5">
               <Star className="h-3 w-3" /> Priority Partner
             </span>
-            <span className="text-white/30 text-sm hidden md:block">{bizEmail}</span>
-            <button onClick={logout} className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white transition-colors">
+            <span className="text-slate-300 text-sm hidden md:block">{bizEmail}</span>
+            <button onClick={logout} className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-900 transition-colors">
               <LogOut className="h-3.5 w-3.5" /> Sign out
             </button>
           </>
@@ -193,18 +193,18 @@ export default function PriorityPortalPage() {
 
             {/* Welcome */}
             <div className="mb-10">
-              <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-black px-4 py-2 rounded-full mb-4 uppercase tracking-widest">
+              <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-600 text-xs font-black px-4 py-2 rounded-full mb-4 uppercase tracking-widest">
                 <Star className="h-3.5 w-3.5" /> Priority Partner Account
               </div>
-              <p className="text-white/30 text-sm mb-1">Welcome back{companyName ? `, ${companyName}` : ''}</p>
-              <h1 className="text-4xl font-black tracking-tight">Priority access,<br /><span className="text-amber-400">guaranteed response.</span></h1>
-              <p className="text-white/35 mt-3 max-w-xl leading-relaxed">
+              <p className="text-slate-300 text-sm mb-1">Welcome back{companyName ? `, ${companyName}` : ''}</p>
+              <h1 className="text-4xl font-black tracking-tight">Priority access,<br /><span className="text-amber-600">guaranteed response.</span></h1>
+              <p className="text-slate-600 mt-3 max-w-xl leading-relaxed">
                 As a BootHop Priority Partner, your jobs are first in the allocation queue. Expect operator assignment within 2 hours on all bookings.
               </p>
               {discount && (
                 <div className="mt-4 inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-2">
-                  <Star className="h-4 w-4 text-amber-400" />
-                  <span className="text-amber-400 font-bold text-sm">{discount}% partner discount applied to all bookings</span>
+                  <Star className="h-4 w-4 text-amber-600" />
+                  <span className="text-amber-600 font-bold text-sm">{discount}% partner discount applied to all bookings</span>
                 </div>
               )}
             </div>
@@ -219,7 +219,7 @@ export default function PriorityPortalPage() {
               </button>
               <button
                 onClick={() => { setStage('jobs'); loadMyJobs(); }}
-                className="inline-flex items-center gap-2 bg-white/8 hover:bg-white/12 text-white font-semibold text-sm px-6 py-3 rounded-xl border border-white/10 hover:border-white/20 transition-all"
+                className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-100 text-slate-900 font-semibold text-sm px-6 py-3 rounded-xl border border-slate-200 hover:border-slate-200 transition-all"
               >
                 View my jobs <ArrowRight className="h-4 w-4" />
               </button>
@@ -234,36 +234,36 @@ export default function PriorityPortalPage() {
                 { icon: Truck,  label: 'Dedicated support',  sub: 'Direct line to ops team' },
               ].map(({ icon: Icon, label, sub }) => (
                 <div key={label} className="bg-amber-500/5 border border-amber-500/15 rounded-2xl p-4 text-center">
-                  <Icon className="h-5 w-5 text-amber-400 mx-auto mb-2" />
-                  <p className="font-bold text-white text-sm">{label}</p>
-                  <p className="text-white/30 text-xs mt-0.5">{sub}</p>
+                  <Icon className="h-5 w-5 text-amber-600 mx-auto mb-2" />
+                  <p className="font-bold text-slate-900 text-sm">{label}</p>
+                  <p className="text-slate-300 text-xs mt-0.5">{sub}</p>
                 </div>
               ))}
             </div>
 
             {/* Pricing tiers */}
             <div className="bg-amber-500/5 border border-amber-500/15 rounded-2xl p-6">
-              <p className="text-xs font-black text-amber-400/50 uppercase tracking-widest mb-4">Your pricing tiers</p>
+              <p className="text-xs font-black text-amber-600/50 uppercase tracking-widest mb-4">Your pricing tiers</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                 <div>
-                  <p className="font-bold text-amber-400 mb-2">UK → UK</p>
-                  <div className="space-y-1 text-white/40 text-xs">
+                  <p className="font-bold text-amber-600 mb-2">UK → UK</p>
+                  <div className="space-y-1 text-slate-600 text-xs">
                     <p>Express (3–6 hr)  — from £300</p>
                     <p>Priority (1–3 hr) — from £700</p>
                     <p>Critical (immed.) — from £1,200</p>
                   </div>
                 </div>
                 <div>
-                  <p className="font-bold text-amber-400 mb-2">UK ↔ EU</p>
-                  <div className="space-y-1 text-white/40 text-xs">
+                  <p className="font-bold text-amber-600 mb-2">UK ↔ EU</p>
+                  <div className="space-y-1 text-slate-600 text-xs">
                     <p>Next-day  — from £1,000</p>
                     <p>Same-day  — from £1,500</p>
                     <p>Critical  — from £2,500</p>
                   </div>
                 </div>
                 <div>
-                  <p className="font-bold text-amber-400 mb-2">UK → Global</p>
-                  <div className="space-y-1 text-white/40 text-xs">
+                  <p className="font-bold text-amber-600 mb-2">UK → Global</p>
+                  <div className="space-y-1 text-slate-600 text-xs">
                     <p>Standard  — from £2,000</p>
                     <p>Priority  — from £4,000</p>
                     <p>Critical  — from £7,000</p>
@@ -271,7 +271,7 @@ export default function PriorityPortalPage() {
                 </div>
               </div>
               {discount && (
-                <p className="text-xs text-amber-400/60 mt-4 pt-4 border-t border-amber-500/15">
+                <p className="text-xs text-amber-600/60 mt-4 pt-4 border-t border-amber-500/15">
                   Your {discount}% partner discount is applied automatically at checkout.
                 </p>
               )}
@@ -284,7 +284,7 @@ export default function PriorityPortalPage() {
           <motion.div key="jobs" {...FADE} className="max-w-3xl mx-auto px-6 pt-24 pb-12">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <button onClick={() => setStage('hub')} className="flex items-center gap-1.5 text-white/30 hover:text-white text-sm font-semibold transition-colors mb-2">
+                <button onClick={() => setStage('hub')} className="flex items-center gap-1.5 text-slate-300 hover:text-slate-900 text-sm font-semibold transition-colors mb-2">
                   ← Back
                 </button>
                 <h2 className="text-2xl font-black">My priority deliveries</h2>
@@ -298,12 +298,12 @@ export default function PriorityPortalPage() {
             </div>
 
             {jobsLoading ? (
-              <div className="flex justify-center py-16"><Loader2 className="h-7 w-7 text-amber-400 animate-spin" /></div>
+              <div className="flex justify-center py-16"><Loader2 className="h-7 w-7 text-amber-600 animate-spin" /></div>
             ) : myJobs.length === 0 ? (
               <div className="text-center py-16">
-                <Package className="h-10 w-10 text-white/10 mx-auto mb-4" />
-                <p className="text-white/30">No deliveries yet.</p>
-                <button onClick={() => setStage('wizard')} className="mt-4 text-amber-400 hover:text-amber-300 text-sm font-bold transition-colors flex items-center gap-2 mx-auto">
+                <Package className="h-10 w-10 text-slate-200 mx-auto mb-4" />
+                <p className="text-slate-300">No deliveries yet.</p>
+                <button onClick={() => setStage('wizard')} className="mt-4 text-amber-600 hover:text-amber-300 text-sm font-bold transition-colors flex items-center gap-2 mx-auto">
                   Book your first priority delivery <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -313,15 +313,15 @@ export default function PriorityPortalPage() {
                 {myJobs.filter(j => j.status === 'pending_payment').length > 0 && (
                   <div className="bg-yellow-500/8 border border-yellow-500/20 rounded-2xl p-5 mb-2">
                     <p className="text-yellow-400 font-bold text-sm mb-1">Incomplete bookings</p>
-                    <p className="text-white/35 text-xs mb-4">These bookings were not paid. Start a new booking to proceed — your previous reference will not be charged.</p>
+                    <p className="text-slate-600 text-xs mb-4">These bookings were not paid. Start a new booking to proceed — your previous reference will not be charged.</p>
                     <div className="space-y-2">
                       {myJobs.filter(j => j.status === 'pending_payment').map(job => (
-                        <div key={job.id} className="flex items-center justify-between gap-4 bg-white/3 border border-white/8 rounded-xl px-4 py-3">
+                        <div key={job.id} className="flex items-center justify-between gap-4 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
                           <div>
                             <span className="font-mono text-xs text-yellow-400 font-bold">{job.job_ref}</span>
-                            <p className="text-white/40 text-xs mt-0.5">{job.pickup} → {job.dropoff}</p>
+                            <p className="text-slate-600 text-xs mt-0.5">{job.pickup} → {job.dropoff}</p>
                           </div>
-                          <button onClick={() => setStage('wizard')} className="text-xs text-amber-400 hover:text-amber-300 font-bold whitespace-nowrap transition-colors">
+                          <button onClick={() => setStage('wizard')} className="text-xs text-amber-600 hover:text-amber-300 font-bold whitespace-nowrap transition-colors">
                             New booking →
                           </button>
                         </div>
@@ -334,20 +334,20 @@ export default function PriorityPortalPage() {
                   return (
                     <div
                       key={job.id}
-                      className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 transition-all hover:border-amber-500/25 hover:bg-white/5 hover:-translate-y-0.5"
+                      className="group relative overflow-hidden bg-slate-50 border border-slate-200 rounded-2xl p-6 transition-all hover:border-amber-500/25 hover:bg-slate-50 hover:-translate-y-0.5"
                     >
                       <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-24 bg-amber-500/12 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                       <div className="flex items-start justify-between gap-4 flex-wrap">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 flex-wrap mb-2">
-                            <span className="font-mono font-black text-amber-400 text-sm">{job.job_ref}</span>
-                            <span className="text-xs text-amber-400/70 bg-amber-500/8 border border-amber-500/20 px-2 py-0.5 rounded-full font-bold">Priority</span>
-                            <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border ${STATUS_COLORS[job.status] ?? 'text-white/40 bg-white/5 border-white/10'}`}>
+                            <span className="font-mono font-black text-amber-600 text-sm">{job.job_ref}</span>
+                            <span className="text-xs text-amber-600/70 bg-amber-500/8 border border-amber-500/20 px-2 py-0.5 rounded-full font-bold">Priority</span>
+                            <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border ${STATUS_COLORS[job.status] ?? 'text-slate-600 bg-slate-50 border-slate-200'}`}>
                               {STATUS_LABELS[job.status] ?? job.status}
                             </span>
                           </div>
-                          <p className="text-white font-semibold text-sm mb-1">{job.pickup} → {job.dropoff}</p>
-                          <p className="text-white/25 text-xs">
+                          <p className="text-slate-900 font-semibold text-sm mb-1">{job.pickup} → {job.dropoff}</p>
+                          <p className="text-slate-300 text-xs">
                             {new Date(job.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </p>
                           {job.driver_name && (
@@ -358,26 +358,26 @@ export default function PriorityPortalPage() {
                           )}
                           {(job.assigned_at || job.picked_up_at || job.delivered_at) && (
                             <div className="mt-3 space-y-1">
-                              {job.assigned_at  && <p className="text-xs text-white/25">Assigned: {fmt(job.assigned_at)}</p>}
-                              {job.picked_up_at && <p className="text-xs text-white/25">Collected: {fmt(job.picked_up_at)}</p>}
-                              {job.delivered_at && <p className="text-xs text-emerald-400/60">Delivered: {fmt(job.delivered_at)}</p>}
+                              {job.assigned_at  && <p className="text-xs text-slate-300">Assigned: {fmt(job.assigned_at)}</p>}
+                              {job.picked_up_at && <p className="text-xs text-slate-300">Collected: {fmt(job.picked_up_at)}</p>}
+                              {job.delivered_at && <p className="text-xs text-emerald-600/60">Delivered: {fmt(job.delivered_at)}</p>}
                             </div>
                           )}
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
                           {job.estimated_price !== null && (
-                            <span className="text-amber-400 font-black text-lg">£{job.estimated_price.toLocaleString()}</span>
+                            <span className="text-amber-600 font-black text-lg">£{job.estimated_price.toLocaleString()}</span>
                           )}
                           {canAct && (
                             <button onClick={() => openEdit(job)}
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/35 hover:text-amber-400 bg-white/5 border border-white/10 hover:border-amber-500/20 hover:bg-amber-500/8 px-3 py-2 rounded-xl transition-all"
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-amber-600 bg-slate-50 border border-slate-200 hover:border-amber-500/20 hover:bg-amber-500/8 px-3 py-2 rounded-xl transition-all"
                             >
                               <Pencil className="h-3.5 w-3.5" /> Amend
                             </button>
                           )}
                           {canAct && (
                             <button onClick={() => cancelJob(job.id)} disabled={cancellingId === job.id}
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/25 hover:text-red-400 bg-white/5 border border-white/10 hover:border-red-500/20 hover:bg-red-500/8 px-3 py-2 rounded-xl transition-all disabled:opacity-50"
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-red-600 bg-slate-50 border border-slate-200 hover:border-red-500/20 hover:bg-red-500/8 px-3 py-2 rounded-xl transition-all disabled:opacity-50"
                             >
                               {cancellingId === job.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XCircle className="h-3.5 w-3.5" />}
                               Cancel
@@ -398,26 +398,26 @@ export default function PriorityPortalPage() {
           <motion.div key="success" {...FADE} className="min-h-[80vh] flex items-center justify-center px-6">
             <div className="text-center max-w-md">
               <div className="w-20 h-20 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="h-10 w-10 text-amber-400" />
+                <CheckCircle className="h-10 w-10 text-amber-600" />
               </div>
-              <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-black px-4 py-2 rounded-full mb-4 uppercase tracking-widest">
+              <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/25 text-amber-600 text-xs font-black px-4 py-2 rounded-full mb-4 uppercase tracking-widest">
                 <Star className="h-3.5 w-3.5" /> Priority Job Submitted
               </div>
               <h2 className="text-4xl font-black mb-3">{isPaid ? 'Payment received' : 'Booking received'}</h2>
-              <p className="text-white/40 mb-3 leading-relaxed">
+              <p className="text-slate-600 mb-3 leading-relaxed">
                 {isPaid ? 'Your payment has been received. Your priority job is now under review.' : 'Your priority delivery request has been received.'}
               </p>
-              <p className="text-amber-400/80 text-sm mb-8">Operator assignment within 2 hours — flagged as Priority.</p>
+              <p className="text-amber-600/80 text-sm mb-8">Operator assignment within 2 hours — flagged as Priority.</p>
               <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl px-8 py-5 inline-block mb-6">
-                <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-1">Reference</p>
-                <p className="text-amber-400 font-mono font-black text-2xl tracking-widest">{jobRef}</p>
+                <p className="text-slate-300 text-xs font-bold uppercase tracking-widest mb-1">Reference</p>
+                <p className="text-amber-600 font-mono font-black text-2xl tracking-widest">{jobRef}</p>
               </div>
-              <p className="text-white/20 text-sm mb-8">Confirmation sent to <span className="text-white/35">{bizEmail}</span></p>
+              <p className="text-slate-300 text-sm mb-8">Confirmation sent to <span className="text-slate-600">{bizEmail}</span></p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button onClick={() => setStage('hub')} className="text-amber-400 hover:text-amber-300 text-sm font-bold transition-colors">
+                <button onClick={() => setStage('hub')} className="text-amber-600 hover:text-amber-300 text-sm font-bold transition-colors">
                   Back to portal →
                 </button>
-                <button onClick={() => { setStage('jobs'); loadMyJobs(); }} className="text-white/35 hover:text-white text-sm font-semibold transition-colors">
+                <button onClick={() => { setStage('jobs'); loadMyJobs(); }} className="text-slate-600 hover:text-slate-900 text-sm font-semibold transition-colors">
                   View all jobs →
                 </button>
               </div>
@@ -428,43 +428,43 @@ export default function PriorityPortalPage() {
       </AnimatePresence>
 
       {/* WhatsApp FAB */}
-      <a href="/api/whatsapp" className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-2xl shadow-[#25D366]/40 hover:scale-110 active:scale-95 transition-all" aria-label="Chat on WhatsApp">
+      <a href="/api/whatsapp" className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] text-slate-900 rounded-full shadow-2xl shadow-[#25D366]/40 hover:scale-110 active:scale-95 transition-all" aria-label="Chat on WhatsApp">
         <MessageCircle className="h-7 w-7" />
       </a>
 
       {/* ── Edit modal ── */}
       {editingJob && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative w-full max-w-lg bg-[#0d1117] border border-amber-500/20 rounded-2xl p-6 shadow-2xl">
-            <button onClick={() => setEditingJob(null)} className="absolute top-4 right-4 text-white/30 hover:text-white transition-colors"><X className="h-5 w-5" /></button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative w-full max-w-lg bg-white border border-amber-500/20 rounded-2xl p-6 shadow-2xl">
+            <button onClick={() => setEditingJob(null)} className="absolute top-4 right-4 text-slate-300 hover:text-slate-900 transition-colors"><X className="h-5 w-5" /></button>
             <div className="flex items-center gap-3 mb-1">
               <h3 className="text-lg font-black">Amend priority job</h3>
-              <span className="text-xs bg-amber-500/10 border border-amber-500/25 text-amber-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Priority</span>
+              <span className="text-xs bg-amber-500/10 border border-amber-500/25 text-amber-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Priority</span>
             </div>
-            <p className="text-white/25 text-xs mb-6 font-mono">{editingJob.job_ref}</p>
+            <p className="text-slate-300 text-xs mb-6 font-mono">{editingJob.job_ref}</p>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-white/35 uppercase tracking-wider mb-1.5">Pickup</label>
-                <input type="text" value={editForm.pickup} onChange={e => setEditForm(f => ({ ...f, pickup: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/40 transition-colors" />
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Pickup</label>
+                <input type="text" value={editForm.pickup} onChange={e => setEditForm(f => ({ ...f, pickup: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-500/40 transition-colors" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-white/35 uppercase tracking-wider mb-1.5">Drop-off</label>
-                <input type="text" value={editForm.dropoff} onChange={e => setEditForm(f => ({ ...f, dropoff: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/40 transition-colors" />
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Drop-off</label>
+                <input type="text" value={editForm.dropoff} onChange={e => setEditForm(f => ({ ...f, dropoff: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-500/40 transition-colors" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-white/35 uppercase tracking-wider mb-1.5">Collection date</label>
-                  <input type="date" value={editForm.delivery_date} onChange={e => setEditForm(f => ({ ...f, delivery_date: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/40 transition-colors" />
+                  <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Collection date</label>
+                  <input type="date" value={editForm.delivery_date} onChange={e => setEditForm(f => ({ ...f, delivery_date: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-500/40 transition-colors" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-white/35 uppercase tracking-wider mb-1.5">Must arrive by</label>
-                  <input type="date" value={editForm.expected_delivery_date} onChange={e => setEditForm(f => ({ ...f, expected_delivery_date: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/40 transition-colors" />
+                  <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Must arrive by</label>
+                  <input type="date" value={editForm.expected_delivery_date} onChange={e => setEditForm(f => ({ ...f, expected_delivery_date: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-500/40 transition-colors" />
                 </div>
               </div>
             </div>
-            {editError && <p className="mt-4 text-xs text-red-400 flex items-center gap-2"><AlertCircle className="h-4 w-4 flex-shrink-0" />{editError}</p>}
+            {editError && <p className="mt-4 text-xs text-red-600 flex items-center gap-2"><AlertCircle className="h-4 w-4 flex-shrink-0" />{editError}</p>}
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setEditingJob(null)} className="flex-1 text-sm font-semibold text-white/30 hover:text-white bg-white/5 border border-white/10 px-4 py-3 rounded-xl transition-all">Cancel</button>
+              <button onClick={() => setEditingJob(null)} className="flex-1 text-sm font-semibold text-slate-300 hover:text-slate-900 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl transition-all">Cancel</button>
               <button onClick={saveEdit} disabled={editLoading} className="flex-1 text-sm font-black text-black bg-amber-400 hover:bg-amber-300 px-4 py-3 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                 {editLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save changes'}
               </button>

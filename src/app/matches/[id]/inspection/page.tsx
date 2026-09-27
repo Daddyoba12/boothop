@@ -138,12 +138,12 @@ function CheckRow({
 }) {
   return (
     <div className={`rounded-2xl border p-4 transition-all ${
-      value === true  ? 'border-green-500/40 bg-green-500/10' :
-      value === false ? 'border-red-500/40 bg-red-500/10' :
-      'border-white/10 bg-white/5'
+      value === true  ? 'border-green-300 bg-green-50' :
+      value === false ? 'border-red-300 bg-red-50' :
+      'border-slate-200 bg-white'
     }`}>
-      <p className="font-semibold text-white mb-1">{item.label}</p>
-      <p className="text-xs text-white/50 mb-3">{item.detail}</p>
+      <p className="font-semibold text-slate-900 mb-1">{item.label}</p>
+      <p className="text-xs text-slate-600 mb-3">{item.detail}</p>
       <div className="flex gap-3">
         <button
           type="button"
@@ -151,7 +151,7 @@ function CheckRow({
           className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
             value === true
               ? 'bg-green-600 text-white'
-              : 'bg-white/10 text-white/50 hover:bg-green-500/20 hover:text-green-400'
+              : 'bg-slate-100 text-slate-600 hover:bg-green-100 hover:text-green-700'
           }`}
         >
           <CheckCircle2 className="h-4 w-4" /> Yes
@@ -162,7 +162,7 @@ function CheckRow({
           className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
             value === false
               ? 'bg-red-600 text-white'
-              : 'bg-white/10 text-white/50 hover:bg-red-500/20 hover:text-red-400'
+              : 'bg-slate-100 text-slate-600 hover:bg-red-100 hover:text-red-700'
           }`}
         >
           <XCircle className="h-4 w-4" /> No
@@ -240,16 +240,16 @@ export default function InspectionPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#07111f] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 text-blue-400 animate-spin" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
       </div>
     );
   }
 
   if (error && !match) {
     return (
-      <div className="min-h-screen bg-[#07111f] flex items-center justify-center">
-        <p className="text-red-400">{error}</p>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <p className="text-red-600">{error}</p>
       </div>
     );
   }
@@ -263,12 +263,12 @@ export default function InspectionPage() {
   // Already completed
   if (done === 'passed') {
     return (
-      <div className="min-h-screen bg-[#07111f] flex flex-col items-center justify-center px-4 text-center">
-        <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mb-4">
-          <CheckCircle2 className="h-8 w-8 text-green-400" />
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4 text-center">
+        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
+          <CheckCircle2 className="h-8 w-8 text-green-600" />
         </div>
-        <h1 className="text-2xl font-bold text-white mb-2">Inspection passed</h1>
-        <p className="text-white/50 mb-6">Contact details for {fromCity} → {toCity} have been released. Check your email.</p>
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Inspection passed</h1>
+        <p className="text-slate-600 mb-6">Contact details for {fromCity} → {toCity} have been released. Check your email.</p>
         <Link
           href={`/matches/${matchId}`}
           className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-2xl transition"
@@ -282,25 +282,25 @@ export default function InspectionPage() {
   if (done === 'failed') {
     const escalated = doneStatus === 'external_verification_required';
     return (
-      <div className="min-h-screen bg-[#07111f] flex flex-col items-center justify-center px-4 text-center">
-        <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-4">
-          <AlertTriangle className="h-8 w-8 text-red-400" />
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4 text-center">
+        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+          <AlertTriangle className="h-8 w-8 text-red-600" />
         </div>
-        <h1 className="text-2xl font-bold text-white mb-2">Inspection flagged</h1>
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Inspection flagged</h1>
         {escalated ? (
           <>
-            <p className="text-white/50 mb-2">This shipment has been escalated to BootHop&apos;s verification team. You will be contacted directly.</p>
-            <p className="text-white/30 text-sm mb-6">Do not accept the item.</p>
+            <p className="text-slate-600 mb-2">This shipment has been escalated to BootHop&apos;s verification team. You will be contacted directly.</p>
+            <p className="text-slate-600 text-sm mb-6">Do not accept the item.</p>
           </>
         ) : (
           <>
-            <p className="text-white/50 mb-2">You have flagged issues with this shipment. Our team has been alerted and will investigate.</p>
-            <p className="text-white/30 text-sm mb-6">Please do not accept the item until BootHop confirms it is safe to proceed.</p>
+            <p className="text-slate-600 mb-2">You have flagged issues with this shipment. Our team has been alerted and will investigate.</p>
+            <p className="text-slate-600 text-sm mb-6">Please do not accept the item until BootHop confirms it is safe to proceed.</p>
           </>
         )}
         <Link
           href={`/matches/${matchId}`}
-          className="bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-8 rounded-2xl transition"
+          className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-8 rounded-2xl transition"
         >
           Back to match
         </Link>
@@ -310,36 +310,36 @@ export default function InspectionPage() {
 
   if (match.status !== 'inspection_pending') {
     return (
-      <div className="min-h-screen bg-[#07111f] flex flex-col items-center justify-center px-4 text-center">
-        <p className="text-white/50">This shipment is not currently awaiting inspection.</p>
-        <Link href={`/matches/${matchId}`} className="text-blue-400 underline mt-4 text-sm">Back to match</Link>
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4 text-center">
+        <p className="text-slate-600">This shipment is not currently awaiting inspection.</p>
+        <Link href={`/matches/${matchId}`} className="text-blue-600 underline mt-4 text-sm">Back to match</Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#07111f] text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Header */}
-      <div className="border-b border-white/10 px-5 py-4 flex items-center gap-3">
-        <Link href={`/matches/${matchId}`} className="text-white/40 hover:text-white">
+      <div className="border-b border-slate-200 px-5 py-4 flex items-center gap-3">
+        <Link href={`/matches/${matchId}`} className="text-slate-600 hover:text-slate-900">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
-          <p className="font-bold text-white">{fromCity} → {toCity}</p>
-          <p className="text-xs text-white/40">Handover inspection</p>
+          <p className="font-bold text-slate-900">{fromCity} → {toCity}</p>
+          <p className="text-xs text-slate-600">Handover inspection</p>
         </div>
       </div>
 
       <div className="max-w-xl mx-auto px-5 py-7 space-y-6">
 
         {/* Instructions */}
-        <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 p-5">
+        <div className="rounded-2xl bg-amber-50 border border-amber-200 p-5">
           <div className="flex items-center gap-2 mb-2">
-            <Shield className="h-4 w-4 text-amber-400" />
-            <span className="text-sm font-bold text-amber-400 uppercase tracking-wider">Action required</span>
+            <Shield className="h-4 w-4 text-amber-600" />
+            <span className="text-sm font-bold text-amber-600 uppercase tracking-wider">Action required</span>
           </div>
-          <p className="text-white font-semibold mb-1">Inspect the item before accepting</p>
-          <p className="text-white/50 text-sm">
+          <p className="text-slate-900 font-semibold mb-1">Inspect the item before accepting</p>
+          <p className="text-slate-600 text-sm">
             Before contact details are released, please physically inspect the item from the sender.
             Answer each question honestly. If anything looks wrong, select No and add a note.
           </p>
@@ -347,51 +347,51 @@ export default function InspectionPage() {
 
         {/* Declaration summary */}
         {declaration && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
-            <div className="px-5 py-4 border-b border-white/10 flex items-center gap-2">
-              <Package className="h-4 w-4 text-white/40" />
-              <span className="font-semibold text-white/80 text-sm">Item to inspect</span>
+          <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-200 flex items-center gap-2">
+              <Package className="h-4 w-4 text-slate-600" />
+              <span className="font-semibold text-slate-700 text-sm">Item to inspect</span>
             </div>
             <div className="px-5 py-4 grid grid-cols-2 gap-3 text-sm">
               <div>
-                <p className="text-white/40 text-xs mb-0.5">Name</p>
-                <p className="text-white font-medium">{declaration.item_name ?? '—'}</p>
+                <p className="text-slate-600 text-xs mb-0.5">Name</p>
+                <p className="text-slate-900 font-medium">{declaration.item_name ?? '—'}</p>
               </div>
               <div>
-                <p className="text-white/40 text-xs mb-0.5">Category</p>
-                <p className="text-white font-medium">{declaration.item_category ?? '—'}</p>
+                <p className="text-slate-600 text-xs mb-0.5">Category</p>
+                <p className="text-slate-900 font-medium">{declaration.item_category ?? '—'}</p>
               </div>
               <div>
-                <p className="text-white/40 text-xs mb-0.5">Declared value</p>
-                <p className="text-white font-medium">
+                <p className="text-slate-600 text-xs mb-0.5">Declared value</p>
+                <p className="text-slate-900 font-medium">
                   {declaration.declared_value != null
                     ? `${declaration.declared_currency ?? 'GBP'} ${declaration.declared_value}`
                     : '—'}
                 </p>
               </div>
               <div>
-                <p className="text-white/40 text-xs mb-0.5">Weight</p>
-                <p className="text-white font-medium">
+                <p className="text-slate-600 text-xs mb-0.5">Weight</p>
+                <p className="text-slate-900 font-medium">
                   {declaration.declared_weight_kg != null ? `${declaration.declared_weight_kg} kg` : '—'}
                 </p>
               </div>
               {declaration.brand && (
                 <div>
-                  <p className="text-white/40 text-xs mb-0.5">Brand</p>
-                  <p className="text-white font-medium">{declaration.brand}</p>
+                  <p className="text-slate-600 text-xs mb-0.5">Brand</p>
+                  <p className="text-slate-900 font-medium">{declaration.brand}</p>
                 </div>
               )}
               {declaration.quantity && declaration.quantity > 1 && (
                 <div>
-                  <p className="text-white/40 text-xs mb-0.5">Quantity</p>
-                  <p className="text-white font-medium">{declaration.quantity}</p>
+                  <p className="text-slate-600 text-xs mb-0.5">Quantity</p>
+                  <p className="text-slate-900 font-medium">{declaration.quantity}</p>
                 </div>
               )}
             </div>
             {declaration.item_description && (
               <div className="px-5 pb-4">
-                <p className="text-white/40 text-xs mb-1">Description</p>
-                <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">{declaration.item_description}</p>
+                <p className="text-slate-600 text-xs mb-1">Description</p>
+                <p className="text-slate-700 text-sm leading-relaxed whitespace-pre-wrap">{declaration.item_description}</p>
               </div>
             )}
           </div>
@@ -399,24 +399,24 @@ export default function InspectionPage() {
 
         {/* Evidence thumbnails */}
         {evidence.length > 0 && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
-            <div className="px-5 py-3 border-b border-white/10 flex items-center gap-2">
-              <ImageIcon className="h-4 w-4 text-white/40" />
-              <span className="text-sm font-semibold text-white/80">Evidence ({evidence.length})</span>
+          <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+            <div className="px-5 py-3 border-b border-slate-200 flex items-center gap-2">
+              <ImageIcon className="h-4 w-4 text-slate-600" />
+              <span className="text-sm font-semibold text-slate-700">Evidence ({evidence.length})</span>
             </div>
             <div className="p-4 grid grid-cols-2 gap-3">
               {evidence.map((e) => {
                 const isImage = e.mime_type?.startsWith('image/');
                 return (
-                  <div key={e.id} className="rounded-xl border border-white/10 overflow-hidden bg-white/5">
+                  <div key={e.id} className="rounded-xl border border-slate-200 overflow-hidden bg-white">
                     {isImage && e.file_url && (
                       <img src={e.file_url} alt={e.evidence_type} className="w-full h-32 object-cover" />
                     )}
                     <div className="px-3 py-2 flex items-center justify-between gap-2">
-                      <p className="text-xs text-white/60 capitalize">{e.evidence_type.replace(/_/g, ' ')}</p>
+                      <p className="text-xs text-slate-600 capitalize">{e.evidence_type.replace(/_/g, ' ')}</p>
                       {e.file_url && (
                         <a href={e.file_url} target="_blank" rel="noopener noreferrer"
-                           className="text-blue-400 hover:text-blue-300">
+                           className="text-blue-600 hover:text-blue-700">
                           <ExternalLink className="h-3.5 w-3.5" />
                         </a>
                       )}
@@ -430,7 +430,7 @@ export default function InspectionPage() {
 
         {/* Checklist */}
         <div className="space-y-3">
-          <p className="text-xs font-semibold text-white/40 uppercase tracking-wider">Inspection checklist</p>
+          <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Inspection checklist</p>
           {CHECKS.map((item) => (
             <CheckRow
               key={item.key}
@@ -446,7 +446,7 @@ export default function InspectionPage() {
           <>
             {/* Failure reason picker — required when any check fails */}
             <div>
-              <label className="block text-sm font-semibold text-red-400 mb-2">
+              <label className="block text-sm font-semibold text-red-600 mb-2">
                 What best describes the issue? (required)
               </label>
               <div className="space-y-2">
@@ -458,26 +458,26 @@ export default function InspectionPage() {
                     className={`w-full text-left rounded-xl border p-4 transition-all ${
                       failureReason === reason.value
                         ? reason.escalates
-                          ? 'border-amber-500/60 bg-amber-500/10'
-                          : 'border-orange-500/60 bg-orange-500/10'
-                        : 'border-white/10 bg-white/5 hover:border-white/20'
+                          ? 'border-amber-300 bg-amber-50'
+                          : 'border-orange-300 bg-orange-50'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
                     }`}
                   >
                     <p className={`font-semibold text-sm ${
                       failureReason === reason.value
-                        ? reason.escalates ? 'text-amber-300' : 'text-orange-300'
-                        : 'text-white'
+                        ? reason.escalates ? 'text-amber-700' : 'text-orange-700'
+                        : 'text-slate-900'
                     }`}>
                       {reason.label}
                     </p>
-                    <p className="text-xs text-white/50 mt-1">{reason.detail}</p>
+                    <p className="text-xs text-slate-600 mt-1">{reason.detail}</p>
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-red-400 mb-2">
+              <label className="block text-sm font-semibold text-red-600 mb-2">
                 What did you find? (required when a check fails)
               </label>
               <textarea
@@ -485,7 +485,7 @@ export default function InspectionPage() {
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Describe what you found. Be specific — our team will investigate."
                 rows={3}
-                className="w-full bg-white/5 border border-red-500/40 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                className="w-full bg-white border border-red-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
               />
             </div>
           </>
@@ -494,7 +494,7 @@ export default function InspectionPage() {
         {/* Optional note when all pass */}
         {allAnswered && !anyFailed && (
           <div>
-            <label className="block text-xs font-semibold text-white/40 mb-2 uppercase tracking-wider">
+            <label className="block text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wider">
               Optional note
             </label>
             <textarea
@@ -502,12 +502,12 @@ export default function InspectionPage() {
               onChange={(e) => setNote(e.target.value)}
               placeholder="Any additional observations (optional)…"
               rows={2}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
             />
           </div>
         )}
 
-        {error && <p className="text-red-400 text-sm">{error}</p>}
+        {error && <p className="text-red-600 text-sm">{error}</p>}
 
         {/* Submit */}
         <button
@@ -516,7 +516,7 @@ export default function InspectionPage() {
           onClick={handleSubmit}
           className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-base transition-all ${
             !canSubmit
-              ? 'bg-white/10 text-white/30 cursor-not-allowed'
+              ? 'bg-slate-100 text-slate-600 cursor-not-allowed'
               : anyFailed
               ? 'bg-red-600 hover:bg-red-500 text-white'
               : 'bg-green-600 hover:bg-green-500 text-white'
@@ -532,7 +532,7 @@ export default function InspectionPage() {
         </button>
 
         {!allAnswered && (
-          <p className="text-center text-xs text-white/30">Answer all 5 checks above to submit</p>
+          <p className="text-center text-xs text-slate-600">Answer all 5 checks above to submit</p>
         )}
 
         <div className="pb-8" />

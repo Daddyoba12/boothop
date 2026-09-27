@@ -85,24 +85,24 @@ export default function BrowseRequestsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <nav className="bg-white border-b sticky top-0 z-50">
+      <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center space-x-2">
               <Package className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">BootHop</span>
+              <span className="text-2xl font-bold text-slate-900">BootHop</span>
             </Link>
 
             <div className="flex items-center space-x-4">
-              <Link href="/about" className="text-gray-600 hover:text-gray-900">
+              <Link href="/about" className="text-slate-600 hover:text-slate-900">
                 About Us
               </Link>
-              <Link href="/journeys" className="text-gray-600 hover:text-gray-900">
+              <Link href="/journeys" className="text-slate-600 hover:text-slate-900">
                 Browse Journeys
               </Link>
-              <Link href="/login" className="text-gray-600 hover:text-gray-900">
+              <Link href="/login" className="text-slate-600 hover:text-slate-900">
                 Login
               </Link>
             </div>
@@ -113,22 +113,22 @@ export default function BrowseRequestsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Browse Delivery Requests</h1>
-          <p className="text-gray-600">Find items to deliver along your route and earn money</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Browse Delivery Requests</h1>
+          <p className="text-slate-600">Find items to deliver along your route and earn money</p>
         </div>
 
         {/* Search & Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
           <div className="grid md:grid-cols-4 gap-4">
             <div className="md:col-span-4">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
                 <input
                   type="text"
                   placeholder="Search by city or item name..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-12 pr-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -139,7 +139,7 @@ export default function BrowseRequestsPage() {
                 placeholder="Pickup city"
                 value={filters.pickupCity}
                 onChange={(e) => setFilters({ ...filters, pickupCity: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -149,7 +149,7 @@ export default function BrowseRequestsPage() {
                 placeholder="Delivery city"
                 value={filters.deliveryCity}
                 onChange={(e) => setFilters({ ...filters, deliveryCity: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -157,7 +157,7 @@ export default function BrowseRequestsPage() {
               <select
                 value={filters.urgency}
                 onChange={(e) => setFilters({ ...filters, urgency: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All urgency</option>
                 <option value="normal">Normal</option>
@@ -168,7 +168,7 @@ export default function BrowseRequestsPage() {
             <div>
               <button
                 onClick={() => setFilters({ pickupCity: '', deliveryCity: '', urgency: 'all' })}
-                className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition text-gray-700 font-medium"
+                className="w-full px-4 py-3 bg-slate-100 hover:bg-slate-100 rounded-lg transition text-slate-700 font-medium"
               >
                 Clear Filters
               </button>
@@ -180,17 +180,17 @@ export default function BrowseRequestsPage() {
         {loading ? (
           <div className="text-center py-12">
             <Package className="h-16 w-16 text-blue-600 animate-bounce mx-auto mb-4" />
-            <p className="text-gray-600">Loading requests...</p>
+            <p className="text-slate-600">Loading requests...</p>
           </div>
         ) : filteredRequests.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+          <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
             <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-600 mb-2">No requests found</p>
-            <p className="text-sm text-gray-500">Try adjusting your filters or check back later</p>
+            <p className="text-slate-600 mb-2">No requests found</p>
+            <p className="text-sm text-slate-600">Try adjusting your filters or check back later</p>
           </div>
         ) : (
           <div>
-            <div className="mb-4 text-sm text-gray-600">
+            <div className="mb-4 text-sm text-slate-600">
               Found {filteredRequests.length} {filteredRequests.length === 1 ? 'request' : 'requests'}
             </div>
 
@@ -198,7 +198,7 @@ export default function BrowseRequestsPage() {
               {filteredRequests.map((request) => (
                 <div
                   key={request.id}
-                  className="bg-white rounded-xl border border-gray-200 p-6 hover:border-blue-300 hover:shadow-md transition cursor-pointer"
+                  className="bg-white rounded-xl border border-slate-200 p-6 hover:border-blue-300 hover:shadow-md transition cursor-pointer"
                   onClick={() => router.push(`/requests/${request.id}`)}
                 >
                   {/* Header */}
@@ -209,14 +209,14 @@ export default function BrowseRequestsPage() {
                           <Package className="h-6 w-6 text-green-600" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-lg font-bold text-gray-900 mb-1">
+                          <h3 className="text-lg font-bold text-slate-900 mb-1">
                             {request.item_name}
                           </h3>
                           <div className="flex items-center gap-2 mb-2">
                             <span className={`px-2 py-1 text-xs font-semibold rounded ${
                               request.urgency === 'urgent'
                                 ? 'bg-red-100 text-red-700'
-                                : 'bg-gray-100 text-gray-700'
+                                : 'bg-slate-100 text-slate-700'
                             }`}>
                               {request.urgency}
                             </span>
@@ -234,7 +234,7 @@ export default function BrowseRequestsPage() {
                       <div className="text-2xl font-bold text-green-600">
                         £{Number(request.offered_price).toFixed(2)}
                       </div>
-                      <div className="text-xs text-gray-500">Offered</div>
+                      <div className="text-xs text-slate-600">Offered</div>
                       <div className="text-xs text-green-600 font-semibold mt-1">
                         You get: £{(Number(request.offered_price) * 0.95).toFixed(2)}
                       </div>
@@ -242,24 +242,24 @@ export default function BrowseRequestsPage() {
                   </div>
 
                   {/* Route */}
-                  <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                  <div className="bg-slate-50 rounded-lg p-3 mb-4">
                     <div className="flex items-center gap-2 text-sm">
-                      <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                      <MapPin className="h-4 w-4 text-slate-300 flex-shrink-0" />
                       <div className="flex-1">
-                        <span className="font-semibold text-gray-900">{request.pickup_city}</span>
-                        <span className="text-gray-500">, {request.pickup_country}</span>
+                        <span className="font-semibold text-slate-900">{request.pickup_city}</span>
+                        <span className="text-slate-600">, {request.pickup_country}</span>
                       </div>
-                      <span className="text-gray-400">→</span>
+                      <span className="text-slate-300">→</span>
                       <div className="flex-1 text-right">
-                        <span className="font-semibold text-gray-900">{request.delivery_city}</span>
-                        <span className="text-gray-500">, {request.delivery_country}</span>
+                        <span className="font-semibold text-slate-900">{request.delivery_city}</span>
+                        <span className="text-slate-600">, {request.delivery_country}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Item Details */}
                   <div className="space-y-2 mb-4">
-                    <p className="text-sm text-gray-600 line-clamp-2">
+                    <p className="text-sm text-slate-600 line-clamp-2">
                       {request.item_description}
                     </p>
                     
@@ -274,14 +274,14 @@ export default function BrowseRequestsPage() {
                           {request.item_dimensions}
                         </span>
                       )}
-                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded capitalize">
+                      <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded capitalize">
                         {request.item_category?.replace('_', ' ')}
                       </span>
                     </div>
                   </div>
 
                   {/* Dates */}
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                  <div className="flex items-center gap-4 text-sm text-slate-600 mb-4">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
                       <span>Pickup: {new Date(request.preferred_pickup_date).toLocaleDateString()}</span>
@@ -291,14 +291,14 @@ export default function BrowseRequestsPage() {
                   </div>
 
                   {/* Hooper Info */}
-                  <div className="pt-4 border-t border-gray-100">
+                  <div className="pt-4 border-t border-slate-100">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
                         {request.profiles.full_name.charAt(0)}
                       </div>
                       <div className="flex-1">
-                        <div className="font-semibold text-sm text-gray-900">{request.profiles.full_name}</div>
-                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <div className="font-semibold text-sm text-slate-900">{request.profiles.full_name}</div>
+                        <div className="flex items-center gap-2 text-xs text-slate-600">
                           <div className="flex items-center gap-1">
                             <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
                             <span>{request.profiles.rating.toFixed(1)}</span>

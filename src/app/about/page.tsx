@@ -48,7 +48,7 @@ export default function AboutPage() {
   useScrollReveal();
 
   return (
-    <div className="min-h-screen bg-[#07111f] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
       <NavBar />
 
       {/* ── CINEMATIC HERO ── */}
@@ -63,9 +63,9 @@ export default function AboutPage() {
           <source src="/videos/aboutuspart1.mp4" type="video/mp4" />
         </video>
 
-        {/* Layered overlays — dark bottom for text, lighter at top so her face shows */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#07111f] via-[#07111f]/40 to-[#07111f]/10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#07111f]/60 via-transparent to-transparent" />
+        {/* Soft white fade at the bottom for text legibility — video stays visible above it */}
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-white via-white/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-white/70 via-transparent to-transparent" />
 
         {/* Soft blue ambient */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_80%,rgba(59,130,246,0.12),transparent_55%)]" />
@@ -74,12 +74,12 @@ export default function AboutPage() {
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-8 pb-20 pt-32">
           <div className="max-w-2xl">
 
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 backdrop-blur-sm px-4 py-2 text-xs font-semibold text-white/60 uppercase tracking-widest mb-7">
+            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 backdrop-blur-sm px-4 py-2 text-xs font-semibold text-slate-600 uppercase tracking-widest mb-7">
               <Heart className="h-3 w-3 text-blue-400" />
               About BootHop
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-[1.05] tracking-tight mb-6">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 leading-[1.05] tracking-tight mb-6">
               Keeping families<br />
               connected,{' '}
               <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
@@ -87,7 +87,7 @@ export default function AboutPage() {
               </span>
             </h1>
 
-            <p className="text-white/60 text-lg leading-relaxed max-w-xl mb-10">
+            <p className="text-slate-600 text-lg leading-relaxed max-w-xl mb-10">
               We started BootHop because sending things home shouldn&apos;t cost a fortune or take weeks.
               There are thousands of people making the same journey — we just connect them.
             </p>
@@ -98,7 +98,7 @@ export default function AboutPage() {
                 Start sending <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/how-it-works"
-                className="inline-flex items-center gap-2 rounded-full border border-white/20 text-white/80 font-medium px-7 py-3.5 text-sm hover:bg-white/8 hover:border-white/35 transition-all">
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 text-slate-700 font-medium px-7 py-3.5 text-sm hover:bg-slate-50 hover:border-slate-300 transition-all">
                 How it works
               </Link>
             </div>
@@ -106,17 +106,17 @@ export default function AboutPage() {
         </div>
 
         {/* Smooth fade into next section */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-[#07111f]" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-white" />
       </section>
 
       {/* ── STATS BAR ── */}
-      <section className="bg-[#07111f] border-y border-white/[0.06]">
+      <section className="bg-white border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-6 md:px-8 py-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-0 md:divide-x md:divide-white/[0.07]">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-0 md:divide-x md:divide-slate-200">
             {STATS.map((s) => (
               <div key={s.label} className="text-center md:px-8">
-                <p className="text-3xl md:text-4xl font-extrabold text-white mb-1 tracking-tight">{s.value}</p>
-                <p className="text-xs text-white/40 font-medium uppercase tracking-widest">{s.label}</p>
+                <p className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-1 tracking-tight">{s.value}</p>
+                <p className="text-xs text-slate-600 font-medium uppercase tracking-widest">{s.label}</p>
               </div>
             ))}
           </div>
@@ -131,11 +131,11 @@ export default function AboutPage() {
             {/* Left — the story */}
             <div className="reveal">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-400 mb-4">Our Story</p>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight mb-8">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-8">
                 Born from a<br />real problem.
               </h2>
 
-              <div className="space-y-5 text-[15px] text-white/55 leading-[1.85]">
+              <div className="space-y-5 text-[15px] text-slate-600 leading-[1.85]">
                 <p>
                   Sending a parcel from London to Lagos could cost £80–£200 with a courier.
                   It could take weeks. And there was no guarantee it would arrive safely.
@@ -144,7 +144,7 @@ export default function AboutPage() {
                   Meanwhile, thousands of people were flying that exact route every week —
                   with empty luggage space and no way to connect with people who needed things sent.
                 </p>
-                <p className="text-white/80 font-semibold">
+                <p className="text-slate-700 font-semibold">
                   BootHop closes that gap. We match senders with verified travellers already
                   making the journey, so packages move faster, cheaper, and with someone who cares.
                 </p>
@@ -154,7 +154,7 @@ export default function AboutPage() {
               <div className="mt-9 flex flex-wrap gap-2">
                 {['London → Lagos', 'Manchester → Lagos', 'Birmingham → Accra', 'UK → Nigeria'].map((r) => (
                   <span key={r}
-                    className="rounded-full border border-blue-500/20 bg-blue-500/8 px-4 py-1.5 text-xs font-semibold text-blue-300">
+                    className="rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-xs font-semibold text-blue-700">
                     {r}
                   </span>
                 ))}
@@ -168,9 +168,9 @@ export default function AboutPage() {
                   { icon: '💰', t: 'Secure payment escrow'   },
                   { icon: '🌍', t: '200+ city corridors'     },
                 ].map(({ icon, t }) => (
-                  <div key={t} className="flex items-center gap-2.5 rounded-xl border border-white/8 bg-white/[0.03] px-4 py-3">
+                  <div key={t} className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                     <span className="text-base">{icon}</span>
-                    <span className="text-xs text-white/50 font-medium">{t}</span>
+                    <span className="text-xs text-slate-600 font-medium">{t}</span>
                   </div>
                 ))}
               </div>
@@ -178,28 +178,28 @@ export default function AboutPage() {
 
             {/* Right — what we carry */}
             <div className="reveal d2">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/35 mb-6">What people send with BootHop</p>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-600 mb-6">What people send with BootHop</p>
               <div className="space-y-3">
                 {CARRY_ITEMS.map((item, i) => (
                   <div key={item.title}
                     className={`group flex items-start gap-5 p-5 rounded-2xl border transition-all duration-300
                       ${item.muted
-                        ? 'border-white/5 bg-white/[0.02] opacity-50'
-                        : 'border-white/8 bg-white/[0.03] hover:border-blue-500/30 hover:bg-blue-500/5 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-500/10 cursor-pointer'
+                        ? 'border-slate-200 bg-slate-50 opacity-50'
+                        : 'border-slate-200 bg-slate-50 hover:border-blue-500/30 hover:bg-blue-500/5 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-500/10 cursor-pointer'
                       }`}>
                     <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110
                       ${item.muted
-                        ? 'bg-white/5 text-white/20'
+                        ? 'bg-slate-50 text-slate-600'
                         : 'bg-gradient-to-br from-blue-500 to-cyan-400 text-white shadow-lg shadow-blue-500/25'
                       }`}>
                       {item.icon}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm font-bold mb-1 transition-colors duration-300
-                        ${item.muted ? 'text-white/25' : 'text-white group-hover:text-cyan-300'}`}>
+                        ${item.muted ? 'text-slate-600' : 'text-slate-900 group-hover:text-blue-600'}`}>
                         {item.title}
                       </p>
-                      <p className={`text-xs leading-relaxed ${item.muted ? 'text-white/20' : 'text-white/45'}`}>
+                      <p className={`text-xs leading-relaxed ${item.muted ? 'text-slate-600' : 'text-slate-600'}`}>
                         {item.desc}
                       </p>
                     </div>
@@ -212,12 +212,12 @@ export default function AboutPage() {
       </section>
 
       {/* ── VALUES ── */}
-      <section className="py-24 md:py-32 border-t border-white/[0.05]">
+      <section className="py-24 md:py-32 border-t border-slate-200">
         <div className="mx-auto max-w-7xl px-6 md:px-8">
           <div className="mb-14 text-center">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-400 mb-4">What We Stand For</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Built on trust.</h2>
-            <p className="mt-4 text-white/45 text-base max-w-lg mx-auto">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Built on trust.</h2>
+            <p className="mt-4 text-slate-600 text-base max-w-lg mx-auto">
               Every decision we make comes back to one question: would we trust this with our own family&apos;s package?
             </p>
           </div>
@@ -228,8 +228,8 @@ export default function AboutPage() {
                 <div className={`mb-6 flex h-12 w-12 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 ${v.iconBg}`}>
                   {v.icon}
                 </div>
-                <h3 className="mb-3 text-base font-bold text-white">{v.title}</h3>
-                <p className="text-sm leading-relaxed text-white/50">{v.body}</p>
+                <h3 className="mb-3 text-base font-bold text-slate-900">{v.title}</h3>
+                <p className="text-sm leading-relaxed text-slate-600">{v.body}</p>
               </div>
             ))}
           </div>
@@ -245,26 +245,29 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-black/58" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.15),transparent_65%)]" />
 
+        {/* Soft fade from the light section above into this closing panel */}
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/90 to-transparent" />
+
         <div className="relative z-10 max-w-2xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-300/80 mb-5">Someone is flying that route today</p>
           <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-5 tracking-tight leading-tight">
             Ready to send<br />
-            <span className="text-white/50">something home?</span>
+            <span className="text-white/60">something home?</span>
           </h2>
-          <p className="text-white/50 text-base mb-10 max-w-sm mx-auto leading-relaxed">
+          <p className="text-white/60 text-base mb-10 max-w-sm mx-auto leading-relaxed">
             Register your trip or delivery in under 2 minutes. Free to join — no subscription.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/start"
-              className="inline-flex items-center gap-2 bg-white text-black px-8 py-4 rounded-full font-extrabold text-sm hover:bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(255,255,255,0.18)]">
+              className="inline-flex items-center gap-2 bg-white text-black px-8 py-4 rounded-full font-extrabold text-sm hover:bg-slate-50 transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(255,255,255,0.18)]">
               Get Started Free <ArrowRight className="h-4 w-4" />
             </Link>
             <Link href="/how-it-works"
-              className="inline-flex items-center gap-2 border border-white/25 text-white/80 px-8 py-4 rounded-full text-sm font-semibold hover:border-white/50 hover:text-white transition-all">
+              className="inline-flex items-center gap-2 border border-white/25 text-white px-8 py-4 rounded-full text-sm font-semibold hover:bg-white/10 hover:border-white/40 transition-all">
               How It Works
             </Link>
           </div>
-          <p className="mt-6 text-xs text-white/25">🎁 New members get £20 delivery credit</p>
+          <p className="mt-6 text-xs text-white/45">🎁 New members get £20 delivery credit</p>
         </div>
       </section>
 

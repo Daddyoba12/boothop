@@ -21,10 +21,10 @@ function StepCard({
   const isBlue = color === 'blue';
   return (
     <div className={`step-enter d${Math.min(i + 1, 5)} group flex gap-5 mb-6 p-5 rounded-2xl
-      bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/50
+      bg-white border border-slate-200
       ${isBlue
-        ? 'hover:border-blue-500/50 hover:shadow-blue-500/20 touch-blue'
-        : 'hover:border-emerald-500/50 hover:shadow-emerald-500/20 touch-emerald'}
+        ? 'hover:border-blue-300 hover:shadow-blue-500/10 touch-blue'
+        : 'hover:border-emerald-300 hover:shadow-emerald-500/10 touch-emerald'}
       transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5
       active:scale-[0.98] active:translate-y-0 cursor-pointer`}
     >
@@ -47,11 +47,11 @@ function StepCard({
 
       {/* Text */}
       <div className="flex-1 min-w-0">
-        <div className={`font-bold text-lg mb-1.5 text-white transition-colors duration-300
-          ${isBlue ? 'group-hover:text-cyan-400' : 'group-hover:text-emerald-400'}`}>
+        <div className={`font-bold text-lg mb-1.5 text-slate-900 transition-colors duration-300
+          ${isBlue ? 'group-hover:text-blue-600' : 'group-hover:text-emerald-600'}`}>
           {s.title}
         </div>
-        <div className="text-slate-400 text-sm leading-relaxed">{s.desc}</div>
+        <div className="text-slate-600 text-sm leading-relaxed">{s.desc}</div>
       </div>
 
       {/* Image thumbnail — with glow border matching the card colour */}
@@ -126,7 +126,7 @@ export default function HowItWorksPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-900 font-sans overflow-x-hidden">
 
       {/* BG */}
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.04),transparent_35%)]" />
@@ -146,8 +146,8 @@ export default function HowItWorksPage() {
 
         <div className="relative">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/30 rounded-full px-6 py-3 mb-8 backdrop-blur-xl">
-            <Sparkles className="w-4 h-4 text-cyan-400" />
-            <span className="text-sm text-cyan-300 font-medium">How BootHop Works</span>
+            <Sparkles className="w-4 h-4 text-cyan-700" />
+            <span className="text-sm text-cyan-700 font-medium">How BootHop Works</span>
           </div>
           <h1 className="text-6xl md:text-8xl font-black mb-6 leading-tight">
             Delivery,<br />
@@ -155,7 +155,7 @@ export default function HowItWorksPage() {
               reimagined.
             </span>
           </h1>
-          <p className="text-slate-400 text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-600 text-xl max-w-2xl mx-auto leading-relaxed">
             Someone is already flying London→Lagos, Manchester→Lagos, or Birmingham→Accra.
             They have space. You have something to send. We connect you — safely, cheaply, fast.
           </p>
@@ -186,7 +186,7 @@ export default function HowItWorksPage() {
                   <TrendingUp className="w-4 h-4 text-blue-400" />
                   <span className="text-sm text-blue-300 font-semibold">For Travellers</span>
                 </div>
-                <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight">
+                <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight text-white">
                   Your journey.<br />
                   <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Your income.</span>
                 </h2>
@@ -194,7 +194,7 @@ export default function HowItWorksPage() {
                   Transform unused luggage space into a steady income stream while you travel.
                 </p>
                 <div className="flex gap-4">
-                  <Link href="/start" className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 flex items-center gap-2">
+                  <Link href="/start" className="bg-gradient-to-r from-blue-600 to-cyan-500 text-slate-900 px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 flex items-center gap-2">
                     Get Started <ArrowRight className="w-5 h-5" />
                   </Link>
                 </div>
@@ -243,7 +243,7 @@ export default function HowItWorksPage() {
                   <Globe className="w-4 h-4 text-emerald-400" />
                   <span className="text-sm text-emerald-300 font-semibold">For Senders</span>
                 </div>
-                <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight">
+                <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight text-white">
                   Send it.<br />
                   <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">They carry it.</span>
                 </h2>
@@ -251,7 +251,7 @@ export default function HowItWorksPage() {
                   Faster, cheaper, and more trusted delivery through our global traveller network.
                 </p>
                 <div className="flex gap-4">
-                  <Link href="/start" className="bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center gap-2">
+                  <Link href="/start" className="bg-gradient-to-r from-emerald-600 to-teal-500 text-slate-900 px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center gap-2">
                     Get Started <ArrowRight className="w-5 h-5" />
                   </Link>
                 </div>
@@ -270,12 +270,12 @@ export default function HowItWorksPage() {
             {/* Traveller */}
             <div className="flex flex-col">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-white/80 tracking-wide">Traveller — step by step</span>
+                <span className="text-sm font-semibold text-slate-700 tracking-wide">Traveller — step by step</span>
                 <a
                   href="/images/traveller-diagram.jpg"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-blue-400 transition-colors duration-200"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-blue-700 transition-colors duration-200"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
                   View full size
@@ -292,7 +292,7 @@ export default function HowItWorksPage() {
                 />
               </div>
               <div className="mt-4">
-                <Link href="/guide" className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-400 hover:text-white transition-colors duration-200 group">
+                <Link href="/guide" className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-700 hover:text-slate-900 transition-colors duration-200 group">
                   View full process guide
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                 </Link>
@@ -302,12 +302,12 @@ export default function HowItWorksPage() {
             {/* Sender */}
             <div className="flex flex-col">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-white/80 tracking-wide">Sender — step by step</span>
+                <span className="text-sm font-semibold text-slate-700 tracking-wide">Sender — step by step</span>
                 <a
                   href="/images/sender-diagram.jpg"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-emerald-400 transition-colors duration-200"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-emerald-700 transition-colors duration-200"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
                   View full size
@@ -324,7 +324,7 @@ export default function HowItWorksPage() {
                 />
               </div>
               <div className="mt-4">
-                <Link href="/guide" className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-400 hover:text-white transition-colors duration-200 group">
+                <Link href="/guide" className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700 hover:text-slate-900 transition-colors duration-200 group">
                   View full process guide
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                 </Link>
@@ -338,47 +338,47 @@ export default function HowItWorksPage() {
       {/* ── WHAT CAN I SEND ── */}
       <section className="relative py-20 px-6 mt-8">
         <div className="max-w-5xl mx-auto">
-          <div className="reveal group cursor-pointer rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/30 to-slate-900/30 overflow-hidden hover:border-amber-500/40 hover:shadow-2xl hover:shadow-amber-500/15 hover:scale-[1.008] hover:-translate-y-1 transition-all duration-300 active:scale-[0.99] touch-amber relative">
-            <div className="pointer-events-none absolute -top-10 -right-10 w-40 h-40 bg-amber-500/15 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="reveal group cursor-pointer rounded-3xl border border-slate-200 bg-white overflow-hidden hover:border-amber-300 hover:shadow-xl hover:shadow-amber-500/10 hover:scale-[1.008] hover:-translate-y-1 transition-all duration-300 active:scale-[0.99] touch-amber relative">
+            <div className="pointer-events-none absolute -top-10 -right-10 w-40 h-40 bg-amber-100 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             {/* Header */}
-            <div className="border-b border-white/8 px-8 py-6 flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-yellow-400 text-white shadow-lg shadow-amber-500/40 group-hover:scale-110 transition-transform duration-300">
+            <div className="border-b border-slate-200 px-8 py-6 flex items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-yellow-400 text-slate-900 shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform duration-300">
                 <Globe className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors duration-300">What can I send? — Customs guide</h2>
-                <p className="text-sm text-white/45">Sending to Nigeria, Ghana or West Africa? Read this first.</p>
+                <h2 className="text-lg font-bold text-slate-900 group-hover:text-amber-600 transition-colors duration-300">What can I send? — Customs guide</h2>
+                <p className="text-sm text-slate-600">Sending to Nigeria, Ghana or West Africa? Read this first.</p>
               </div>
             </div>
 
-            <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/8">
+            <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200">
               {/* Accepted */}
-              <div className="p-6 hover:bg-emerald-500/5 transition-colors duration-300">
-                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-emerald-400">Typically accepted</p>
+              <div className="p-6 hover:bg-emerald-50/60 transition-colors duration-300">
+                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-emerald-700">Typically accepted</p>
                 <ul className="space-y-2.5">
                   {['Clothes & shoes (personal use)', 'Letters & documents', 'Phones & small electronics', 'Gifts & household items', 'Food (sealed, non-perishable)', 'Books & magazines'].map((item) => (
-                    <li key={item} className="flex items-center gap-2.5 text-sm text-white/65">
-                      <CheckCircle className="h-3.5 w-3.5 shrink-0 text-emerald-400/80" />{item}
+                    <li key={item} className="flex items-center gap-2.5 text-sm text-slate-600">
+                      <CheckCircle className="h-3.5 w-3.5 shrink-0 text-emerald-500" />{item}
                     </li>
                   ))}
                 </ul>
               </div>
 
               {/* Not accepted */}
-              <div className="p-6 hover:bg-red-500/5 transition-colors duration-300">
-                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-red-400">Never accepted</p>
+              <div className="p-6 hover:bg-red-50/60 transition-colors duration-300">
+                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-red-600">Never accepted</p>
                 <ul className="space-y-2.5">
                   {['Cash or monetary instruments', 'Controlled substances / drugs', 'Weapons or ammunition', 'Counterfeit goods', 'Hazardous materials', 'Anything misrepresented'].map((item) => (
-                    <li key={item} className="flex items-center gap-2.5 text-sm text-white/65">
-                      <span className="h-3.5 w-3.5 shrink-0 text-red-400/80 font-bold text-base leading-none">✗</span>{item}
+                    <li key={item} className="flex items-center gap-2.5 text-sm text-slate-600">
+                      <span className="h-3.5 w-3.5 shrink-0 text-red-500 font-bold text-base leading-none">✗</span>{item}
                     </li>
                   ))}
                 </ul>
               </div>
 
               {/* Customs tips */}
-              <div className="p-6 hover:bg-blue-500/5 transition-colors duration-300">
-                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-blue-400">Customs tips for Nigeria</p>
+              <div className="p-6 hover:bg-blue-50/60 transition-colors duration-300">
+                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-blue-700">Customs tips for Nigeria</p>
                 <ul className="space-y-3">
                   {[
                     { tip: 'Personal effects are duty-free up to a reasonable quantity', note: 'FIRS guidance' },
@@ -387,8 +387,8 @@ export default function HowItWorksPage() {
                     { tip: 'Traveller signs a customs declaration — sender is responsible for accuracy', note: 'BootHop policy' },
                   ].map((item) => (
                     <li key={item.tip} className="text-sm">
-                      <p className="text-white/65">{item.tip}</p>
-                      <p className="text-[11px] text-white/30 mt-0.5">{item.note}</p>
+                      <p className="text-slate-600">{item.tip}</p>
+                      <p className="text-[11px] text-slate-600 mt-0.5">{item.note}</p>
                     </li>
                   ))}
                 </ul>
@@ -396,9 +396,9 @@ export default function HowItWorksPage() {
             </div>
 
             {/* Footer note */}
-            <div className="border-t border-white/8 bg-amber-500/5 px-8 py-4">
-              <p className="text-xs text-amber-300/70">
-                <span className="font-semibold text-amber-300">Important:</span> The sender is solely responsible for ensuring items comply with UK export and Nigerian import regulations.
+            <div className="border-t border-slate-200 bg-amber-50 px-8 py-4">
+              <p className="text-xs text-amber-800">
+                <span className="font-semibold text-amber-900">Important:</span> The sender is solely responsible for ensuring items comply with UK export and Nigerian import regulations.
                 BootHop facilitates the connection — we do not inspect packages. Travellers are not liable for undeclared or misrepresented contents.
               </p>
             </div>
@@ -410,25 +410,25 @@ export default function HowItWorksPage() {
       <section className="px-6 py-12">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-6">
-            <p className="text-xs font-semibold tracking-widest text-slate-400/60 uppercase mb-3">Quick walkthrough</p>
-            <h2 className="text-xl font-bold text-white mb-1">Need to see it in action?</h2>
-            <p className="text-slate-500 text-sm">Both flows explained in under 3 minutes</p>
+            <p className="text-xs font-semibold tracking-widest text-slate-600 uppercase mb-3">Quick walkthrough</p>
+            <h2 className="text-xl font-bold text-slate-900 mb-1">Need to see it in action?</h2>
+            <p className="text-slate-600 text-sm">Both flows explained in under 3 minutes</p>
           </div>
 
           <Link href="/watch"
-            className="group relative block rounded-2xl overflow-hidden border border-white/8 hover:border-white/15 transition-all duration-300 cursor-pointer"
+            className="group relative block rounded-2xl overflow-hidden border border-slate-200 hover:border-slate-200 transition-all duration-300 cursor-pointer"
             style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.45)' }}
           >
             <div className="relative bg-gradient-to-br from-slate-900 to-slate-950" style={{ paddingBottom: '56.25%' }}>
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/8 border border-white/14 group-hover:bg-white/12 group-hover:scale-110 transition-all duration-300">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 border border-slate-200 group-hover:bg-slate-50 group-hover:scale-110 transition-all duration-300">
                   <svg viewBox="0 0 24 24" fill="white" className="h-7 w-7 ml-0.5">
                     <path d="M8 5v14l11-7z"/>
                   </svg>
                 </div>
                 <div className="text-center px-4">
                   <p className="text-white font-semibold text-base mb-0.5">Watch the full walkthrough</p>
-                  <p className="text-slate-500 text-xs">2m 50s · Returns to BootHop after</p>
+                  <p className="text-slate-300 text-xs">2m 50s · Returns to BootHop after</p>
                 </div>
               </div>
             </div>
@@ -441,37 +441,36 @@ export default function HowItWorksPage() {
         <div className="max-w-5xl mx-auto">
           <Link
             href="/trust-safety"
-            className="reveal group relative overflow-hidden flex items-center justify-between rounded-2xl border border-violet-500/20 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm px-6 py-5 transition-all duration-300 hover:border-violet-500/50 hover:shadow-xl hover:shadow-violet-500/15 hover:-translate-y-0.5 hover:scale-[1.015] active:scale-[0.98] touch-violet"
+            className="reveal group relative overflow-hidden flex items-center justify-between rounded-2xl border border-violet-200 bg-white px-6 py-5 transition-all duration-300 hover:border-violet-300 hover:shadow-xl hover:shadow-violet-500/10 hover:-translate-y-0.5 hover:scale-[1.015] active:scale-[0.98] touch-violet"
           >
-            <div className="pointer-events-none absolute -top-6 -right-6 w-24 h-24 bg-violet-500/15 rounded-full blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="pointer-events-none absolute -top-6 -right-6 w-24 h-24 bg-violet-100 rounded-full blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-400 text-white shadow-lg shadow-violet-500/40 group-hover:scale-110 transition-transform duration-300">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-400 text-slate-900 shadow-lg shadow-violet-500/30 group-hover:scale-110 transition-transform duration-300">
                 <Shield className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white group-hover:text-violet-400 transition-colors duration-300">ID verified · Escrow payments · 8-stage pipeline</p>
-                <p className="mt-0.5 text-xs text-white/40">How we keep every match safe →</p>
+                <p className="text-sm font-semibold text-slate-900 group-hover:text-violet-600 transition-colors duration-300">ID verified · Escrow payments · 8-stage pipeline</p>
+                <p className="mt-0.5 text-xs text-slate-600">How we keep every match safe →</p>
               </div>
             </div>
-            <ArrowRight className="relative h-4 w-4 shrink-0 text-white/25 transition-transform group-hover:translate-x-1 group-hover:text-violet-400" />
+            <ArrowRight className="relative h-4 w-4 shrink-0 text-slate-500 transition-transform group-hover:translate-x-1 group-hover:text-violet-600" />
           </Link>
         </div>
       </section>
 
       {/* ── CTA ── */}
-      <section className="relative py-32 text-center px-6">
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
+      <section className="relative py-32 text-center px-6 bg-slate-50">
         <div className="max-w-4xl mx-auto relative">
-          <h2 className="text-6xl font-black mb-6 leading-tight">
-            Ready to <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">transform</span><br />
+          <h2 className="text-6xl font-black mb-6 leading-tight text-slate-900">
+            Ready to <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-600 bg-clip-text text-transparent">transform</span><br />
             your journey?
           </h2>
-          <p className="text-slate-400 text-xl mb-12">Join thousands already earning and saving with BootHop</p>
+          <p className="text-slate-600 text-xl mb-12">Join thousands already earning and saving with BootHop</p>
           <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <a href="/start?role=traveller" className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-10 py-5 rounded-xl text-lg font-bold hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3">
+            <a href="/start?role=traveller" className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-10 py-5 rounded-xl text-lg font-bold hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3">
               I&apos;m a Traveller <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
             </a>
-            <a href="/register?type=hooper" className="group bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-10 py-5 rounded-xl text-lg font-bold hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3">
+            <a href="/register?type=hooper" className="group bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-10 py-5 rounded-xl text-lg font-bold hover:shadow-2xl hover:shadow-emerald-500/30 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3">
               I&apos;m a Sender <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
             </a>
           </div>

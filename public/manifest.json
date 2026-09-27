@@ -5,7 +5,7 @@
   "description": "Peer-to-peer international delivery with real-time GPS tracking. Connect with verified travellers, track your package live, and pay securely via escrow.",
   "start_url": "/?source=pwa",
   "display": "standalone",
-  "background_color": "#0a0f1e",
+  "background_color": "#ffffff",
   "theme_color": "#2563eb",
   "orientation": "portrait-primary",
   "scope": "/",

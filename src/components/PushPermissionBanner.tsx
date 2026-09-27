@@ -56,21 +56,21 @@ export default function PushPermissionBanner() {
 
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm">
-      <div className="rounded-2xl border border-white/10 bg-[#0d1829]/95 backdrop-blur-xl shadow-2xl px-4 py-4">
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10 px-4 py-4">
         <div className="flex items-start gap-3">
           <span className="text-2xl leading-none mt-0.5">🔔</span>
           <div className="flex-1 min-w-0">
-            <p className="text-white font-semibold text-sm leading-snug">Stay in the loop</p>
-            <p className="text-white/50 text-xs mt-0.5 leading-relaxed">
+            <p className="text-slate-900 font-semibold text-sm leading-snug">Stay in the loop</p>
+            <p className="text-slate-600 text-xs mt-0.5 leading-relaxed">
               Get notified when a match is found, payment confirmed, or your package is delivered.
             </p>
 
             {error && (
-              <p className="text-orange-400 text-xs mt-2 leading-snug">{error}</p>
+              <p className="text-orange-600 text-xs mt-2 leading-snug">{error}</p>
             )}
 
             {permission === 'denied' && !error && (
-              <p className="text-orange-400 text-xs mt-2 leading-snug">
+              <p className="text-orange-600 text-xs mt-2 leading-snug">
                 Notifications are blocked. Open your browser settings to allow them for this site.
               </p>
             )}
@@ -85,7 +85,7 @@ export default function PushPermissionBanner() {
               </button>
               <button
                 onClick={handleDismiss}
-                className="px-3 py-2 rounded-xl border border-white/10 text-white/40 text-xs hover:text-white/60 transition-colors"
+                className="px-3 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs hover:text-slate-700 transition-colors"
               >
                 Not now
               </button>

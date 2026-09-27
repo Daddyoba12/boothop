@@ -118,7 +118,7 @@ function VerifyContent() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-6 py-20">
+    <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-20">
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
           <Link href="/">
@@ -126,9 +126,9 @@ function VerifyContent() {
           </Link>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-slate-900/80 p-8 shadow-2xl backdrop-blur">
-          <h1 className="text-2xl font-bold text-white mb-2">Verify your email</h1>
-          <p className="text-sm text-slate-400 mb-8">
+        <div className="rounded-3xl border border-slate-200 bg-slate-900/80 p-8 shadow-2xl backdrop-blur">
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Verify your email</h1>
+          <p className="text-sm text-slate-600 mb-8">
             Enter the 5-character code we sent to your email.
           </p>
 
@@ -139,7 +139,7 @@ function VerifyContent() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-slate-800 px-4 py-3 text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-blue-500 transition"
+                className="w-full rounded-xl border border-slate-200 bg-slate-800 px-4 py-3 text-slate-900 placeholder-slate-500 outline-none focus:ring-2 focus:ring-blue-500 transition"
                 placeholder="you@example.com"
                 required
               />
@@ -151,7 +151,7 @@ function VerifyContent() {
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
-                className="w-full rounded-xl border border-white/10 bg-slate-800 px-4 py-3 text-center text-2xl font-bold tracking-[0.35em] uppercase text-white placeholder-slate-600 outline-none focus:ring-2 focus:ring-blue-500 transition"
+                className="w-full rounded-xl border border-slate-200 bg-slate-800 px-4 py-3 text-center text-2xl font-bold tracking-[0.35em] uppercase text-slate-900 placeholder-slate-600 outline-none focus:ring-2 focus:ring-blue-500 transition"
                 placeholder="4827A"
                 maxLength={5}
                 required
@@ -179,7 +179,7 @@ function VerifyContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-semibold py-3 px-4 rounded-xl transition-all"
+              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-slate-900 font-semibold py-3 px-4 rounded-xl transition-all"
             >
               {loading ? (
                 <>
@@ -192,7 +192,7 @@ function VerifyContent() {
             </button>
           </form>
 
-          <p className="text-center text-sm text-slate-500 mt-6">
+          <p className="text-center text-sm text-slate-600 mt-6">
             Didn&apos;t get a code?{' '}
             <Link href="/login" className="text-blue-400 hover:text-blue-300 font-medium">
               Back to login

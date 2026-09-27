@@ -41,7 +41,7 @@ const DELETABLE_DATA = [
 
 export default function DeleteDataPage() {
   return (
-    <main className="min-h-screen bg-[#0a0f1e] text-white">
+    <main className="min-h-screen bg-white text-slate-900">
       <div className="max-w-2xl mx-auto px-6 py-16">
 
         <div className="mb-8">
@@ -67,7 +67,7 @@ export default function DeleteDataPage() {
           <h2 className="text-xl font-semibold mb-4">What you can request to delete</h2>
           <div className="space-y-3">
             {DELETABLE_DATA.map((item) => (
-              <div key={item.category} className="bg-white/5 rounded-xl p-4 flex justify-between items-start gap-4">
+              <div key={item.category} className="bg-slate-50 rounded-xl p-4 flex justify-between items-start gap-4">
                 <div>
                   <p className="font-medium text-sm">{item.category}</p>
                   <p className="text-gray-400 text-xs mt-0.5">{item.description}</p>
@@ -94,7 +94,7 @@ export default function DeleteDataPage() {
                   >
                     privacy@boothop.com
                   </a>{" "}
-                  with the subject line <strong className="text-white">Data Deletion Request</strong>.
+                  with the subject line <strong className="text-slate-900">Data Deletion Request</strong>.
                 </p>
               </div>
             </li>
@@ -112,7 +112,7 @@ export default function DeleteDataPage() {
               <div>
                 <p className="font-medium">We confirm and action it</p>
                 <p className="text-gray-400 text-sm mt-1">
-                  We'll confirm receipt within <strong className="text-white">48 hours</strong> and complete the deletion within <strong className="text-white">30 days</strong>. Your account remains active.
+                  We'll confirm receipt within <strong className="text-slate-900">48 hours</strong> and complete the deletion within <strong className="text-slate-900">30 days</strong>. Your account remains active.
                 </p>
               </div>
             </li>
@@ -120,10 +120,10 @@ export default function DeleteDataPage() {
         </section>
 
         {/* What we must keep */}
-        <section className="mb-10 bg-white/5 rounded-xl p-6">
+        <section className="mb-10 bg-slate-50 rounded-xl p-6">
           <h2 className="text-xl font-semibold mb-3">What we must keep</h2>
           <p className="text-gray-400 text-sm mb-3">
-            UK financial regulations require us to retain completed transaction records (amounts, dates, parties involved) for up to <strong className="text-white">7 years</strong>. These cannot be deleted on request but are used solely for legal compliance.
+            UK financial regulations require us to retain completed transaction records (amounts, dates, parties involved) for up to <strong className="text-slate-900">7 years</strong>. These cannot be deleted on request but are used solely for legal compliance.
           </p>
           <p className="text-gray-500 text-xs">
             All other data is fully deletable on request at any time.
@@ -131,7 +131,7 @@ export default function DeleteDataPage() {
         </section>
 
         {/* Footer */}
-        <section className="border-t border-white/10 pt-8">
+        <section className="border-t border-slate-200 pt-8">
           <h2 className="text-xl font-semibold mb-2">Questions?</h2>
           <p className="text-gray-400 text-sm">
             Email{" "}

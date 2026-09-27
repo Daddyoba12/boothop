@@ -16,23 +16,23 @@ function TodayClicks() {
 }
 
 function StatCard({
-  label, value, sub, color = 'text-white',
+  label, value, sub, color = 'text-slate-900',
 }: { label: string; value: React.ReactNode; sub?: string; color?: string }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</p>
+    <div className="bg-white border border-slate-200 rounded-xl p-5">
+      <p className="text-xs text-slate-600 uppercase tracking-wider mb-1">{label}</p>
       <p className={`text-2xl font-bold ${color}`}>{value ?? '—'}</p>
-      {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
+      {sub && <p className="text-xs text-slate-600 mt-1">{sub}</p>}
     </div>
   );
 }
 
 function Badge({ text, color }: { text: string; color: 'green' | 'red' | 'yellow' | 'blue' }) {
   const map = {
-    green:  'bg-green-900/50 text-green-400 border-green-800',
-    red:    'bg-red-900/50   text-red-400   border-red-800',
-    yellow: 'bg-yellow-900/50 text-yellow-400 border-yellow-800',
-    blue:   'bg-blue-900/50  text-blue-400  border-blue-800',
+    green:  'bg-green-100 text-green-600 border-green-200',
+    red:    'bg-red-100   text-red-600   border-red-200',
+    yellow: 'bg-yellow-100 text-yellow-600 border-yellow-200',
+    blue:   'bg-blue-100  text-blue-600  border-blue-200',
   };
   return (
     <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border ${map[color]}`}>
@@ -78,7 +78,7 @@ export default function MissionControl() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-500">
+      <div className="flex items-center justify-center h-64 text-slate-600">
         Loading Mission Control...
       </div>
     );
@@ -93,28 +93,28 @@ export default function MissionControl() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Mission Control</h1>
-          <p className="text-gray-500 text-sm mt-1">BootHop Flight Intelligence — real-time route monitoring</p>
+          <p className="text-slate-600 text-sm mt-1">BootHop Flight Intelligence — real-time route monitoring</p>
         </div>
         <button
           onClick={triggerScan}
           disabled={scanning}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors"
+          className="px-4 py-2 bg-blue-500 hover:bg-blue-400 disabled:opacity-50 rounded-lg text-sm font-medium text-white transition-colors"
         >
           {scanning ? 'Scanning...' : 'Run Scan Now'}
         </button>
       </div>
 
       {scanResult && (
-        <div className="bg-green-900/30 border border-green-800 rounded-lg px-4 py-3 text-sm text-green-400">
+        <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-600">
           {scanResult}
         </div>
       )}
 
       {/* AI Brief */}
       {d?.aiSummary && (
-        <div className="bg-blue-950/40 border border-blue-800 rounded-xl p-5">
-          <p className="text-xs text-blue-400 uppercase tracking-wider mb-2">Today&apos;s AI Brief</p>
-          <p className="text-sm text-gray-200 leading-relaxed">{d.aiSummary}</p>
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+          <p className="text-xs text-blue-600 uppercase tracking-wider mb-2">Today&apos;s AI Brief</p>
+          <p className="text-sm text-slate-700 leading-relaxed">{d.aiSummary}</p>
         </div>
       )}
 
@@ -123,80 +123,80 @@ export default function MissionControl() {
         <StatCard
           label="Flights Scanned"
           value={d?.flightsMonitored?.toLocaleString() ?? '0'}
-          color="text-blue-400"
+          color="text-blue-600"
         />
         <StatCard
           label="Homepage Clicks"
           value={<TodayClicks />}
-          color="text-green-400"
+          color="text-green-600"
         />
         <StatCard
           label="Routes Healthy"
           value={d?.routesHealthy ?? 0}
-          color="text-gray-200"
+          color="text-slate-700"
         />
         <StatCard
           label="Unread Alerts"
           value={d?.unreadAlerts ?? 0}
-          color={d?.unreadAlerts ? 'text-yellow-400' : 'text-gray-400'}
+          color={d?.unreadAlerts ? 'text-yellow-600' : 'text-slate-600'}
         />
       </div>
 
       {/* Price highlights */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {d?.cheapestOneway && (
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Cheapest One-Way Today</p>
-            <p className="text-3xl font-bold text-white">£{d.cheapestOneway.price.toFixed(0)}</p>
-            <p className="text-sm text-gray-400 mt-1">{d.cheapestOneway.route}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{d.cheapestOneway.airline}</p>
+          <div className="bg-white border border-slate-200 rounded-xl p-5">
+            <p className="text-xs text-slate-600 uppercase tracking-wider mb-2">Cheapest One-Way Today</p>
+            <p className="text-3xl font-bold text-slate-900">£{d.cheapestOneway.price.toFixed(0)}</p>
+            <p className="text-sm text-slate-600 mt-1">{d.cheapestOneway.route}</p>
+            <p className="text-xs text-slate-600 mt-0.5">{d.cheapestOneway.airline}</p>
           </div>
         )}
 
         {d?.biggestSavingGbp && (
-          <div className="bg-gray-900 border border-green-900 rounded-xl p-5">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Biggest Saving Today</p>
-            <p className="text-3xl font-bold text-green-400">£{d.biggestSavingGbp.toFixed(0)}</p>
-            <p className="text-sm text-gray-400 mt-1">{d.biggestSavingRoute}</p>
-            <p className="text-xs text-gray-500 mt-0.5">vs yesterday</p>
+          <div className="bg-white border border-green-200 rounded-xl p-5">
+            <p className="text-xs text-slate-600 uppercase tracking-wider mb-2">Biggest Saving Today</p>
+            <p className="text-3xl font-bold text-green-600">£{d.biggestSavingGbp.toFixed(0)}</p>
+            <p className="text-sm text-slate-600 mt-1">{d.biggestSavingRoute}</p>
+            <p className="text-xs text-slate-600 mt-0.5">vs yesterday</p>
           </div>
         )}
 
         {d?.bestOpportunityRoute && (
-          <div className="bg-gray-900 border border-blue-900 rounded-xl p-5">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Best Opportunity</p>
-            <p className="text-3xl font-bold text-blue-400">{d.bestOpportunityScore}</p>
-            <p className="text-sm text-gray-400 mt-1">{d.bestOpportunityRoute}</p>
-            <p className="text-xs text-gray-500 mt-0.5">opportunity score / 100</p>
+          <div className="bg-white border border-blue-200 rounded-xl p-5">
+            <p className="text-xs text-slate-600 uppercase tracking-wider mb-2">Best Opportunity</p>
+            <p className="text-3xl font-bold text-blue-600">{d.bestOpportunityScore}</p>
+            <p className="text-sm text-slate-600 mt-1">{d.bestOpportunityRoute}</p>
+            <p className="text-xs text-slate-600 mt-0.5">opportunity score / 100</p>
           </div>
         )}
       </div>
 
       {/* System health */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-        <p className="text-xs text-gray-500 uppercase tracking-wider mb-4">System Health</p>
+      <div className="bg-white border border-slate-200 rounded-xl p-5">
+        <p className="text-xs text-slate-600 uppercase tracking-wider mb-4">System Health</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div>
-            <p className="text-xs text-gray-500">Providers Online</p>
-            <p className="text-lg font-semibold text-green-400 mt-0.5">{d?.providersOnline ?? 0}</p>
+            <p className="text-xs text-slate-600">Providers Online</p>
+            <p className="text-lg font-semibold text-green-600 mt-0.5">{d?.providersOnline ?? 0}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Providers Offline</p>
-            <p className={`text-lg font-semibold mt-0.5 ${d?.providersOffline ? 'text-red-400' : 'text-gray-500'}`}>
+            <p className="text-xs text-slate-600">Providers Offline</p>
+            <p className={`text-lg font-semibold mt-0.5 ${d?.providersOffline ? 'text-red-600' : 'text-slate-600'}`}>
               {d?.providersOffline ?? 0}
             </p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Last Scan</p>
-            <p className="text-sm font-medium text-gray-300 mt-0.5">
+            <p className="text-xs text-slate-600">Last Scan</p>
+            <p className="text-sm font-medium text-slate-600 mt-0.5">
               {d?.lastScanAt
                 ? new Date(d.lastScanAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
                 : 'Not yet run'}
             </p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Avg Scan Time</p>
-            <p className="text-sm font-medium text-gray-300 mt-0.5">
+            <p className="text-xs text-slate-600">Avg Scan Time</p>
+            <p className="text-sm font-medium text-slate-600 mt-0.5">
               {d?.avgScanMs ? `${(d.avgScanMs / 1000).toFixed(1)}s` : '—'}
             </p>
           </div>
@@ -204,8 +204,8 @@ export default function MissionControl() {
       </div>
 
       {/* Sprint status */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-        <p className="text-xs text-gray-500 uppercase tracking-wider mb-4">Sprint 1 — Infrastructure</p>
+      <div className="bg-white border border-slate-200 rounded-xl p-5">
+        <p className="text-xs text-slate-600 uppercase tracking-wider mb-4">Sprint 1 — Infrastructure</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
           {[
             'Database schema', 'Airport table', 'Airline table', 'Route table',
@@ -214,8 +214,8 @@ export default function MissionControl() {
             'Intelligence engine', 'Statistics engine', 'Admin dashboard', 'Mission Control',
             'Route manager', 'Scan logs', 'Alerts page', 'Flight ticker',
           ].map(item => (
-            <div key={item} className="flex items-center gap-2 text-gray-400">
-              <span className="text-green-400">✓</span>
+            <div key={item} className="flex items-center gap-2 text-slate-600">
+              <span className="text-green-600">✓</span>
               <span className="text-xs">{item}</span>
             </div>
           ))}

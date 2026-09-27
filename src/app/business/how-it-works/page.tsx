@@ -118,7 +118,7 @@ function AirportPhotoStrip() {
 
               {/* Label — outside the flip so it stays visible */}
               <div className="absolute bottom-3 left-3 z-10">
-                <p className={`text-xs font-black uppercase tracking-widest drop-shadow transition-colors duration-300 ${i === 0 ? 'text-emerald-400' : 'text-white/80'}`}>
+                <p className={`text-xs font-black uppercase tracking-widest drop-shadow transition-colors duration-300 ${i === 0 ? 'text-emerald-600' : 'text-slate-700'}`}>
                   {box.labels[imgIdx[i]]}
                 </p>
               </div>
@@ -136,9 +136,9 @@ function AirportPhotoStrip() {
 export default function HowItWorksPage() {
   return (
     <div
-      className="min-h-screen text-white"
+      className="min-h-screen text-slate-900"
       style={{
-        background: 'linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%)',
+        background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
         backgroundAttachment: 'fixed',
       }}
     >
@@ -147,16 +147,16 @@ export default function HowItWorksPage() {
       {/* Hero */}
       <div className="max-w-5xl mx-auto px-8 pt-20 pb-12 text-center">
         <motion.div {...FADE} transition={{ delay: 0.05 }}
-          className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold px-4 py-2 rounded-full mb-8 uppercase tracking-widest">
+          className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-xs font-semibold px-4 py-2 rounded-full mb-8 uppercase tracking-widest">
           <Zap className="h-3.5 w-3.5" /> Premium Business Logistics
         </motion.div>
         <motion.h1 {...FADE} transition={{ delay: 0.1 }}
           className="text-5xl md:text-6xl font-black tracking-tight leading-none mb-5">
           How BootHop Business<br />
-          <span className="text-emerald-400">Works</span>
+          <span className="text-emerald-600">Works</span>
         </motion.h1>
         <motion.p {...FADE} transition={{ delay: 0.15 }}
-          className="text-white/50 text-xl max-w-2xl mx-auto leading-relaxed">
+          className="text-slate-600 text-xl max-w-2xl mx-auto leading-relaxed">
           Verified carriers, same-day delivery, full insurance — built for businesses
           that need goods moved fast and reliably.
         </motion.p>
@@ -172,11 +172,11 @@ export default function HowItWorksPage() {
         <motion.div {...FADE} transition={{ delay: 0.18 }} className="mb-10">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-              <Truck className="h-5 w-5 text-emerald-400" />
+              <Truck className="h-5 w-5 text-emerald-600" />
             </div>
             <div>
               <h2 className="text-2xl font-black">For Businesses</h2>
-              <p className="text-white/40 text-sm mt-0.5">How to book a delivery — four simple steps</p>
+              <p className="text-slate-600 text-sm mt-0.5">How to book a delivery — four simple steps</p>
             </div>
           </div>
           <div className="grid md:grid-cols-4 gap-4">
@@ -187,16 +187,16 @@ export default function HowItWorksPage() {
               { step: '04', title: 'Delivered & invoiced',body: 'Carrier delivers directly to the recipient. Invoice issued on net terms upon confirmed delivery.',       icon: CheckCircle },
             ].map(({ step, title, body, icon: Icon }) => (
               <div key={step}
-                className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98]">
+                className="group relative overflow-hidden bg-slate-50 border border-slate-200 rounded-2xl p-6 transition-all duration-300 hover:border-emerald-500/30 hover:bg-slate-50 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98]">
                 <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                    <Icon className="h-4 w-4 text-emerald-400" />
+                    <Icon className="h-4 w-4 text-emerald-600" />
                   </div>
-                  <span className="text-emerald-400/60 text-xs font-black tracking-widest">{step}</span>
+                  <span className="text-emerald-600/60 text-xs font-black tracking-widest">{step}</span>
                 </div>
-                <p className="text-white font-bold text-sm mb-2 group-hover:text-emerald-300 transition-colors duration-300">{title}</p>
-                <p className="text-white/40 text-xs leading-relaxed">{body}</p>
+                <p className="text-slate-900 font-bold text-sm mb-2 group-hover:text-emerald-300 transition-colors duration-300">{title}</p>
+                <p className="text-slate-600 text-xs leading-relaxed">{body}</p>
               </div>
             ))}
           </div>
@@ -208,11 +208,11 @@ export default function HowItWorksPage() {
         <motion.div {...FADE} transition={{ delay: 0.22 }} className="mb-10">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
-              <Star className="h-5 w-5 text-amber-400" />
+              <Star className="h-5 w-5 text-amber-600" />
             </div>
             <div>
               <h2 className="text-2xl font-black">For Priority Partners</h2>
-              <p className="text-white/40 text-sm mt-0.5">Elevated service for businesses that ship regularly</p>
+              <p className="text-slate-600 text-sm mt-0.5">Elevated service for businesses that ship regularly</p>
             </div>
           </div>
           <div className="grid md:grid-cols-4 gap-4">
@@ -223,16 +223,16 @@ export default function HowItWorksPage() {
               { step: '04', title: 'Dedicated team',        body: '2-hour guaranteed response on every request, plus a named account manager at BootHop.',                        icon: ShieldCheck },
             ].map(({ step, title, body, icon: Icon }) => (
               <div key={step}
-                className="group relative overflow-hidden bg-white/3 border border-white/8 rounded-2xl p-6 transition-all duration-300 hover:border-amber-500/30 hover:bg-white/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/10 active:scale-[0.98]">
+                className="group relative overflow-hidden bg-slate-50 border border-slate-200 rounded-2xl p-6 transition-all duration-300 hover:border-amber-500/30 hover:bg-slate-50 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/10 active:scale-[0.98]">
                 <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-amber-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-9 h-9 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                    <Icon className="h-4 w-4 text-amber-400" />
+                    <Icon className="h-4 w-4 text-amber-600" />
                   </div>
-                  <span className="text-amber-400/60 text-xs font-black tracking-widest">{step}</span>
+                  <span className="text-amber-600/60 text-xs font-black tracking-widest">{step}</span>
                 </div>
-                <p className="text-white font-bold text-sm mb-2 group-hover:text-amber-300 transition-colors duration-300">{title}</p>
-                <p className="text-white/40 text-xs leading-relaxed">{body}</p>
+                <p className="text-slate-900 font-bold text-sm mb-2 group-hover:text-amber-300 transition-colors duration-300">{title}</p>
+                <p className="text-slate-600 text-xs leading-relaxed">{body}</p>
               </div>
             ))}
           </div>
@@ -246,14 +246,14 @@ export default function HowItWorksPage() {
             className="group flex items-center justify-between bg-gradient-to-r from-emerald-500/10 to-teal-500/5 border border-emerald-500/25 rounded-2xl p-6 hover:border-emerald-500/50 hover:from-emerald-500/15 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-emerald-500/15">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <Truck className="h-5 w-5 text-emerald-400" />
+                <Truck className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-white font-black group-hover:text-emerald-300 transition-colors">View full pricing</p>
-                <p className="text-white/40 text-sm">UK local, international routes, insurance &amp; Priority Partner rates</p>
+                <p className="text-slate-900 font-black group-hover:text-emerald-300 transition-colors">View full pricing</p>
+                <p className="text-slate-600 text-sm">UK local, international routes, insurance &amp; Priority Partner rates</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-emerald-400 font-black text-sm shrink-0">
+            <div className="flex items-center gap-2 text-emerald-600 font-black text-sm shrink-0">
               See pricing <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </a>
@@ -265,7 +265,7 @@ export default function HowItWorksPage() {
         <motion.div {...FADE} transition={{ delay: 0.3 }}
           className="bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border border-emerald-500/20 rounded-3xl p-10">
           <h2 className="text-3xl font-black mb-3">Ready to ship?</h2>
-          <p className="text-white/40 mb-8 leading-relaxed">
+          <p className="text-slate-600 mb-8 leading-relaxed">
             Sign in to book a delivery or become a Priority Partner for dedicated enterprise logistics.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

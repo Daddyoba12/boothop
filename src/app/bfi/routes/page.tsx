@@ -21,9 +21,9 @@ type RouteRow = {
 };
 
 function scoreColor(score: number) {
-  if (score >= 70) return 'text-green-400';
-  if (score >= 45) return 'text-yellow-400';
-  return 'text-red-400';
+  if (score >= 70) return 'text-green-600';
+  if (score >= 45) return 'text-yellow-600';
+  return 'text-red-600';
 }
 
 function trendIcon(trend: string) {
@@ -64,16 +64,16 @@ export default function RoutesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Route Manager</h1>
-        <p className="text-gray-500 text-sm mt-1">Enable / disable routes and view per-route intelligence</p>
+        <p className="text-slate-600 text-sm mt-1">Enable / disable routes and view per-route intelligence</p>
       </div>
 
       {loading ? (
-        <div className="text-gray-500 text-sm">Loading routes...</div>
+        <div className="text-slate-600 text-sm">Loading routes...</div>
       ) : (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wider">
+              <tr className="border-b border-slate-200 text-xs text-slate-600 uppercase tracking-wider">
                 <th className="text-left px-5 py-3">Route</th>
                 <th className="text-left px-5 py-3">Cheapest Ever</th>
                 <th className="text-left px-5 py-3">30d Avg</th>
@@ -88,17 +88,17 @@ export default function RoutesPage() {
               {routes.map(r => {
                 const st = Array.isArray(r.stats) ? r.stats[0] : r.stats;
                 return (
-                  <tr key={r.id} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
-                    <td className="px-5 py-4 font-mono font-semibold text-white">
+                  <tr key={r.id} className="border-b border-slate-200 hover:bg-slate-100 transition-colors">
+                    <td className="px-5 py-4 font-mono font-semibold text-slate-900">
                       {r.origin} → {r.destination}
                     </td>
-                    <td className="px-5 py-4 text-gray-300">
+                    <td className="px-5 py-4 text-slate-600">
                       {st?.all_time_lowest_gbp ? `£${st.all_time_lowest_gbp.toFixed(0)}` : '—'}
                     </td>
-                    <td className="px-5 py-4 text-gray-300">
+                    <td className="px-5 py-4 text-slate-600">
                       {st?.thirty_day_avg_gbp ? `£${st.thirty_day_avg_gbp.toFixed(0)}` : '—'}
                     </td>
-                    <td className="px-5 py-4 text-gray-400">
+                    <td className="px-5 py-4 text-slate-600">
                       {st?.trend ? trendIcon(st.trend) : '—'}
                     </td>
                     <td className="px-5 py-4">
@@ -109,21 +109,21 @@ export default function RoutesPage() {
                     <td className="px-5 py-4">
                       {st?.recommendation ? (
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                          st.recommendation === 'BUY'  ? 'bg-green-900/50 text-green-400' :
-                          st.recommendation === 'WAIT' ? 'bg-red-900/50   text-red-400'   :
-                                                         'bg-gray-800     text-gray-400'
+                          st.recommendation === 'BUY'  ? 'bg-green-100 text-green-600' :
+                          st.recommendation === 'WAIT' ? 'bg-red-100   text-red-600'   :
+                                                         'bg-slate-100     text-slate-600'
                         }`}>{st.recommendation}</span>
                       ) : '—'}
                     </td>
-                    <td className="px-5 py-4 text-gray-500">{r.priority}</td>
+                    <td className="px-5 py-4 text-slate-600">{r.priority}</td>
                     <td className="px-5 py-4">
                       <button
                         onClick={() => toggle(r.id, r.enabled)}
                         disabled={toggling === r.id}
                         className={`text-xs px-3 py-1 rounded-full transition-colors ${
                           r.enabled
-                            ? 'bg-green-900/50 text-green-400 border border-green-800 hover:bg-red-900/50 hover:text-red-400 hover:border-red-800'
-                            : 'bg-gray-800 text-gray-500 border border-gray-700 hover:bg-green-900/50 hover:text-green-400 hover:border-green-800'
+                            ? 'bg-green-100 text-green-600 border border-green-200 hover:bg-red-100 hover:text-red-600 hover:border-red-200'
+                            : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-green-100 hover:text-green-600 hover:border-green-200'
                         }`}
                       >
                         {toggling === r.id ? '...' : r.enabled ? 'Active' : 'Disabled'}

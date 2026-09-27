@@ -6,13 +6,13 @@ import { Suspense, useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import {
-  ArrowRight, CheckCircle, Menu, Package,
+  ArrowRight, CheckCircle, Package,
   Plane, Search, Star, X, Users,
   MessageCircle,
 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import dynamic from 'next/dynamic';
-import BootHopLogo from '@/components/BootHopLogo';
+import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import RoleToggle from '@/components/RoleToggle';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
@@ -28,16 +28,6 @@ type Mode = 'send' | 'travel';
 type TripForm = { from: string; to: string; date: string; price: string; email: string; weight: string; };
 type RecentTrip = { id?: string; from_city: string; to_city: string; travel_date: string; type: Mode; weight?: string; };
 
-const navLinks = [
-  { href: '/how-it-works', label: 'How It Works' },
-  { href: '/pricing', label: 'Pricing' },
-  { href: '/about', label: 'About' },
-  { href: '/trust-safety', label: 'Trust & Safety' },
-  { href: '/journeys', label: 'Live Journeys' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/business', label: 'For Business' },
-];
-
 const testimonials = [
   { name: 'Toyin A.', role: 'MSc Student', route: 'Lagos → London', text: 'I travelled from Lagos to London and used BootHop to send documents ahead. Everything arrived before I did.', rating: 5, outcome: 'Delivered same day · Escrow payment released' },
   { name: 'Kunle O.', role: 'Tech Consultant', route: 'Lagos → London', text: 'Moving from Lagos to London for work was hectic, but BootHop made sending personal items simple.', rating: 5, outcome: 'Items delivered · Payment secured via escrow' },
@@ -45,15 +35,15 @@ const testimonials = [
 ];
 
 const featuredRoutes = [
-  { from: 'London',     to: 'Lagos',     tag: 'Most Popular',  color: 'from-blue-500/20 to-blue-600/10',       border: 'border-blue-500/20',    badge: 'bg-blue-500/20 text-blue-300',       travellers: 12, departs: 'Today',     sendSlug: 'london-to-lagos'      },
-  { from: 'Manchester', to: 'Lagos',     tag: 'High Demand',   color: 'from-emerald-500/20 to-emerald-600/10', border: 'border-emerald-500/20', badge: 'bg-emerald-500/20 text-emerald-300', travellers: 7,  departs: 'Tomorrow',  sendSlug: 'manchester-to-lagos'  },
-  { from: 'Derby',      to: 'Heathrow',  tag: 'UK Domestic',   color: 'from-violet-500/20 to-violet-600/10',   border: 'border-violet-500/20',  badge: 'bg-violet-500/20 text-violet-300',   travellers: 4,  departs: 'Today',     sendSlug: null                   },
-  { from: 'London',     to: 'Aberdeen',  tag: 'UK Domestic',   color: 'from-sky-500/20 to-sky-600/10',         border: 'border-sky-500/20',     badge: 'bg-sky-500/20 text-sky-300',         travellers: 3,  departs: 'Tomorrow',  sendSlug: null                   },
-  { from: 'London',     to: 'Edinburgh', tag: 'High Demand',   color: 'from-green-500/20 to-green-600/10',     border: 'border-green-500/20',   badge: 'bg-green-500/20 text-green-300',     travellers: 9,  departs: 'Today',     sendSlug: 'london-to-edinburgh'  },
-  { from: 'London',     to: 'New York',  tag: 'Transatlantic', color: 'from-cyan-500/20 to-cyan-600/10',       border: 'border-cyan-500/20',    badge: 'bg-cyan-500/20 text-cyan-300',       travellers: 5,  departs: 'Thu',       sendSlug: null                   },
-  { from: 'Birmingham', to: 'Lagos',     tag: 'Growing Route', color: 'from-amber-500/20 to-amber-600/10',     border: 'border-amber-500/20',   badge: 'bg-amber-500/20 text-amber-300',     travellers: 6,  departs: 'Tomorrow',  sendSlug: 'birmingham-to-lagos'  },
-  { from: 'London',     to: 'Dubai',     tag: 'International', color: 'from-orange-500/20 to-orange-600/10',   border: 'border-orange-500/20',  badge: 'bg-orange-500/20 text-orange-300',   travellers: 8,  departs: 'Today',     sendSlug: null                   },
-  { from: 'Nottingham', to: 'Lagos',     tag: 'New Corridor',  color: 'from-purple-500/20 to-purple-600/10',   border: 'border-purple-500/20',  badge: 'bg-purple-500/20 text-purple-300',   travellers: 2,  departs: 'Fri',       sendSlug: null                   },
+  { from: 'London',     to: 'Lagos',     tag: 'Most Popular',  color: 'from-blue-50 to-blue-100/60',       border: 'border-blue-200',    badge: 'bg-blue-100 text-blue-700',       travellers: 12, departs: 'Today',     sendSlug: 'london-to-lagos'      },
+  { from: 'Manchester', to: 'Lagos',     tag: 'High Demand',   color: 'from-emerald-50 to-emerald-100/60', border: 'border-emerald-200', badge: 'bg-emerald-100 text-emerald-700', travellers: 7,  departs: 'Tomorrow',  sendSlug: 'manchester-to-lagos'  },
+  { from: 'Derby',      to: 'Heathrow',  tag: 'UK Domestic',   color: 'from-violet-50 to-violet-100/60',   border: 'border-violet-200',  badge: 'bg-violet-100 text-violet-700',   travellers: 4,  departs: 'Today',     sendSlug: null                   },
+  { from: 'London',     to: 'Aberdeen',  tag: 'UK Domestic',   color: 'from-sky-50 to-sky-100/60',         border: 'border-sky-200',     badge: 'bg-sky-100 text-sky-700',         travellers: 3,  departs: 'Tomorrow',  sendSlug: null                   },
+  { from: 'London',     to: 'Edinburgh', tag: 'High Demand',   color: 'from-green-50 to-green-100/60',     border: 'border-green-200',   badge: 'bg-green-100 text-green-700',     travellers: 9,  departs: 'Today',     sendSlug: 'london-to-edinburgh'  },
+  { from: 'London',     to: 'New York',  tag: 'Transatlantic', color: 'from-cyan-50 to-cyan-100/60',       border: 'border-cyan-200',    badge: 'bg-cyan-100 text-cyan-700',       travellers: 5,  departs: 'Thu',       sendSlug: null                   },
+  { from: 'Birmingham', to: 'Lagos',     tag: 'Growing Route', color: 'from-amber-50 to-amber-100/60',     border: 'border-amber-200',   badge: 'bg-amber-100 text-amber-700',     travellers: 6,  departs: 'Tomorrow',  sendSlug: 'birmingham-to-lagos'  },
+  { from: 'London',     to: 'Dubai',     tag: 'International', color: 'from-orange-50 to-orange-100/60',   border: 'border-orange-200',  badge: 'bg-orange-100 text-orange-700',   travellers: 8,  departs: 'Today',     sendSlug: null                   },
+  { from: 'Nottingham', to: 'Lagos',     tag: 'New Corridor',  color: 'from-purple-50 to-purple-100/60',   border: 'border-purple-200',  badge: 'bg-purple-100 text-purple-700',   travellers: 2,  departs: 'Fri',       sendSlug: null                   },
 ];
 
 const weightOptions = [
@@ -75,27 +65,27 @@ function StarRating({ count }: { count: number }) {
 
 function TestimonialsSection() {
   return (
-    <section id="testimonials" className="relative py-20 md:py-28 bg-[#07111f]">
+    <section id="testimonials" className="relative py-20 md:py-28 bg-slate-50">
       <div className="mx-auto max-w-5xl px-6 md:px-8">
 
         {/* Big pull quote — first testimonial */}
-        <div className="mb-14 border-l-2 border-blue-500/40 pl-8">
-          <p className="text-2xl md:text-3xl font-medium text-white/85 leading-snug italic mb-6">
+        <div className="mb-14 border-l-2 border-blue-400 pl-8">
+          <p className="text-2xl md:text-3xl font-medium text-slate-800 leading-snug italic mb-6">
             &ldquo;{testimonials[0].text}&rdquo;
           </p>
           <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-500/20 text-sm font-bold text-blue-300">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
               {testimonials[0].name[0]}
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">{testimonials[0].name}</p>
-              <p className="text-xs text-white/40">{testimonials[0].role} · {testimonials[0].route}</p>
+              <p className="text-sm font-semibold text-slate-900">{testimonials[0].name}</p>
+              <p className="text-xs text-slate-400">{testimonials[0].role} · {testimonials[0].route}</p>
             </div>
             <div className="ml-4">
               <StarRating count={testimonials[0].rating} />
             </div>
           </div>
-          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1 text-xs text-green-400 font-medium">
+          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-green-50 border border-green-200 px-3 py-1 text-xs text-green-700 font-medium">
             <CheckCircle className="h-3 w-3 shrink-0" /> {testimonials[0].outcome}
           </div>
         </div>
@@ -103,19 +93,19 @@ function TestimonialsSection() {
         {/* Two smaller cards */}
         <div className="grid gap-5 md:grid-cols-2">
           {testimonials.slice(1).map((t) => (
-            <div key={t.name} className="rounded-2xl border border-white/8 bg-white/3 p-6">
+            <div key={t.name} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <StarRating count={t.rating} />
-              <p className="mt-3 text-sm leading-relaxed text-white/65 italic">&quot;{t.text}&quot;</p>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600 italic">&quot;{t.text}&quot;</p>
               <div className="mt-4 flex items-center gap-3">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white/60">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
                   {t.name[0]}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white/80">{t.name}</p>
-                  <p className="text-xs text-white/35">{t.role} · {t.route}</p>
+                  <p className="text-sm font-medium text-slate-800">{t.name}</p>
+                  <p className="text-xs text-slate-400">{t.role} · {t.route}</p>
                 </div>
               </div>
-              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1 text-xs text-green-400 font-medium">
+              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-green-50 border border-green-200 px-3 py-1 text-xs text-green-700 font-medium">
                 <CheckCircle className="h-3 w-3 shrink-0" /> {t.outcome}
               </div>
             </div>
@@ -136,10 +126,10 @@ const TRANSPORT_MODES = [
     title:    'Flight-Speed Delivery',
     body:     'Match with verified travellers on commercial flights. Ideal for urgent cross-border deliveries, documents, and high-value items.',
     accent:   'blue',
-    glow:     'rgba(59,130,246,0.22)',
-    border:   'border-blue-500/30',
-    bg:       'from-blue-900/50 to-blue-700/20',
-    tag:      'text-blue-300/80',
+    glow:     'rgba(59,130,246,0.12)',
+    border:   'border-blue-200',
+    bg:       'from-blue-50 to-blue-100/50',
+    tag:      'text-blue-600',
   },
   {
     emoji:    '🚆',
@@ -147,10 +137,10 @@ const TRANSPORT_MODES = [
     title:    'Same-Day UK Corridors',
     body:     'Intercity trains connect London, Manchester, Birmingham, Edinburgh and beyond. Perfect for domestic same-day delivery.',
     accent:   'cyan',
-    glow:     'rgba(6,182,212,0.22)',
-    border:   'border-cyan-500/30',
-    bg:       'from-cyan-900/50 to-cyan-700/20',
-    tag:      'text-cyan-300/80',
+    glow:     'rgba(6,182,212,0.12)',
+    border:   'border-cyan-200',
+    bg:       'from-cyan-50 to-cyan-100/50',
+    tag:      'text-cyan-600',
   },
   {
     emoji:    '🚗',
@@ -158,10 +148,10 @@ const TRANSPORT_MODES = [
     title:    'Door-to-Door Precision',
     body:     'Drivers and commuters cover the last mile. Fast, flexible, and ideal for local same-day jobs where flexibility matters most.',
     accent:   'violet',
-    glow:     'rgba(139,92,246,0.22)',
-    border:   'border-violet-500/30',
-    bg:       'from-violet-900/50 to-violet-700/20',
-    tag:      'text-violet-300/80',
+    glow:     'rgba(139,92,246,0.12)',
+    border:   'border-violet-200',
+    bg:       'from-violet-50 to-violet-100/50',
+    tag:      'text-violet-600',
   },
 ] as const;
 
@@ -191,15 +181,15 @@ function TransportCarousel() {
       {/* Card */}
       <div
         key={active}
-        className={`relative backdrop-blur-xl bg-gradient-to-br ${mode.bg} border ${mode.border} rounded-3xl p-10 text-left
-          shadow-[0_0_80px_var(--glow),0_24px_64px_rgba(0,0,0,0.45)]
+        className={`relative bg-gradient-to-br ${mode.bg} border ${mode.border} rounded-3xl p-10 text-left
+          shadow-[0_0_50px_var(--glow),0_16px_40px_rgba(15,23,42,0.08)]
           animate-[fadeSlide_0.45s_ease_forwards]`}
         style={{ '--glow': mode.glow } as React.CSSProperties}
       >
         <div className="text-4xl mb-5">{mode.emoji}</div>
         <p className={`text-xs font-bold uppercase tracking-[0.2em] mb-2 ${mode.tag}`}>{mode.label}</p>
-        <h3 className="text-white text-2xl font-semibold mb-3">{mode.title}</h3>
-        <p className="text-white/60 text-sm leading-relaxed">{mode.body}</p>
+        <h3 className="text-slate-900 text-2xl font-semibold mb-3">{mode.title}</h3>
+        <p className="text-slate-500 text-sm leading-relaxed">{mode.body}</p>
       </div>
 
       {/* Dot navigation */}
@@ -211,8 +201,8 @@ function TransportCarousel() {
             aria-label={`Show ${m.label}`}
             className={`rounded-full transition-all duration-300 ${
               i === active
-                ? 'w-8 h-2.5 bg-white'
-                : 'w-2.5 h-2.5 bg-white/25 hover:bg-white/50'
+                ? 'w-8 h-2.5 bg-blue-500'
+                : 'w-2.5 h-2.5 bg-slate-300 hover:bg-slate-400'
             }`}
           />
         ))}
@@ -222,14 +212,14 @@ function TransportCarousel() {
       <div className="flex items-center justify-center gap-4 mt-5">
         <button
           onClick={() => go((active - 1 + TRANSPORT_MODES.length) % TRANSPORT_MODES.length, -1)}
-          className="w-9 h-9 rounded-full border border-white/15 bg-white/5 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all"
+          className="w-9 h-9 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-all"
           aria-label="Previous"
         >
           ‹
         </button>
         <button
           onClick={() => go((active + 1) % TRANSPORT_MODES.length, 1)}
-          className="w-9 h-9 rounded-full border border-white/15 bg-white/5 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all"
+          className="w-9 h-9 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-all"
           aria-label="Next"
         >
           ›
@@ -255,8 +245,7 @@ function HomePageContent() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('send');
   const [winsVid,  setWinsVid]  = useState(0);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [heroVisual, setHeroVisual] = useState(0);
   const [showEmail, setShowEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [codeInput, setCodeInput] = useState('');
@@ -277,7 +266,7 @@ function HomePageContent() {
 
   const [scrollY, setScrollY] = useState(0);
   useEffect(() => {
-    const onScroll = () => { setScrollY(window.scrollY); setScrolled(window.scrollY > 20); };
+    const onScroll = () => { setScrollY(window.scrollY); };
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -325,6 +314,12 @@ function HomePageContent() {
   // Why BootHop Wins background — 6s crossfade between video1 and video2
   useEffect(() => {
     const id = setInterval(() => setWinsVid(v => (v + 1) % 2), 6000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Hero visual — crossfade between the plane video and the delivery photo
+  useEffect(() => {
+    const id = setInterval(() => setHeroVisual(v => (v + 1) % 2), 30000);
     return () => clearInterval(id);
   }, []);
 
@@ -424,176 +419,142 @@ function HomePageContent() {
     router.push(data.redirectTo || '/intent');
   };
 
-  const inputClass = "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/45 focus:outline-none focus:ring-2 focus:ring-blue-400/70 focus:border-blue-400/50 backdrop-blur-xl transition-all duration-200 hover:bg-white/15 hover:border-white/30 text-sm shadow-inner shadow-black/10";
+  const inputClass = "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/70 focus:border-blue-400/50 transition-all duration-200 hover:border-slate-300 text-sm";
 
   return (
-    <div className="min-h-screen bg-[#07111f] text-white overflow-x-hidden pb-14">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pb-14">
 
       {/* ── ANNOUNCEMENT BANNER ── */}
       {showBanner && (
-        <div className="fixed top-0 left-0 right-0 z-[70] h-10 flex items-center justify-center gap-3 bg-amber-500/15 border-b border-amber-500/25 backdrop-blur-md px-4">
-          <span className="text-amber-300 text-xs font-semibold hidden sm:inline">🎁 New members get £20 delivery credit — first 500 only · No subscription needed</span>
-          <span className="text-amber-300 text-xs font-semibold sm:hidden">🎁 Get £20 delivery credit — first 500 members</span>
+        <div className="fixed top-0 left-0 right-0 z-[70] h-10 flex items-center justify-center gap-3 bg-amber-50 border-b border-amber-200 px-4">
+          <span className="text-amber-800 text-xs font-semibold hidden sm:inline">🎁 New members get £20 delivery credit — first 500 only · No subscription needed</span>
+          <span className="text-amber-800 text-xs font-semibold sm:hidden">🎁 Get £20 delivery credit — first 500 members</span>
           <Link href="/start" className="rounded-full bg-amber-500 text-black text-xs font-bold px-3 py-1 hover:bg-amber-400 transition-colors whitespace-nowrap">
             Claim yours →
           </Link>
-          <button onClick={dismissBanner} className="ml-1 text-amber-400/60 hover:text-amber-300 transition-colors" aria-label="Dismiss">
+          <button onClick={dismissBanner} className="ml-1 text-amber-700/60 hover:text-amber-800 transition-colors" aria-label="Dismiss">
             <X className="h-3.5 w-3.5" />
           </button>
         </div>
       )}
 
       {/* ── NAV ── */}
-      <nav className={`fixed z-50 w-full transition-all duration-500 ${showBanner ? 'top-10' : 'top-0'} ${scrolled ? 'border-b border-white/10 bg-[#07111f]/90 shadow-xl backdrop-blur-2xl' : 'bg-transparent backdrop-blur-sm'}`}>
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 md:px-8">
-          <Link href="/" className="flex items-center">
-            <BootHopLogo size="md" />
-          </Link>
-
-          <div className="hidden items-center gap-1 md:flex">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/8 transition-all duration-200">
-                {link.label}
-              </Link>
-            ))}
-          </div>
-
-          <div className="hidden items-center gap-3 md:flex">
-            <Link href="/login" className="rounded-lg px-4 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/8 transition-all duration-200">Log in</Link>
-            <Link href="/start" className="rounded-full bg-blue-500 px-5 py-2 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(59,130,246,0.4)]">Get Started</Link>
-          </div>
-
-          <button className="rounded-lg p-2 md:hidden text-white/70 hover:text-white hover:bg-white/8 transition-all"
-            onClick={() => setMobileOpen((prev) => !prev)} aria-label="Toggle menu">
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
-
-        {mobileOpen && (
-          <div className="border-t border-white/8 bg-[#07111f]/98 backdrop-blur-2xl md:hidden">
-            <div className="space-y-1 px-6 py-4">
-              {navLinks.map((link) => (
-                <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)}
-                  className="block rounded-lg px-4 py-3 text-sm font-medium text-white/65 hover:text-white hover:bg-white/8 transition-colors">{link.label}</Link>
-              ))}
-              <div className="flex flex-col gap-2 pt-3">
-                <Link href="/login" className="block rounded-xl border border-white/12 py-3 text-center text-sm font-medium text-white/65 hover:text-white hover:bg-white/8 transition-all">Log in</Link>
-                <Link href="/start" className="block rounded-xl bg-blue-500 py-3 text-center text-sm font-semibold text-white">Get Started</Link>
-              </div>
-            </div>
-          </div>
-        )}
-      </nav>
+      <NavBar bannerVisible={showBanner} />
 
       {/* ── HERO ── */}
-      <section className={`relative min-h-screen overflow-hidden flex flex-col justify-center ${showBanner ? 'pt-[104px]' : 'pt-16'}`}>
-
-        {/* PLANE VIDEO — SPEED SIGNAL */}
-        <video autoPlay muted loop playsInline
-          className="absolute inset-0 w-full h-full object-cover">
-          <source src={HERO_VIDEO} type="video/mp4" />
-        </video>
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
+      <section className={`relative overflow-hidden bg-gradient-to-b from-white to-slate-50 ${showBanner ? 'pt-[120px]' : 'pt-20'}`}>
 
         {/* CONTENT */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 h-full flex items-center pt-8 pb-20 md:py-0">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-14 md:py-20">
           <div className="grid md:grid-cols-2 gap-12 items-center w-full">
 
             {/* LEFT */}
             <div>
-              {/* H1 anchored at top — visible immediately above the fold */}
-              <h1 className="text-4xl md:text-6xl font-semibold text-white leading-tight mb-4 tracking-tight">
+              <h1 className="text-4xl md:text-6xl font-semibold text-slate-900 leading-tight mb-4 tracking-tight">
                 Sending home shouldn&apos;t<br />cost £300 and take a week.
               </h1>
 
-              <p className="text-white/80 text-lg mb-1 max-w-xl leading-relaxed">
+              <p className="text-slate-600 text-lg mb-1 max-w-xl leading-relaxed">
                 Connect with a verified traveller already flying your route.
               </p>
-              <p className="text-white/55 text-sm mb-7 max-w-xl">
+              <p className="text-slate-500 text-sm mb-7 max-w-xl">
                 Same day. You set the price. Payment protected.{' '}
-                <Link href="/trust-safety" className="underline underline-offset-2 hover:text-white/80 transition-colors">What can I send? →</Link>
+                <Link href="/trust-safety" className="underline underline-offset-2 hover:text-slate-800 transition-colors">What can I send? →</Link>
               </p>
 
-              {/* CTAs — two equal options */}
+              {/* CTAs — two equal options, the first choice made immediately clear */}
               <div className="flex flex-col sm:flex-row gap-3 mb-3">
                 <Link href="/start?role=sender"
                   onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'hero_sender_cta' })}
-                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.45)] shadow-lg shadow-amber-500/30">
-                  📦 Start Sending
+                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.35)] shadow-lg shadow-amber-500/20">
+                  📦 Send an Item
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link href="/start?role=traveller"
                   onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'hero_traveller_cta' })}
-                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full border border-white/20 bg-white/8 hover:bg-white/12 hover:border-white/35 text-white font-bold text-base transition-all hover:-translate-y-0.5">
+                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full border-2 border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50 text-slate-900 font-bold text-base transition-all hover:-translate-y-0.5 shadow-sm">
                   ✈️ Earn While Travelling
                 </Link>
               </div>
-              <p className="text-white/45 text-sm mb-7">
-                🎁 New members receive <span className="text-white font-semibold">£20</span> delivery credit ·{' '}
-                <span className="text-white/30">Most deliveries £30–£120</span>
+              <p className="text-slate-400 text-sm mb-7">
+                🎁 New members receive <span className="text-slate-900 font-semibold">£20</span> delivery credit ·{' '}
+                <span className="text-slate-400">Most deliveries £30–£120</span>
               </p>
               <div className="flex flex-col gap-1.5 mb-7">
-                <p className="text-xs text-white/30">
+                <p className="text-xs text-slate-400">
                   Using BootHop for business?{' '}
-                  <Link href="/business" className="underline underline-offset-2 hover:text-white/50 transition-colors">
+                  <Link href="/business" className="underline underline-offset-2 hover:text-slate-600 transition-colors">
                     Explore Business Portal →
                   </Link>
                 </p>
               </div>
 
               {/* Micro How It Works */}
-              <div className="flex flex-wrap items-center gap-2 text-white/45 text-sm mb-6">
+              <div className="flex flex-wrap items-center gap-2 text-slate-400 text-sm mb-6">
                 {['Post', 'Match', 'Handoff', 'Deliver'].map((step, i, arr) => (
                   <span key={step} className="flex items-center gap-2">
-                    <span className="text-white/70 font-medium">{step}</span>
-                    {i < arr.length - 1 && <ArrowRight className="h-3 w-3 text-white/25" />}
+                    <span className="text-slate-700 font-medium">{step}</span>
+                    {i < arr.length - 1 && <ArrowRight className="h-3 w-3 text-slate-300" />}
                   </span>
                 ))}
               </div>
 
               {/* Trust strip */}
-              <div className="flex flex-wrap gap-5 text-white/50 text-xs">
-                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Every traveller ID-verified before matching</span>
-                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Payment held in escrow until you confirm delivery</span>
-                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Real-time GPS tracking on every active delivery</span>
+              <div className="flex flex-wrap gap-5 text-slate-500 text-xs">
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-500" />Every traveller ID-verified before matching</span>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-500" />Payment held in escrow until you confirm delivery</span>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-500" />Real-time GPS tracking on every active delivery</span>
               </div>
             </div>
 
-            {/* RIGHT — live glass card */}
+            {/* RIGHT — one window, crossfading between the plane video and the delivery photo */}
             <div className="relative hidden md:block">
-              <div className="rounded-3xl border border-white/20 bg-white/5 backdrop-blur-xl p-3 shadow-[0_40px_120px_rgba(0,0,0,0.6)]">
+              <div className="rounded-3xl border border-slate-200 bg-white p-3 shadow-[0_30px_80px_rgba(15,23,42,0.12)]">
                 <div className="relative overflow-hidden rounded-2xl" style={{ aspectRatio: '4/5' }}>
-                  <Image src="/images/drealboothop.jpg" alt="BootHop delivery" fill priority className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                  <video autoPlay muted loop playsInline
+                    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[1500ms] ease-in-out"
+                    style={{ opacity: heroVisual === 0 ? 1 : 0 }}>
+                    <source src={HERO_VIDEO} type="video/mp4" />
+                  </video>
+                  <Image src="/images/drealboothop.jpg" alt="BootHop delivery" fill
+                    className="absolute inset-0 object-cover transition-opacity duration-[1500ms] ease-in-out"
+                    style={{ opacity: heroVisual === 1 ? 1 : 0 }} />
+
                   {/* Live badge */}
-                  <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3 py-1.5 backdrop-blur-xl">
-                    <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-xs font-semibold text-white/90">Live platform</span>
+                  <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-1.5 backdrop-blur-xl shadow-sm">
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-xs font-semibold text-slate-800">Live platform</span>
                   </div>
                   {/* ID Verified badge */}
-                  <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-green-500/20 border border-green-500/30 px-3 py-1.5 backdrop-blur-xl">
-                    <CheckCircle className="h-3 w-3 text-green-400" />
-                    <span className="text-xs text-white font-semibold">ID Verified</span>
+                  <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-white/90 border border-green-200 px-3 py-1.5 backdrop-blur-xl shadow-sm">
+                    <CheckCircle className="h-3 w-3 text-green-600" />
+                    <span className="text-xs text-slate-800 font-semibold">ID Verified</span>
                   </div>
                   {/* Match found signal */}
-                  <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-xl bg-black/60 px-4 py-2 backdrop-blur-md">
-                    <span className="h-2 w-2 bg-green-400 rounded-full animate-pulse" />
-                    <span className="text-xs text-white font-medium">Match found · 2 mins ago</span>
+                  <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-xl bg-white/90 px-4 py-2 backdrop-blur-md shadow-sm">
+                    <span className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+                    <span className="text-xs text-slate-800 font-medium">Match found · 2 mins ago</span>
+                  </div>
+
+                  {/* Dot toggle — shows which visual is active */}
+                  <div className="absolute bottom-4 right-4 flex items-center gap-1.5">
+                    {[0, 1].map(i => (
+                      <button key={i} onClick={() => setHeroVisual(i)} aria-label={`Show visual ${i + 1}`}
+                        className={`rounded-full transition-all duration-300 ${heroVisual === i ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/60 hover:bg-white/90'}`} />
+                    ))}
                   </div>
                 </div>
               </div>
               {/* Floating route card */}
-              <div className="absolute -bottom-4 -left-8 rounded-2xl border border-white/25 bg-white/10 p-4 shadow-2xl backdrop-blur-xl">
-                <p className="mb-1.5 text-[10px] font-semibold text-white/50 uppercase tracking-wider">Live Match</p>
+              <div className="absolute -bottom-4 -left-8 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_20px_50px_rgba(15,23,42,0.15)]">
+                <p className="mb-1.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Live Match</p>
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/25">
-                    <Plane className="h-4 w-4 text-blue-400" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
+                    <Plane className="h-4 w-4 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-white">London → Lagos</p>
-                    <p className="text-xs text-white/50">Verified traveller · 3 slots left</p>
+                    <p className="text-sm font-bold text-slate-900">London → Lagos</p>
+                    <p className="text-xs text-slate-500">Verified traveller · 3 slots left</p>
                   </div>
                 </div>
               </div>
@@ -604,37 +565,36 @@ function HomePageContent() {
       </section>
 
       {/* ── WHY NOT DHL? — comparison table, moved to section 2 ── */}
-      <section className="relative py-24 md:py-32 px-6 overflow-hidden">
-
-        {/* Video 1 & 2 crossfading as full background */}
-        {[1, 2].map((n, i) => (
-          <video
-            key={n}
-            autoPlay muted loop playsInline
-            preload={i === 0 ? 'auto' : 'none'}
-            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[3000ms] ease-in-out"
-            style={{ opacity: i === winsVid ? 1 : 0 }}
-          >
-            <source src={`/videos/onecall/test_v/video${n}.mp4`} type="video/mp4" />
-          </video>
-        ))}
-
-        <div className="absolute inset-0 bg-black/58" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_60%,rgba(59,130,246,0.10),transparent_70%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050D1A]/90 via-transparent to-[#040C19]/90 pointer-events-none" />
+      <section className="relative py-24 md:py-32 px-6 bg-white">
 
         <div className="relative z-10 max-w-5xl mx-auto">
           <div className="text-center mb-10">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300/70 mb-3">Why not just use DHL?</p>
-            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">Same package. Very different experience.</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600/80 mb-3">Why not just use DHL?</p>
+            <h2 className="text-3xl md:text-4xl font-semibold text-slate-900 tracking-tight">Same package. Very different experience.</h2>
           </div>
+
+          {/* Video 1 & 2 crossfading, framed as a banner instead of a full-bleed background */}
+          <div className="relative mb-12 overflow-hidden rounded-3xl border border-slate-200 shadow-[0_30px_70px_rgba(15,23,42,0.12)]" style={{ aspectRatio: '21/9' }}>
+            {[1, 2].map((n, i) => (
+              <video
+                key={n}
+                autoPlay muted loop playsInline
+                preload={i === 0 ? 'auto' : 'none'}
+                className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[3000ms] ease-in-out"
+                style={{ opacity: i === winsVid ? 1 : 0 }}
+              >
+                <source src={`/videos/onecall/test_v/video${n}.mp4`} type="video/mp4" />
+              </video>
+            ))}
+          </div>
+
           <div className="grid md:grid-cols-2 gap-6 mb-12">
 
-            {/* Traditional — glass with red tint */}
-            <div className="rounded-3xl border border-red-500/20 bg-black/30 backdrop-blur-xl p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            {/* Traditional — light card, red accent */}
+            <div className="rounded-3xl border border-red-100 bg-red-50/40 p-8">
               <div className="flex items-center gap-3 mb-7">
-                <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-sm">✕</div>
-                <h3 className="text-white font-semibold text-lg">Traditional Courier</h3>
+                <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-sm">✕</div>
+                <h3 className="text-slate-900 font-semibold text-lg">Traditional Courier</h3>
               </div>
               <ul className="space-y-4">
                 {[
@@ -644,19 +604,19 @@ function HomePageContent() {
                   'Customs delays, lost items, no recourse',
                   'Depot-to-depot — not door-to-door',
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-white/50">
-                    <span className="mt-0.5 text-red-400/60 shrink-0">—</span>
+                  <li key={item} className="flex items-start gap-3 text-sm text-slate-500">
+                    <span className="mt-0.5 text-red-400 shrink-0">—</span>
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* BootHop — glass with blue glow */}
-            <div className="rounded-3xl border border-blue-500/30 bg-blue-950/30 backdrop-blur-xl p-8 shadow-[0_0_60px_rgba(59,130,246,0.15),inset_0_1px_0_rgba(255,255,255,0.08)]">
+            {/* BootHop — light card, blue accent */}
+            <div className="rounded-3xl border border-blue-200 bg-blue-50/40 p-8 shadow-[0_20px_50px_rgba(59,130,246,0.08)]">
               <div className="flex items-center gap-3 mb-7">
-                <div className="w-8 h-8 rounded-full bg-blue-500/25 flex items-center justify-center text-sm">✓</div>
-                <h3 className="text-white font-semibold text-lg">BootHop</h3>
+                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">✓</div>
+                <h3 className="text-slate-900 font-semibold text-lg">BootHop</h3>
               </div>
               <ul className="space-y-4">
                 {[
@@ -666,8 +626,8 @@ function HomePageContent() {
                   'Escrow protection — funds held until delivery confirmed',
                   'Airport-to-door, city-to-city, or wherever you need',
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-white/80">
-                    <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 shrink-0" />
+                  <li key={item} className="flex items-start gap-3 text-sm text-slate-700">
+                    <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -686,73 +646,51 @@ function HomePageContent() {
       </section>
 
       {/* ── EMOTIONAL STORY — "Sending home" + £20 credit ── */}
-      <section id="emotional-hook" className="relative overflow-hidden" style={{ minHeight: '92vh' }}>
+      <section id="emotional-hook" className="relative bg-slate-50 py-24 md:py-32 px-6 overflow-hidden">
+        <div className="relative z-10 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
 
-        {/* dont_worry.mp4 — the emotional hook video */}
-        <video
-          autoPlay muted loop playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/videos/onecall/test_v/dont_worry.mp4" type="video/mp4" />
-        </video>
-
-        {/* Layered overlays — heavy on left for text, fades to transparent on right so video shows */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#07111f] via-[#07111f]/85 to-[#07111f]/20" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#07111f]/70 via-transparent to-[#07111f]/85" />
-
-        {/* Soft warm ambient — gives the section a gentle glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_60%,rgba(245,158,11,0.07),transparent_60%)]" />
-
-        {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-28 flex items-center min-h-[92vh] w-full">
-          <div className="max-w-xl w-full">
-
-            {/* Headline — three-line emotional break */}
-            <h2 className="text-4xl sm:text-5xl md:text-[3.75rem] font-extrabold text-white leading-[1.06] tracking-tight mb-7">
+          {/* LEFT — copy + credit card */}
+          <div>
+            <h2 className="text-4xl sm:text-5xl font-semibold text-slate-900 leading-[1.1] tracking-tight mb-7">
               Sending home<br />
-              <span className="text-white/38">shouldn&apos;t be</span><br />
+              <span className="text-slate-400">shouldn&apos;t be</span><br />
               this hard.
             </h2>
 
-            {/* Body copy */}
-            <p className="text-white/60 text-lg leading-[1.75] mb-3 max-w-[420px]">
+            <p className="text-slate-600 text-lg leading-[1.75] mb-3 max-w-[420px]">
               A birthday present stuck at a depot. A letter that can&apos;t wait. A gift that means
               everything — delayed by slow couriers and hidden fees.
             </p>
-            <p className="text-white/38 text-base leading-[1.75] mb-11 max-w-[400px]">
+            <p className="text-slate-400 text-base leading-[1.75] mb-11 max-w-[400px]">
               We built BootHop so the miles between you and home feel smaller — by connecting
               your parcel with a real person already making that journey.
             </p>
 
             {/* ── £20 CREDIT CARD ── */}
-            <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-br from-[#1c1300]/90 to-[#0d0900]/70 backdrop-blur-2xl p-7 shadow-[0_0_90px_rgba(245,158,11,0.10),0_32px_80px_rgba(0,0,0,0.55)]">
+            <div className="rounded-3xl border border-amber-200 bg-amber-50 p-7 shadow-[0_20px_50px_rgba(245,158,11,0.08)]">
               <div className="flex items-start gap-5">
 
-                {/* Gift icon block */}
-                <div className="w-14 h-14 rounded-2xl border border-amber-500/25 bg-amber-500/10 flex items-center justify-center shrink-0 text-2xl shadow-[inset_0_1px_0_rgba(245,158,11,0.12)]">
+                <div className="w-14 h-14 rounded-2xl border border-amber-200 bg-amber-100 flex items-center justify-center shrink-0 text-2xl">
                   🎁
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  {/* Title row */}
                   <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <p className="text-amber-200 font-extrabold text-xl">£20 free credit</p>
-                    <span className="rounded-full bg-amber-500/15 border border-amber-500/25 px-2.5 py-0.5 text-[10px] font-bold text-amber-400 uppercase tracking-wide">
+                    <p className="text-amber-700 font-extrabold text-xl">£20 free credit</p>
+                    <span className="rounded-full bg-amber-100 border border-amber-200 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 uppercase tracking-wide">
                       New members only
                     </span>
                   </div>
 
-                  {/* Description */}
-                  <p className="text-white/45 text-sm leading-relaxed mb-6">
+                  <p className="text-slate-500 text-sm leading-relaxed mb-6">
                     Join today and your first delivery is on us — up to £20 off, no minimum spend.
                     First 500 members only. Credit applied automatically at checkout.
                   </p>
 
-                  {/* CTA button */}
                   <Link
                     href="/start?role=sender"
                     onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'credit_cta' })}
-                    className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold px-7 py-3.5 text-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_44px_rgba(245,158,11,0.45)] active:scale-[0.98] shadow-[0_6px_24px_rgba(245,158,11,0.25)]"
+                    className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold px-7 py-3.5 text-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_44px_rgba(245,158,11,0.35)] active:scale-[0.98] shadow-[0_6px_24px_rgba(245,158,11,0.2)]"
                   >
                     Claim £20 &amp; send your first package
                     <ArrowRight className="h-4 w-4" />
@@ -760,47 +698,56 @@ function HomePageContent() {
                 </div>
               </div>
 
-              {/* Subtle divider + social proof strip */}
-              <div className="mt-7 pt-5 border-t border-white/[0.06] flex flex-wrap items-center gap-x-6 gap-y-2">
+              <div className="mt-7 pt-5 border-t border-amber-200/60 flex flex-wrap items-center gap-x-6 gap-y-2">
                 {[
-                  { dot: 'bg-green-400', text: 'No subscription required' },
-                  { dot: 'bg-blue-400',  text: 'Auto-applied at checkout' },
-                  { dot: 'bg-amber-400', text: 'First 500 members only' },
+                  { dot: 'bg-green-500', text: 'No subscription required' },
+                  { dot: 'bg-blue-500',  text: 'Auto-applied at checkout' },
+                  { dot: 'bg-amber-500', text: 'First 500 members only' },
                 ].map(({ dot, text }) => (
-                  <span key={text} className="flex items-center gap-1.5 text-[11px] text-white/30 font-medium">
-                    <span className={`w-1.5 h-1.5 rounded-full ${dot} opacity-70`} />
+                  <span key={text} className="flex items-center gap-1.5 text-[11px] text-slate-500 font-medium">
+                    <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
                     {text}
                   </span>
                 ))}
               </div>
             </div>
+          </div>
 
+          {/* RIGHT — dont_worry.mp4, framed clean with no overlay now that text has moved off it */}
+          <div className="relative hidden md:block">
+            <div className="rounded-3xl border border-slate-200 bg-white p-3 shadow-[0_30px_80px_rgba(15,23,42,0.12)]">
+              <div className="relative overflow-hidden rounded-2xl" style={{ aspectRatio: '4/5' }}>
+                <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
+                  <source src="/videos/onecall/test_v/dont_worry.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── EMAIL MODAL ── */}
       {showEmail && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 backdrop-blur-sm sm:items-center">
-          <div className="w-full max-w-md rounded-2xl border border-white/12 bg-[#0b1829] p-6 shadow-2xl md:p-8">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-4 backdrop-blur-sm sm:items-center">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl md:p-8">
             {!emailSent ? (
               <>
-                <h2 className="mb-2 text-xl font-semibold text-white md:text-2xl">Almost there</h2>
-                <p className="mb-5 text-sm text-white/50">Set your {mode === 'travel' ? 'price' : 'budget'} and enter your email to post.</p>
+                <h2 className="mb-2 text-xl font-semibold text-slate-900 md:text-2xl">Almost there</h2>
+                <p className="mb-5 text-sm text-slate-500">Set your {mode === 'travel' ? 'price' : 'budget'} and enter your email to post.</p>
                 <div className="mb-4 relative">
-                  <label className="block text-xs text-white/40 mb-1.5">{mode === 'travel' ? 'Your price (£) — what you charge to carry' : 'Your budget (£) — what you\'re willing to pay'}</label>
+                  <label className="block text-xs text-slate-400 mb-1.5">{mode === 'travel' ? 'Your price (£) — what you charge to carry' : 'Your budget (£) — what you\'re willing to pay'}</label>
                   <input type="number" placeholder="e.g. 25" value={trip.price}
                     onChange={(e) => { setTrip({ ...trip, price: e.target.value }); setFormErrors(p => ({ ...p, price: '' })); }}
-                    className={`w-full rounded-xl border bg-white/5 p-3.5 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all ${formErrors.price ? 'border-red-500/60 ring-1 ring-red-500/40' : 'border-white/12'}`} />
-                  {formErrors.price && <p className="mt-1 text-xs text-red-400">{formErrors.price}</p>}
+                    className={`w-full rounded-xl border bg-white p-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all ${formErrors.price ? 'border-red-400 ring-1 ring-red-300' : 'border-slate-200'}`} />
+                  {formErrors.price && <p className="mt-1 text-xs text-red-500">{formErrors.price}</p>}
                 </div>
                 <input type="email" placeholder="Enter your email" value={trip.email}
                   onChange={(e) => { setTrip({ ...trip, email: e.target.value }); setFormErrors(p => ({ ...p, email: '' })); }}
-                  className={`mb-1 w-full rounded-xl border bg-white/5 p-3.5 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all ${formErrors.email ? 'border-red-500/60 ring-1 ring-red-500/40' : 'border-white/12'}`} />
-                {formErrors.email && <p className="mb-3 text-xs text-red-400">{formErrors.email}</p>}
+                  className={`mb-1 w-full rounded-xl border bg-white p-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all ${formErrors.email ? 'border-red-400 ring-1 ring-red-300' : 'border-slate-200'}`} />
+                {formErrors.email && <p className="mb-3 text-xs text-red-500">{formErrors.email}</p>}
                 <div className="flex gap-3">
                   <button onClick={() => setShowEmail(false)}
-                    className="flex-1 rounded-xl border border-white/12 py-3 text-sm text-white/65 transition-all hover:bg-white/5 hover:text-white">
+                    className="flex-1 rounded-xl border border-slate-200 py-3 text-sm text-slate-600 transition-all hover:bg-slate-50 hover:text-slate-900">
                     Cancel
                   </button>
                   <button onClick={sendMagicLink} disabled={submitting}
@@ -811,20 +758,20 @@ function HomePageContent() {
               </>
             ) : (
               <>
-                <h2 className="mb-1 text-xl font-semibold text-white md:text-2xl">Enter your code</h2>
-                <p className="mb-5 text-sm text-white/50">We sent a 5-character code to <span className="font-medium text-blue-400">{trip.email}</span></p>
+                <h2 className="mb-1 text-xl font-semibold text-slate-900 md:text-2xl">Enter your code</h2>
+                <p className="mb-5 text-sm text-slate-500">We sent a 5-character code to <span className="font-medium text-blue-600">{trip.email}</span></p>
                 <input
                   type="text"
                   value={codeInput}
                   onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
                   maxLength={5}
                   placeholder="4827A"
-                  className="mb-4 w-full rounded-xl border border-white/12 bg-white/5 p-3.5 text-center text-2xl font-bold tracking-[0.35em] uppercase text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                  className="mb-4 w-full rounded-xl border border-slate-200 bg-white p-3.5 text-center text-2xl font-bold tracking-[0.35em] uppercase text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                 />
-                {otpError && <p className="mb-3 text-xs text-red-400 text-center">{otpError}</p>}
+                {otpError && <p className="mb-3 text-xs text-red-500 text-center">{otpError}</p>}
                 <div className="flex gap-3">
                   <button onClick={() => { setEmailSent(false); setCodeInput(''); setOtpError(''); }}
-                    className="flex-1 rounded-xl border border-white/12 py-3 text-sm text-white/65 transition-all hover:bg-white/5 hover:text-white">
+                    className="flex-1 rounded-xl border border-slate-200 py-3 text-sm text-slate-600 transition-all hover:bg-slate-50 hover:text-slate-900">
                     ← Resend
                   </button>
                   <button onClick={verifyModalCode} disabled={submitting || codeInput.trim().length < 5}
@@ -839,94 +786,94 @@ function HomePageContent() {
       )}
 
       {/* ── BOOKING FORM — right below hero for instant action ── */}
-      <section id="booking-form" className="py-20 px-6 bg-[#07111f] border-t border-white/[0.05]">
+      <section id="booking-form" className="py-20 px-6 bg-white border-t border-slate-100">
         <div className="max-w-2xl mx-auto">
           <div className="mb-8">
-            <h2 className="text-2xl md:text-3xl font-semibold text-white mb-1">Post in 30 seconds.</h2>
-            <p className="text-white/40 text-sm">We&apos;ll match you with a verified traveller heading that way.</p>
+            <h2 className="text-2xl md:text-3xl font-semibold text-slate-900 mb-1">Post in 30 seconds.</h2>
+            <p className="text-slate-500 text-sm">We&apos;ll match you with a verified traveller heading that way.</p>
           </div>
 
           {/* Mode toggle */}
           <div className="mb-5 flex justify-center">
-            <div className="inline-flex rounded-xl border border-white/20 bg-white/8 p-1 backdrop-blur-xl">
-              <button onClick={() => setMode('send')} className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'send' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/40' : 'text-white/55 hover:text-white hover:bg-white/8'}`}>
+            <div className="inline-flex rounded-xl border border-slate-200 bg-slate-100 p-1">
+              <button onClick={() => setMode('send')} className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'send' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 hover:text-slate-900 hover:bg-white'}`}>
                 📦 Send Item
               </button>
-              <button onClick={() => setMode('travel')} className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'travel' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/40' : 'text-white/55 hover:text-white hover:bg-white/8'}`}>
+              <button onClick={() => setMode('travel')} className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${mode === 'travel' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 hover:text-slate-900 hover:bg-white'}`}>
                 ✈️ I&apos;m Travelling
               </button>
             </div>
           </div>
 
           {/* Form card */}
-          <div className="rounded-2xl border border-white/12 bg-white/[0.04] p-6 backdrop-blur-xl shadow-[0_32px_80px_rgba(0,0,0,0.4)]">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="relative pb-4">
                 <input placeholder="From (City)" value={queryFrom}
                   onChange={(e) => { setQueryFrom(e.target.value); setTrip({ ...trip, from: e.target.value }); setFromSelected(false); setFormErrors(p => ({ ...p, from: '' })); }}
                   className={`${inputClass} ${formErrors.from ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
                 {fromSuggestions.length > 0 && (
-                  <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl">
+                  <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-slate-200 bg-white shadow-2xl">
                     {fromSuggestions.map((s, i) => (
                       <div key={i} onClick={() => { setTrip({ ...trip, from: s }); setQueryFrom(s); setFromSuggestions([]); setFromSelected(true); setFormErrors(p => ({ ...p, from: '' })); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
-                        className="cursor-pointer px-4 py-3 text-sm text-white/85 hover:bg-white/8 hover:text-white transition-colors">{s}</div>
+                        className="cursor-pointer px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors">{s}</div>
                     ))}
                   </div>
                 )}
                 {formErrors.from
-                  ? <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.from}</p>
-                  : queryFrom && !fromSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-400">Select from list</p>}
+                  ? <p className="absolute bottom-0 left-0 text-xs text-red-500">{formErrors.from}</p>
+                  : queryFrom && !fromSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-600">Select from list</p>}
               </div>
               <div className="relative pb-4">
                 <input placeholder="To (City)" value={queryTo}
                   onChange={(e) => { setQueryTo(e.target.value); setTrip({ ...trip, to: e.target.value }); setToSelected(false); setFormErrors(p => ({ ...p, to: '' })); }}
                   className={`${inputClass} ${formErrors.to ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
                 {toSuggestions.length > 0 && (
-                  <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl">
+                  <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-slate-200 bg-white shadow-2xl">
                     {toSuggestions.map((s, i) => (
                       <div key={i} onClick={() => { setTrip({ ...trip, to: s }); setQueryTo(s); setToSuggestions([]); setToSelected(true); setFormErrors(p => ({ ...p, to: '' })); if (window.google?.maps?.places) setSessionToken(new google.maps.places.AutocompleteSessionToken()); }}
-                        className="cursor-pointer px-4 py-3 text-sm text-white/85 hover:bg-white/8 hover:text-white transition-colors">{s}</div>
+                        className="cursor-pointer px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors">{s}</div>
                     ))}
                   </div>
                 )}
                 {formErrors.to
-                  ? <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.to}</p>
-                  : queryTo && !toSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-400">Select from list</p>}
+                  ? <p className="absolute bottom-0 left-0 text-xs text-red-500">{formErrors.to}</p>
+                  : queryTo && !toSelected && <p className="absolute bottom-0 left-0 text-xs text-amber-600">Select from list</p>}
               </div>
               <div className="relative pb-4">
-                <label className="block text-xs text-white/40 mb-1.5 pl-1">Travel / send date</label>
+                <label className="block text-xs text-slate-400 mb-1.5 pl-1">Travel / send date</label>
                 <input type="date" value={trip.date} min={(() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; })()}
                   onChange={(e) => { setTrip({ ...trip, date: e.target.value }); setFormErrors(p => ({ ...p, date: '' })); }}
-                  className={`${inputClass} [color-scheme:dark] ${formErrors.date ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
-                {formErrors.date && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.date}</p>}
+                  className={`${inputClass} ${formErrors.date ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`} />
+                {formErrors.date && <p className="absolute bottom-0 left-0 text-xs text-red-500">{formErrors.date}</p>}
               </div>
               <div className="relative pb-4">
                 <select value={trip.weight} onChange={(e) => { setTrip({ ...trip, weight: e.target.value }); setFormErrors(p => ({ ...p, weight: '' })); }}
                   className={`${inputClass} cursor-pointer ${formErrors.weight ? 'border-red-500/60 ring-1 ring-red-500/40' : ''}`}>
-                  <option value="" disabled className="bg-slate-900 text-white/50">Package size</option>
-                  {weightOptions.map((o) => <option key={o.value} value={o.value} className="bg-slate-900 text-white">{o.label}</option>)}
+                  <option value="" disabled className="bg-white text-slate-400">Package size</option>
+                  {weightOptions.map((o) => <option key={o.value} value={o.value} className="bg-white text-slate-900">{o.label}</option>)}
                 </select>
-                {formErrors.weight && <p className="absolute bottom-0 left-0 text-xs text-red-400">{formErrors.weight}</p>}
+                {formErrors.weight && <p className="absolute bottom-0 left-0 text-xs text-red-500">{formErrors.weight}</p>}
               </div>
               <button onClick={handleSubmit}
                 className="sm:col-span-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 py-4 font-bold text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(59,130,246,0.5)] shadow-lg shadow-blue-500/25 text-base tracking-wide">
                 {mode === 'send' ? 'Find a Traveller' : 'Post My Journey'} <ArrowRight className="h-4 w-4" />
               </button>
             </div>
-            <p className="mt-4 text-center text-xs text-white/30">Free to join · No subscription · You control your price</p>
+            <p className="mt-4 text-center text-xs text-slate-400">Free to join · No subscription · You control your price</p>
           </div>
         </div>
       </section>
 
       {/* ── BUSINESS STRIP ── */}
-      <section className="py-8 px-6 border-y border-white/[0.06] bg-[#020B18]">
+      <section className="py-8 px-6 border-y border-slate-100 bg-slate-50">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-2">For Business</p>
-            <h3 className="text-white font-semibold text-xl leading-snug max-w-lg">
+            <p className="text-xs font-semibold uppercase tracking-widest text-blue-600 mb-2">For Business</p>
+            <h3 className="text-slate-900 font-semibold text-xl leading-snug max-w-lg">
               Same-day critical logistics for time-sensitive operations
             </h3>
-            <p className="text-white/45 text-sm mt-2">
+            <p className="text-slate-500 text-sm mt-2">
               Pharmaceutical samples · Legal documents · Luxury goods · Tech equipment
             </p>
           </div>
@@ -939,15 +886,15 @@ function HomePageContent() {
 
 
       {/* ── HOW BOOTHOP WORKS ── */}
-      <section className="py-24 md:py-32 bg-[#050D1A]">
+      <section className="py-24 md:py-32 bg-white">
         <div className="px-6 max-w-5xl mx-auto w-full">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-14">
-            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">How BootHop Works</h2>
-            <div className="flex items-center gap-5 text-sm text-white/30 pb-1">
+            <h2 className="text-3xl md:text-4xl font-semibold text-slate-900 tracking-tight">How BootHop Works</h2>
+            <div className="flex items-center gap-5 text-sm text-slate-300 pb-1">
               {['01 Post', '02 Match', '03 Handoff', '04 Deliver'].map((s, i) => (
                 <span key={s} className="flex items-center gap-2">
-                  <span className="text-white/60 font-mono text-xs">{s}</span>
-                  {i < 3 && <span className="text-white/15">›</span>}
+                  <span className="text-slate-500 font-mono text-xs">{s}</span>
+                  {i < 3 && <span className="text-slate-200">›</span>}
                 </span>
               ))}
             </div>
@@ -959,21 +906,19 @@ function HomePageContent() {
             {/* Traveller card */}
             <div className="group cursor-pointer flex flex-col">
               <div className="flex items-center gap-3 mb-4">
-                <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-sm shadow-lg shadow-blue-500/40">✈️</span>
+                <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-sm shadow-lg shadow-blue-500/30">✈️</span>
                 <div>
-                  <p className="text-white font-bold text-sm">For Travellers</p>
-                  <p className="text-white/40 text-xs">Earn from your spare luggage space</p>
+                  <p className="text-slate-900 font-bold text-sm">For Travellers</p>
+                  <p className="text-slate-400 text-xs">Earn from your spare luggage space</p>
                 </div>
               </div>
               <div className="relative flex-1">
-                <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-blue-500/50 via-cyan-400/30 to-blue-600/50 blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative rounded-2xl overflow-hidden border border-blue-500/25 shadow-2xl shadow-blue-500/20 group-hover:shadow-blue-500/50 group-hover:-translate-y-2 transition-all duration-500">
+                <div className="relative rounded-2xl overflow-hidden border border-blue-100 shadow-[0_20px_50px_rgba(59,130,246,0.10)] group-hover:shadow-[0_24px_60px_rgba(59,130,246,0.18)] group-hover:-translate-y-2 transition-all duration-500 bg-white">
                   <img
                     src="/images/traveller-diagram.jpg"
                     alt="How it works for Travellers"
                     className="w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-blue-950/30 via-transparent to-transparent" />
                 </div>
               </div>
             </div>
@@ -981,21 +926,19 @@ function HomePageContent() {
             {/* Sender card */}
             <div className="group cursor-pointer flex flex-col">
               <div className="flex items-center gap-3 mb-4">
-                <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center text-sm shadow-lg shadow-emerald-500/40">📦</span>
+                <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center text-sm shadow-lg shadow-emerald-500/30">📦</span>
                 <div>
-                  <p className="text-white font-bold text-sm">For Senders</p>
-                  <p className="text-white/40 text-xs">Send anything, anywhere, affordably</p>
+                  <p className="text-slate-900 font-bold text-sm">For Senders</p>
+                  <p className="text-slate-400 text-xs">Send anything, anywhere, affordably</p>
                 </div>
               </div>
               <div className="relative flex-1">
-                <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-emerald-500/50 via-teal-400/30 to-emerald-600/50 blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative rounded-2xl overflow-hidden border border-emerald-500/25 shadow-2xl shadow-emerald-500/20 group-hover:shadow-emerald-500/50 group-hover:-translate-y-2 transition-all duration-500">
+                <div className="relative rounded-2xl overflow-hidden border border-emerald-100 shadow-[0_20px_50px_rgba(16,185,129,0.10)] group-hover:shadow-[0_24px_60px_rgba(16,185,129,0.18)] group-hover:-translate-y-2 transition-all duration-500 bg-white">
                   <img
                     src="/images/sender-diagram.png"
                     alt="How it works for Senders"
                     className="w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/30 via-transparent to-transparent" />
                 </div>
               </div>
             </div>
@@ -1005,15 +948,15 @@ function HomePageContent() {
           {/* QR — scan to watch */}
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
             <Link href="/watch"
-              className="group flex items-center gap-5 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-blue-500/30 hover:bg-blue-500/5 transition-all duration-300 px-6 py-4 cursor-pointer">
+              className="group flex items-center gap-5 rounded-2xl border border-slate-200 bg-slate-50 hover:border-blue-200 hover:bg-blue-50 transition-all duration-300 px-6 py-4 cursor-pointer">
               <Image src="/images/watch-qr.png" alt="Scan to watch" width={72} height={72} className="rounded-lg opacity-90 group-hover:opacity-100 transition-opacity" />
               <div className="text-left">
-                <p className="text-white font-semibold text-sm mb-0.5">Watch how it works</p>
-                <p className="text-white/40 text-xs">Scan with your phone or click to play</p>
-                <p className="text-blue-400 text-xs mt-1.5 font-medium group-hover:text-blue-300 transition-colors">▶ Play video →</p>
+                <p className="text-slate-900 font-semibold text-sm mb-0.5">Watch how it works</p>
+                <p className="text-slate-400 text-xs">Scan with your phone or click to play</p>
+                <p className="text-blue-600 text-xs mt-1.5 font-medium group-hover:text-blue-700 transition-colors">▶ Play video →</p>
               </div>
             </Link>
-            <Link href="/how-it-works" className="inline-flex items-center gap-2 text-sm text-white/35 hover:text-white/65 transition-colors">
+            <Link href="/how-it-works" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-700 transition-colors">
               Full process details <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -1021,48 +964,38 @@ function HomePageContent() {
       </section>
 
       {/* ── POWERED BY MOVEMENT — 3-column transport videos ── */}
-      <section className="relative bg-[#020617] py-32 overflow-hidden">
-
-        {/* Plane / Train / Bus — each behind its matching card */}
-        <div className="absolute inset-0 opacity-[0.22]">
-          <div className="grid grid-cols-3 h-full">
-            <video autoPlay muted loop playsInline className="w-full h-full object-cover">
-              <source src="/videos/onecall/plane2.mp4" type="video/mp4" />
-            </video>
-            <video autoPlay muted loop playsInline className="w-full h-full object-cover">
-              <source src="/videos/onecall/Aboutus_train.mp4" type="video/mp4" />
-            </video>
-            <video autoPlay muted loop playsInline className="w-full h-full object-cover">
-              <source src="/videos/onecall/test1/Aboutusbus.mp4" type="video/mp4" />
-            </video>
-          </div>
-        </div>
-
-        {/* Dark scrim */}
-        <div className="absolute inset-0 bg-black/62" />
-
-        {/* Fade edges into adjacent sections */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/95 via-transparent to-[#020617]/95" />
-
-        {/* Blue radial glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.13),transparent_70%)]" />
-
-        {/* Content */}
+      <section className="relative bg-slate-50 py-24 md:py-32 overflow-hidden">
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-5xl text-white font-semibold mb-16 reveal">Powered by Movement</h2>
+          <h2 className="text-4xl md:text-5xl text-slate-900 font-semibold mb-10 reveal">Powered by Movement</h2>
+
+          {/* Plane / Train / Bus — framed banner instead of a full-bleed dark background */}
+          <div className="relative mb-14 overflow-hidden rounded-3xl border border-slate-200 shadow-[0_30px_70px_rgba(15,23,42,0.10)]" style={{ aspectRatio: '21/7' }}>
+            <div className="grid grid-cols-3 h-full">
+              <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+                <source src="/videos/onecall/plane2.mp4" type="video/mp4" />
+              </video>
+              <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+                <source src="/videos/onecall/Aboutus_train.mp4" type="video/mp4" />
+              </video>
+              <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+                <source src="/videos/onecall/test1/Aboutusbus.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+
           <TransportCarousel />
         </div>
       </section>
 
       {/* ── FEATURED ROUTES ── */}
-      <section className="relative py-20 md:py-28 bg-[#050D1A]">
+      <section className="relative py-20 md:py-28 bg-white">
         <div className="mx-auto max-w-7xl px-6 md:px-8">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-ping" />
-              <span className="text-white font-semibold text-lg">Active Corridors</span>
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-ping" />
+              <span className="text-slate-900 font-semibold text-lg">Active Corridors</span>
             </div>
-            <Link href="/journeys" className="text-sm text-white/35 hover:text-white/65 transition-colors">
+            <Link href="/journeys" className="text-sm text-slate-400 hover:text-slate-700 transition-colors">
               View all →
             </Link>
           </div>
@@ -1070,7 +1003,7 @@ function HomePageContent() {
           {!routesLoaded ? (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="rounded-2xl border border-white/10 bg-white/[0.03] h-28 animate-pulse" />
+                <div key={i} className="rounded-2xl border border-slate-200 bg-slate-50 h-28 animate-pulse" />
               ))}
             </div>
           ) : (
@@ -1085,29 +1018,29 @@ function HomePageContent() {
                 return (
                   <Link key={`${route.from}-${route.to}`}
                     href={href}
-                    className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${route.color} ${route.border} p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer block`}>
+                    className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${route.color} ${route.border} p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer block`}>
                     <div className="mb-3 flex items-center justify-between">
                       <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${route.badge}`}>{route.tag}</span>
                       {isLive ? (
                         <div className="flex items-center gap-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-                          <span className="text-[10px] text-green-400 font-semibold">Live</span>
+                          <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                          <span className="text-[10px] text-green-600 font-semibold">Live</span>
                         </div>
                       ) : (
-                        <span className="text-[10px] text-white/30 font-medium">{route.departs}</span>
+                        <span className="text-[10px] text-slate-400 font-medium">{route.departs}</span>
                       )}
                     </div>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-base font-semibold text-white">{route.from}</span>
-                      <ArrowRight className="h-4 w-4 text-white/30" />
-                      <span className="text-base font-semibold text-white">{route.to}</span>
+                      <span className="text-base font-semibold text-slate-900">{route.from}</span>
+                      <ArrowRight className="h-4 w-4 text-slate-300" />
+                      <span className="text-base font-semibold text-slate-900">{route.to}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <p className="flex items-center gap-1 text-xs text-white/40">
+                      <p className="flex items-center gap-1 text-xs text-slate-500">
                         <Users className="h-3 w-3" />
                         {`${displayCount} traveller${displayCount !== 1 ? 's' : ''} available`}
                       </p>
-                      <span className="text-xs text-white/25 group-hover:text-white/60 transition-colors">Book →</span>
+                      <span className="text-xs text-slate-400 group-hover:text-slate-700 transition-colors">Book →</span>
                     </div>
                   </Link>
                 );
@@ -1120,9 +1053,9 @@ function HomePageContent() {
 
 
       {/* ── ROUTE LINK HUB — crawlable anchor links for Google ── */}
-      <section className="py-10 bg-[#07111f] border-t border-white/[0.04]">
+      <section className="py-10 bg-slate-50 border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
-          <p className="text-xs font-semibold uppercase tracking-widest text-white/25 mb-4">Popular delivery routes</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-4">Popular delivery routes</p>
           <div className="flex flex-wrap gap-2">
             {[
               { label: 'London → Lagos',        href: '/send/london-to-lagos'        },
@@ -1143,7 +1076,7 @@ function HomePageContent() {
               { label: 'Business Urgent',        href: '/send/business-urgent'        },
             ].map(({ label, href }) => (
               <Link key={href} href={href}
-                className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/45 hover:text-white/80 hover:border-white/20 hover:bg-white/[0.06] transition-all">
+                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 hover:border-slate-300 hover:bg-slate-50 transition-all">
                 {label}
               </Link>
             ))}
@@ -1152,33 +1085,33 @@ function HomePageContent() {
       </section>
 
       {/* ── USE CASES — "What people use BootHop for" ── */}
-      <section className="py-24 md:py-32 bg-[#07111f]">
+      <section className="py-24 md:py-32 bg-white">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="mb-14">
-            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight mb-2">What people use BootHop for</h2>
-            <p className="text-white/40 text-base">From urgent business deliveries to sending love home.</p>
+            <h2 className="text-3xl md:text-4xl font-semibold text-slate-900 tracking-tight mb-2">What people use BootHop for</h2>
+            <p className="text-slate-500 text-base">From urgent business deliveries to sending love home.</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              { icon: '🌍', title: 'Diaspora & Home Goods', body: 'Birthday gifts, food parcels, personal items — from family in the UK to loved ones across Africa and Europe.', tag: 'Consumer', tagColor: 'bg-emerald-500/15 text-emerald-300' },
-              { icon: '🛫', title: 'Airport Hand-Carry', body: 'High-value or fragile items that need a human escort — carried personally, door to door.', tag: 'Premium', tagColor: 'bg-rose-500/15 text-rose-300' },
-              { icon: '📄', title: 'Legal Documents', body: 'Signed contracts, court bundles, mortgage deeds — time-sensitive paperwork that cannot wait for a depot.', tag: 'B2B & Personal', tagColor: 'bg-violet-500/15 text-violet-300' },
-              { icon: '🧬', title: 'Medical & Pharmaceutical', body: 'Clinical samples, patient medication, medical devices — tracked and compliance-aware delivery.', tag: 'B2B', tagColor: 'bg-blue-500/15 text-blue-300' },
-              { icon: '⚙️', title: 'Business-Critical Parts', body: 'Aerospace components, AOG spares, engineering parts — same-day with full compliance documentation.', tag: 'B2B', tagColor: 'bg-blue-500/15 text-blue-300' },
-              { icon: '🛍️', title: 'Retail & E-Commerce', body: 'Overflow fulfilment, marketplace orders, boutique deliveries — where standard couriers are too slow or too costly.', tag: 'B2B', tagColor: 'bg-amber-500/15 text-amber-300' },
+              { icon: '🌍', title: 'Diaspora & Home Goods', body: 'Birthday gifts, food parcels, personal items — from family in the UK to loved ones across Africa and Europe.', tag: 'Consumer', tagColor: 'bg-emerald-100 text-emerald-700' },
+              { icon: '🛫', title: 'Airport Hand-Carry', body: 'High-value or fragile items that need a human escort — carried personally, door to door.', tag: 'Premium', tagColor: 'bg-rose-100 text-rose-700' },
+              { icon: '📄', title: 'Legal Documents', body: 'Signed contracts, court bundles, mortgage deeds — time-sensitive paperwork that cannot wait for a depot.', tag: 'B2B & Personal', tagColor: 'bg-violet-100 text-violet-700' },
+              { icon: '🧬', title: 'Medical & Pharmaceutical', body: 'Clinical samples, patient medication, medical devices — tracked and compliance-aware delivery.', tag: 'B2B', tagColor: 'bg-blue-100 text-blue-700' },
+              { icon: '⚙️', title: 'Business-Critical Parts', body: 'Aerospace components, AOG spares, engineering parts — same-day with full compliance documentation.', tag: 'B2B', tagColor: 'bg-blue-100 text-blue-700' },
+              { icon: '🛍️', title: 'Retail & E-Commerce', body: 'Overflow fulfilment, marketplace orders, boutique deliveries — where standard couriers are too slow or too costly.', tag: 'B2B', tagColor: 'bg-amber-100 text-amber-700' },
             ].map(({ icon, title, body, tag, tagColor }) => (
-              <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 hover:border-white/20 hover:bg-white/[0.05] transition-all duration-300 hover:-translate-y-1">
+              <div key={title} className="rounded-2xl border border-slate-200 bg-slate-50 p-6 hover:border-slate-300 hover:bg-white hover:shadow-md transition-all duration-300 hover:-translate-y-1">
                 <span className="text-3xl mb-4 block">{icon}</span>
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  <p className="text-white font-semibold text-base">{title}</p>
+                  <p className="text-slate-900 font-semibold text-base">{title}</p>
                   <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${tagColor}`}>{tag}</span>
                 </div>
-                <p className="text-white/45 text-sm leading-relaxed">{body}</p>
+                <p className="text-slate-500 text-sm leading-relaxed">{body}</p>
               </div>
             ))}
           </div>
           <div className="mt-10 text-center">
-            <Link href="/trust-safety" className="inline-flex items-center gap-2 text-sm text-white/35 hover:text-white/65 transition-colors">
+            <Link href="/trust-safety" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-700 transition-colors">
               See full permitted items list <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -1188,13 +1121,15 @@ function HomePageContent() {
       {/* ── TESTIMONIALS ── */}
       <TestimonialsSection />
 
-      {/* ── Final CTA ── */}
+      {/* ── Final CTA — kept as one deliberate bold moment to close on ── */}
       <section className="relative py-36 px-6 text-center overflow-hidden">
         <video autoPlay muted loop playsInline
           className="absolute inset-0 w-full h-full object-cover scale-105">
           <source src="/videos/onecall/plane1.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-black/52" />
+        {/* Soft fade from the light section above into this closing panel */}
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/90 to-transparent" />
 
         <div className="relative z-10 max-w-2xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300/80 mb-4">Someone is flying that route today</p>

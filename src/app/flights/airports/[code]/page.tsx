@@ -49,16 +49,16 @@ export default async function AirportPage({
     return (
       <Link
         href={`/flights/${slug}`}
-        className="flex items-center justify-between bg-gray-900 border border-gray-800 hover:border-gray-700 rounded-xl px-5 py-4 transition-all group"
+        className="flex items-center justify-between bg-white border border-slate-200 hover:border-slate-300 rounded-xl px-5 py-4 transition-all group"
       >
         <div>
-          <p className="font-semibold text-white group-hover:text-blue-400 transition-colors">
+          <p className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
             {dir === 'dep' ? `${airport.city} → ${cityMap[peer] ?? peer}` : `${cityMap[peer] ?? peer} → ${airport.city}`}
           </p>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-slate-600 mt-0.5">
             {r.origin} → {r.destination}
             {stats?.recommendation && (
-              <span className={`ml-2 font-semibold ${stats.recommendation === 'BUY' ? 'text-green-400' : stats.recommendation === 'WAIT' ? 'text-red-400' : 'text-gray-400'}`}>
+              <span className={`ml-2 font-semibold ${stats.recommendation === 'BUY' ? 'text-green-600' : stats.recommendation === 'WAIT' ? 'text-red-600' : 'text-slate-600'}`}>
                 · {stats.recommendation}
               </span>
             )}
@@ -67,11 +67,11 @@ export default async function AirportPage({
         <div className="text-right shrink-0">
           {stats?.all_time_lowest_gbp ? (
             <>
-              <p className="font-bold text-white">From £{stats.all_time_lowest_gbp.toFixed(0)}</p>
-              <p className="text-xs text-gray-500">Best price seen</p>
+              <p className="font-bold text-slate-900">From £{stats.all_time_lowest_gbp.toFixed(0)}</p>
+              <p className="text-xs text-slate-600">Best price seen</p>
             </>
           ) : (
-            <p className="text-xs text-gray-600">No data yet</p>
+            <p className="text-xs text-slate-600">No data yet</p>
           )}
         </div>
       </Link>
@@ -79,27 +79,27 @@ export default async function AirportPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-3xl px-4 py-10 space-y-8">
 
         {/* Breadcrumb */}
-        <div className="text-sm text-gray-500 flex items-center gap-1.5">
-          <Link href="/" className="hover:text-white transition-colors">BootHop</Link>
+        <div className="text-sm text-slate-600 flex items-center gap-1.5">
+          <Link href="/" className="hover:text-slate-900 transition-colors">BootHop</Link>
           <span>/</span>
-          <Link href="/flights" className="hover:text-white transition-colors">Flights</Link>
+          <Link href="/flights" className="hover:text-slate-900 transition-colors">Flights</Link>
           <span>/</span>
-          <span className="text-gray-300">Airports</span>
+          <span className="text-slate-600">Airports</span>
           <span>/</span>
-          <span className="text-gray-300">{code}</span>
+          <span className="text-slate-600">{code}</span>
         </div>
 
         {/* Header */}
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-2">
+          <p className="text-xs font-semibold uppercase tracking-widest text-blue-600 mb-2">
             Airport Hub
           </p>
-          <h1 className="text-3xl md:text-4xl font-bold text-white">{airport.city}</h1>
-          <p className="text-gray-400 mt-1 text-sm">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900">{airport.city}</h1>
+          <p className="text-slate-600 mt-1 text-sm">
             {airport.name} · {code}
             {airport.country ? ` · ${airport.country}` : ''}
           </p>
@@ -107,20 +107,20 @@ export default async function AirportPage({
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-            <p className="text-xs text-gray-500 mb-1">Departing routes</p>
-            <p className="text-2xl font-bold text-white">{departures.length}</p>
+          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
+            <p className="text-xs text-slate-600 mb-1">Departing routes</p>
+            <p className="text-2xl font-bold text-slate-900">{departures.length}</p>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-            <p className="text-xs text-gray-500 mb-1">Arriving routes</p>
-            <p className="text-2xl font-bold text-white">{arrivals.length}</p>
+          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
+            <p className="text-xs text-slate-600 mb-1">Arriving routes</p>
+            <p className="text-2xl font-bold text-slate-900">{arrivals.length}</p>
           </div>
         </div>
 
         {/* Departures */}
         {departures.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold text-white mb-4">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">
               Departures from {airport.city}
             </h2>
             <div className="space-y-2.5">
@@ -132,7 +132,7 @@ export default async function AirportPage({
         {/* Arrivals */}
         {arrivals.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold text-white mb-4">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">
               Arrivals into {airport.city}
             </h2>
             <div className="space-y-2.5">
@@ -142,17 +142,17 @@ export default async function AirportPage({
         )}
 
         {!departures.length && !arrivals.length && (
-          <p className="text-gray-500 text-center py-10">
+          <p className="text-slate-600 text-center py-10">
             No routes tracked for {code} yet. Routes are added via the BFI admin.
           </p>
         )}
 
         {/* Match layer CTA */}
-        <div className="bg-gradient-to-br from-emerald-950/60 to-gray-900 border border-emerald-800/30 rounded-2xl p-6 text-center">
-          <p className="text-white font-semibold mb-2">
+        <div className="bg-gradient-to-br from-emerald-50 to-white border border-emerald-200 rounded-2xl p-6 text-center shadow-sm">
+          <p className="text-slate-900 font-semibold mb-2">
             Flying through {airport.city}?
           </p>
-          <p className="text-gray-400 text-sm mb-4">
+          <p className="text-slate-600 text-sm mb-4">
             Earn £150–£350 carrying verified BootHop packages on any of these routes.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

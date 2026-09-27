@@ -57,38 +57,38 @@ const useCases = [
 
 export default function UKSameDayPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+    <div className="min-h-screen bg-white text-slate-900">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <TikTokViewContent contentName="UK Same-Day Delivery" contentType="delivery_service" />
       <NavBar />
 
       {/* Hero */}
-      <section className="pt-32 pb-20 px-6 max-w-5xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold px-4 py-2 rounded-full mb-6">
+      <section className="pt-32 pb-20 px-6 max-w-5xl mx-auto text-center bg-gradient-to-b from-white to-slate-50">
+        <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold px-4 py-2 rounded-full mb-6">
           <Clock className="h-3.5 w-3.5" /> UK SAME-DAY DELIVERY
         </div>
-        <h1 className="text-5xl md:text-6xl font-black leading-tight mb-6">
+        <h1 className="text-5xl md:text-6xl font-black leading-tight mb-6 text-slate-900">
           Same-Day Delivery<br />
-          <span className="text-blue-400">Anywhere in the UK</span>
+          <span className="text-blue-600">Anywhere in the UK</span>
         </h1>
-        <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
+        <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
           Someone is already travelling your route today. BootHop connects your package with a verified traveller heading in the same direction — door-to-door, today, no depot queues.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/start"
-            className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-full text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)]"
+            className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-full text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.35)]"
           >
             Send Something Today <ArrowRight className="h-4 w-4" />
           </Link>
-          <Link href="/journeys" className="text-slate-400 hover:text-white text-sm underline underline-offset-4">
+          <Link href="/journeys" className="text-slate-600 hover:text-slate-900 text-sm underline underline-offset-4">
             Browse live UK journeys →
           </Link>
         </div>
       </section>
 
       {/* Stats strip */}
-      <section className="border-y border-white/8 py-8">
+      <section className="border-y border-slate-100 bg-white py-8">
         <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 px-6 text-center">
           {[
             { stat: 'Same Day', label: 'UK delivery' },
@@ -97,17 +97,17 @@ export default function UKSameDayPage() {
             { stat: 'From £15', label: 'UK routes' },
           ].map(({ stat, label }) => (
             <div key={label}>
-              <div className="text-2xl font-black text-blue-400">{stat}</div>
-              <div className="text-sm text-slate-400 mt-1">{label}</div>
+              <div className="text-2xl font-black text-blue-600">{stat}</div>
+              <div className="text-sm text-slate-600 mt-1">{label}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* How it works */}
-      <section className="py-20 px-6 max-w-5xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-black text-center mb-4">How Same-Day UK Delivery Works</h2>
-        <p className="text-slate-400 text-center mb-14 max-w-xl mx-auto">No depots. No sorting centres. Your package travels with a person who is already going there.</p>
+      <section className="py-20 px-6 max-w-5xl mx-auto bg-slate-50">
+        <h2 className="text-3xl md:text-4xl font-black text-center mb-4 text-slate-900">How Same-Day UK Delivery Works</h2>
+        <p className="text-slate-600 text-center mb-14 max-w-xl mx-auto">No depots. No sorting centres. Your package travels with a person who is already going there.</p>
         <div className="grid md:grid-cols-4 gap-6">
           {[
             { step: '01', title: 'Post your delivery', desc: 'Enter pickup and drop-off, package details, and when you need it there.' },
@@ -115,56 +115,56 @@ export default function UKSameDayPage() {
             { step: '03', title: 'Handoff & go', desc: 'Meet the carrier, hand over your item. Payment held securely in escrow.' },
             { step: '04', title: 'Delivered', desc: 'Carrier delivers to your recipient. Payment releases on confirmation.' },
           ].map(({ step, title, desc }) => (
-            <div key={step} className="bg-white/4 border border-white/8 rounded-2xl p-6">
-              <div className="text-blue-400 font-black text-sm mb-3">{step}</div>
-              <h3 className="font-bold text-white mb-2">{title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
+            <div key={step} className="bg-white border border-slate-200 rounded-2xl p-6">
+              <div className="text-blue-600 font-black text-sm mb-3">{step}</div>
+              <h3 className="font-bold text-slate-900 mb-2">{title}</h3>
+              <p className="text-slate-600 text-sm leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Active UK routes */}
-      <section className="py-16 px-6 max-w-5xl mx-auto">
-        <h2 className="text-3xl font-black text-center mb-4">Popular UK Same-Day Routes</h2>
-        <p className="text-slate-400 text-center mb-10">Travellers post their routes daily — these corridors are covered most frequently.</p>
+      <section className="py-16 px-6 max-w-5xl mx-auto bg-white">
+        <h2 className="text-3xl font-black text-center mb-4 text-slate-900">Popular UK Same-Day Routes</h2>
+        <p className="text-slate-600 text-center mb-10">Travellers post their routes daily — these corridors are covered most frequently.</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {routes.map(({ from, to, time }) => (
-            <div key={`${from}-${to}`} className="bg-white/4 border border-white/8 rounded-xl p-4 text-center hover:border-blue-500/40 transition-colors">
-              <div className="font-bold text-white text-sm">{from} → {to}</div>
-              <div className="text-blue-400 text-xs mt-1">{time}</div>
+            <div key={`${from}-${to}`} className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center hover:border-blue-300 hover:shadow-sm transition-all">
+              <div className="font-bold text-slate-900 text-sm">{from} → {to}</div>
+              <div className="text-blue-600 text-xs mt-1">{time}</div>
             </div>
           ))}
         </div>
-        <p className="text-center text-slate-500 text-sm mt-6">
+        <p className="text-center text-slate-600 text-sm mt-6">
           Don't see your route?{' '}
-          <Link href="/journeys" className="text-blue-400 hover:underline">Check live journeys</Link>
+          <Link href="/journeys" className="text-blue-600 hover:underline">Check live journeys</Link>
           {' '}— new routes are added every hour.
         </p>
       </section>
 
       {/* Use cases */}
-      <section className="py-16 px-6 max-w-5xl mx-auto">
-        <h2 className="text-3xl font-black text-center mb-12">What People Send Same-Day</h2>
+      <section className="py-16 px-6 max-w-5xl mx-auto bg-slate-50">
+        <h2 className="text-3xl font-black text-center mb-12 text-slate-900">What People Send Same-Day</h2>
         <div className="grid md:grid-cols-3 gap-6">
           {useCases.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="bg-white/4 border border-white/8 rounded-2xl p-6 hover:border-blue-500/30 transition-colors">
-              <Icon className="h-6 w-6 text-blue-400 mb-4" />
-              <h3 className="font-bold text-white mb-2">{title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
+            <div key={title} className="bg-white border border-slate-200 rounded-2xl p-6 hover:border-blue-300 hover:shadow-md transition-all">
+              <Icon className="h-6 w-6 text-blue-600 mb-4" />
+              <h3 className="font-bold text-slate-900 mb-2">{title}</h3>
+              <p className="text-slate-600 text-sm leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* vs traditional couriers */}
-      <section className="py-16 px-6 max-w-3xl mx-auto">
-        <h2 className="text-3xl font-black text-center mb-10">BootHop vs Traditional Same-Day Courier</h2>
-        <div className="bg-white/4 border border-white/8 rounded-2xl overflow-hidden">
+      <section className="py-16 px-6 max-w-3xl mx-auto bg-white">
+        <h2 className="text-3xl font-black text-center mb-10 text-slate-900">BootHop vs Traditional Same-Day Courier</h2>
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden">
           <div className="grid grid-cols-3 gap-0 text-sm">
-            <div className="p-4 font-bold text-slate-400 border-b border-white/8">Feature</div>
-            <div className="p-4 font-bold text-blue-400 border-b border-white/8 text-center">BootHop</div>
-            <div className="p-4 font-bold text-slate-400 border-b border-white/8 text-center">Traditional Courier</div>
+            <div className="p-4 font-bold text-slate-600 border-b border-slate-200">Feature</div>
+            <div className="p-4 font-bold text-blue-600 border-b border-slate-200 text-center">BootHop</div>
+            <div className="p-4 font-bold text-slate-600 border-b border-slate-200 text-center">Traditional Courier</div>
             {[
               ['Depot handoffs', '0 — direct delivery', '3–5 sorting stages'],
               ['Verified carrier', 'KYC on every traveller', 'Driver check varies'],
@@ -174,9 +174,9 @@ export default function UKSameDayPage() {
               ['Availability', 'If a traveller is going', 'Service area dependent'],
             ].map(([feature, boothop, courier]) => (
               <>
-                <div key={`${feature}-f`} className="p-4 text-slate-300 border-b border-white/6">{feature}</div>
-                <div key={`${feature}-b`} className="p-4 text-slate-200 border-b border-white/6 text-center">{boothop}</div>
-                <div key={`${feature}-c`} className="p-4 text-slate-400 border-b border-white/6 text-center">{courier}</div>
+                <div key={`${feature}-f`} className="p-4 text-slate-600 border-b border-slate-100">{feature}</div>
+                <div key={`${feature}-b`} className="p-4 text-slate-800 border-b border-slate-100 text-center">{boothop}</div>
+                <div key={`${feature}-c`} className="p-4 text-slate-600 border-b border-slate-100 text-center">{courier}</div>
               </>
             ))}
           </div>
@@ -184,17 +184,17 @@ export default function UKSameDayPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-6">
-        <div className="max-w-2xl mx-auto bg-blue-500/10 border border-blue-500/20 rounded-3xl p-10 text-center">
-          <h2 className="text-3xl font-black mb-4">Your package should already be moving.</h2>
-          <p className="text-slate-400 mb-8">Post your delivery in under 2 minutes. Matched with a verified traveller heading your way today.</p>
+      <section className="py-20 px-6 bg-slate-50">
+        <div className="max-w-2xl mx-auto bg-blue-50 border border-blue-200 rounded-3xl p-10 text-center">
+          <h2 className="text-3xl font-black mb-4 text-slate-900">Your package should already be moving.</h2>
+          <p className="text-slate-600 mb-8">Post your delivery in under 2 minutes. Matched with a verified traveller heading your way today.</p>
           <Link
             href="/start"
             className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-full text-base transition-all hover:-translate-y-0.5"
           >
             Post Your Delivery <ArrowRight className="h-4 w-4" />
           </Link>
-          <p className="text-slate-500 text-xs mt-6">Free to post · No commitment until matched · Stripe-secured payment</p>
+          <p className="text-slate-600 text-xs mt-6">Free to post · No commitment until matched · Stripe-secured payment</p>
         </div>
       </section>
 

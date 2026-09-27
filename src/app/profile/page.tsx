@@ -170,11 +170,11 @@ export default function ProfilePage() {
             <div className="flex items-center gap-6">
               {/* Avatar */}
               <div className="relative">
-                <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
+                <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-slate-900 text-3xl font-bold">
                   {profile.full_name.charAt(0).toUpperCase()}
                 </div>
                 <button className="absolute bottom-0 right-0 w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition">
-                  <Camera className="h-4 w-4 text-white" />
+                  <Camera className="h-4 w-4 text-slate-900" />
                 </button>
               </div>
 
@@ -267,7 +267,7 @@ export default function ProfilePage() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+                className="w-full bg-blue-600 text-slate-900 py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
               >
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
@@ -358,7 +358,7 @@ export default function ProfilePage() {
                 <p className="text-sm text-yellow-800 mb-4">
                   For international deliveries, you need to verify your identity. This helps keep the community safe.
                 </p>
-                <button className="px-4 py-2 bg-yellow-600 text-white rounded-lg font-semibold hover:bg-yellow-700 transition">
+                <button className="px-4 py-2 bg-yellow-600 text-slate-900 rounded-lg font-semibold hover:bg-yellow-700 transition">
                   Start Verification
                 </button>
               </div>
@@ -391,7 +391,7 @@ export default function ProfilePage() {
                     <button
                       onClick={handleDeleteAccount}
                       disabled={deleting}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold disabled:opacity-50"
+                      className="px-4 py-2 bg-red-600 text-slate-900 rounded-lg hover:bg-red-700 transition text-sm font-semibold disabled:opacity-50"
                     >
                       {deleting ? 'Deleting…' : 'Yes, Delete My Account'}
                     </button>
@@ -423,7 +423,7 @@ export default function ProfilePage() {
                 <div key={rating.id} className="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-slate-900 font-semibold">
                         {rating.reviewer_profile.full_name.charAt(0)}
                       </div>
                       <div>

@@ -21,13 +21,13 @@ export default function OpenFilePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#07111f] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="w-full max-w-sm text-center">
         <div className="text-4xl mb-4">📎</div>
         {fileName ? (
           <>
-            <p className="text-white font-semibold mb-1">{fileName}</p>
-            <p className="text-white/40 text-sm mb-6">
+            <p className="text-slate-900 font-semibold mb-1">{fileName}</p>
+            <p className="text-slate-600 text-sm mb-6">
               {fileType?.startsWith('image/') ? 'Share this as proof of delivery or package photo.' : 'Share this document with your delivery partner.'}
             </p>
             <Link
@@ -39,8 +39,8 @@ export default function OpenFilePage() {
           </>
         ) : (
           <>
-            <p className="text-white font-semibold mb-1">Opening file…</p>
-            <p className="text-white/40 text-sm mb-6">Use BootHop to share delivery documents and photos with your partner.</p>
+            <p className="text-slate-900 font-semibold mb-1">Opening file…</p>
+            <p className="text-slate-600 text-sm mb-6">Use BootHop to share delivery documents and photos with your partner.</p>
             <Link href="/dashboard" className="text-orange-400 text-sm hover:underline">
               Go to Dashboard →
             </Link>

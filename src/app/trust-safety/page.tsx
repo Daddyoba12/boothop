@@ -110,7 +110,7 @@ export default function TrustSafetyPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden font-sans">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden font-sans">
 
       {/* BG */}
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(139,92,246,0.07),transparent_35%)]" />
@@ -141,7 +141,7 @@ export default function TrustSafetyPage() {
             <Sparkles className="w-4 h-4 text-cyan-400" />
             <span className="text-sm text-cyan-300 font-medium">Trust &amp; Safety</span>
           </div>
-          <h1 className="text-6xl md:text-8xl font-black mb-6 leading-tight">
+          <h1 className="text-6xl md:text-8xl font-black mb-6 leading-tight text-white">
             Safe by<br />
             <span className="bg-gradient-to-r from-cyan-400 via-blue-300 to-violet-400 bg-clip-text text-transparent animate-pulse">
               design.
@@ -158,28 +158,28 @@ export default function TrustSafetyPage() {
       <section className="relative py-20 px-6">
         <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent pointer-events-none" />
         <div className="relative max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-2 mb-4 mx-auto flex justify-center w-fit">
-            <span className="text-xs font-semibold uppercase tracking-widest text-cyan-400">Every delivery goes through</span>
+          <div className="inline-flex items-center gap-2 bg-cyan-50 border border-cyan-200 rounded-full px-4 py-2 mb-4 mx-auto flex justify-center w-fit">
+            <span className="text-xs font-semibold uppercase tracking-widest text-cyan-700">Every delivery goes through</span>
           </div>
-          <h2 className="text-center text-3xl md:text-4xl font-black text-white mb-12">
+          <h2 className="text-center text-3xl md:text-4xl font-black text-slate-900 mb-12">
             8-stage verified pipeline
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {pipeline.map((step, i) => (
-              <div key={step.label} className={`reveal d${Math.min(i+1,5)} group relative rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-5 text-center hover:scale-[1.06] active:scale-[0.97] transition-all duration-300 hover:shadow-2xl cursor-pointer overflow-hidden touch-violet`}>
+              <div key={step.label} className={`reveal d${Math.min(i+1,5)} group relative rounded-2xl border border-slate-200 bg-white p-5 text-center hover:scale-[1.06] active:scale-[0.97] transition-all duration-300 hover:shadow-xl cursor-pointer overflow-hidden touch-violet`}>
                 {/* Colour glow on hover */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${step.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-2xl`} />
                 {/* Top edge light bar */}
                 <div className={`absolute top-0 left-4 right-4 h-px bg-gradient-to-r ${step.color} opacity-0 group-hover:opacity-60 transition-opacity duration-300`} />
                 <div className="relative">
-                  <span className="text-slate-500 text-xs font-mono mb-2 block group-hover:text-slate-400 transition-colors">{String(i+1).padStart(2,'0')}</span>
-                  <span className={`inline-block px-2 py-1 rounded-full text-white text-[10px] font-bold uppercase tracking-wider mb-3 bg-gradient-to-r ${step.color} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <span className="text-slate-600 text-xs font-mono mb-2 block group-hover:text-slate-800 transition-colors">{String(i+1).padStart(2,'0')}</span>
+                  <span className={`inline-block px-2 py-1 rounded-full text-slate-900 text-[10px] font-bold uppercase tracking-wider mb-3 bg-gradient-to-r ${step.color} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                     {step.label}
                   </span>
-                  <p className="text-slate-400 text-xs leading-relaxed group-hover:text-slate-300 transition-colors duration-300">{step.desc}</p>
+                  <p className="text-slate-600 text-xs leading-relaxed group-hover:text-slate-800 transition-colors duration-300">{step.desc}</p>
                 </div>
                 {i < pipeline.length-1 && (
-                  <div className="hidden md:block absolute -right-2 top-1/2 -translate-y-1/2 text-slate-600 text-lg group-hover:text-slate-400 transition-colors">→</div>
+                  <div className="hidden md:block absolute -right-2 top-1/2 -translate-y-1/2 text-slate-500 text-lg group-hover:text-slate-700 transition-colors">→</div>
                 )}
               </div>
             ))}
@@ -190,25 +190,25 @@ export default function TrustSafetyPage() {
       {/* FOUR PILLARS */}
       <section className="relative py-20 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-4 mx-auto flex justify-center w-fit">
-            <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">How we protect you</span>
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-4 py-2 mb-4 mx-auto flex justify-center w-fit">
+            <span className="text-xs font-semibold uppercase tracking-widest text-blue-700">How we protect you</span>
           </div>
-          <h2 className="text-center text-3xl md:text-5xl font-black text-white mb-14">
+          <h2 className="text-center text-3xl md:text-5xl font-black text-slate-900 mb-14">
             Four layers of protection
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
             {pillars.map(({ icon: Icon, title, gradient, glow, hover, points }, i) => (
-              <div key={title} className={`reveal d${i+1} group relative overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-8 transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] hover:shadow-2xl ${hover} cursor-pointer touch-violet`}>
+              <div key={title} className={`reveal d${i+1} group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] hover:shadow-xl cursor-pointer touch-violet`}>
                 <div className={`absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-10 rounded-full blur-2xl transition-opacity duration-500`} />
                 <div className="relative">
                   <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} mb-5 shadow-lg ${glow} group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className="h-7 w-7 text-white" />
+                    <Icon className="h-7 w-7 text-slate-900" />
                   </div>
-                  <h3 className="text-xl font-black text-white mb-4 group-hover:text-cyan-400 transition-colors duration-300">{title}</h3>
+                  <h3 className="text-xl font-black text-slate-900 mb-4 group-hover:text-blue-600 transition-colors duration-300">{title}</h3>
                   <ul className="space-y-3">
                     {points.map((pt) => (
-                      <li key={pt} className="flex items-start gap-3 text-sm text-slate-400">
-                        <CheckCircle className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />
+                      <li key={pt} className="flex items-start gap-3 text-sm text-slate-600">
+                        <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                         {pt}
                       </li>
                     ))}
@@ -223,22 +223,22 @@ export default function TrustSafetyPage() {
       {/* PROHIBITED ITEMS */}
       <section className="relative py-20 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="relative overflow-hidden rounded-3xl border border-red-500/30 bg-gradient-to-br from-red-500/10 to-slate-900/50 backdrop-blur-sm p-10">
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-red-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-3xl border border-red-200 bg-gradient-to-br from-red-50 to-white p-10">
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-red-100 rounded-full blur-3xl pointer-events-none" />
             <div className="relative flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-rose-400 flex items-center justify-center shadow-lg shadow-red-500/50">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-rose-400 flex items-center justify-center shadow-lg shadow-red-500/30">
                 <AlertTriangle className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-black text-white">Prohibited Items</h2>
-                <p className="text-sm text-slate-400">Accounts permanently banned for violations</p>
+                <h2 className="text-2xl font-black text-slate-900">Prohibited Items</h2>
+                <p className="text-sm text-slate-600">Accounts permanently banned for violations</p>
               </div>
             </div>
             <div className="relative grid md:grid-cols-2 gap-3">
               {prohibited.map((item) => (
-                <div key={item} className="group flex items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 hover:border-red-500/40 hover:bg-red-500/10 hover:scale-[1.02] transition-all duration-300 cursor-default">
-                  <span className="text-red-400 font-bold text-lg">✗</span>
-                  <span className="text-sm text-slate-300">{item}</span>
+                <div key={item} className="group flex items-center gap-3 rounded-xl border border-red-200 bg-white px-4 py-3 hover:border-red-300 hover:bg-red-50 hover:scale-[1.02] transition-all duration-300 cursor-default">
+                  <span className="text-red-500 font-bold text-lg">✗</span>
+                  <span className="text-sm text-slate-700">{item}</span>
                 </div>
               ))}
             </div>
@@ -254,14 +254,14 @@ export default function TrustSafetyPage() {
               <Shield className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-white">Sending on the UK → Nigeria corridor?</h2>
-              <p className="text-sm text-slate-400">Here&apos;s what both sides need to know</p>
+              <h2 className="text-xl font-black text-slate-900">Sending on the UK → Nigeria corridor?</h2>
+              <p className="text-sm text-slate-600">Here&apos;s what both sides need to know</p>
             </div>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             {/* For senders */}
             <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-6">
-              <p className="mb-4 text-xs font-bold uppercase tracking-widest text-blue-400">For Senders</p>
+              <p className="mb-4 text-xs font-bold uppercase tracking-widest text-blue-700">For Senders</p>
               <ul className="space-y-3">
                 {[
                   'You are responsible for ensuring your item complies with Nigerian Customs Service (NCS) import rules',
@@ -270,15 +270,15 @@ export default function TrustSafetyPage() {
                   'Food items must be factory-sealed and NAFDAC compliant to clear customs',
                   'You sign a declaration confirming contents — false declarations lead to permanent ban',
                 ].map((pt) => (
-                  <li key={pt} className="flex items-start gap-2.5 text-sm text-white/65">
-                    <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-400/70" />{pt}
+                  <li key={pt} className="flex items-start gap-2.5 text-sm text-slate-600">
+                    <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-600" />{pt}
                   </li>
                 ))}
               </ul>
             </div>
             {/* For travellers */}
             <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-6">
-              <p className="mb-4 text-xs font-bold uppercase tracking-widest text-emerald-400">For Travellers (Booters)</p>
+              <p className="mb-4 text-xs font-bold uppercase tracking-widest text-emerald-700">For Travellers (Booters)</p>
               <ul className="space-y-3">
                 {[
                   'You are never liable for contents you did not pack and were not informed of',
@@ -287,16 +287,16 @@ export default function TrustSafetyPage() {
                   'BootHop\'s customs declaration places legal responsibility on the sender',
                   'UK travellers: personal effects carried for others may be questioned at Nigerian customs — carry the BootHop match confirmation',
                 ].map((pt) => (
-                  <li key={pt} className="flex items-start gap-2.5 text-sm text-white/65">
-                    <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400/70" />{pt}
+                  <li key={pt} className="flex items-start gap-2.5 text-sm text-slate-600">
+                    <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" />{pt}
                   </li>
                 ))}
               </ul>
             </div>
           </div>
-          <div className="mt-4 rounded-xl border border-white/8 bg-white/3 px-5 py-4">
-            <p className="text-xs text-white/40">
-              <span className="font-semibold text-white/60">Need more guidance?</span> The Nigerian Customs Service (customs.gov.ng) publishes the current passenger baggage allowances and prohibited items list.
+          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4">
+            <p className="text-xs text-slate-600">
+              <span className="font-semibold text-slate-800">Need more guidance?</span> The Nigerian Customs Service (customs.gov.ng) publishes the current passenger baggage allowances and prohibited items list.
               UK export restrictions are governed by HMRC and the Export Control Joint Unit.
             </p>
           </div>
@@ -306,15 +306,14 @@ export default function TrustSafetyPage() {
       {/* CTA */}
       <section className="relative py-24 text-center px-6">
         <div className="max-w-4xl mx-auto relative">
-          <div className="relative overflow-hidden rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-blue-600/20 to-cyan-500/10 backdrop-blur-sm p-16">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-cyan-500/5 pointer-events-none" />
-            <div className="absolute -top-10 -right-10 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-3xl border border-cyan-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-16">
+            <div className="absolute -top-10 -right-10 w-48 h-48 bg-cyan-100 rounded-full blur-3xl pointer-events-none" />
             <div className="relative">
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+              <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
                 Ready to send or travel?
               </h2>
-              <p className="text-slate-300 mb-10 text-lg">Every delivery protected. Every traveller verified.</p>
-              <Link href="/login" className="group inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold px-10 py-5 rounded-2xl hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105">
+              <p className="text-slate-600 mb-10 text-lg">Every delivery protected. Every traveller verified.</p>
+              <Link href="/login" className="group inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold px-10 py-5 rounded-2xl hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 hover:scale-105">
                 Get Started <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
               </Link>
             </div>

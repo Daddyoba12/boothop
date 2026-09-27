@@ -5,10 +5,10 @@ import type { BFIAlert } from '@/lib/bfi/types';
 
 function severityStyle(s: BFIAlert['severity']) {
   const map = {
-    success:  'border-l-green-500  bg-green-950/30  text-green-300',
-    info:     'border-l-blue-500   bg-blue-950/30   text-blue-300',
-    warning:  'border-l-yellow-500 bg-yellow-950/30 text-yellow-300',
-    critical: 'border-l-red-500    bg-red-950/30    text-red-300',
+    success:  'border-l-green-500  bg-green-50  text-green-600',
+    info:     'border-l-blue-500   bg-blue-50   text-blue-600',
+    warning:  'border-l-yellow-500 bg-yellow-50 text-yellow-600',
+    critical: 'border-l-red-500    bg-red-50    text-red-600',
   };
   return map[s] ?? map.info;
 }
@@ -41,12 +41,12 @@ export default function AlertsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Alerts</h1>
-          <p className="text-gray-500 text-sm mt-1">Price drops, lowest-ever fares, and system events</p>
+          <p className="text-slate-600 text-sm mt-1">Price drops, lowest-ever fares, and system events</p>
         </div>
         {unread > 0 && (
           <button
             onClick={markAllRead}
-            className="text-sm text-gray-400 hover:text-white underline underline-offset-2"
+            className="text-sm text-slate-600 hover:text-slate-900 underline underline-offset-2"
           >
             Mark all read
           </button>
@@ -54,9 +54,9 @@ export default function AlertsPage() {
       </div>
 
       {loading ? (
-        <div className="text-gray-500 text-sm">Loading...</div>
+        <div className="text-slate-600 text-sm">Loading...</div>
       ) : alerts.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-10 text-center text-gray-500 text-sm">
+        <div className="bg-white border border-slate-200 rounded-xl p-10 text-center text-slate-600 text-sm">
           No alerts yet. Alerts are generated automatically after each scan.
         </div>
       ) : (

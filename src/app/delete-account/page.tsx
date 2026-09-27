@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function DeleteAccountPage() {
   return (
-    <main className="min-h-screen bg-[#0a0f1e] text-white">
+    <main className="min-h-screen bg-white text-slate-900">
       <div className="max-w-2xl mx-auto px-6 py-16">
 
         <div className="mb-8">
@@ -35,7 +35,7 @@ export default function DeleteAccountPage() {
                   <a href="mailto:privacy@boothop.com?subject=Account%20Deletion%20Request" className="text-blue-400 hover:underline">
                     privacy@boothop.com
                   </a>{" "}
-                  with the subject line <strong className="text-white">Account Deletion Request</strong>.
+                  with the subject line <strong className="text-slate-900">Account Deletion Request</strong>.
                 </p>
               </div>
             </li>
@@ -53,7 +53,7 @@ export default function DeleteAccountPage() {
               <div>
                 <p className="font-medium">We confirm and delete</p>
                 <p className="text-gray-400 text-sm mt-1">
-                  We will send a confirmation email within <strong className="text-white">48 hours</strong>. Your account and data will be permanently deleted within <strong className="text-white">30 days</strong> of your request.
+                  We will send a confirmation email within <strong className="text-slate-900">48 hours</strong>. Your account and data will be permanently deleted within <strong className="text-slate-900">30 days</strong> of your request.
                 </p>
               </div>
             </li>
@@ -61,7 +61,7 @@ export default function DeleteAccountPage() {
         </section>
 
         {/* What gets deleted */}
-        <section className="mb-10 bg-white/5 rounded-xl p-6">
+        <section className="mb-10 bg-slate-50 rounded-xl p-6">
           <h2 className="text-xl font-semibold mb-4">What gets deleted</h2>
           <ul className="space-y-2 text-gray-300 text-sm">
             {[
@@ -82,10 +82,10 @@ export default function DeleteAccountPage() {
         </section>
 
         {/* What's retained */}
-        <section className="mb-10 bg-white/5 rounded-xl p-6">
+        <section className="mb-10 bg-slate-50 rounded-xl p-6">
           <h2 className="text-xl font-semibold mb-4">What we must keep</h2>
           <p className="text-gray-400 text-sm mb-3">
-            UK financial regulations require us to retain certain transaction records. The following are kept for up to <strong className="text-white">7 years</strong> after account deletion, then permanently destroyed:
+            UK financial regulations require us to retain certain transaction records. The following are kept for up to <strong className="text-slate-900">7 years</strong> after account deletion, then permanently destroyed:
           </p>
           <ul className="space-y-2 text-gray-300 text-sm">
             {[
@@ -112,13 +112,13 @@ export default function DeleteAccountPage() {
           </p>
           <ol className="mt-3 space-y-1 text-gray-300 text-sm list-decimal list-inside">
             <li>Open BootHop and sign in</li>
-            <li>Go to <strong className="text-white">Profile → Settings → Account</strong></li>
-            <li>Tap <strong className="text-white">Delete Account</strong> and follow the prompts</li>
+            <li>Go to <strong className="text-slate-900">Profile → Settings → Account</strong></li>
+            <li>Tap <strong className="text-slate-900">Delete Account</strong> and follow the prompts</li>
           </ol>
         </section>
 
         {/* Contact */}
-        <section className="border-t border-white/10 pt-8">
+        <section className="border-t border-slate-200 pt-8">
           <h2 className="text-xl font-semibold mb-2">Questions?</h2>
           <p className="text-gray-400 text-sm">
             Contact us at{" "}

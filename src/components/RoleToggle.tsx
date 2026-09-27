@@ -21,8 +21,8 @@ const ROLE_MAP: Record<Role, [string, string]> = {
 };
 
 const BADGE_COLORS: Record<Role, string> = {
-  sender: 'bg-emerald-500/12 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 hover:text-emerald-300',
-  travel: 'bg-blue-500/12    text-blue-400    border border-blue-500/20    hover:bg-blue-500/20    hover:text-blue-300',
+  sender: 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100',
+  travel: 'bg-blue-50    text-blue-700    border border-blue-200    hover:bg-blue-100',
 };
 
 interface Props {

@@ -184,7 +184,7 @@ export default function CreateRequestPage() {
       <div className="max-w-3xl mx-auto px-4 py-10">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Post a Delivery Request</h1>
-          <p className="text-slate-500">Find a verified traveler to carry your item to its destination.</p>
+          <p className="text-slate-600">Find a verified traveler to carry your item to its destination.</p>
         </div>
 
         {/* Disclaimer */}
@@ -243,7 +243,7 @@ export default function CreateRequestPage() {
                       <span className={`text-sm font-semibold ${formData.parcelSize === sz.id ? 'text-blue-700' : 'text-slate-700'}`}>
                         {sz.label}
                       </span>
-                      <span className="text-xs text-slate-500">{sz.sub}</span>
+                      <span className="text-xs text-slate-600">{sz.sub}</span>
                     </button>
                   ))}
                 </div>
@@ -348,7 +348,7 @@ export default function CreateRequestPage() {
                 <input type="number" step="0.01" min="1" value={formData.offeredPrice} onChange={set('offeredPrice')}
                   required placeholder="e.g. 30" className={inputCls} />
                 {formData.offeredPrice && (
-                  <p className="text-xs text-slate-500 mt-1">You pay £{hooперPays} total (inc. 3% service fee)</p>
+                  <p className="text-xs text-slate-600 mt-1">You pay £{hooперPays} total (inc. 3% service fee)</p>
                 )}
               </div>
               <div>
@@ -385,7 +385,7 @@ export default function CreateRequestPage() {
               <h2 className="font-bold text-slate-900 flex items-center gap-2">
                 <Globe className="h-5 w-5 text-blue-600" /> International Goods Declaration
               </h2>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-slate-600">
                 BootHop carries <strong>personal effects only</strong> on international routes.
                 All items must comply with UK and destination country import rules.
               </p>
@@ -421,7 +421,7 @@ export default function CreateRequestPage() {
               {/* Duties estimator link */}
               <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
                 <ShieldCheck className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-600">
                   Import duties and VAT may apply at destination.{' '}
                   <a href="/customs/duties" className="text-blue-600 hover:underline font-medium">
                     Estimate your landed cost →

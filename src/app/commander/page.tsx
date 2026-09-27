@@ -53,13 +53,13 @@ function AuthShell({ children, view, onSwitch }: {
   onSwitch: (v: View) => void;
 }) {
   return (
-    <div className={S.shell} style={{ background: '#0d1526' }}>
+    <div className={S.shell} style={{ background: '#ffffff' }}>
       {/* Back to main site */}
       <div className="absolute top-5 left-6">
         <Link href="/" className="text-sm font-medium transition-colors"
-          style={{ color: '#4b6080' }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#8fa4c0')}
-          onMouseLeave={e => (e.currentTarget.style.color = '#4b6080')}>
+          style={{ color: '#94a3b8' }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#334155')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}>
           ← BootHop.com
         </Link>
       </div>
@@ -68,30 +68,30 @@ function AuthShell({ children, view, onSwitch }: {
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <img
-            src="/images/boothop-icon-512.png"
+            src="/images/boothopimage-transparent.png"
             alt="BootHop"
             style={{ height: 72, width: 'auto', objectFit: 'contain', display: 'block' }}
             draggable={false}
           />
           <div className="mt-3 flex items-center gap-2">
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#3d5170' }}>Pipeline</span>
-            <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#253047', display: 'inline-block' }} />
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#94a3b8' }}>Pipeline</span>
+            <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#cbd5e1', display: 'inline-block' }} />
             <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#ff6a00' }}>Commander</span>
           </div>
         </div>
 
         {/* Card */}
-        <div className={S.card} style={{ background: '#131f35', borderColor: '#1e2f4a' }}>
+        <div className={S.card} style={{ background: '#ffffff', borderColor: '#e2e8f0', boxShadow: '0 20px 60px rgba(15,23,42,0.08)' }}>
           {children}
         </div>
 
         {/* Footer link */}
-        <p className="mt-5 text-center text-xs" style={{ color: '#3d5170' }}>
+        <p className="mt-5 text-center text-xs" style={{ color: '#94a3b8' }}>
           Need help?{' '}
           <a href="mailto:info@boothop.com" className={S.link}
-            style={{ color: '#5a7090' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#8fa4c0')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#5a7090')}>
+            style={{ color: '#64748b' }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#334155')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#64748b')}>
             Contact support
           </a>
         </p>
@@ -104,9 +104,9 @@ function AuthShell({ children, view, onSwitch }: {
 function Field({ label: lbl, helper, children }: { label: string; helper?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className={S.label} style={{ color: '#8fa4c0' }}>{lbl}</label>
+      <label className={S.label} style={{ color: '#64748b' }}>{lbl}</label>
       {children}
-      {helper && <p className={S.helper} style={{ color: '#4b6080' }}>{helper}</p>}
+      {helper && <p className={S.helper} style={{ color: '#94a3b8' }}>{helper}</p>}
     </div>
   );
 }
@@ -117,13 +117,13 @@ function StyledInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
       {...props}
       className={S.input}
       style={{
-        background: '#1a2840',
-        borderColor: '#253047',
-        color: '#e2eaf5',
+        background: '#ffffff',
+        borderColor: '#e2e8f0',
+        color: '#0f172a',
         caretColor: '#ff6a00',
       }}
       onFocus={e => { e.currentTarget.style.borderColor = '#ff6a00'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255,106,0,0.12)'; }}
-      onBlur={e =>  { e.currentTarget.style.borderColor = '#253047'; e.currentTarget.style.boxShadow = 'none'; }}
+      onBlur={e =>  { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = 'none'; }}
     />
   );
 }
@@ -134,12 +134,12 @@ function StyledSelect(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
       {...props}
       className={S.input + ' appearance-none cursor-pointer'}
       style={{
-        background: '#1a2840',
-        borderColor: '#253047',
-        color: '#e2eaf5',
+        background: '#ffffff',
+        borderColor: '#e2e8f0',
+        color: '#0f172a',
       }}
       onFocus={e => { e.currentTarget.style.borderColor = '#ff6a00'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255,106,0,0.12)'; }}
-      onBlur={e =>  { e.currentTarget.style.borderColor = '#253047'; e.currentTarget.style.boxShadow = 'none'; }}
+      onBlur={e =>  { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = 'none'; }}
     >
       {props.children}
     </select>
@@ -158,20 +158,20 @@ function PrimaryBtn({ loading, label, loadingLabel }: { loading: boolean; label:
 }
 
 function ErrMsg({ msg }: { msg: string }) {
-  return <p className={S.err} style={{ color: '#fca5a5', background: 'rgba(220,38,38,0.1)', borderColor: 'rgba(220,38,38,0.2)' }}>{msg}</p>;
+  return <p className={S.err} style={{ color: '#dc2626', background: '#fef2f2', borderColor: '#fecaca' }}>{msg}</p>;
 }
 
 function OkMsg({ msg }: { msg: string }) {
-  return <p className={S.ok} style={{ color: '#86efac', background: 'rgba(22,163,74,0.1)', borderColor: 'rgba(22,163,74,0.2)' }}>{msg}</p>;
+  return <p className={S.ok} style={{ color: '#16a34a', background: '#f0fdf4', borderColor: '#bbf7d0' }}>{msg}</p>;
 }
 
 function BackLink({ onClick, label }: { onClick: () => void; label: string }) {
   return (
     <button type="button" onClick={onClick}
       className="text-sm transition-colors mt-1"
-      style={{ color: '#5a7090', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-      onMouseEnter={e => (e.currentTarget.style.color = '#8fa4c0')}
-      onMouseLeave={e => (e.currentTarget.style.color = '#5a7090')}>
+      style={{ color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+      onMouseEnter={e => (e.currentTarget.style.color = '#334155')}
+      onMouseLeave={e => (e.currentTarget.style.color = '#64748b')}>
       {label}
     </button>
   );
@@ -247,7 +247,7 @@ export default function CommanderPage() {
     setSuccess('If the details match an account, a reset email is on its way. Check your inbox — the link expires after first use.');
   }
 
-  const divider = <div style={{ height: 1, background: '#1e2f4a', margin: '6px 0' }} />;
+  const divider = <div style={{ height: 1, background: '#e2e8f0', margin: '6px 0' }} />;
 
   return (
     <AuthShell view={view} onSwitch={switchView}>
@@ -258,8 +258,8 @@ export default function CommanderPage() {
           <div className="flex items-center gap-2.5 mb-6" style={{ color: '#ff6a00' }}>
             <LockIcon />
             <div>
-              <h1 style={{ fontSize: 18, fontWeight: 800, color: '#e2eaf5', lineHeight: 1.2 }}>Welcome back</h1>
-              <p style={{ fontSize: 13, color: '#5a7090', marginTop: 3 }}>Sign in to your Commander workspace.</p>
+              <h1 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', lineHeight: 1.2 }}>Welcome back</h1>
+              <p style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>Sign in to your Commander workspace.</p>
             </div>
           </div>
 
@@ -290,8 +290,8 @@ export default function CommanderPage() {
           <div className="flex items-center gap-2.5 mb-6" style={{ color: '#ff6a00' }}>
             <UserPlusIcon />
             <div>
-              <h1 style={{ fontSize: 18, fontWeight: 800, color: '#e2eaf5', lineHeight: 1.2 }}>Create your workspace</h1>
-              <p style={{ fontSize: 13, color: '#5a7090', marginTop: 3 }}>Set up your Commander account to get started.</p>
+              <h1 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', lineHeight: 1.2 }}>Create your workspace</h1>
+              <p style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>Set up your Commander account to get started.</p>
             </div>
           </div>
 
@@ -339,8 +339,8 @@ export default function CommanderPage() {
           <div className="flex items-center gap-2.5 mb-6" style={{ color: '#ff6a00' }}>
             <ShieldIcon />
             <div>
-              <h1 style={{ fontSize: 18, fontWeight: 800, color: '#e2eaf5', lineHeight: 1.2 }}>Reset your password</h1>
-              <p style={{ fontSize: 13, color: '#5a7090', marginTop: 3, lineHeight: 1.5 }}>
+              <h1 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', lineHeight: 1.2 }}>Reset your password</h1>
+              <p style={{ fontSize: 13, color: '#64748b', marginTop: 3, lineHeight: 1.5 }}>
                 Enter your workspace ID and registered email. We'll send you a secure reset link.
               </p>
             </div>
@@ -361,7 +361,7 @@ export default function CommanderPage() {
           {!success && (
             <>
               <PrimaryBtn loading={loading} label="Send Reset Link →" loadingLabel="Sending…" />
-              <p className="text-center" style={{ fontSize: 11, color: '#3d5170' }}>
+              <p className="text-center" style={{ fontSize: 11, color: '#94a3b8' }}>
                 For your security, reset links expire after 30 minutes.
               </p>
             </>

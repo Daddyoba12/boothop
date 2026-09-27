@@ -64,7 +64,7 @@ const STATIC_POSTS = [
     excerpt: 'Learn how pre-departure AI compliance screening is eliminating customs holds, documentation errors, and hidden import fees on cross-border deliveries.',
     date: '2026-05-19',
     labels: ['Customs & Compliance', 'Cross-Border Delivery'],
-    gradient: 'from-blue-900/40 to-slate-900/30',
+    gradient: 'from-blue-50 to-slate-100',
   },
   {
     slug: 'small-business-cross-border-shipping',
@@ -72,7 +72,7 @@ const STATIC_POSTS = [
     excerpt: 'How small businesses are shipping internationally without the cost, complexity, or customs risk of traditional couriers — and saving up to 60% per parcel.',
     date: '2026-05-19',
     labels: ['Small Business', 'B2B Logistics'],
-    gradient: 'from-emerald-900/40 to-slate-900/30',
+    gradient: 'from-emerald-50 to-slate-100',
   },
   {
     slug: 'on-board-courier-time-critical-logistics',
@@ -80,7 +80,7 @@ const STATIC_POSTS = [
     excerpt: 'When hours matter — not days — on-board courier delivery is the only option. Discover how BootHop makes in-cabin, zero-handoff delivery accessible to every business.',
     date: '2026-05-19',
     labels: ['Time-Critical Logistics', 'On-Board Courier'],
-    gradient: 'from-violet-900/40 to-slate-900/30',
+    gradient: 'from-violet-50 to-slate-100',
   },
 ];
 
@@ -88,21 +88,21 @@ export default async function BlogPage() {
   const posts = await getPosts();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+    <div className="min-h-screen bg-white text-slate-900">
       <NavBar />
 
       {/* Hero */}
       <section className="pt-32 pb-16 px-6 text-center max-w-4xl mx-auto">
-        <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold px-4 py-2 rounded-full mb-8 uppercase tracking-widest">
+        <div className="inline-flex items-center gap-2 bg-blue-100 border border-blue-200 text-blue-700 text-xs font-semibold px-4 py-2 rounded-full mb-8 uppercase tracking-widest">
           <BookOpen className="h-3.5 w-3.5" /> BootHop Blog
         </div>
-        <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-6">
+        <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-6 text-slate-900">
           Insights &{' '}
           <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
             Updates
           </span>
         </h1>
-        <p className="text-slate-400 text-xl max-w-2xl mx-auto">
+        <p className="text-slate-600 text-xl max-w-2xl mx-auto">
           Logistics, diaspora delivery, customs compliance, and the future of community-powered movement — from the BootHop team.
         </p>
       </section>
@@ -116,29 +116,29 @@ export default async function BlogPage() {
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="group relative overflow-hidden rounded-2xl border border-white/8 bg-white/3 hover:border-blue-500/30 hover:bg-white/5 hover:-translate-y-1 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 flex flex-col"
+              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50 hover:-translate-y-1 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 flex flex-col"
             >
               <div className={`h-48 bg-gradient-to-br ${post.gradient} flex items-center justify-center`}>
-                <BookOpen className="h-12 w-12 text-blue-500/30" />
+                <BookOpen className="h-12 w-12 text-blue-300" />
               </div>
               <div className="p-6 flex flex-col flex-1">
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {post.labels.map(label => (
-                    <span key={label} className="inline-flex items-center gap-1 text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full">
+                    <span key={label} className="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full">
                       <Tag className="h-2.5 w-2.5" />{label}
                     </span>
                   ))}
                 </div>
-                <h2 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors mb-2 leading-snug flex-1">
+                <h2 className="text-lg font-bold text-slate-900 group-hover:text-blue-700 transition-colors mb-2 leading-snug flex-1">
                   {post.title}
                 </h2>
-                <p className="text-sm text-slate-400 leading-relaxed mb-4">{post.excerpt}</p>
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                <p className="text-sm text-slate-600 leading-relaxed mb-4">{post.excerpt}</p>
+                <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-600">
                     <Calendar className="h-3.5 w-3.5" />
                     {formatDate(post.date)}
                   </div>
-                  <span className="text-xs font-semibold text-blue-400 flex items-center gap-1 group-hover:gap-2 transition-all">
+                  <span className="text-xs font-semibold text-blue-700 flex items-center gap-1 group-hover:gap-2 transition-all">
                     Read <ArrowRight className="h-3 w-3" />
                   </span>
                 </div>
@@ -155,17 +155,17 @@ export default async function BlogPage() {
               <Link
                 key={slug}
                 href={`/blog/${slug}`}
-                className="group relative overflow-hidden rounded-2xl border border-white/8 bg-white/3 hover:border-blue-500/30 hover:bg-white/5 hover:-translate-y-1 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 flex flex-col"
+                className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50 hover:-translate-y-1 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 flex flex-col"
               >
                 {img ? (
                   <div className="relative h-48 overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={img} alt={entry.title.$t} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
                   </div>
                 ) : (
-                  <div className="h-48 bg-gradient-to-br from-blue-900/30 to-slate-900/30 flex items-center justify-center">
-                    <BookOpen className="h-12 w-12 text-blue-500/30" />
+                  <div className="h-48 bg-gradient-to-br from-blue-50 to-slate-100 flex items-center justify-center">
+                    <BookOpen className="h-12 w-12 text-blue-300" />
                   </div>
                 )}
 
@@ -173,27 +173,27 @@ export default async function BlogPage() {
                   {labels.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {labels.slice(0, 3).map(label => (
-                        <span key={label} className="inline-flex items-center gap-1 text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full">
+                        <span key={label} className="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full">
                           <Tag className="h-2.5 w-2.5" />{label}
                         </span>
                       ))}
                     </div>
                   )}
 
-                  <h2 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors mb-2 leading-snug flex-1">
+                  <h2 className="text-lg font-bold text-slate-900 group-hover:text-blue-700 transition-colors mb-2 leading-snug flex-1">
                     {entry.title.$t}
                   </h2>
 
-                  <p className="text-sm text-slate-400 leading-relaxed mb-4">
+                  <p className="text-sm text-slate-600 leading-relaxed mb-4">
                     {excerpt(entry.content.$t)}
                   </p>
 
-                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-600">
                       <Calendar className="h-3.5 w-3.5" />
                       {formatDate(entry.published.$t)}
                     </div>
-                    <span className="text-xs font-semibold text-blue-400 flex items-center gap-1 group-hover:gap-2 transition-all">
+                    <span className="text-xs font-semibold text-blue-700 flex items-center gap-1 group-hover:gap-2 transition-all">
                       Read <ArrowRight className="h-3 w-3" />
                     </span>
                   </div>
@@ -203,9 +203,9 @@ export default async function BlogPage() {
           })}
 
           {posts.length === 0 && STATIC_POSTS.length === 0 && (
-            <div className="col-span-3 text-center py-24 text-slate-500">
+            <div className="col-span-3 text-center py-24 text-slate-600">
               <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-30" />
-              <p className="text-lg font-semibold text-slate-400">First post coming soon.</p>
+              <p className="text-lg font-semibold text-slate-600">First post coming soon.</p>
             </div>
           )}
         </div>

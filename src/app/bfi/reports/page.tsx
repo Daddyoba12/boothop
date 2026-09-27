@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import type { Report, ReportPeriod } from '@/lib/bfi/reports';
 
 function signalColor(r: string) {
-  if (r === 'BUY')  return 'text-green-400';
-  if (r === 'WAIT') return 'text-red-400';
-  return 'text-gray-400';
+  if (r === 'BUY')  return 'text-green-600';
+  if (r === 'WAIT') return 'text-red-600';
+  return 'text-slate-600';
 }
 
 export default function ReportsPage() {
@@ -33,16 +33,16 @@ export default function ReportsPage() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold">Reports</h1>
-          <p className="text-gray-500 text-sm mt-1">Flight intelligence performance by period</p>
+          <p className="text-slate-600 text-sm mt-1">Flight intelligence performance by period</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex gap-1 bg-gray-900 border border-gray-800 rounded-lg p-1">
+          <div className="flex gap-1 bg-white border border-slate-200 rounded-lg p-1">
             {periods.map(p => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
                 className={`px-3 py-1 text-sm rounded-md capitalize transition-colors ${
-                  period === p ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'
+                  period === p ? 'bg-blue-500 text-white' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {p}
@@ -51,7 +51,7 @@ export default function ReportsPage() {
           </div>
           <button
             onClick={downloadCsv}
-            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-sm text-gray-300 rounded-lg transition-colors"
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-sm text-slate-600 rounded-lg transition-colors"
           >
             ↓ CSV
           </button>
@@ -59,9 +59,9 @@ export default function ReportsPage() {
       </div>
 
       {loading ? (
-        <div className="text-gray-500 text-sm">Generating report...</div>
+        <div className="text-slate-600 text-sm">Generating report...</div>
       ) : !report ? (
-        <div className="text-gray-500 text-sm">No data available.</div>
+        <div className="text-slate-600 text-sm">No data available.</div>
       ) : (
         <>
           {/* Summary */}
@@ -72,33 +72,33 @@ export default function ReportsPage() {
               { label: 'Total Offers',  value: report.totalOffers.toLocaleString() },
               { label: 'Biggest Drop',  value: report.biggestDrop ? `£${report.biggestDrop.toFixed(0)}` : '—' },
             ].map(({ label, value }) => (
-              <div key={label} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</p>
-                <p className="text-2xl font-bold text-white">{value}</p>
+              <div key={label} className="bg-white border border-slate-200 rounded-xl p-5">
+                <p className="text-xs text-slate-600 uppercase tracking-wider mb-1">{label}</p>
+                <p className="text-2xl font-bold text-slate-900">{value}</p>
               </div>
             ))}
           </div>
 
           {report.topRoute && (
             <div className="flex gap-4 flex-wrap">
-              <div className="bg-blue-950/30 border border-blue-900 rounded-xl px-5 py-3 text-sm">
-                <span className="text-gray-500">Top Route: </span>
-                <span className="text-white font-semibold font-mono">{report.topRoute}</span>
+              <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-3 text-sm">
+                <span className="text-slate-600">Top Route: </span>
+                <span className="text-slate-900 font-semibold font-mono">{report.topRoute}</span>
               </div>
               {report.topAirline && (
-                <div className="bg-green-950/30 border border-green-900 rounded-xl px-5 py-3 text-sm">
-                  <span className="text-gray-500">Top Airline: </span>
-                  <span className="text-white font-semibold">{report.topAirline}</span>
+                <div className="bg-green-50 border border-green-200 rounded-xl px-5 py-3 text-sm">
+                  <span className="text-slate-600">Top Airline: </span>
+                  <span className="text-slate-900 font-semibold">{report.topAirline}</span>
                 </div>
               )}
             </div>
           )}
 
           {/* Per-route breakdown */}
-          <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wider">
+                <tr className="border-b border-slate-200 text-xs text-slate-600 uppercase tracking-wider">
                   <th className="text-left px-5 py-3">Route</th>
                   <th className="text-left px-5 py-3">Cheapest</th>
                   <th className="text-left px-5 py-3">Avg</th>
@@ -112,15 +112,15 @@ export default function ReportsPage() {
               </thead>
               <tbody>
                 {report.rows.map(r => (
-                  <tr key={r.route} className="border-b border-gray-800/40 hover:bg-gray-800/20">
-                    <td className="px-5 py-3 font-mono font-semibold text-white">{r.route}</td>
-                    <td className="px-5 py-3 text-gray-300">{r.cheapestGbp ? `£${r.cheapestGbp.toFixed(0)}` : '—'}</td>
-                    <td className="px-5 py-3 text-gray-400">{r.averageGbp ? `£${r.averageGbp.toFixed(0)}` : '—'}</td>
-                    <td className="px-5 py-3 text-green-400">{r.biggestDrop ? `£${r.biggestDrop.toFixed(0)}` : '—'}</td>
-                    <td className="px-5 py-3 text-gray-400">{r.totalOffers.toLocaleString()}</td>
-                    <td className="px-5 py-3 text-gray-400">{r.views}</td>
-                    <td className="px-5 py-3 text-blue-400 font-semibold">{r.clicks}</td>
-                    <td className="px-5 py-3 text-gray-400">{r.ctr}%</td>
+                  <tr key={r.route} className="border-b border-slate-200 hover:bg-slate-50">
+                    <td className="px-5 py-3 font-mono font-semibold text-slate-900">{r.route}</td>
+                    <td className="px-5 py-3 text-slate-600">{r.cheapestGbp ? `£${r.cheapestGbp.toFixed(0)}` : '—'}</td>
+                    <td className="px-5 py-3 text-slate-600">{r.averageGbp ? `£${r.averageGbp.toFixed(0)}` : '—'}</td>
+                    <td className="px-5 py-3 text-green-600">{r.biggestDrop ? `£${r.biggestDrop.toFixed(0)}` : '—'}</td>
+                    <td className="px-5 py-3 text-slate-600">{r.totalOffers.toLocaleString()}</td>
+                    <td className="px-5 py-3 text-slate-600">{r.views}</td>
+                    <td className="px-5 py-3 text-blue-600 font-semibold">{r.clicks}</td>
+                    <td className="px-5 py-3 text-slate-600">{r.ctr}%</td>
                     <td className={`px-5 py-3 font-semibold ${signalColor(r.recommendation)}`}>{r.recommendation}</td>
                   </tr>
                 ))}

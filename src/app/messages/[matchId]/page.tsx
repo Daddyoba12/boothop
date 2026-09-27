@@ -126,41 +126,41 @@ export default function ChatPage() {
   // ── Loading state ──────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center">
-        <Loader2 className="h-10 w-10 text-blue-400 animate-spin" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
       </div>
     );
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
 
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-slate-950/90 backdrop-blur border-b border-white/8 px-4 py-3">
+      <div className="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-slate-200 px-4 py-3">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
-          <button onClick={() => router.back()} className="p-2 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition">
+          <button onClick={() => router.back()} className="p-2 rounded-lg hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition">
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-white font-semibold text-sm truncate">Shipment</span>
+              <span className="text-slate-900 font-semibold text-sm truncate">Shipment</span>
               {shipmentId && (
-                <span className="bg-blue-900/60 text-blue-300 text-xs font-mono px-2 py-0.5 rounded border border-blue-700/40">
+                <span className="bg-blue-50 text-blue-700 text-xs font-mono px-2 py-0.5 rounded border border-blue-200">
                   {shipmentId}
                 </span>
               )}
             </div>
             {isLocked ? (
-              <p className="text-xs text-red-400 flex items-center gap-1 mt-0.5">
+              <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
                 <Archive className="h-3 w-3" /> Archived — dispute window closed
               </p>
             ) : lockedSince ? (
-              <p className="text-xs text-amber-400 flex items-center gap-1 mt-0.5">
+              <p className="text-xs text-amber-600 flex items-center gap-1 mt-0.5">
                 <Lock className="h-3 w-3" /> 7-day dispute window active
               </p>
             ) : (
-              <p className="text-xs text-white/40 mt-0.5">BootHop secure messaging</p>
+              <p className="text-xs text-slate-600 mt-0.5">BootHop secure messaging</p>
             )}
           </div>
           {/* BootHop Call */}
@@ -175,7 +175,7 @@ export default function ChatPage() {
         </div>
         {callMsg && (
           <div className="max-w-2xl mx-auto mt-2 px-4">
-            <p className={`text-xs px-3 py-2 rounded-lg ${callMsg.includes('connect') ? 'bg-green-900/40 text-green-300 border border-green-700/40' : 'bg-red-900/40 text-red-300 border border-red-700/40'}`}>
+            <p className={`text-xs px-3 py-2 rounded-lg ${callMsg.includes('connect') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
               {callMsg}
             </p>
           </div>
@@ -183,24 +183,24 @@ export default function ChatPage() {
       </div>
 
       {/* Escrow & mantra banner */}
-      <div className="bg-blue-950/50 border-b border-blue-800/30 px-4 py-2.5">
+      <div className="bg-blue-50 border-b border-blue-100 px-4 py-2.5">
         <div className="max-w-2xl mx-auto flex items-center gap-2">
-          <Shield className="h-3.5 w-3.5 text-blue-400 shrink-0" />
-          <p className="text-xs text-blue-300/80">
-            <span className="font-semibold text-blue-300">Escrow protected</span>
+          <Shield className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+          <p className="text-xs text-blue-700">
+            <span className="font-semibold text-blue-700">Escrow protected</span>
             {' '}— payment held by Stripe until you confirm delivery.{' '}
-            <span className="text-white/40">Talk through BootHop. Pay through BootHop. Stay protected through BootHop.</span>
+            <span className="text-slate-600">Talk through BootHop. Pay through BootHop. Stay protected through BootHop.</span>
           </p>
         </div>
       </div>
 
       {/* Archived banner */}
       {isLocked && (
-        <div className="bg-slate-900/80 border-b border-white/8 px-4 py-3">
-          <div className="max-w-2xl mx-auto flex items-center gap-3 text-white/50">
+        <div className="bg-slate-100 border-b border-slate-200 px-4 py-3">
+          <div className="max-w-2xl mx-auto flex items-center gap-3 text-slate-600">
             <Archive className="h-5 w-5 shrink-0" />
             <div>
-              <p className="text-sm font-semibold text-white/70">Conversation archived</p>
+              <p className="text-sm font-semibold text-slate-700">Conversation archived</p>
               <p className="text-xs">The 7-day dispute window has closed. This thread is read-only.</p>
             </div>
           </div>
@@ -214,9 +214,9 @@ export default function ChatPage() {
           {/* Empty state */}
           {messages.length === 0 && (
             <div className="text-center py-16">
-              <CheckCircle className="h-12 w-12 text-white/20 mx-auto mb-3" />
-              <p className="text-white/40 text-sm">No messages yet — say hello!</p>
-              <p className="text-white/25 text-xs mt-1">All messages stay within BootHop for your protection.</p>
+              <CheckCircle className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-600 text-sm">No messages yet — say hello!</p>
+              <p className="text-slate-300 text-xs mt-1">All messages stay within BootHop for your protection.</p>
             </div>
           )}
 
@@ -226,16 +226,16 @@ export default function ChatPage() {
               <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-xs lg:max-w-sm ${isMine ? '' : ''}`}>
                   {!isMine && (
-                    <p className="text-xs text-white/40 mb-1 ml-1">{msg.sender_email.split('@')[0]}</p>
+                    <p className="text-xs text-slate-600 mb-1 ml-1">{msg.sender_email.split('@')[0]}</p>
                   )}
                   <div className={`rounded-2xl px-4 py-2.5 ${
                     isMine
-                      ? 'bg-blue-600 text-white rounded-br-sm'
-                      : 'bg-slate-800 text-white/90 rounded-bl-sm'
+                      ? 'bg-blue-500 text-white rounded-br-sm'
+                      : 'bg-white border border-slate-200 text-slate-800 rounded-bl-sm'
                   }`}>
                     <p className="text-sm leading-relaxed">{msg.content}</p>
                   </div>
-                  <p className={`text-xs text-white/30 mt-1 ${isMine ? 'text-right' : 'text-left'}`}>
+                  <p className={`text-xs text-slate-600 mt-1 ${isMine ? 'text-right' : 'text-left'}`}>
                     {new Date(msg.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
@@ -249,17 +249,17 @@ export default function ChatPage() {
       {/* Contact block error */}
       {blockError && (
         <div className="px-4 pb-2">
-          <div className="max-w-2xl mx-auto bg-red-950/60 border border-red-700/40 rounded-xl px-4 py-3 flex gap-3">
-            <AlertTriangle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
-            <p className="text-sm text-red-300">{blockError}</p>
-            <button onClick={() => setBlockError('')} className="ml-auto text-red-400 hover:text-red-300 text-lg leading-none">×</button>
+          <div className="max-w-2xl mx-auto bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex gap-3">
+            <AlertTriangle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+            <p className="text-sm text-red-700">{blockError}</p>
+            <button onClick={() => setBlockError('')} className="ml-auto text-red-500 hover:text-red-700 text-lg leading-none">×</button>
           </div>
         </div>
       )}
 
       {/* Input */}
       {!isLocked && (
-        <div className="bg-slate-950/90 backdrop-blur border-t border-white/8 px-4 py-3">
+        <div className="bg-white/90 backdrop-blur border-t border-slate-200 px-4 py-3">
           <div className="max-w-2xl mx-auto">
             <form onSubmit={handleSend} className="flex gap-2">
               <input
@@ -269,7 +269,7 @@ export default function ChatPage() {
                 placeholder="Type a message…"
                 maxLength={1000}
                 disabled={sending}
-                className="flex-1 bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-blue-500 transition disabled:opacity-50"
+                className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 transition disabled:opacity-50"
               />
               <button
                 type="submit"
@@ -279,7 +279,7 @@ export default function ChatPage() {
                 {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </button>
             </form>
-            <p className="text-xs text-white/25 mt-2 text-center">
+            <p className="text-xs text-slate-600 mt-2 text-center">
               Personal contact details are blocked to keep you protected under BootHop.
             </p>
           </div>

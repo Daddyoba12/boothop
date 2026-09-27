@@ -148,7 +148,7 @@ function CreateRatingPageInner() {
     label: string;
   }) => (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+      <label className="block text-sm font-medium text-slate-700 mb-2">{label}</label>
       <div className="flex gap-2">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
@@ -161,7 +161,7 @@ function CreateRatingPageInner() {
               className={`h-8 w-8 transition ${
                 star <= value
                   ? 'text-yellow-500 fill-yellow-500'
-                  : 'text-gray-300'
+                  : 'text-slate-300'
               }`}
             />
           </button>
@@ -182,23 +182,23 @@ function CreateRatingPageInner() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">Match not found</p>
+          <p className="text-slate-600">Match not found</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <nav className="bg-white border-b">
+      <nav className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center space-x-2">
               <Package className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">BootHop</span>
+              <span className="text-2xl font-bold text-slate-900">BootHop</span>
             </Link>
-            <Link href={`/matches/${matchId}`} className="text-gray-600 hover:text-gray-900">
+            <Link href={`/matches/${matchId}`} className="text-slate-600 hover:text-slate-900">
               ← Back to Match
             </Link>
           </div>
@@ -214,19 +214,19 @@ function CreateRatingPageInner() {
                 <Star className="h-12 w-12 text-yellow-600" />
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Rate Your Experience</h1>
-            <p className="text-gray-600">Help us build a trusted community</p>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Rate Your Experience</h1>
+            <p className="text-slate-600">Help us build a trusted community</p>
           </div>
 
           {/* User Info */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-8">
+          <div className="bg-slate-50 rounded-lg p-4 mb-8">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
                 {otherUser.full_name.charAt(0)}
               </div>
               <div>
-                <div className="font-semibold text-gray-900">{otherUser.full_name}</div>
-                <div className="text-sm text-gray-600">
+                <div className="font-semibold text-slate-900">{otherUser.full_name}</div>
+                <div className="text-sm text-slate-600">
                   Current Rating: {otherUser.rating.toFixed(1)} ⭐
                 </div>
               </div>
@@ -257,7 +257,7 @@ function CreateRatingPageInner() {
 
             {/* Written Review */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Written Review (Optional)
               </label>
               <textarea
@@ -265,7 +265,7 @@ function CreateRatingPageInner() {
                 onChange={(e) => setFormData({ ...formData, review: e.target.value })}
                 placeholder="Share your experience with this delivery..."
                 rows={4}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 

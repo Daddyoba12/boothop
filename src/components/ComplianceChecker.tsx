@@ -126,7 +126,7 @@ export default function ComplianceChecker({
           <button
             type="button"
             onClick={() => setExpanded(!expanded)}
-            className="text-slate-400 hover:text-slate-600 transition"
+            className="text-slate-600 hover:text-slate-600 transition"
           >
             {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
@@ -136,7 +136,7 @@ export default function ComplianceChecker({
       {/* Body */}
       <div className="px-5 py-4 space-y-4">
         {!result && !loading && (
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-600">
             Check import restrictions and risk score for this item and destination before submitting.
           </p>
         )}
@@ -153,7 +153,7 @@ export default function ComplianceChecker({
             <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
             <div className="space-y-1">
               <p className="text-sm font-medium text-slate-700">Running compliance check…</p>
-              <p className="text-xs text-slate-400">Classifying item · Checking restrictions · Calculating risk</p>
+              <p className="text-xs text-slate-600">Classifying item · Checking restrictions · Calculating risk</p>
             </div>
           </div>
         )}
@@ -170,8 +170,8 @@ export default function ComplianceChecker({
             <div className="bg-slate-50 rounded-xl px-4 py-3">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1.5">
-                  <Activity className="h-4 w-4 text-slate-500" />
-                  <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Risk Score</span>
+                  <Activity className="h-4 w-4 text-slate-600" />
+                  <span className="text-xs text-slate-600 font-medium uppercase tracking-wider">Risk Score</span>
                 </div>
                 <span className="text-sm font-bold text-slate-900">{result.riskScore}/100</span>
               </div>
@@ -191,7 +191,7 @@ export default function ComplianceChecker({
                   { label: 'Qty',      value: result.breakdown.quantityScore },
                 ].map((b) => (
                   <div key={b.label} className="bg-white rounded-lg px-2 py-1.5 border border-slate-100">
-                    <p className="text-xs text-slate-400">{b.label}</p>
+                    <p className="text-xs text-slate-600">{b.label}</p>
                     <p className="text-sm font-semibold text-slate-700">+{b.value}</p>
                   </div>
                 ))}
@@ -200,7 +200,7 @@ export default function ComplianceChecker({
 
             {/* Category */}
             <div className="flex items-center gap-2 text-sm text-slate-600">
-              <span className="text-slate-400 text-xs uppercase tracking-wider font-medium">Category:</span>
+              <span className="text-slate-600 text-xs uppercase tracking-wider font-medium">Category:</span>
               <span className="capitalize font-medium text-slate-800">{result.category}</span>
             </div>
           </div>
@@ -214,7 +214,7 @@ export default function ComplianceChecker({
             className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${
               canCheck
                 ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                : 'bg-slate-100 text-slate-600 cursor-not-allowed'
             }`}
           >
             {result ? 'Re-run Check' : 'Check Compliance'}
@@ -222,7 +222,7 @@ export default function ComplianceChecker({
         )}
 
         {!canCheck && !result && (
-          <p className="text-center text-xs text-slate-400">
+          <p className="text-center text-xs text-slate-600">
             Fill in item description, destination, and declared value to enable this check.
           </p>
         )}

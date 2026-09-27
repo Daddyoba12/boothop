@@ -20,15 +20,15 @@ function OpenHandler() {
   }, [params, router]);
 
   return (
-    <div className="min-h-screen bg-[#07111f] flex items-center justify-center">
-      <p className="text-white/40 text-sm">Opening BootHop…</p>
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <p className="text-slate-600 text-sm">Opening BootHop…</p>
     </div>
   );
 }
 
 export default function OpenPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#07111f]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
       <OpenHandler />
     </Suspense>
   );

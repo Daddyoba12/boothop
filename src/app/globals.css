@@ -10,7 +10,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -19,11 +20,17 @@ html {
 }
 
 body {
-  background: linear-gradient(135deg, #020617 0%, #0c1e3d 50%, #020617 100%);
-  background-attachment: fixed;
+  background: #ffffff;
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Premium heading font, applied site-wide to every semantic heading so
+   individual pages don't need a font utility class added by hand. */
+h1, h2, h3 {
+  font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.01em;
 }
 
 /* ── Hero slow zoom ── */
@@ -198,8 +205,8 @@ body {
    as an installed app (no browser chrome)
 ═══════════════════════════════════════════ */
 @media all and (display-mode: standalone) {
-  /* Ensure full-bleed dark background with no white flash */
-  html, body { background: #07111f; }
+  /* Full-bleed light background with no dark flash, matching the site's light theme */
+  html, body { background: #ffffff; }
 
   /* Make "Request →" and "Carry this →" buttons always visible
      (they use group-hover:opacity-100 which never fires on touch) */

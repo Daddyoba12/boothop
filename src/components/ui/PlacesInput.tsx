@@ -62,21 +62,21 @@ export function PlacesInput({ label, value, onChange, placeholder = 'Enter addre
   return (
     <div className={className}>
       {label && (
-        <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-1.5">{label}</p>
+        <p className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-1.5">{label}</p>
       )}
       <div className="relative">
-        <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/25 pointer-events-none" />
+        <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 pointer-events-none" />
         <input
           ref={inputRef}
           defaultValue={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
           autoComplete="off"
-          className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-colors"
+          className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 transition-colors"
         />
       </div>
       {ready && (
-        <p className="text-[10px] text-white/15 mt-1 ml-1">Powered by Google Maps</p>
+        <p className="text-[10px] text-slate-300 mt-1 ml-1">Powered by Google Maps</p>
       )}
     </div>
   );

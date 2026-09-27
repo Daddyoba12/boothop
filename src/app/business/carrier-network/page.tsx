@@ -12,7 +12,7 @@ import {
 import { BusinessNav } from '@/components/business/BusinessNav';
 import BusinessFooter from '@/components/business/BusinessFooter';
 
-const BG = 'linear-gradient(135deg, #020617 0%, #061230 50%, #020617 100%)';
+const BG = 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -138,15 +138,15 @@ function ProgressBar({ step }: { step: Step }) {
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all ${
                 done   ? 'bg-blue-400 text-black'
                 : active ? 'bg-blue-400/20 border-2 border-blue-400 text-blue-300'
-                         : 'bg-white/6 border border-white/12 text-white/30'
+                         : 'bg-slate-50 border border-slate-200 text-slate-300'
               }`}>
                 {done ? <CheckCircle className="h-4 w-4" /> : num}
               </div>
               <span className={`text-[10px] mt-1 font-bold uppercase tracking-wider ${
-                active ? 'text-blue-300' : done ? 'text-blue-300/60' : 'text-white/25'
+                active ? 'text-blue-300' : done ? 'text-blue-300/60' : 'text-slate-300'
               }`}>{label}</span>
             </div>
-            {i < 3 && <div className={`w-10 h-px mb-5 transition-all ${done ? 'bg-blue-400/50' : 'bg-white/8'}`} />}
+            {i < 3 && <div className={`w-10 h-px mb-5 transition-all ${done ? 'bg-blue-400/50' : 'bg-slate-100'}`} />}
           </div>
         );
       })}
@@ -158,17 +158,17 @@ function CBox({ checked, onChange, label, sub }: { checked: boolean; onChange: (
   return (
     <button type="button" onClick={onChange}
       className={`text-left p-4 rounded-2xl border transition-all ${
-        checked ? 'bg-blue-500/12 border-blue-400/50' : 'bg-white/3 border-white/8 hover:border-white/20 hover:bg-white/5'
+        checked ? 'bg-blue-500/12 border-blue-400/50' : 'bg-slate-50 border-slate-200 hover:border-slate-200 hover:bg-slate-50'
       }`}>
       <div className="flex items-start gap-3">
         <div className={`mt-0.5 w-5 h-5 rounded-md border flex-shrink-0 flex items-center justify-center transition-all ${
-          checked ? 'bg-blue-400 border-blue-400' : 'border-white/25'
+          checked ? 'bg-blue-400 border-blue-400' : 'border-slate-300'
         }`}>
           {checked && <CheckCircle className="h-3.5 w-3.5 text-black" strokeWidth={3} />}
         </div>
         <div>
-          <p className={`text-sm font-bold leading-tight ${checked ? 'text-white' : 'text-white/70'}`}>{label}</p>
-          <p className="text-xs text-white/35 mt-0.5">{sub}</p>
+          <p className={`text-sm font-bold leading-tight ${checked ? 'text-blue-700' : 'text-slate-600'}`}>{label}</p>
+          <p className="text-xs text-slate-600 mt-0.5">{sub}</p>
         </div>
       </div>
     </button>
@@ -187,10 +187,10 @@ function RadioGrid({ options, value, onChange }: {
           className={`text-left p-3.5 rounded-xl border transition-all ${
             value === opt.value
               ? 'bg-blue-500/15 border-blue-400/50 text-blue-300'
-              : 'bg-white/3 border-white/8 text-white/60 hover:border-white/20 hover:bg-white/5'
+              : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-200 hover:bg-slate-50'
           }`}>
           <p className="text-sm font-bold">{opt.label}</p>
-          {opt.sub && <p className="text-xs text-white/35 mt-0.5">{opt.sub}</p>}
+          {opt.sub && <p className="text-xs text-slate-600 mt-0.5">{opt.sub}</p>}
         </button>
       ))}
     </div>
@@ -200,16 +200,16 @@ function RadioGrid({ options, value, onChange }: {
 function Field({ label, required, children, hint }: { label: string; required?: boolean; children: React.ReactNode; hint?: string }) {
   return (
     <div>
-      <label className="text-xs text-white/40 uppercase tracking-widest font-bold mb-2 block">
-        {label}{required && <span className="text-blue-400 ml-1">*</span>}
+      <label className="text-xs text-slate-600 uppercase tracking-widest font-bold mb-2 block">
+        {label}{required && <span className="text-blue-600 ml-1">*</span>}
       </label>
       {children}
-      {hint && <p className="text-xs text-white/25 mt-1.5">{hint}</p>}
+      {hint && <p className="text-xs text-slate-300 mt-1.5">{hint}</p>}
     </div>
   );
 }
 
-const inputCls = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm focus:outline-none focus:border-blue-400/50 focus:bg-white/8 transition-all';
+const inputCls = 'w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-blue-400/50 focus:bg-slate-100 transition-all';
 
 // ── Main page ─────────────────────────────────────────────────────────
 
@@ -287,11 +287,11 @@ export default function CarrierNetworkPage() {
   };
 
   return (
-    <div className="min-h-screen text-white" style={{ background: BG }}>
+    <div className="min-h-screen text-slate-900" style={{ background: BG }}>
       <BusinessNav
         rightSlot={
           <>
-            <a href="/business" className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-semibold transition-colors">
+            <a href="/business" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-slate-900 text-sm font-semibold transition-colors">
               <ChevronLeft className="h-4 w-4" /> Business
             </a>
             <span className="text-xs font-semibold bg-blue-500/15 border border-blue-400/25 text-blue-300 px-2.5 py-1 rounded-full uppercase tracking-widest">
@@ -314,13 +314,13 @@ export default function CarrierNetworkPage() {
           More jobs.<br /><span className="text-blue-300">Less searching.</span>
         </motion.h1>
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-          className="text-white/50 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-4">
+          className="text-slate-600 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-4">
           Join the BootHop Carrier Network — AOG, same-day, specialist cargo. Earn per job.
-          Paid within <strong className="text-white">1 week</strong> of each delivery.
+          Paid within <strong className="text-slate-900">1 week</strong> of each delivery.
           One-time registration fee: <span className="text-blue-300 font-bold">£250</span>.
         </motion.p>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
-          className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-400/80 text-xs font-semibold px-4 py-2 rounded-full">
+          className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-600/80 text-xs font-semibold px-4 py-2 rounded-full">
           Registered companies only · No sole traders · Business email required
         </motion.div>
       </div>
@@ -335,7 +335,7 @@ export default function CarrierNetworkPage() {
           {step === 1 && (
             <motion.div key="s1"
               initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
-              className="bg-white/3 border border-white/8 rounded-3xl p-8 space-y-5">
+              className="bg-slate-50 border border-slate-200 rounded-3xl p-8 space-y-5">
 
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
@@ -343,7 +343,7 @@ export default function CarrierNetworkPage() {
                 </div>
                 <div>
                   <h2 className="text-xl font-black">Company Identity</h2>
-                  <p className="text-white/35 text-sm">Registered businesses only — no sole traders</p>
+                  <p className="text-slate-600 text-sm">Registered businesses only — no sole traders</p>
                 </div>
               </div>
 
@@ -393,7 +393,7 @@ export default function CarrierNetworkPage() {
                       className={`text-sm px-4 py-2 rounded-xl border font-semibold transition-all ${
                         form.your_role === r
                           ? 'bg-blue-400/20 border-blue-400/50 text-blue-300'
-                          : 'bg-white/4 border-white/12 text-white/50 hover:text-white/80 hover:border-white/25'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-700 hover:border-slate-300'
                       }`}>{r}</button>
                   ))}
                 </div>
@@ -410,7 +410,7 @@ export default function CarrierNetworkPage() {
           {step === 2 && (
             <motion.div key="s2"
               initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
-              className="bg-white/3 border border-white/8 rounded-3xl p-8 space-y-7">
+              className="bg-slate-50 border border-slate-200 rounded-3xl p-8 space-y-7">
 
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
@@ -420,23 +420,23 @@ export default function CarrierNetworkPage() {
               </div>
 
               <div>
-                <p className="text-xs text-white/40 uppercase tracking-widest font-bold mb-3">Fleet size <span className="text-blue-400">*</span></p>
+                <p className="text-xs text-slate-600 uppercase tracking-widest font-bold mb-3">Fleet size <span className="text-blue-600">*</span></p>
                 <div className="flex flex-wrap gap-2">
                   {FLEET_SIZES.map(s => (
                     <button key={s} type="button" onClick={() => set('fleet_size', s)}
                       className={`text-sm px-4 py-2 rounded-xl border font-semibold transition-all ${
                         form.fleet_size === s
                           ? 'bg-blue-400/20 border-blue-400/50 text-blue-300'
-                          : 'bg-white/4 border-white/12 text-white/50 hover:text-white/80 hover:border-white/25'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-700 hover:border-slate-300'
                       }`}>{s}</button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <p className="text-xs text-white/40 uppercase tracking-widest font-bold mb-3">
-                  Vehicle types <span className="text-blue-400">*</span>
-                  <span className="text-white/25 normal-case ml-2">Select all that apply</span>
+                <p className="text-xs text-slate-600 uppercase tracking-widest font-bold mb-3">
+                  Vehicle types <span className="text-blue-600">*</span>
+                  <span className="text-slate-300 normal-case ml-2">Select all that apply</span>
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {VEHICLE_TYPES.map(v => (
@@ -444,19 +444,19 @@ export default function CarrierNetworkPage() {
                       className={`text-sm px-4 py-2 rounded-xl border font-semibold transition-all ${
                         form.vehicle_types.includes(v)
                           ? 'bg-blue-400/20 border-blue-400/50 text-blue-300'
-                          : 'bg-white/4 border-white/12 text-white/50 hover:text-white/80 hover:border-white/25'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-700 hover:border-slate-300'
                       }`}>{v}</button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <p className="text-xs text-white/40 uppercase tracking-widest font-bold mb-3">Operating hours <span className="text-blue-400">*</span></p>
+                <p className="text-xs text-slate-600 uppercase tracking-widest font-bold mb-3">Operating hours <span className="text-blue-600">*</span></p>
                 <RadioGrid options={OPERATING_HOURS_OPTIONS} value={form.operating_hours} onChange={v => set('operating_hours', v)} />
               </div>
 
               <div>
-                <p className="text-xs text-white/40 uppercase tracking-widest font-bold mb-3">Coverage area <span className="text-blue-400">*</span></p>
+                <p className="text-xs text-slate-600 uppercase tracking-widest font-bold mb-3">Coverage area <span className="text-blue-600">*</span></p>
                 <RadioGrid options={COVERAGE_OPTIONS} value={form.coverage_area} onChange={v => set('coverage_area', v)} />
               </div>
             </motion.div>
@@ -468,14 +468,14 @@ export default function CarrierNetworkPage() {
               initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
               className="space-y-6">
 
-              <div className="bg-white/3 border border-white/8 rounded-3xl p-8">
+              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
                     <Shield className="h-5 w-5 text-blue-300" />
                   </div>
                   <div>
                     <h2 className="text-xl font-black">Certifications</h2>
-                    <p className="text-white/35 text-sm">These determine your specialist job matches</p>
+                    <p className="text-slate-600 text-sm">These determine your specialist job matches</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
@@ -486,11 +486,11 @@ export default function CarrierNetworkPage() {
                 </div>
               </div>
 
-              <div className="bg-white/3 border border-white/8 rounded-3xl p-8">
+              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8">
                 <h2 className="text-xl font-black mb-2 flex items-center gap-2">
                   <Truck className="h-5 w-5 text-blue-300" /> Cargo types
                 </h2>
-                <p className="text-white/35 text-sm mb-6">What do you regularly move?</p>
+                <p className="text-slate-600 text-sm mb-6">What do you regularly move?</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {CARGO_OPTIONS.map(({ key, label, sub }) => (
                     <CBox key={key} checked={form[key as keyof FormData] as boolean}
@@ -499,11 +499,11 @@ export default function CarrierNetworkPage() {
                 </div>
               </div>
 
-              <div className="bg-white/3 border border-white/8 rounded-3xl p-8">
+              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8">
                 <h2 className="text-xl font-black mb-2 flex items-center gap-2">
                   <Clock className="h-5 w-5 text-blue-300" /> Service capabilities
                 </h2>
-                <p className="text-white/35 text-sm mb-6">What service types can you offer?</p>
+                <p className="text-slate-600 text-sm mb-6">What service types can you offer?</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {SERVICE_OPTIONS.map(({ key, label, sub }) => (
                     <CBox key={key} checked={form[key as keyof FormData] as boolean}
@@ -513,11 +513,11 @@ export default function CarrierNetworkPage() {
               </div>
 
               {/* Insurance upload */}
-              <div className="bg-white/3 border border-white/8 rounded-3xl p-8">
+              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8">
                 <h2 className="text-xl font-black mb-2 flex items-center gap-2">
                   <FileText className="h-5 w-5 text-blue-300" /> Insurance certificate
                 </h2>
-                <p className="text-white/35 text-sm mb-6">
+                <p className="text-slate-600 text-sm mb-6">
                   Public liability minimum £1,000,000. PDF only, max 5MB.
                 </p>
                 <input ref={fileRef} type="file" accept="application/pdf" className="hidden"
@@ -532,25 +532,25 @@ export default function CarrierNetworkPage() {
                     <div className="flex items-center gap-3">
                       <FileText className="h-5 w-5 text-blue-300 shrink-0" />
                       <div>
-                        <p className="text-sm font-bold text-white">{insuranceFile.name}</p>
-                        <p className="text-xs text-white/40">{(insuranceFile.size / 1024).toFixed(0)} KB</p>
+                        <p className="text-sm font-bold text-slate-900">{insuranceFile.name}</p>
+                        <p className="text-xs text-slate-600">{(insuranceFile.size / 1024).toFixed(0)} KB</p>
                       </div>
                     </div>
-                    <button onClick={() => setInsuranceFile(null)} className="text-white/30 hover:text-white/60 transition-colors">
+                    <button onClick={() => setInsuranceFile(null)} className="text-slate-300 hover:text-slate-600 transition-colors">
                       <X className="h-4 w-4" />
                     </button>
                   </div>
                 ) : (
                   <button onClick={() => fileRef.current?.click()}
-                    className="w-full flex flex-col items-center justify-center gap-3 border-2 border-dashed border-white/12 hover:border-blue-400/30 rounded-2xl py-8 text-white/30 hover:text-blue-300 transition-all">
+                    className="w-full flex flex-col items-center justify-center gap-3 border-2 border-dashed border-slate-200 hover:border-blue-400/30 rounded-2xl py-8 text-slate-300 hover:text-blue-300 transition-all">
                     <Upload className="h-8 w-8" />
                     <span className="text-sm font-semibold">Click to upload insurance certificate</span>
                     <span className="text-xs">PDF only · Max 5MB</span>
                   </button>
                 )}
-                <p className="text-xs text-white/20 mt-3">
+                <p className="text-xs text-slate-300 mt-3">
                   Don&apos;t have it to hand? Email it to{' '}
-                  <span className="text-white/35">carriers@boothop.com</span> after registering — use your company name as the subject.
+                  <span className="text-slate-600">carriers@boothop.com</span> after registering — use your company name as the subject.
                 </p>
               </div>
             </motion.div>
@@ -563,14 +563,14 @@ export default function CarrierNetworkPage() {
               className="space-y-6">
 
               {/* Banking */}
-              <div className="bg-white/3 border border-white/8 rounded-3xl p-8 space-y-5">
+              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 space-y-5">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
                     <CreditCard className="h-5 w-5 text-blue-300" />
                   </div>
                   <div>
                     <h2 className="text-xl font-black">Banking details</h2>
-                    <p className="text-white/35 text-sm">For receiving earnings — paid within 1 week of each job completion</p>
+                    <p className="text-slate-600 text-sm">For receiving earnings — paid within 1 week of each job completion</p>
                   </div>
                 </div>
                 <Field label="Account holder name" required>
@@ -594,7 +594,7 @@ export default function CarrierNetworkPage() {
               </div>
 
               {/* How did you hear */}
-              <div className="bg-white/3 border border-white/8 rounded-3xl p-8">
+              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8">
                 <h2 className="text-xl font-black mb-4">How did you hear about us?</h2>
                 <div className="flex flex-wrap gap-2">
                   {HOW_HEARD.map(o => (
@@ -602,29 +602,29 @@ export default function CarrierNetworkPage() {
                       className={`text-sm px-4 py-2 rounded-xl border font-semibold transition-all ${
                         form.how_did_you_hear === o
                           ? 'bg-blue-400/20 border-blue-400/50 text-blue-300'
-                          : 'bg-white/4 border-white/12 text-white/50 hover:text-white/80 hover:border-white/25'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-700 hover:border-slate-300'
                       }`}>{o}</button>
                   ))}
                 </div>
               </div>
 
               {/* Notes */}
-              <div className="bg-white/3 border border-white/8 rounded-3xl p-8">
+              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8">
                 <h2 className="text-xl font-black mb-4">Anything else?</h2>
                 <textarea value={form.notes} onChange={e => set('notes', e.target.value)}
                   placeholder="Specialist capabilities, geographic coverage, anything else we should know…"
                   rows={3}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm focus:outline-none focus:border-blue-400/50 transition-all resize-none" />
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-blue-400/50 transition-all resize-none" />
               </div>
 
               {/* Registration fee notice */}
               <div className="bg-amber-500/8 border border-amber-500/25 rounded-3xl p-8">
-                <p className="text-xs font-black text-amber-400/60 uppercase tracking-widest mb-2">Registration fee</p>
-                <p className="text-3xl font-black text-amber-400 mb-3">£250 <span className="text-lg text-amber-400/60">one-time</span></p>
-                <p className="text-white/50 text-sm leading-relaxed mb-4">
+                <p className="text-xs font-black text-amber-600/60 uppercase tracking-widest mb-2">Registration fee</p>
+                <p className="text-3xl font-black text-amber-600 mb-3">£250 <span className="text-lg text-amber-600/60">one-time</span></p>
+                <p className="text-slate-600 text-sm leading-relaxed mb-4">
                   Bank transfer details provided on the next screen. Your carrier profile will be reviewed and activated within 2 working days of payment clearing.
                 </p>
-                <div className="flex flex-wrap gap-4 text-xs text-white/40">
+                <div className="flex flex-wrap gap-4 text-xs text-slate-600">
                   {[
                     'No exclusivity required',
                     'You choose the jobs you accept',
@@ -643,14 +643,14 @@ export default function CarrierNetworkPage() {
                 className={`w-full flex items-start gap-4 p-5 rounded-2xl border text-left transition-all ${
                   form.agreed_to_terms
                     ? 'bg-blue-500/10 border-blue-400/40'
-                    : 'bg-white/3 border-white/8 hover:border-white/20'
+                    : 'bg-slate-50 border-slate-200 hover:border-slate-200'
                 }`}>
                 <div className={`w-6 h-6 rounded-lg border flex-shrink-0 flex items-center justify-center transition-all mt-0.5 ${
-                  form.agreed_to_terms ? 'bg-blue-400 border-blue-400' : 'border-white/25'
+                  form.agreed_to_terms ? 'bg-blue-400 border-blue-400' : 'border-slate-300'
                 }`}>
                   {form.agreed_to_terms && <CheckCircle className="h-4 w-4 text-black" strokeWidth={3} />}
                 </div>
-                <p className="text-sm text-white/70 leading-relaxed">
+                <p className="text-sm text-slate-600 leading-relaxed">
                   I confirm the information above is accurate and I agree to the{' '}
                   <span className="text-blue-300 underline">BootHop Carrier Agreement</span>.
                   I understand BootHop operates a 70/30 model — I receive 70% of the client rate for each completed job,
@@ -660,7 +660,7 @@ export default function CarrierNetworkPage() {
 
               {error && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                  className="flex items-center gap-3 bg-red-500/10 border border-red-500/25 rounded-2xl px-5 py-4 text-sm text-red-400">
+                  className="flex items-center gap-3 bg-red-500/10 border border-red-500/25 rounded-2xl px-5 py-4 text-sm text-red-600">
                   <AlertCircle className="h-4 w-4 shrink-0" /> {error}
                 </motion.div>
               )}
@@ -673,7 +673,7 @@ export default function CarrierNetworkPage() {
         <div className={`flex gap-3 mt-6 ${step > 1 ? 'justify-between' : 'justify-end'}`}>
           {step > 1 && (
             <button onClick={goBack}
-              className="inline-flex items-center gap-2 bg-white/6 border border-white/12 text-white/70 font-bold text-sm px-6 py-3 rounded-xl hover:bg-white/10 transition-all">
+              className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 text-slate-600 font-bold text-sm px-6 py-3 rounded-xl hover:bg-slate-100 transition-all">
               <ArrowLeft className="h-4 w-4" /> Back
             </button>
           )}

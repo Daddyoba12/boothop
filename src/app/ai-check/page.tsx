@@ -60,7 +60,7 @@ export default function AICheckPage() {
   const style = result ? (VERDICT_STYLES[result.verdict] ?? VERDICT_STYLES.REVIEW_REQUIRED) : null;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#020617] to-[#0c1e3d] px-4 py-16">
+    <main className="min-h-screen bg-white px-4 py-16">
       <div className="mx-auto max-w-2xl">
 
         {/* Header */}
@@ -69,19 +69,19 @@ export default function AICheckPage() {
             <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
             AI Safety Assistant
           </div>
-          <h1 className="text-3xl font-bold text-white mb-3">Can I send this?</h1>
-          <p className="text-white/50 text-sm leading-relaxed">
+          <h1 className="text-3xl font-bold text-slate-900 mb-3">Can I send this?</h1>
+          <p className="text-slate-500 text-sm leading-relaxed">
             Describe what you want to send and where. Our AI checks customs rules,<br />
             airline restrictions, and BootHop policy in seconds.
           </p>
         </div>
 
         {/* Form */}
-        <div className="rounded-2xl border border-white/8 bg-white/3 p-6 space-y-4">
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 space-y-4">
 
           {/* Item */}
           <div>
-            <label className="block text-xs font-medium text-white/50 mb-1.5">
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
               What do you want to send?
             </label>
             <input
@@ -89,18 +89,18 @@ export default function AICheckPage() {
               value={item}
               onChange={(e) => setItem(e.target.value)}
               placeholder="e.g. a Samsung phone, prescription medication, jollof rice..."
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/25 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition"
             />
           </div>
 
           {/* Route */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-white/50 mb-1.5">From</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">From</label>
               <select
                 value={fromCountry}
                 onChange={(e) => setFromCountry(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-[#0c1e3d] px-4 py-3 text-sm text-white outline-none focus:border-blue-500/50 transition"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500/50 transition"
               >
                 {COUNTRIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -108,11 +108,11 @@ export default function AICheckPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-white/50 mb-1.5">To</label>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">To</label>
               <select
                 value={toCountry}
                 onChange={(e) => setToCountry(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-[#0c1e3d] px-4 py-3 text-sm text-white outline-none focus:border-blue-500/50 transition"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500/50 transition"
               >
                 <option value="">Select destination</option>
                 {COUNTRIES.map((c) => (
@@ -125,27 +125,27 @@ export default function AICheckPage() {
           {/* Value + optional question */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-white/50 mb-1.5">
-                Estimated value (£) <span className="text-white/25">optional</span>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">
+                Estimated value (£) <span className="text-slate-400">optional</span>
               </label>
               <input
                 type="number"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 placeholder="e.g. 150"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/25 outline-none focus:border-blue-500/50 transition"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-blue-500/50 transition"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-white/50 mb-1.5">
-                Specific question <span className="text-white/25">optional</span>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">
+                Specific question <span className="text-slate-400">optional</span>
               </label>
               <input
                 type="text"
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="e.g. Does it need a receipt?"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/25 outline-none focus:border-blue-500/50 transition"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-blue-500/50 transition"
               />
             </div>
           </div>
@@ -154,11 +154,11 @@ export default function AICheckPage() {
           <button
             onClick={handleCheck}
             disabled={loading || !item.trim() || !toCountry}
-            className="w-full rounded-xl bg-blue-600 py-3.5 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full rounded-xl bg-blue-600 py-3.5 text-sm font-semibold text-slate-900 transition hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
-                <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span className="h-4 w-4 border-2 border-slate-300 border-t-white rounded-full animate-spin" />
                 Checking...
               </>
             ) : (
@@ -182,22 +182,22 @@ export default function AICheckPage() {
               </div>
               <div>
                 <p className={`text-base font-bold ${style.text}`}>{result.verdictLabel}</p>
-                <p className="text-xs text-white/40">
+                <p className="text-xs text-slate-500">
                   Risk score: {result.riskScore}/100 · Category: {result.category}
                 </p>
               </div>
             </div>
 
             {/* Explanation */}
-            <p className="text-sm text-white/80 leading-relaxed">{result.explanation}</p>
+            <p className="text-sm text-slate-700 leading-relaxed">{result.explanation}</p>
 
             {/* Tips */}
             {result.tips.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-white/40 uppercase tracking-wide mb-2">Tips</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Tips</p>
                 <ul className="space-y-1.5">
                   {result.tips.map((tip, i) => (
-                    <li key={i} className="flex gap-2 text-sm text-white/65">
+                    <li key={i} className="flex gap-2 text-sm text-slate-600">
                       <span className={`mt-0.5 shrink-0 ${style.text}`}>›</span>
                       {tip}
                     </li>
@@ -215,7 +215,7 @@ export default function AICheckPage() {
             )}
 
             {/* Disclaimer */}
-            <p className="text-xs text-white/25 leading-relaxed border-t border-white/8 pt-4">
+            <p className="text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">
               {result.disclaimer}
             </p>
 
@@ -223,13 +223,13 @@ export default function AICheckPage() {
             <div className="flex gap-3 pt-1">
               <a
                 href="/journeys/create"
-                className="flex-1 rounded-xl bg-blue-600 py-3 text-center text-sm font-semibold text-white hover:bg-blue-500 transition"
+                className="flex-1 rounded-xl bg-blue-600 py-3 text-center text-sm font-semibold text-slate-900 hover:bg-blue-500 transition"
               >
                 Post a Journey
               </a>
               <a
                 href="/contact"
-                className="flex-1 rounded-xl border border-white/10 py-3 text-center text-sm font-semibold text-white/70 hover:text-white hover:border-white/20 transition"
+                className="flex-1 rounded-xl border border-slate-200 py-3 text-center text-sm font-semibold text-slate-600 hover:text-slate-900 hover:border-slate-200 transition"
               >
                 Contact Support
               </a>
@@ -240,7 +240,7 @@ export default function AICheckPage() {
         {/* Examples */}
         {!result && (
           <div className="mt-8">
-            <p className="text-xs font-medium text-white/30 text-center mb-4">Try an example</p>
+            <p className="text-xs font-medium text-slate-400 text-center mb-4">Try an example</p>
             <div className="flex flex-wrap justify-center gap-2">
               {[
                 ['Samsung phone', 'Nigeria'],
@@ -252,7 +252,7 @@ export default function AICheckPage() {
                 <button
                   key={exItem}
                   onClick={() => { setItem(exItem); setToCountry(exCountry); }}
-                  className="rounded-full border border-white/10 bg-white/4 px-3 py-1.5 text-xs text-white/50 hover:text-white hover:border-white/20 transition"
+                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 hover:border-slate-200 transition"
                 >
                   {exItem} → {exCountry}
                 </button>

@@ -143,10 +143,10 @@ export default function LoginPage() {
     setTrips([]);
   };
 
-  const inputCls = "w-full py-3 rounded-xl border border-slate-700/50 bg-slate-800/50 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/70 focus:border-transparent backdrop-blur-sm transition text-sm";
+  const inputCls = "w-full py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/70 focus:border-transparent transition text-sm";
 
   return (
-    <div className="min-h-screen flex bg-slate-950">
+    <div className="min-h-screen flex bg-white">
 
       {/* ── Left panel — image carousel ── */}
       <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 overflow-hidden">
@@ -155,9 +155,9 @@ export default function LoginPage() {
             <Image src={src} alt="" fill className="object-cover" priority={i === 0} />
           </div>
         ))}
-        {/* Multi-layer overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950/85 via-blue-950/70 to-slate-900/60" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+        {/* Soft light overlay — photo stays visible, enough contrast for the text below */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/80 via-white/40 to-white/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
 
         {/* Floating accent orbs */}
         <div className="absolute top-1/4 right-1/4 w-56 h-56 bg-blue-500/15 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '5s' }} />
@@ -169,26 +169,26 @@ export default function LoginPage() {
 
         <div className="relative z-10 space-y-5">
           {/* Live indicator */}
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-4 py-2 backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-4 py-2 backdrop-blur-sm">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span className="text-sm text-white/80 font-medium">Live platform · 10K+ verified users</span>
+            <span className="text-sm text-slate-700 font-medium">Live platform · 10K+ verified users</span>
           </div>
 
-          <blockquote className="text-white text-2xl font-black leading-snug">
+          <blockquote className="text-slate-900 text-2xl font-black leading-snug">
             &quot;Ship anything, anywhere —<br />
-            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
               with someone already going.
             </span>&quot;
           </blockquote>
 
           <div className="grid grid-cols-2 gap-3">
             {[
-              { icon: <CheckCircle className="h-4 w-4 text-emerald-400" />, text: '10K+ verified users' },
-              { icon: <Shield className="h-4 w-4 text-blue-400" />, text: 'Stripe escrow' },
-              { icon: <Sparkles className="h-4 w-4 text-cyan-400" />, text: '95% success rate' },
-              { icon: <Clock className="h-4 w-4 text-amber-400" />, text: '1–2 day delivery' },
+              { icon: <CheckCircle className="h-4 w-4 text-emerald-600" />, text: '10K+ verified users' },
+              { icon: <Shield className="h-4 w-4 text-blue-600" />, text: 'Stripe escrow' },
+              { icon: <Sparkles className="h-4 w-4 text-cyan-600" />, text: '95% success rate' },
+              { icon: <Clock className="h-4 w-4 text-amber-600" />, text: '1–2 day delivery' },
             ].map(({ icon, text }) => (
-              <div key={text} className="flex items-center gap-2 text-white/65 text-sm">
+              <div key={text} className="flex items-center gap-2 text-slate-600 text-sm">
                 {icon} {text}
               </div>
             ))}
@@ -196,8 +196,8 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ── Right panel — dark luxury form ── */}
-      <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
+      {/* ── Right panel — light form ── */}
+      <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 bg-white relative overflow-hidden">
 
         {/* Background glow blobs */}
         <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_45%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.06),transparent_40%)]" />
@@ -217,25 +217,25 @@ export default function LoginPage() {
           {step === 'email' && (
             <>
               <div className="mb-8">
-                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/25 rounded-full px-4 py-1.5 mb-4 backdrop-blur-sm">
-                  <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
-                  <span className="text-xs text-cyan-300 font-semibold">Sign in to BootHop</span>
+                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-50 to-cyan-50 border border-cyan-200 rounded-full px-4 py-1.5 mb-4">
+                  <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-pulse" />
+                  <span className="text-xs text-cyan-700 font-semibold">Sign in to BootHop</span>
                 </div>
-                <h1 className="text-3xl font-black text-white mb-2">Welcome back</h1>
-                <p className="text-slate-400 text-sm">Enter your email to access your listings.</p>
+                <h1 className="text-3xl font-black text-slate-900 mb-2">Welcome back</h1>
+                <p className="text-slate-600 text-sm">Enter your email to access your listings.</p>
               </div>
 
               {error && (
-                <div className="mb-4 flex items-start gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
+                <div className="mb-4 flex items-start gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
                   <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />{error}
                 </div>
               )}
 
               <form onSubmit={handleEmailSubmit} className="space-y-5">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1.5">Email address</label>
+                  <label htmlFor="email" className="block text-sm font-medium text-slate-600 mb-1.5">Email address</label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" />
                     <input
                       id="email" type="email" value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -245,7 +245,7 @@ export default function LoginPage() {
                   </div>
                 </div>
                 <button type="submit" disabled={loading}
-                  className="group w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold py-3 px-4 rounded-xl transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60">
+                  className="group w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold py-3 px-4 rounded-xl transition-all hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60">
                   {loading ? (
                     <span className="flex items-center gap-2">
                       <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
@@ -260,9 +260,9 @@ export default function LoginPage() {
                 </button>
               </form>
 
-              <p className="text-center text-sm text-slate-500 mt-6">
+              <p className="text-center text-sm text-slate-600 mt-6">
                 Don&apos;t have a listing?{' '}
-                <Link href="/register" className="text-cyan-400 hover:text-cyan-300 font-medium transition">Create one →</Link>
+                <Link href="/register" className="text-cyan-600 hover:text-cyan-700 font-medium transition">Create one →</Link>
               </p>
             </>
           )}
@@ -272,23 +272,23 @@ export default function LoginPage() {
           ══════════════════════════ */}
           {step === 'verify' && (
             <>
-              <button onClick={resetToEmail} className="text-sm text-cyan-400 hover:text-cyan-300 flex items-center gap-1 mb-6 transition">
+              <button onClick={resetToEmail} className="text-sm text-cyan-600 hover:text-cyan-700 flex items-center gap-1 mb-6 transition">
                 ← Change email
               </button>
 
               <div className="mb-6">
-                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/25 rounded-full px-4 py-1.5 mb-4 backdrop-blur-sm">
-                  <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
-                  <span className="text-xs text-cyan-300 font-semibold">Code sent</span>
+                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-50 to-cyan-50 border border-cyan-200 rounded-full px-4 py-1.5 mb-4">
+                  <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-pulse" />
+                  <span className="text-xs text-cyan-700 font-semibold">Code sent</span>
                 </div>
-                <h2 className="text-2xl font-black text-white mb-1">Check your email</h2>
-                <p className="text-sm text-slate-400">
-                  We sent a 5-character code to <span className="font-medium text-cyan-400">{email}</span>
+                <h2 className="text-2xl font-black text-slate-900 mb-1">Check your email</h2>
+                <p className="text-sm text-slate-600">
+                  We sent a 5-character code to <span className="font-medium text-cyan-600">{email}</span>
                 </p>
               </div>
 
               {error && (
-                <div className="my-3 flex items-start gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
+                <div className="my-3 flex items-start gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
                   <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />{error}
                 </div>
               )}
@@ -298,12 +298,12 @@ export default function LoginPage() {
                   <input ref={codeRef} type="text" value={code}
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     maxLength={5} placeholder="4827A"
-                    className="w-full h-14 text-center text-2xl font-bold tracking-[0.35em] uppercase rounded-xl border border-slate-700/50 bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/70 focus:border-transparent transition placeholder:text-slate-700 backdrop-blur-sm"
+                    className="w-full h-14 text-center text-2xl font-bold tracking-[0.35em] uppercase rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/70 focus:border-transparent transition placeholder:text-slate-400"
                   />
                   <p className="text-xs text-slate-600 mt-1.5 text-center">4 digits + 1 letter · e.g. 4827A</p>
                 </div>
                 <button type="submit" disabled={loading || code.trim().length < 5}
-                  className="group w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold py-3 px-4 rounded-xl transition-all hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60">
+                  className="group w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold py-3 px-4 rounded-xl transition-all hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60">
                   {loading ? 'Verifying…' : 'Verify & continue'}
                   {!loading && <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />}
                 </button>
@@ -311,12 +311,12 @@ export default function LoginPage() {
 
               <div className="mt-5 text-center">
                 {resendTimer > 0 ? (
-                  <p className="text-sm text-slate-500 flex items-center justify-center gap-1.5">
+                  <p className="text-sm text-slate-600 flex items-center justify-center gap-1.5">
                     <Clock className="h-3.5 w-3.5" /> Resend in {resendTimer}s
                   </p>
                 ) : (
                   <button onClick={resendCode} disabled={loading}
-                    className="text-sm text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1.5 mx-auto transition">
+                    className="text-sm text-cyan-600 hover:text-cyan-700 font-medium flex items-center gap-1.5 mx-auto transition">
                     <RefreshCw className="h-3.5 w-3.5" /> Resend code
                   </button>
                 )}
@@ -326,9 +326,9 @@ export default function LoginPage() {
 
           {/* Trust strip */}
           <div className="flex justify-center gap-5 mt-8 text-slate-600 text-xs">
-            <span className="flex items-center gap-1 text-slate-500"><Shield className="h-3.5 w-3.5 text-blue-500/70" /> Secure login</span>
-            <span className="flex items-center gap-1 text-slate-500"><Clock className="h-3.5 w-3.5 text-cyan-500/70" /> 24/7 support</span>
-            <span className="flex items-center gap-1 text-slate-500"><CheckCircle className="h-3.5 w-3.5 text-emerald-500/70" /> Verified</span>
+            <span className="flex items-center gap-1 text-slate-600"><Shield className="h-3.5 w-3.5 text-blue-500/70" /> Secure login</span>
+            <span className="flex items-center gap-1 text-slate-600"><Clock className="h-3.5 w-3.5 text-cyan-500/70" /> 24/7 support</span>
+            <span className="flex items-center gap-1 text-slate-600"><CheckCircle className="h-3.5 w-3.5 text-emerald-500/70" /> Verified</span>
           </div>
         </div>
 
@@ -339,12 +339,12 @@ export default function LoginPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-              className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
               onClick={() => setShowNoListingModal(false)}
             />
 
             {/* Modal card */}
-            <div className="relative w-full max-w-sm bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-slate-700/50 rounded-3xl shadow-2xl shadow-black/50 overflow-hidden">
+            <div className="relative w-full max-w-sm bg-white border border-slate-200 rounded-3xl shadow-2xl shadow-slate-900/15 overflow-hidden">
 
               {/* Top gradient accent bar */}
               <div className="h-1 w-full bg-gradient-to-r from-amber-500 via-orange-400 to-yellow-400" />
@@ -356,7 +356,7 @@ export default function LoginPage() {
               {/* Close button */}
               <button
                 onClick={() => setShowNoListingModal(false)}
-                className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800/60 transition z-10"
+                className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-600 hover:text-slate-700 hover:bg-slate-100 transition z-10"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
@@ -365,18 +365,18 @@ export default function LoginPage() {
               <div className="relative px-7 py-7">
                 {/* Gradient icon */}
                 <div className="flex h-13 w-13 mb-5">
-                  <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-yellow-400 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/40">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-yellow-400 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
                     <Mail className="h-6 w-6 text-white" />
                   </div>
                 </div>
 
-                <h2 className="text-xl font-black text-white mb-2">No listings found</h2>
-                <p className="text-sm text-slate-400 leading-relaxed mb-1">
+                <h2 className="text-xl font-black text-slate-900 mb-2">No listings found</h2>
+                <p className="text-sm text-slate-600 leading-relaxed mb-1">
                   We couldn&apos;t find any journeys or delivery requests linked to
                 </p>
-                <p className="text-sm font-bold text-cyan-400 mb-4 break-all">{email}</p>
+                <p className="text-sm font-bold text-cyan-600 mb-4 break-all">{email}</p>
 
-                <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+                <p className="text-sm text-slate-600 mb-6 leading-relaxed">
                   To log in, you need an active listing. Would you like to create one?
                 </p>
 
@@ -384,20 +384,20 @@ export default function LoginPage() {
                 <div className="flex flex-col gap-3">
                   <Link
                     href="/register"
-                    className="group flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] text-white font-semibold py-3 px-4 rounded-xl transition-all text-sm"
+                    className="group flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] text-white font-semibold py-3 px-4 rounded-xl transition-all text-sm"
                   >
                     <PlusCircle className="h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
                     Create a journey
                   </Link>
                   <Link
                     href="/"
-                    className="flex items-center justify-center gap-2 border border-slate-700/60 text-slate-300 hover:bg-slate-800/60 hover:border-slate-600 hover:text-white font-medium py-3 px-4 rounded-xl transition text-sm"
+                    className="flex items-center justify-center gap-2 border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 font-medium py-3 px-4 rounded-xl transition text-sm"
                   >
                     <Home className="h-4 w-4" /> Go to home page
                   </Link>
                   <button
                     onClick={() => setShowNoListingModal(false)}
-                    className="text-sm text-slate-600 hover:text-slate-400 transition py-1"
+                    className="text-sm text-slate-600 hover:text-slate-700 transition py-1"
                   >
                     Try a different email
                   </button>

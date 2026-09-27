@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 
 export default function CarrierAgreementPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+    <div className="min-h-screen bg-white text-slate-900">
       <NavBar />
 
       <main className="max-w-4xl mx-auto px-6 pt-32 pb-24">
 
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-10 group">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors mb-10 group">
           <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-300" />
           Back to BootHop
         </Link>
@@ -27,7 +27,7 @@ export default function CarrierAgreementPage() {
             <Shield className="h-3.5 w-3.5" /> Legal
           </div>
           <h1 className="text-4xl md:text-5xl font-black mb-4">Carrier & Traveller Agreement</h1>
-          <p className="text-slate-400 text-lg">Last Updated: May 18, 2026</p>
+          <p className="text-slate-600 text-lg">Last Updated: May 18, 2026</p>
         </div>
 
         {/* Download button */}
@@ -35,14 +35,14 @@ export default function CarrierAgreementPage() {
           <a
             href="/docs/carrier-agreement.pdf"
             download
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold px-6 py-3 rounded-xl hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 transition-all duration-300"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-slate-900 font-bold px-6 py-3 rounded-xl hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 transition-all duration-300"
           >
             <Download className="h-4 w-4" /> Download Full Agreement (.pdf)
           </a>
           <a
             href="/docs/general-terms-of-service.pdf"
             download
-            className="inline-flex items-center gap-2 border border-white/20 text-white/70 font-semibold px-6 py-3 rounded-xl hover:border-white/40 hover:text-white transition-all duration-300"
+            className="inline-flex items-center gap-2 border border-slate-200 text-slate-600 font-semibold px-6 py-3 rounded-xl hover:border-slate-300 hover:text-slate-900 transition-all duration-300"
           >
             <FileText className="h-4 w-4" /> General Terms of Service (.pdf)
           </a>
@@ -51,8 +51,8 @@ export default function CarrierAgreementPage() {
         {/* Content */}
         <div className="space-y-8 text-slate-300 leading-relaxed">
 
-          <div className="rounded-2xl border border-white/8 bg-white/3 p-8">
-            <p className="text-white font-semibold mb-4">Overview</p>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-8">
+            <p className="text-slate-900 font-semibold mb-4">Overview</p>
             <p>This Courier and Traveller Agreement is a legally binding contract between BootHop (&quot;the Company&quot;) and you, an individual acting as a verified carrier or traveller on the BootHop platform. By registering as a carrier or traveller, you agree to be bound by the terms set out in this agreement.</p>
           </div>
 
@@ -86,8 +86,8 @@ export default function CarrierAgreementPage() {
               body: 'You agree not to circumvent the platform to conduct transactions directly with shippers, not to share personal contact details before they are released by BootHop, and to maintain a professional standard of conduct in all interactions with shippers and BootHop staff.'
             },
           ].map(({ title, body }) => (
-            <div key={title} className="rounded-2xl border border-white/8 bg-white/3 p-8">
-              <h2 className="text-xl font-bold text-white mb-3">{title}</h2>
+            <div key={title} className="rounded-2xl border border-slate-200 bg-slate-50 p-8">
+              <h2 className="text-xl font-bold text-slate-900 mb-3">{title}</h2>
               <p>{body}</p>
             </div>
           ))}
@@ -97,7 +97,7 @@ export default function CarrierAgreementPage() {
             <p className="text-sm">The above is a summary. The full legally binding agreement is available for download above. By using the BootHop platform as a carrier or traveller, you confirm you have read, understood, and agreed to the full terms.</p>
           </div>
 
-          <div className="text-sm text-slate-500 pt-4 border-t border-white/8">
+          <div className="text-sm text-slate-600 pt-4 border-t border-slate-200">
             <p>Questions about this agreement? Contact us at{' '}
               <a href="mailto:info@boothop.com" className="text-blue-400 hover:underline">info@boothop.com</a>
             </p>

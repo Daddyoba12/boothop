@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Inter, Plus_Jakarta_Sans, Geist_Mono } from 'next/font/google';
 import Script from 'next/script';
 import { Suspense } from 'react';
 import './globals.css';
@@ -9,7 +9,12 @@ import WorldCupWidget from '@/components/WorldCupWidget';
 import GATracker from '@/components/GATracker';
 import { TikTokPageTracker } from '@/components/TikTokTracker';
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
+// Body copy — Inter is screen-optimized with a tall x-height, which is why it
+// reads as noticeably less strainy than Geist at small sizes on long pages.
+const fontSans = Inter({ variable: '--font-sans', subsets: ['latin'], weight: ['400', '500', '600', '700'] });
+// Headings — a slightly more distinctive geometric sans for a premium feel,
+// applied globally to h1/h2/h3 via globals.css so every page picks it up.
+const fontHeading = Plus_Jakarta_Sans({ variable: '--font-heading', subsets: ['latin'], weight: ['500', '600', '700', '800'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
 
 const APP_URL  = 'https://www.boothop.com';
@@ -359,9 +364,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </>
         )}
         {/* Service Worker — registered inline so scanners (PWABuilder) detect it before React hydrates */}
-        <script dangerouslySetInnerHTML={{ __html: `if('serviceWorker'in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}` }} />
+        <script dangerouslySetInnerHTML={{ __html: `if('serviceWorker'in navigator){var isLocal=['localhost','127.0.0.1'].indexOf(location.hostname)!==-1;if(isLocal){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});});if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k);});});}}else{window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}}` }} />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 min-h-screen`}>
+      <body className={`${fontSans.variable} ${fontHeading.variable} ${geistMono.variable} antialiased bg-white min-h-screen`}>
         {children}
         <TikTokPageTracker />
         <DeviceFingerprint />

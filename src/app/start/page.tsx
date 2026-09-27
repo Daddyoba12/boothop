@@ -273,28 +273,28 @@ function StartContent() {
     router.push('/dashboard');
   };
 
-  const inputCls = 'w-full rounded-xl border border-white/15 bg-white/[0.06] px-5 py-4 text-white text-base placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all';
+  const inputCls = 'w-full rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-slate-900 text-base placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all';
 
   // Show a spinner while we confirm auth status (avoids flicker)
   if (!authChecked) {
-    return <div className="min-h-screen bg-[#07111f]" />;
+    return <div className="min-h-screen bg-white" />;
   }
 
   return (
-    <div className="min-h-screen bg-[#07111f] text-white flex flex-col">
+    <div className="min-h-screen bg-white text-slate-900 flex flex-col">
 
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-lg mx-auto w-full">
         <Link href="/"><BootHopLogo size="sm" /></Link>
         {authenticated
-          ? <Link href="/dashboard" className="text-sm text-white/40 hover:text-white/70 transition-colors">Dashboard</Link>
-          : <Link href="/login"     className="text-sm text-white/40 hover:text-white/70 transition-colors">Log in</Link>
+          ? <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">Dashboard</Link>
+          : <Link href="/login"     className="text-sm text-slate-500 hover:text-slate-900 transition-colors">Log in</Link>
         }
       </nav>
 
       {/* Progress bar */}
       {step > 0 && (
-        <div className="w-full h-1 bg-white/8">
+        <div className="w-full h-1 bg-slate-50">
           <div
             className="h-1 bg-blue-500 rounded-r-full transition-all duration-500 ease-out"
             style={{ width: `${progressPct}%` }}
@@ -309,35 +309,41 @@ function StartContent() {
           {step === 0 && (
             <>
               <div className="text-center mb-10">
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+                <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
                   {authenticated ? 'Add a new listing' : 'Welcome to BootHop'}
                 </h1>
-                <p className="text-white/45 text-base">How can we help you today?</p>
+                <p className="text-slate-500 text-base">How can we help you today?</p>
               </div>
 
               <div className="space-y-4">
                 {([
-                  { r: 'sender'    as Role, emoji: '📦', title: 'Send a Package',  sub: 'Find someone already travelling your route' },
-                  { r: 'traveller' as Role, emoji: '✈️', title: "I'm Travelling",  sub: 'Earn money from your spare luggage space'    },
-                ] as const).map(({ r, emoji, title, sub }) => (
+                  { r: 'sender'    as Role, emoji: '📦', title: 'Send a Package',  sub: 'Find someone already travelling your route', accent: 'emerald' },
+                  { r: 'traveller' as Role, emoji: '✈️', title: "I'm Travelling",  sub: 'Earn money from your spare luggage space',    accent: 'blue'    },
+                ] as const).map(({ r, emoji, title, sub, accent }) => (
                   <button key={r} onClick={() => chooseRole(r)}
-                    className="w-full rounded-2xl border border-white/12 bg-white/[0.03] hover:border-blue-500/35 hover:bg-blue-500/5 transition-all duration-200 p-6 text-left group">
+                    className={`w-full rounded-2xl border border-slate-200 bg-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 p-6 text-left group ${
+                      accent === 'emerald' ? 'hover:border-emerald-300 hover:shadow-emerald-500/10' : 'hover:border-blue-300 hover:shadow-blue-500/10'
+                    }`}>
                     <div className="flex items-center gap-4">
-                      <span className="text-3xl">{emoji}</span>
+                      <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl transition-transform duration-200 group-hover:scale-110 ${
+                        accent === 'emerald' ? 'bg-emerald-100' : 'bg-blue-100'
+                      }`}>{emoji}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-white font-bold text-lg">{title}</p>
-                        <p className="text-white/40 text-sm mt-0.5">{sub}</p>
+                        <p className="text-slate-900 font-bold text-lg">{title}</p>
+                        <p className="text-slate-500 text-sm mt-0.5">{sub}</p>
                       </div>
-                      <ArrowRight className="h-5 w-5 text-white/20 group-hover:text-white/55 transition-colors shrink-0" />
+                      <ArrowRight className={`h-5 w-5 text-slate-300 transition-all shrink-0 group-hover:translate-x-1 ${
+                        accent === 'emerald' ? 'group-hover:text-emerald-600' : 'group-hover:text-blue-600'
+                      }`} />
                     </div>
                   </button>
                 ))}
               </div>
 
               {!authenticated && (
-                <p className="text-center text-xs text-white/25 mt-8">
+                <p className="text-center text-xs text-slate-500 mt-8">
                   Already have an account?{' '}
-                  <Link href="/login" className="text-white/45 underline underline-offset-2 hover:text-white/65 transition-colors">Log in</Link>
+                  <Link href="/login" className="text-slate-700 underline underline-offset-2 hover:text-slate-900 transition-colors">Log in</Link>
                 </p>
               )}
             </>
@@ -346,15 +352,15 @@ function StartContent() {
           {/* ── STEPS 1–N — Questions ── */}
           {step > 0 && !isGate && currentKey && (
             <>
-              <button onClick={back} className="flex items-center gap-1.5 text-white/35 hover:text-white/65 text-sm mb-10 transition-colors">
+              <button onClick={back} className="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 text-sm mb-10 transition-colors">
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
 
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/25 mb-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 mb-4">
                 Step {step} of {TOTAL}
               </p>
 
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-8 leading-snug">
+              <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8 leading-snug">
                 {currentKey === 'from'  && (role === 'sender' ? 'Where are you sending from?'             : 'Where are you travelling from?')}
                 {currentKey === 'to'    && (role === 'sender' ? 'Where is it going?'                      : 'Where are you going?')}
                 {currentKey === 'size'  && (role === 'sender' ? 'Package size?'                           : 'How much luggage space do you have spare?')}
@@ -371,11 +377,11 @@ function StartContent() {
                     className={inputCls}
                   />
                   {fromSuggestions.length > 0 && (
-                    <div className="absolute left-0 right-0 z-50 mt-1 rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl overflow-hidden">
+                    <div className="absolute left-0 right-0 z-50 mt-1 rounded-xl border border-slate-200 bg-white backdrop-blur-xl shadow-2xl overflow-hidden">
                       {fromSuggestions.map((s, i) => (
                         <div key={i}
                           onClick={() => { setJourney(j => ({ ...j, from: s })); setFromQuery(s); setFromSuggestions([]); setFromLocked(true); setFieldError(''); if (mapsReady) setSessionToken(new (window as any).google.maps.places.AutocompleteSessionToken()); }}
-                          className="px-4 py-3 text-sm text-white/80 hover:bg-white/8 hover:text-white cursor-pointer transition-colors">{s}</div>
+                          className="px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer transition-colors">{s}</div>
                       ))}
                     </div>
                   )}
@@ -391,11 +397,11 @@ function StartContent() {
                     className={inputCls}
                   />
                   {toSuggestions.length > 0 && (
-                    <div className="absolute left-0 right-0 z-50 mt-1 rounded-xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl overflow-hidden">
+                    <div className="absolute left-0 right-0 z-50 mt-1 rounded-xl border border-slate-200 bg-white backdrop-blur-xl shadow-2xl overflow-hidden">
                       {toSuggestions.map((s, i) => (
                         <div key={i}
                           onClick={() => { setJourney(j => ({ ...j, to: s })); setToQuery(s); setToSuggestions([]); setToLocked(true); setFieldError(''); if (mapsReady) setSessionToken(new (window as any).google.maps.places.AutocompleteSessionToken()); }}
-                          className="px-4 py-3 text-sm text-white/80 hover:bg-white/8 hover:text-white cursor-pointer transition-colors">{s}</div>
+                          className="px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer transition-colors">{s}</div>
                       ))}
                     </div>
                   )}
@@ -410,11 +416,11 @@ function StartContent() {
                       onClick={() => { setJourney(j => ({ ...j, size: opt.value })); setFieldError(''); }}
                       className={`w-full rounded-xl border px-5 py-4 text-left transition-all duration-150 ${
                         journey.size === opt.value
-                          ? 'border-blue-500 bg-blue-500/12 text-white'
-                          : 'border-white/12 bg-white/[0.03] text-white/60 hover:border-white/22 hover:bg-white/[0.05] hover:text-white'
+                          ? 'border-blue-500 bg-blue-50 text-slate-900'
+                          : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900'
                       }`}>
                       <p className="font-semibold text-sm">{opt.label}</p>
-                      <p className="text-xs text-white/40 mt-0.5">{opt.sub}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{opt.sub}</p>
                     </button>
                   ))}
                 </div>
@@ -424,14 +430,14 @@ function StartContent() {
               {currentKey === 'date' && (
                 <input type="date" min={minDate} value={journey.date} autoFocus
                   onChange={e => { setJourney(j => ({ ...j, date: e.target.value })); setFieldError(''); }}
-                  className={`${inputCls} [color-scheme:dark]`}
+                  className={`${inputCls} `}
                 />
               )}
 
               {/* Price — logged-in users only */}
               {currentKey === 'price' && (
                 <div className="relative">
-                  <span className="absolute left-5 top-1/2 -translate-y-1/2 text-white/40 font-semibold text-base">£</span>
+                  <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 font-semibold text-base">£</span>
                   <input
                     type="number" min="1" placeholder="e.g. 40" autoFocus
                     value={journey.price}
@@ -442,8 +448,8 @@ function StartContent() {
                 </div>
               )}
 
-              {fieldError && <p className="mt-3 text-sm text-red-400">{fieldError}</p>}
-              {postError  && <p className="mt-3 text-sm text-red-400">{postError}</p>}
+              {fieldError && <p className="mt-3 text-sm text-red-600">{fieldError}</p>}
+              {postError  && <p className="mt-3 text-sm text-red-600">{postError}</p>}
 
               {/* Continue button — hidden for size until something selected */}
               {(currentKey !== 'size' || journey.size) && (
@@ -463,42 +469,42 @@ function StartContent() {
           {/* ── GATE — guest only (step > TOTAL when not authenticated) ── */}
           {isGate && !authenticated && (
             <>
-              <div className="flex justify-between text-xs text-white/35 mb-2">
+              <div className="flex justify-between text-xs text-slate-500 mb-2">
                 <span>Almost there</span>
-                <span className="font-semibold text-white/55">90% complete</span>
+                <span className="font-semibold text-slate-700">90% complete</span>
               </div>
-              <div className="w-full bg-white/8 rounded-full h-2 mb-10">
+              <div className="w-full bg-slate-100 rounded-full h-2 mb-10">
                 <div className="h-2 bg-gradient-to-r from-blue-500 to-blue-400 rounded-full" style={{ width: '90%' }} />
               </div>
 
               {/* Summary card */}
-              <div className="rounded-2xl border border-white/12 bg-white/[0.04] p-5 mb-8">
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/30 mb-3">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 mb-8">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500 mb-3">
                   {role === 'sender' ? 'Your delivery request' : 'Your trip'}
                 </p>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-white font-bold text-xl">{journey.from.split(',')[0]}</span>
-                  <ArrowRight className="h-4 w-4 text-white/30 shrink-0" />
-                  <span className="text-white font-bold text-xl">{journey.to.split(',')[0]}</span>
+                  <span className="text-slate-900 font-bold text-xl">{journey.from.split(',')[0]}</span>
+                  <ArrowRight className="h-4 w-4 text-slate-400 shrink-0" />
+                  <span className="text-slate-900 font-bold text-xl">{journey.to.split(',')[0]}</span>
                 </div>
-                <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-white/45">
+                <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
                   <span>{fmtDate(journey.date)}</span>
                   {journey.size && <span>· {sizeLabel}</span>}
                 </div>
               </div>
 
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+              <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
                 {role === 'sender' ? 'Your request is ready to publish.' : 'Your trip is ready to publish.'}
               </h2>
-              <p className="text-white/45 text-sm mb-7 leading-relaxed">
+              <p className="text-slate-600 text-sm mb-7 leading-relaxed">
                 Create your FREE BootHop account to publish it to verified{' '}
                 {role === 'sender' ? 'travellers' : 'senders'}.
               </p>
 
               <div className="grid grid-cols-2 gap-y-2.5 gap-x-4 mb-8">
                 {['Less than 30 seconds', '£20 welcome credit', 'ID verified community', 'Escrow protected'].map(t => (
-                  <div key={t} className="flex items-center gap-2 text-sm text-white/50">
-                    <CheckCircle className="h-3.5 w-3.5 text-green-400 shrink-0" />
+                  <div key={t} className="flex items-center gap-2 text-sm text-slate-600">
+                    <CheckCircle className="h-3.5 w-3.5 text-green-500 shrink-0" />
                     {t}
                   </div>
                 ))}
@@ -511,33 +517,33 @@ function StartContent() {
                     onKeyDown={e => e.key === 'Enter' && sendCode()}
                     className={`${inputCls} mb-2`}
                   />
-                  {emailError && <p className="text-sm text-red-400 mb-3">{emailError}</p>}
+                  {emailError && <p className="text-sm text-red-600 mb-3">{emailError}</p>}
                   <button onClick={sendCode} disabled={submitting}
                     className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-500 hover:bg-blue-400 disabled:opacity-60 text-white font-bold py-4 text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)]">
                     {submitting ? 'Sending...' : <> Continue <ArrowRight className="h-4 w-4" /></>}
                   </button>
-                  <p className="text-center text-xs text-white/25 mt-4">
+                  <p className="text-center text-xs text-slate-500 mt-4">
                     Already have an account?{' '}
-                    <Link href="/login" className="text-white/45 underline underline-offset-2 hover:text-white/65 transition-colors">Log in</Link>
+                    <Link href="/login" className="text-slate-700 underline underline-offset-2 hover:text-slate-900 transition-colors">Log in</Link>
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="text-sm text-white/50 mb-4">
+                  <p className="text-sm text-slate-600 mb-4">
                     We sent a 5-character code to{' '}
-                    <span className="text-blue-400 font-medium">{email}</span>
+                    <span className="text-blue-600 font-medium">{email}</span>
                   </p>
                   <input type="text" value={otp} onChange={e => setOtp(e.target.value.toUpperCase())}
                     maxLength={5} placeholder="4827A" autoFocus
-                    className="w-full rounded-xl border border-white/15 bg-white/[0.06] px-5 py-4 text-center text-2xl font-bold tracking-[0.35em] uppercase text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-blue-500/50 mb-2"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-center text-2xl font-bold tracking-[0.35em] uppercase text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 mb-2"
                   />
-                  {otpError && <p className="text-sm text-red-400 mb-3 text-center">{otpError}</p>}
+                  {otpError && <p className="text-sm text-red-600 mb-3 text-center">{otpError}</p>}
                   <button onClick={verifyOtp} disabled={submitting || otp.trim().length < 5}
                     className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-500 hover:bg-blue-400 disabled:opacity-60 text-white font-bold py-4 text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)]">
                     {submitting ? 'Verifying...' : <>Publish my {role === 'sender' ? 'request' : 'trip'} <ArrowRight className="h-4 w-4" /></>}
                   </button>
                   <button onClick={() => { setEmailSent(false); setOtp(''); setOtpError(''); }}
-                    className="w-full mt-2 text-sm text-white/30 hover:text-white/55 transition-colors py-2">
+                    className="w-full mt-2 text-sm text-slate-500 hover:text-slate-900 transition-colors py-2">
                     ← Resend code
                   </button>
                 </>
@@ -555,7 +561,7 @@ function StartContent() {
 
 export default function StartPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#07111f]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
       <StartContent />
     </Suspense>
   );

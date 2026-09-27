@@ -179,13 +179,7 @@ const glowColorMap: Record<string, string> = {
 export default function HelpPageClient() {
   useScrollReveal();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden">
-      <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
-        <div className="absolute top-0 -left-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'4s'}} />
-        <div className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'6s',animationDelay:'2s'}} />
-        <div className="absolute bottom-40 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDuration:'5s',animationDelay:'1s'}} />
-      </div>
-
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
       <NavBar />
 
       <section className="relative min-h-[65vh] flex items-center justify-center text-center overflow-hidden">
@@ -201,26 +195,26 @@ export default function HelpPageClient() {
             <Sparkles className="w-4 h-4 text-cyan-400" />
             <span className="text-sm text-cyan-300 font-medium">Help Centre</span>
           </div>
-          <h1 className="text-6xl md:text-7xl font-black mb-6 leading-tight">
+          <h1 className="text-6xl md:text-7xl font-black mb-6 leading-tight text-white">
             How can we{' '}
             <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent animate-pulse">help?</span>
           </h1>
           <p className="text-slate-300 text-xl max-w-2xl mx-auto mb-10">Everything you need to know about sending and carrying items on BootHop.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/contact" className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 active:scale-[0.96] flex items-center gap-2">
+            <Link href="/contact" className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300 hover:scale-105 active:scale-[0.96] flex items-center gap-2">
               Contact Support
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
-            <Link href="/how-it-works" className="border border-white/20 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all duration-300 hover:scale-105 backdrop-blur-sm">How It Works</Link>
+            <Link href="/how-it-works" className="border border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all duration-300 hover:scale-105 backdrop-blur-sm">How It Works</Link>
           </div>
         </div>
       </section>
 
       <div className="relative z-10 max-w-3xl mx-auto px-6 mt-10 mb-6">
-        <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 backdrop-blur-sm flex items-start gap-3 p-5">
-          <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-200 leading-relaxed">
-            <span className="font-semibold text-amber-300">Never carry items you haven't inspected.</span> BootHop is a peer-to-peer platform — always verify item contents before agreeing to carry anything.
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 flex items-start gap-3 p-5">
+          <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-800 leading-relaxed">
+            <span className="font-semibold text-amber-900">Never carry items you haven't inspected.</span> BootHop is a peer-to-peer platform — always verify item contents before agreeing to carry anything.
           </p>
         </div>
       </div>
@@ -234,9 +228,9 @@ export default function HelpPageClient() {
                 <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${glowMap[section.color]} flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110`}>
                   <Icon className="h-5 w-5 text-white" />
                 </div>
-                <h2 className={`text-lg font-black text-white transition-colors duration-300 ${hoverTitleMap[section.color]}`}>{section.category}</h2>
+                <h2 className={`text-lg font-black text-slate-900 transition-colors duration-300 ${hoverTitleMap[section.color]}`}>{section.category}</h2>
               </div>
-              <div className={`relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm px-6 transition-all duration-300 hover:border-slate-600/70 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.99] cursor-pointer ${borderMap[section.color]} ${touchMap[section.color]}`}>
+              <div className={`relative overflow-hidden rounded-2xl border border-slate-200 bg-white px-6 transition-all duration-300 hover:border-slate-300 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.99] cursor-pointer ${touchMap[section.color]}`}>
                 <div className={`pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 ${glowColorMap[section.color]} rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                 {section.items.map((item) => (
                   <FaqAccordion key={item.q} q={item.q} a={item.a} />
@@ -247,19 +241,19 @@ export default function HelpPageClient() {
         })}
 
         {/* Data Deletion Section — required for Google Play / App Store */}
-        <div id="delete-data" className="relative overflow-hidden rounded-3xl border border-red-500/30 bg-gradient-to-br from-red-500/10 to-orange-500/10 backdrop-blur-sm p-10">
+        <div id="delete-data" className="relative overflow-hidden rounded-3xl border border-red-200 bg-gradient-to-br from-red-50 to-orange-50 p-10">
           <div className="relative">
             <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-orange-400 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-red-500/30">
               <Shield className="h-7 w-7 text-white" />
             </div>
-            <h3 className="text-2xl font-black text-white mb-2">Data Deletion Request</h3>
-            <p className="text-slate-400 text-sm mb-6 max-w-2xl">
+            <h3 className="text-2xl font-black text-slate-900 mb-2">Data Deletion Request</h3>
+            <p className="text-slate-600 text-sm mb-6 max-w-2xl">
               You can request deletion of your personal data at any time — without deleting your account — or request full account and data deletion.
             </p>
             <div className="grid md:grid-cols-2 gap-6 text-left mb-8">
-              <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-                <h4 className="text-white font-bold mb-2">What gets deleted</h4>
-                <ul className="text-slate-400 text-sm space-y-1 list-disc list-inside">
+              <div className="bg-white rounded-2xl p-6 border border-slate-200">
+                <h4 className="text-slate-900 font-bold mb-2">What gets deleted</h4>
+                <ul className="text-slate-600 text-sm space-y-1 list-disc list-inside">
                   <li>Your name, email, and profile information</li>
                   <li>Your delivery and trip history</li>
                   <li>Messages and chat history</li>
@@ -267,36 +261,36 @@ export default function HelpPageClient() {
                   <li>KYC verification data</li>
                 </ul>
               </div>
-              <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-                <h4 className="text-white font-bold mb-2">What we retain</h4>
-                <ul className="text-slate-400 text-sm space-y-1 list-disc list-inside">
+              <div className="bg-white rounded-2xl p-6 border border-slate-200">
+                <h4 className="text-slate-900 font-bold mb-2">What we retain</h4>
+                <ul className="text-slate-600 text-sm space-y-1 list-disc list-inside">
                   <li>Transaction records (required by financial regulations, up to 7 years)</li>
                   <li>Anonymised usage analytics</li>
                   <li>Any data required by law or to resolve disputes</li>
                 </ul>
               </div>
             </div>
-            <h4 className="text-white font-semibold mb-3">How to request data deletion</h4>
-            <ol className="text-slate-400 text-sm space-y-2 mb-6 list-decimal list-inside">
-              <li>Email <a href="mailto:privacy@boothop.com" className="text-blue-400 underline">privacy@boothop.com</a> with subject line <strong className="text-white">"Data Deletion Request"</strong></li>
+            <h4 className="text-slate-900 font-semibold mb-3">How to request data deletion</h4>
+            <ol className="text-slate-600 text-sm space-y-2 mb-6 list-decimal list-inside">
+              <li>Email <a href="mailto:privacy@boothop.com" className="text-blue-600 underline">privacy@boothop.com</a> with subject line <strong className="text-slate-900">"Data Deletion Request"</strong></li>
               <li>Include your registered email address and what you'd like deleted (specific data or full account)</li>
               <li>We will confirm receipt within 48 hours and complete the deletion within 30 days</li>
             </ol>
-            <Link href="/contact" className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-red-500/30 transition-all duration-300 hover:scale-105">
+            <Link href="/contact" className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-red-500/25 transition-all duration-300 hover:scale-105">
               <MessageCircle className="h-4 w-4" /> Contact us to delete data
             </Link>
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-sm p-10 text-center">
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl" />
+        <div className="relative overflow-hidden rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-10 text-center mt-10">
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full blur-3xl" />
           <div className="relative">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/50">
+            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30">
               <MessageCircle className="h-7 w-7 text-white" />
             </div>
-            <h3 className="text-2xl font-black text-white mb-2">Still need help?</h3>
-            <p className="text-sm text-slate-400 mb-6">Our support team typically responds within 24 hours on business days.</p>
-            <Link href="/contact" className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105">
+            <h3 className="text-2xl font-black text-slate-900 mb-2">Still need help?</h3>
+            <p className="text-sm text-slate-600 mb-6">Our support team typically responds within 24 hours on business days.</p>
+            <Link href="/contact" className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300 hover:scale-105">
               <MessageCircle className="h-4 w-4" /> Get in Touch
             </Link>
           </div>

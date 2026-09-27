@@ -122,17 +122,17 @@ const FADE         = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y:
 // ── Shared UI atoms ───────────────────────────────────────────────────────────
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-1.5">{children}</p>;
+  return <p className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-1.5">{children}</p>;
 }
 function Input({ ...p }: React.InputHTMLAttributes<HTMLInputElement>) {
-  return <input {...p} className={`w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-colors ${p.className ?? ''}`} />;
+  return <input {...p} className={`w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 transition-colors ${p.className ?? ''}`} />;
 }
 function Textarea({ ...p }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea {...p} rows={p.rows ?? 2} className={`w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-colors resize-none ${p.className ?? ''}`} />;
+  return <textarea {...p} rows={p.rows ?? 2} className={`w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 transition-colors resize-none ${p.className ?? ''}`} />;
 }
 function Select({ children, ...p }: React.SelectHTMLAttributes<HTMLSelectElement> & { children: React.ReactNode }) {
   return (
-    <select {...p} className={`w-full bg-[#0d1117] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white/30 transition-colors ${p.className ?? ''}`}>
+    <select {...p} className={`w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 transition-colors ${p.className ?? ''}`}>
       {children}
     </select>
   );
@@ -140,14 +140,14 @@ function Select({ children, ...p }: React.SelectHTMLAttributes<HTMLSelectElement
 function Toggle({ checked, onChange, label, sub, danger }: { checked: boolean; onChange: (v: boolean) => void; label: string; sub?: string; danger?: boolean }) {
   return (
     <button type="button" onClick={() => onChange(!checked)}
-      className={`flex items-start gap-3 w-full text-left p-3 rounded-xl border transition-all ${checked ? 'border-white/20 bg-white/5' : 'border-white/8 hover:border-white/15'}`}
+      className={`flex items-start gap-3 w-full text-left p-3 rounded-xl border transition-all ${checked ? 'border-blue-300 bg-blue-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}
     >
-      <div className={`mt-0.5 w-4 h-4 rounded flex-shrink-0 border-2 flex items-center justify-center transition-colors ${checked ? 'bg-white border-white' : 'border-white/30'}`}>
-        {checked && <div className="w-2 h-2 bg-black rounded-sm" />}
+      <div className={`mt-0.5 w-4 h-4 rounded flex-shrink-0 border-2 flex items-center justify-center transition-colors ${checked ? 'bg-blue-500 border-blue-500' : 'border-slate-300'}`}>
+        {checked && <div className="w-2 h-2 bg-white rounded-sm" />}
       </div>
       <div>
-        <p className={`text-sm font-medium ${danger && checked ? 'text-red-400' : 'text-white'}`}>{label}</p>
-        {sub && <p className="text-xs text-white/35 mt-0.5">{sub}</p>}
+        <p className={`text-sm font-medium ${danger && checked ? 'text-red-600' : 'text-slate-900'}`}>{label}</p>
+        {sub && <p className="text-xs text-slate-600 mt-0.5">{sub}</p>}
       </div>
     </button>
   );
@@ -155,12 +155,12 @@ function Toggle({ checked, onChange, label, sub, danger }: { checked: boolean; o
 function SectionHead({ icon: Icon, title, sub }: { icon: React.ComponentType<{ className?: string }>; title: string; sub: string }) {
   return (
     <div className="flex items-start gap-3 mb-6">
-      <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-        <Icon className="h-5 w-5 text-white/50" />
+      <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
+        <Icon className="h-5 w-5 text-slate-600" />
       </div>
       <div>
-        <h3 className="font-black text-lg text-white">{title}</h3>
-        <p className="text-white/35 text-sm">{sub}</p>
+        <h3 className="font-black text-lg text-slate-900">{title}</h3>
+        <p className="text-slate-600 text-sm">{sub}</p>
       </div>
     </div>
   );
@@ -169,8 +169,8 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   if (!value || value === '—') return null;
   return (
     <div className="flex items-start justify-between gap-4">
-      <span className="text-white/35 flex-shrink-0 text-sm">{label}</span>
-      <span className="text-white text-right text-sm">{value}</span>
+      <span className="text-slate-600 flex-shrink-0 text-sm">{label}</span>
+      <span className="text-slate-900 text-right text-sm">{value}</span>
     </div>
   );
 }
@@ -198,19 +198,19 @@ function LocationBlock({
   milesLabel?: string; mileRate?: string;
 }) {
   return (
-    <div className="bg-white/3 border border-white/8 rounded-2xl p-5 space-y-4">
+    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className={`w-8 h-8 rounded-lg ${color} flex items-center justify-center`}>{icon}</div>
-          <p className="font-bold text-white text-sm">{title}</p>
+          <p className="font-bold text-slate-900 text-sm">{title}</p>
         </div>
         {/* Address / Airport toggle */}
-        <div className="flex bg-white/5 border border-white/10 rounded-xl p-0.5 gap-0.5">
+        <div className="flex bg-white border border-slate-200 rounded-xl p-0.5 gap-0.5">
           {(['address', 'airport'] as const).map(t => (
             <button key={t} type="button" onClick={() => onTypeChange(t)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all capitalize flex items-center gap-1.5
-                ${locType === t ? 'bg-white/15 text-white' : 'text-white/30 hover:text-white/60'}`}
+                ${locType === t ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-700'}`}
             >
               {t === 'address' ? <MapPin className="h-3 w-3" /> : <Plane className="h-3 w-3" />}
               {t}
@@ -241,7 +241,7 @@ function LocationBlock({
             <div>
               <Label>{milesLabel ?? 'Extra miles from airport'}</Label>
               <Input type="number" min="0" placeholder="0" value={extraMiles} onChange={e => onExtraMiles?.(e.target.value)} />
-              {mileRate && <p className="text-xs text-white/25 mt-1">{mileRate}</p>}
+              {mileRate && <p className="text-xs text-slate-300 mt-1">{mileRate}</p>}
             </div>
           )}
         </div>
@@ -272,56 +272,56 @@ function LocationBlock({
 
 function QuotePanel({ quote, routeType, urgency, accent }: { quote: QuoteBreakdown | null; routeType: RouteType | ''; urgency: UrgencyTier | ''; accent: string }) {
   const fmt       = (n: number) => n > 0 ? `£${n.toLocaleString()}` : '—';
-  const accentText = accent === 'amber' ? 'text-amber-400' : 'text-emerald-400';
+  const accentText = accent === 'amber' ? 'text-amber-600' : 'text-emerald-600';
   return (
-    <div className="bg-white/3 border border-white/8 rounded-2xl p-6 lg:sticky lg:top-6">
-      <p className="text-xs font-bold text-white/30 uppercase tracking-widest mb-4">Live Quote</p>
+    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm lg:sticky lg:top-6">
+      <p className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-4">Live Quote</p>
       {!routeType && (
         <div className="text-center py-8">
-          <Globe className="h-8 w-8 text-white/15 mx-auto mb-3" />
-          <p className="text-white/25 text-sm">Select a route to see pricing</p>
+          <Globe className="h-8 w-8 text-slate-200 mx-auto mb-3" />
+          <p className="text-slate-600 text-sm">Select a route to see pricing</p>
         </div>
       )}
       {routeType && !urgency && (
         <div className="text-center py-8">
-          <Clock className="h-8 w-8 text-white/15 mx-auto mb-3" />
-          <p className="text-white/25 text-sm">Select urgency to calculate</p>
-          <p className="text-white/15 text-xs mt-1">{ROUTE_META[routeType as RouteType].from}</p>
+          <Clock className="h-8 w-8 text-slate-200 mx-auto mb-3" />
+          <p className="text-slate-600 text-sm">Select urgency to calculate</p>
+          <p className="text-slate-300 text-xs mt-1">{ROUTE_META[routeType as RouteType].from}</p>
         </div>
       )}
       {quote && (
         <>
           <div className="space-y-2.5 text-sm mb-4">
-            <div className="flex justify-between"><span className="text-white/50">Base ({ROUTE_META[routeType as RouteType]?.label})</span><span className="text-white font-semibold">{fmt(quote.base)}</span></div>
-            {quote.pickupExtra   > 0 && <div className="flex justify-between"><span className="text-white/50">Pickup mileage</span><span className="text-white">{fmt(quote.pickupExtra)}</span></div>}
-            {quote.dropExtra     > 0 && <div className="flex justify-between"><span className="text-white/50">Drop mileage</span><span className="text-white">{fmt(quote.dropExtra)}</span></div>}
-            {quote.handlingFee   > 0 && <div className="flex justify-between"><span className="text-white/50">Airport handling</span><span className="text-white">{fmt(quote.handlingFee)}</span></div>}
-            {quote.insuranceFee  > 0 && <div className="flex justify-between"><span className="text-white/50">Enhanced insurance</span><span className="text-white">{fmt(quote.insuranceFee)}</span></div>}
-            {quote.addons        > 0 && <div className="flex justify-between"><span className="text-white/50">Add-ons</span><span className="text-white">{fmt(quote.addons)}</span></div>}
-            {quote.weekendSurcharge > 0 && <div className="flex justify-between"><span className="text-white/50">Weekend (+20%)</span><span className="text-white">{fmt(quote.weekendSurcharge)}</span></div>}
+            <div className="flex justify-between"><span className="text-slate-600">Base ({ROUTE_META[routeType as RouteType]?.label})</span><span className="text-slate-900 font-semibold">{fmt(quote.base)}</span></div>
+            {quote.pickupExtra   > 0 && <div className="flex justify-between"><span className="text-slate-600">Pickup mileage</span><span className="text-slate-900">{fmt(quote.pickupExtra)}</span></div>}
+            {quote.dropExtra     > 0 && <div className="flex justify-between"><span className="text-slate-600">Drop mileage</span><span className="text-slate-900">{fmt(quote.dropExtra)}</span></div>}
+            {quote.handlingFee   > 0 && <div className="flex justify-between"><span className="text-slate-600">Airport handling</span><span className="text-slate-900">{fmt(quote.handlingFee)}</span></div>}
+            {quote.insuranceFee  > 0 && <div className="flex justify-between"><span className="text-slate-600">Enhanced insurance</span><span className="text-slate-900">{fmt(quote.insuranceFee)}</span></div>}
+            {quote.addons        > 0 && <div className="flex justify-between"><span className="text-slate-600">Add-ons</span><span className="text-slate-900">{fmt(quote.addons)}</span></div>}
+            {quote.weekendSurcharge > 0 && <div className="flex justify-between"><span className="text-slate-600">Weekend (+20%)</span><span className="text-slate-900">{fmt(quote.weekendSurcharge)}</span></div>}
           </div>
-          <div className="border-t border-white/10 pt-4 flex justify-between items-baseline">
-            <span className="text-white/50 text-sm">Estimated total</span>
+          <div className="border-t border-slate-200 pt-4 flex justify-between items-baseline">
+            <span className="text-slate-600 text-sm">Estimated total</span>
             <span className={`${accentText} font-black text-2xl`}>£{quote.total.toLocaleString()}</span>
           </div>
           {quote.reviewRequired && (
-            <div className="mt-4 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-2">
-              <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
+            <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-bold text-amber-400 mb-1">Manual review required</p>
-                {quote.reviewReasons.map((r, i) => <p key={i} className="text-xs text-white/40">{r}</p>)}
+                <p className="text-xs font-bold text-amber-700 mb-1">Manual review required</p>
+                {quote.reviewReasons.map((r, i) => <p key={i} className="text-xs text-slate-600">{r}</p>)}
               </div>
             </div>
           )}
-          <p className="text-xs text-white/20 mt-4 pt-4 border-t border-white/8 leading-relaxed">
+          <p className="text-xs text-slate-300 mt-4 pt-4 border-t border-slate-200 leading-relaxed">
             Estimate only. Final price confirmed on operator assignment. VAT not included.
           </p>
         </>
       )}
       <div className="mt-6 space-y-2">
         {['Verified operator assigned', 'Direct point-to-point', 'Real-time coordination'].map(item => (
-          <div key={item} className="flex items-center gap-2 text-xs text-white/30">
-            <CheckCircle className="h-3.5 w-3.5 text-white/20 flex-shrink-0" />{item}
+          <div key={item} className="flex items-center gap-2 text-xs text-slate-600">
+            <CheckCircle className="h-3.5 w-3.5 text-slate-300 flex-shrink-0" />{item}
           </div>
         ))}
       </div>
@@ -333,23 +333,23 @@ function QuotePanel({ quote, routeType, urgency, accent }: { quote: QuoteBreakdo
 
 function DangerousGoodsModal({ onClose }: { onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-        className="relative w-full max-w-md bg-[#0d1117] border border-red-500/30 rounded-2xl p-8 shadow-2xl text-center"
+        className="relative w-full max-w-md bg-white border border-red-200 rounded-2xl p-8 shadow-2xl text-center"
       >
-        <button onClick={onClose} className="absolute top-4 right-4 text-white/30 hover:text-white transition-colors"><X className="h-5 w-5" /></button>
-        <div className="w-16 h-16 rounded-full bg-red-500/15 flex items-center justify-center mx-auto mb-4">
-          <AlertTriangle className="h-8 w-8 text-red-400" />
+        <button onClick={onClose} className="absolute top-4 right-4 text-slate-300 hover:text-slate-700 transition-colors"><X className="h-5 w-5" /></button>
+        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+          <AlertTriangle className="h-8 w-8 text-red-600" />
         </div>
-        <h3 className="text-xl font-black text-white mb-2">Dangerous goods — contact us immediately</h3>
-        <p className="text-white/40 text-sm leading-relaxed mb-6">
+        <h3 className="text-xl font-black text-slate-900 mb-2">Dangerous goods — contact us immediately</h3>
+        <p className="text-slate-600 text-sm leading-relaxed mb-6">
           We cannot accept dangerous goods through the standard booking portal. Your consignment requires manual assessment before we can accept it.
         </p>
         <div className="space-y-3">
-          <a href="mailto:info@boothop.com" className="flex items-center justify-center gap-2 w-full bg-red-500/10 border border-red-500/25 text-red-400 font-bold text-sm px-4 py-3 rounded-xl hover:bg-red-500/20 transition-all">
+          <a href="mailto:info@boothop.com" className="flex items-center justify-center gap-2 w-full bg-red-50 border border-red-200 text-red-600 font-bold text-sm px-4 py-3 rounded-xl hover:bg-red-100 transition-all">
             <Mail className="h-4 w-4" /> info@boothop.com
           </a>
-          <a href="/api/whatsapp" className="flex items-center justify-center gap-2 w-full bg-[#25D366]/10 border border-[#25D366]/25 text-[#25D366] font-bold text-sm px-4 py-3 rounded-xl hover:bg-[#25D366]/20 transition-all">
+          <a href="/api/whatsapp" className="flex items-center justify-center gap-2 w-full bg-[#25D366]/10 border border-[#25D366]/30 text-[#1DA851] font-bold text-sm px-4 py-3 rounded-xl hover:bg-[#25D366]/20 transition-all">
             <Phone className="h-4 w-4" /> Contact via WhatsApp
           </a>
         </div>
@@ -374,9 +374,9 @@ function stepLabel(s: number, isIntl: boolean) {
 
 export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, onCancel }: WizardProps) {
   const accent      = tier === 'priority' ? 'amber'   : 'emerald';
-  const accentText  = accent === 'amber'  ? 'text-amber-400'     : 'text-emerald-400';
-  const accentBg    = accent === 'amber'  ? 'bg-amber-400'       : 'bg-emerald-400';
-  const accentHover = accent === 'amber'  ? 'hover:bg-amber-300' : 'hover:bg-emerald-300';
+  const accentText  = accent === 'amber'  ? 'text-amber-600'     : 'text-emerald-600';
+  const accentBg    = accent === 'amber'  ? 'bg-amber-500'       : 'bg-emerald-500';
+  const accentHover = accent === 'amber'  ? 'hover:bg-amber-400' : 'hover:bg-emerald-400';
 
   const [step,            setStep]          = useState(1);
   const [form,            setForm]          = useState<Form>(() => ({
@@ -615,11 +615,11 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
             const m = ROUTE_META[rt]; const sel = form.routeType === rt;
             return (
               <button key={rt} type="button" onClick={() => { up('routeType', rt); setError(null); }}
-                className={`text-left p-3 rounded-xl border transition-all ${sel ? 'border-emerald-500/60 bg-emerald-500/10' : 'border-white/10 bg-white/3 hover:border-white/20'}`}
+                className={`text-left p-3 rounded-xl border transition-all ${sel ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}
               >
                 <span className="text-xl">{m.flag}</span>
-                <p className="font-bold text-white text-xs mt-1.5">{m.label}</p>
-                <p className={`text-xs font-bold mt-0.5 ${sel ? accentText : 'text-white/30'}`}>{m.from}</p>
+                <p className="font-bold text-slate-900 text-xs mt-1.5">{m.label}</p>
+                <p className={`text-xs font-bold mt-0.5 ${sel ? accentText : 'text-slate-600'}`}>{m.from}</p>
               </button>
             );
           })}
@@ -629,7 +629,7 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
       {/* Pickup + Dropoff side by side on lg */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <LocationBlock
-          title="Pickup" icon={<Package className="h-4 w-4 text-emerald-400" />} color="bg-emerald-500/15"
+          title="Pickup" icon={<Package className="h-4 w-4 text-emerald-600" />} color="bg-emerald-100"
           locType={form.pickupType} onTypeChange={v => up('pickupType', v)}
           address={form.pickupAddress} onAddressChange={v => up('pickupAddress', v)}
           airport={form.pickupAirport} onAirportChange={v => up('pickupAirport', v)}
@@ -643,7 +643,7 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
           mileRate={`£${form.urgency === 'planned' ? '3' : '6.50'}/mile`}
         />
         <LocationBlock
-          title="Drop-off" icon={<Truck className="h-4 w-4 text-blue-400" />} color="bg-blue-500/15"
+          title="Drop-off" icon={<Truck className="h-4 w-4 text-blue-600" />} color="bg-blue-100"
           locType={form.dropoffType} onTypeChange={v => up('dropoffType', v)}
           address={form.dropoffAddress} onAddressChange={v => up('dropoffAddress', v)}
           airport={form.dropoffAirport} onAirportChange={v => up('dropoffAirport', v)}
@@ -664,16 +664,16 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
           {(Object.keys(URGENCY_META) as UrgencyTier[]).map(u => {
             const m = URGENCY_META[u]; const sel = form.urgency === u;
-            const colors: Record<string, string> = { planned: 'text-emerald-400', priority: 'text-blue-400', critical: 'text-red-400' };
+            const colors: Record<string, string> = { planned: 'text-emerald-600', priority: 'text-blue-600', critical: 'text-red-600' };
             return (
               <button key={u} type="button" onClick={() => { up('urgency', u); setError(null); }}
-                className={`text-left p-4 rounded-2xl border transition-all ${sel ? 'border-emerald-500/60 bg-emerald-500/10' : 'border-white/10 bg-white/3 hover:border-white/20'}`}
+                className={`text-left p-4 rounded-2xl border transition-all ${sel ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <p className="font-bold text-white text-sm">{m.label}</p>
+                  <p className="font-bold text-slate-900 text-sm">{m.label}</p>
                   <span className={`text-xs font-bold ${colors[u]}`}>{m.time}</span>
                 </div>
-                <p className="text-white/35 text-xs">{m.desc}</p>
+                <p className="text-slate-600 text-xs">{m.desc}</p>
               </button>
             );
           })}
@@ -726,7 +726,7 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
             <Label>Category</Label>
             <Select value={form.category} onChange={e => up('category', e.target.value)}>
               <option value="">Select…</option>
-              {CATEGORIES.map(c => <option key={c} value={c} className="bg-[#0d1117]">{c}</option>)}
+              {CATEGORIES.map(c => <option key={c} value={c} className="bg-white">{c}</option>)}
             </Select>
           </div>
           <div>
@@ -739,7 +739,7 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
             <Label>Weight (kg) *</Label>
             <Input type="number" min="0.1" step="0.1" placeholder="0.0" value={form.weightKg} onChange={e => up('weightKg', e.target.value)} />
             {parseFloat(form.weightKg) > 20 && (
-              <p className="text-xs text-amber-400 mt-1.5 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Above 20 kg — manual review</p>
+              <p className="text-xs text-amber-600 mt-1.5 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Above 20 kg — manual review</p>
             )}
           </div>
           <div>
@@ -751,13 +751,13 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
 
       {/* Insurance — auto-shown if value > £1,000 */}
       {needsInsurance && (
-        <div className="bg-amber-500/8 border border-amber-500/20 rounded-2xl p-4 space-y-3">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-3">
           <div className="flex items-center gap-2 mb-1">
-            <Shield className="h-4 w-4 text-amber-400" />
-            <p className="text-sm font-bold text-amber-300">Declared value exceeds £1,000 — insurance required</p>
+            <Shield className="h-4 w-4 text-amber-600" />
+            <p className="text-sm font-bold text-amber-700">Declared value exceeds £1,000 — insurance required</p>
           </div>
-          <div className="p-3 bg-white/5 border border-white/10 rounded-xl text-xs text-white/40">
-            Standard cover included up to £1,000. Your declared value is <span className="text-white font-bold">£{parseFloat(form.declaredValue).toLocaleString()}</span>.
+          <div className="p-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-600">
+            Standard cover included up to £1,000. Your declared value is <span className="text-slate-900 font-bold">£{parseFloat(form.declaredValue).toLocaleString()}</span>.
           </div>
           <Toggle
             checked={form.enhancedInsurance}
@@ -784,16 +784,16 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
           <Toggle checked={form.dangerousGoods}  onChange={v => up('dangerousGoods', v)}  label="Contains dangerous goods" sub="Batteries, chemicals, flammables" danger />
         </div>
         {form.dangerousGoods && (
-          <div className="mb-3 p-3 bg-red-500/10 border border-red-500/25 rounded-xl flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-red-400">Contact us before proceeding — dangerous goods require manual assessment.</p>
+          <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2">
+            <AlertTriangle className="h-4 w-4 text-red-600 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-red-600">Contact us before proceeding — dangerous goods require manual assessment.</p>
           </div>
         )}
       </div>
 
       <div>
         <Label>Shipment risk flags</Label>
-        <p className="text-xs text-white/25 mb-3">Any flagged item routes to manual review before confirmation.</p>
+        <p className="text-xs text-slate-300 mb-3">Any flagged item routes to manual review before confirmation.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <Toggle checked={form.batteryPowered}       onChange={v => up('batteryPowered', v)}       label="Battery-powered or contains batteries" />
           <Toggle checked={form.containsLiquid}       onChange={v => up('containsLiquid', v)}       label="Contains liquid" />
@@ -802,9 +802,9 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
           <Toggle checked={form.noXray}               onChange={v => up('noXray', v)}               label="Cannot go through X-ray" />
         </div>
         {hasExceptions && (
-          <div className="mt-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-amber-400/80">One or more risk flags require manual review — no payment until approved.</p>
+          <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-2">
+            <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700">One or more risk flags require manual review — no payment until approved.</p>
           </div>
         )}
       </div>
@@ -814,9 +814,9 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
   const renderStep3Customs = () => (
     <div className="space-y-4">
       <SectionHead icon={Globe} title="Customs & Border Responsibility" sub="Required for all cross-border shipments. All declarations are binding." />
-      <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-        <p className="text-sm font-semibold text-amber-400 mb-2">International Goods Policy</p>
-        <ul className="text-xs text-white/50 space-y-1">
+      <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+        <p className="text-sm font-semibold text-amber-700 mb-2">International Goods Policy</p>
+        <ul className="text-xs text-slate-600 space-y-1">
           <li>• Personal effects only — clothing, gifts, documents (no commercial cargo)</li>
           <li>• Total declared value must be under £1,000 per traveller shipment</li>
           <li>• No single item may exceed £2,000 in declared value</li>
@@ -842,9 +842,9 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
         <Label>Who handles customs clearance? *</Label>
         <Select value={form.customsHandledBy} onChange={e => up('customsHandledBy', e.target.value)}>
           <option value="">Select…</option>
-          <option value="sender"   className="bg-[#0d1117]">Sender</option>
-          <option value="receiver" className="bg-[#0d1117]">Receiver</option>
-          <option value="broker"   className="bg-[#0d1117]">Appointed broker</option>
+          <option value="sender"   className="bg-white">Sender</option>
+          <option value="receiver" className="bg-white">Receiver</option>
+          <option value="broker"   className="bg-white">Appointed broker</option>
         </Select>
       </div>
       {form.customsHandledBy === 'broker' && (
@@ -863,7 +863,7 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
       <div className="space-y-5">
         <SectionHead icon={Zap} title="Review & Confirm" sub={reviewRequired ? 'Your booking goes to manual review — no payment until approved.' : 'Check everything, confirm, and proceed to payment.'} />
 
-        <div className="bg-white/3 border border-white/8 rounded-2xl p-5 space-y-3">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
           <SummaryRow label="Route"        value={form.routeType ? ROUTE_META[form.routeType as RouteType].label : '—'} />
           <SummaryRow label="Urgency"      value={form.urgency ? URGENCY_META[form.urgency as UrgencyTier].label : '—'} />
           <SummaryRow label="Collection"   value={[form.collectionDate, form.collectionTime].filter(Boolean).join(' at ')} />
@@ -871,13 +871,13 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
           <SummaryRow label="Pickup contact" value={[form.pickupContactName, form.pickupContactPhone].filter(Boolean).join(' · ')} />
           <SummaryRow label="Drop-off"     value={dropoffAddr || '—'} />
           <SummaryRow label="Drop-off contact" value={[form.dropoffContactName, form.dropoffContactPhone].filter(Boolean).join(' · ')} />
-          <div className="border-t border-white/8 my-1" />
+          <div className="border-t border-slate-200 my-1" />
           <SummaryRow label="Goods"        value={form.itemDesc || '—'} />
           <SummaryRow label="Weight"       value={form.weightKg ? `${form.weightKg} kg` : '—'} />
           <SummaryRow label="Declared value" value={form.declaredValue ? `£${parseFloat(form.declaredValue).toLocaleString()}` : '—'} />
           {quote && (
-            <div className="border-t border-white/10 pt-3 flex justify-between font-black text-base">
-              <span className="text-white">Estimated total</span>
+            <div className="border-t border-slate-200 pt-3 flex justify-between font-black text-base">
+              <span className="text-slate-900">Estimated total</span>
               <span className={accentText}>£{quote.total.toLocaleString()}</span>
             </div>
           )}
@@ -894,32 +894,32 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
         </div>
 
         {form.dangerousGoods && (
-          <div className="p-4 bg-red-500/10 border border-red-500/25 rounded-xl">
-            <p className="text-sm font-bold text-red-400 mb-2">Dangerous goods — contact us before submitting</p>
+          <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+            <p className="text-sm font-bold text-red-600 mb-2">Dangerous goods — contact us before submitting</p>
             <div className="space-y-2">
-              <a href="mailto:info@boothop.com" className="flex items-center gap-2 text-xs text-red-400/80 hover:text-red-400 transition-colors"><Mail className="h-3.5 w-3.5" /> info@boothop.com</a>
-              <a href="/api/whatsapp" className="flex items-center gap-2 text-xs text-[#25D366]/80 hover:text-[#25D366] transition-colors"><Phone className="h-3.5 w-3.5" /> WhatsApp</a>
+              <a href="mailto:info@boothop.com" className="flex items-center gap-2 text-xs text-red-500 hover:text-red-600 transition-colors"><Mail className="h-3.5 w-3.5" /> info@boothop.com</a>
+              <a href="/api/whatsapp" className="flex items-center gap-2 text-xs text-[#25D366] hover:text-[#1DA851] transition-colors"><Phone className="h-3.5 w-3.5" /> WhatsApp</a>
             </div>
           </div>
         )}
 
         {reviewRequired && !form.dangerousGoods && (
-          <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-bold text-amber-400 mb-1">This booking goes to manual review</p>
-              <p className="text-xs text-white/40">Our team will contact you within 2 business hours. No payment is taken until confirmed.</p>
+              <p className="text-sm font-bold text-amber-700 mb-1">This booking goes to manual review</p>
+              <p className="text-xs text-slate-600">Our team will contact you within 2 business hours. No payment is taken until confirmed.</p>
             </div>
           </div>
         )}
 
         {!reviewRequired && !form.dangerousGoods && quote && (
-          <div className="p-4 bg-white/3 border border-white/8 rounded-xl flex items-center justify-between">
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <CreditCard className="h-5 w-5 text-white/30" />
+              <CreditCard className="h-5 w-5 text-slate-600" />
               <div>
-                <p className="text-sm font-bold text-white">Secure card payment</p>
-                <p className="text-xs text-white/35">Redirected to Stripe to complete payment</p>
+                <p className="text-sm font-bold text-slate-900">Secure card payment</p>
+                <p className="text-xs text-slate-600">Redirected to Stripe to complete payment</p>
               </div>
             </div>
             <span className={`${accentText} font-black text-xl`}>£{quote.total.toLocaleString()}</span>
@@ -949,16 +949,16 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
 
   return (
     <>
-      <div className="min-h-screen bg-[#080c10] px-4 py-8 lg:px-8">
+      <div className="min-h-screen bg-white px-4 py-8 lg:px-8">
         <div className="max-w-6xl mx-auto">
 
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
-            <button onClick={onCancel} className="flex items-center gap-2 text-white/30 hover:text-white text-sm font-semibold transition-colors">
+            <button onClick={onCancel} className="flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm font-semibold transition-colors">
               <ChevronLeft className="h-4 w-4" /> Back to portal
             </button>
             {tier === 'priority' && (
-              <span className="inline-flex items-center gap-1.5 text-xs font-black text-amber-400 bg-amber-500/10 border border-amber-500/25 px-3 py-1.5 rounded-full uppercase tracking-widest">
+              <span className="inline-flex items-center gap-1.5 text-xs font-black text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full uppercase tracking-widest">
                 <Star className="h-3 w-3" /> Priority Partner
               </span>
             )}
@@ -967,14 +967,14 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
           {/* Draft banner */}
           <AnimatePresence>
             {showDraftBanner && (
-              <motion.div {...FADE} className="mb-6 flex items-center justify-between gap-4 bg-white/5 border border-white/12 rounded-xl px-5 py-3">
+              <motion.div {...FADE} className="mb-6 flex items-center justify-between gap-4 bg-slate-50 border border-slate-200 rounded-xl px-5 py-3">
                 <div className="flex items-center gap-3">
-                  <RotateCcw className="h-4 w-4 text-white/40 flex-shrink-0" />
-                  <p className="text-sm text-white/60">You have a saved quote from earlier. Resume where you left off?</p>
+                  <RotateCcw className="h-4 w-4 text-slate-600 flex-shrink-0" />
+                  <p className="text-sm text-slate-600">You have a saved quote from earlier. Resume where you left off?</p>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
                   <button onClick={resumeDraft} className={`text-xs font-bold ${accentText} hover:opacity-80 transition-opacity`}>Resume</button>
-                  <button onClick={dismissDraft} className="text-xs text-white/30 hover:text-white transition-colors">Dismiss</button>
+                  <button onClick={dismissDraft} className="text-xs text-slate-600 hover:text-slate-900 transition-colors">Dismiss</button>
                 </div>
               </motion.div>
             )}
@@ -987,20 +987,20 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
               {Array.from({ length: totalSteps }, (_, i) => i + 1).map(s => (
                 <div key={s} className="flex items-center gap-2 flex-shrink-0">
                   <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all
-                    ${s < step  ? `${accentText} bg-emerald-500/10 border border-emerald-500/20` :
-                      s === step ? 'text-white bg-white/10 border border-white/20' :
-                                   'text-white/25 border border-white/8'}`}
+                    ${s < step  ? `${accentText} bg-emerald-50 border border-emerald-200` :
+                      s === step ? 'text-slate-900 bg-slate-100 border border-slate-200' :
+                                   'text-slate-300 border border-slate-100'}`}
                   >
                     {s < step ? <CheckCircle className="h-3 w-3" /> : <span>{s}</span>}
                     <span className="hidden sm:inline">{stepLabel(s, isIntl)}</span>
                   </div>
-                  {s < totalSteps && <div className={`h-px w-6 flex-shrink-0 ${s < step ? 'bg-emerald-500/40' : 'bg-white/10'}`} />}
+                  {s < totalSteps && <div className={`h-px w-6 flex-shrink-0 ${s < step ? 'bg-emerald-300' : 'bg-slate-200'}`} />}
                 </div>
               ))}
             </div>
-            <div className="h-1 bg-white/8 rounded-full overflow-hidden">
+            <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
               <motion.div
-                className={`h-full rounded-full ${accent === 'amber' ? 'bg-amber-400' : 'bg-emerald-400'}`}
+                className={`h-full rounded-full ${accent === 'amber' ? 'bg-amber-500' : 'bg-emerald-500'}`}
                 animate={{ width: `${pct}%` }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
               />
@@ -1012,7 +1012,7 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
 
             {/* Form */}
             <div>
-              <div className="bg-white/3 border border-white/8 rounded-2xl p-6 lg:p-8">
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 shadow-sm">
                 <AnimatePresence mode="wait">
                   <motion.div key={step} {...FADE} transition={{ duration: 0.2 }}>
                     {renderCurrentStep()}
@@ -1022,16 +1022,16 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
 
               {error && (
                 <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 flex items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3"
+                  className="mt-4 flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3"
                 >
-                  <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0" />
-                  <p className="text-sm text-red-400">{error}</p>
+                  <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
+                  <p className="text-sm text-red-600">{error}</p>
                 </motion.div>
               )}
 
               <div className="flex gap-3 mt-5">
                 {step > 1 && (
-                  <button onClick={back} className="flex items-center gap-2 text-sm font-semibold text-white/40 hover:text-white bg-white/5 border border-white/10 hover:border-white/20 px-5 py-3 rounded-xl transition-all">
+                  <button onClick={back} className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:border-slate-300 px-5 py-3 rounded-xl transition-all">
                     <ChevronLeft className="h-4 w-4" /> Back
                   </button>
                 )}

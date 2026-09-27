@@ -8,8 +8,6 @@ const NAV_LINKS = [
   ['About', '/about'],
   ['Help', '/help'],
   ['Contact', '/contact'],
-  ['Pitch Deck', '/downloads/boothop-pitch-deck.pdf'],
-  ['Exec Summary', '/downloads/boothop-executive-summary.pdf'],
 ];
 
 const LEGAL_LINKS = [
@@ -31,31 +29,31 @@ const SOCIALS = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/8 bg-[#07111f]">
+    <footer className="border-t border-slate-200 bg-slate-50">
       <div className="mx-auto max-w-7xl px-6 py-8 md:px-8">
 
         {/* Main row */}
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between mb-5">
 
           {/* Nav links */}
-          <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/60">
+          <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
             {NAV_LINKS.map(([label, href]) =>
               href.endsWith('.pdf') ? (
-                <a key={href} href={href} download className="hover:text-white transition-colors duration-200">{label}</a>
+                <a key={href} href={href} download className="hover:text-slate-900 transition-colors duration-200">{label}</a>
               ) : (
-                <Link key={href} href={href} className="hover:text-white transition-colors duration-200">{label}</Link>
+                <Link key={href} href={href} className="hover:text-slate-900 transition-colors duration-200">{label}</Link>
               )
             )}
           </nav>
 
           {/* Contact + social */}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <a href="mailto:info@boothop.com" className="text-sm text-white/55 hover:text-white transition-colors">info@boothop.com</a>
-            <a href="tel:+441156612825" className="text-sm text-white/55 hover:text-white transition-colors">+44 115 661 2825</a>
+            <a href="mailto:info@boothop.com" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">info@boothop.com</a>
+            <a href="tel:+441156612825" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">+44 115 661 2825</a>
             <div className="flex items-center gap-1.5">
               {SOCIALS.map(({ href, label, path }) => (
                 <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-white/50 transition-all duration-200 hover:border-white/30 hover:text-white hover:bg-white/10">
+                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all duration-200 hover:border-slate-300 hover:text-slate-900 hover:bg-slate-100">
                   <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3"><path d={path} /></svg>
                 </a>
               ))}
@@ -64,18 +62,18 @@ export default function Footer() {
         </div>
 
         {/* Bottom row */}
-        <div className="flex flex-col gap-3 border-t border-white/5 pt-5 md:flex-row md:items-center md:justify-between">
-          <p className="text-xs text-white/45">
+        <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 md:flex-row md:items-center md:justify-between">
+          <p className="text-xs text-slate-600">
             © {new Date().getFullYear()} BootHop Ltd · Registered in England &amp; Wales
           </p>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/45">
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600">
             {LEGAL_LINKS.map(([label, href]) => (
-              <Link key={href} href={href} scroll={true} className="hover:text-white/75 transition-colors">{label}</Link>
+              <Link key={href} href={href} scroll={true} className="hover:text-slate-900 transition-colors">{label}</Link>
             ))}
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs text-emerald-400/90 font-medium">All systems operational</span>
+            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs text-emerald-600 font-medium">All systems operational</span>
           </div>
         </div>
 

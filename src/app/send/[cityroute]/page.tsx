@@ -169,23 +169,23 @@ export default async function CityRoutePage(
     .slice(0, 4);
 
   return (
-    <main className="min-h-screen bg-[#0a0f1e] text-white">
+    <main className="min-h-screen bg-white text-slate-900">
       <TikTokViewContent contentName={`Send ${pair.from} to ${pair.to}`} contentType="delivery_route" />
 
       {/* Hero */}
-      <section className="px-6 py-20 text-center max-w-3xl mx-auto">
+      <section className="px-6 py-20 text-center max-w-3xl mx-auto bg-gradient-to-b from-white to-slate-50">
         <span className={`inline-block text-xs font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full ${
           isInternational
-            ? 'text-amber-400 bg-amber-500/10'
-            : 'text-blue-400 bg-blue-500/10'
+            ? 'text-amber-700 bg-amber-50'
+            : 'text-blue-700 bg-blue-50'
         }`}>
           {isInternational ? '✈️ Peer-to-Peer International Delivery' : 'Same-Day UK Delivery'}
         </span>
-        <h1 className="text-4xl sm:text-5xl font-black mb-4">
+        <h1 className="text-4xl sm:text-5xl font-black mb-4 text-slate-900">
           {pair.from} to {pair.to}
-          <span className={isInternational ? ' text-amber-400' : ' text-blue-400'}> Delivery</span>
+          <span className={isInternational ? ' text-amber-600' : ' text-blue-600'}> Delivery</span>
         </h1>
-        <p className="text-gray-400 text-lg mb-6">
+        <p className="text-slate-600 text-lg mb-6">
           {isInternational
             ? `Send your package from ${pair.from} to ${pair.to} with a verified traveller already flying the route. No courier markup, no depot queues — door-to-door via someone you can track and message. From ${pair.price}.`
             : `Get your package from ${pair.from} to ${pair.to} same-day via a verified BootHop traveller already making the journey — door-to-door in ${pair.time}. From ${pair.price}.`
@@ -198,7 +198,7 @@ export default async function CityRoutePage(
             '🛡️ Insured',
             '✅ ID-verified carriers',
           ].map(tag => (
-            <span key={tag} className="text-sm bg-white/5 border border-white/10 px-4 py-2 rounded-full text-gray-300">{tag}</span>
+            <span key={tag} className="text-sm bg-white border border-slate-200 px-4 py-2 rounded-full text-slate-600 shadow-sm">{tag}</span>
           ))}
         </div>
         <Link
@@ -214,8 +214,8 @@ export default async function CityRoutePage(
       </section>
 
       {/* How it works */}
-      <section className="px-6 py-16 max-w-4xl mx-auto">
-        <h2 className="text-2xl font-bold text-center mb-10">How it works</h2>
+      <section className="px-6 py-16 max-w-4xl mx-auto bg-white">
+        <h2 className="text-2xl font-bold text-center mb-10 text-slate-900">How it works</h2>
         <div className="grid sm:grid-cols-3 gap-6">
           {[
             {
@@ -238,19 +238,19 @@ export default async function CityRoutePage(
                 : `Your package is collected and delivered door-to-door in ${pair.time}. Payment released on delivery.`,
             },
           ].map(({ step, title, desc }) => (
-            <div key={step} className="bg-white/5 border border-white/10 rounded-xl p-6">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mb-4 ${isInternational ? 'bg-amber-500' : 'bg-blue-600'}`}>{step}</div>
-              <h3 className="font-bold text-lg mb-2">{title}</h3>
-              <p className="text-gray-400 text-sm">{desc}</p>
+            <div key={step} className="bg-slate-50 border border-slate-200 rounded-xl p-6">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mb-4 text-white ${isInternational ? 'bg-amber-500' : 'bg-blue-600'}`}>{step}</div>
+              <h3 className="font-bold text-lg mb-2 text-slate-900">{title}</h3>
+              <p className="text-slate-600 text-sm">{desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Why BootHop */}
-      <section className="px-6 py-16 bg-white/[0.02] border-y border-white/5">
+      <section className="px-6 py-16 bg-slate-50 border-y border-slate-100">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-10">Why use BootHop for {pair.from} to {pair.to}?</h2>
+          <h2 className="text-2xl font-bold text-center mb-10 text-slate-900">Why use BootHop for {pair.from} to {pair.to}?</h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {(isInternational ? [
               `No courier company markup — pay the traveller directly`,
@@ -268,8 +268,8 @@ export default async function CityRoutePage(
               'Real-time messaging with your carrier',
             ]).map(point => (
               <div key={point} className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-green-400 shrink-0 mt-0.5" />
-                <span className="text-gray-300 text-sm">{point}</span>
+                <CheckCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                <span className="text-slate-600 text-sm">{point}</span>
               </div>
             ))}
           </div>
@@ -278,8 +278,8 @@ export default async function CityRoutePage(
 
       {/* What can I send? — international only */}
       {isInternational && (
-        <section className="px-6 py-16 max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-10">What can I send from {pair.from} to {pair.to}?</h2>
+        <section className="px-6 py-16 max-w-4xl mx-auto bg-white">
+          <h2 className="text-2xl font-bold text-center mb-10 text-slate-900">What can I send from {pair.from} to {pair.to}?</h2>
           <div className="grid sm:grid-cols-3 gap-4">
             {[
               { emoji: '👗', label: 'Clothes & fashion', desc: 'Send outfits, shoes, bags — anything wearable' },
@@ -289,10 +289,10 @@ export default async function CityRoutePage(
               { emoji: '🍲', label: 'Food items', desc: 'Dry goods, spices, snacks (non-perishable)' },
               { emoji: '📄', label: 'Documents', desc: 'Passports, certificates, legal papers' },
             ].map(({ emoji, label, desc }) => (
-              <div key={label} className="bg-white/5 border border-white/10 rounded-xl p-5">
+              <div key={label} className="bg-slate-50 border border-slate-200 rounded-xl p-5">
                 <div className="text-2xl mb-2">{emoji}</div>
-                <h3 className="font-semibold text-sm mb-1">{label}</h3>
-                <p className="text-gray-400 text-xs">{desc}</p>
+                <h3 className="font-semibold text-sm mb-1 text-slate-900">{label}</h3>
+                <p className="text-slate-600 text-xs">{desc}</p>
               </div>
             ))}
           </div>
@@ -301,14 +301,14 @@ export default async function CityRoutePage(
 
       {/* Related routes */}
       {related.length > 0 && (
-        <section className="px-6 py-16 max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold mb-6">Related delivery routes</h2>
+        <section className="px-6 py-16 max-w-4xl mx-auto bg-slate-50">
+          <h2 className="text-2xl font-bold mb-6 text-slate-900">Related delivery routes</h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {related.map(([slug, p]) => (
               <Link key={slug} href={`/send/${slug}`}
-                className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-4 hover:border-amber-500/50 transition-colors">
-                <span className="font-medium">{p.from} → {p.to}</span>
-                <span className="text-sm text-amber-400">From {p.price} <ArrowRight className="inline h-3 w-3" /></span>
+                className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 hover:border-amber-300 hover:shadow-sm transition-all">
+                <span className="font-medium text-slate-900">{p.from} → {p.to}</span>
+                <span className="text-sm text-amber-600">From {p.price} <ArrowRight className="inline h-3 w-3" /></span>
               </Link>
             ))}
           </div>
@@ -316,9 +316,9 @@ export default async function CityRoutePage(
       )}
 
       {/* CTA */}
-      <section className="px-6 py-20 text-center max-w-2xl mx-auto">
-        <h2 className="text-3xl font-black mb-4">Ready to send from {pair.from} to {pair.to}?</h2>
-        <p className="text-gray-400 mb-8">
+      <section className="px-6 py-20 text-center max-w-2xl mx-auto bg-white">
+        <h2 className="text-3xl font-black mb-4 text-slate-900">Ready to send from {pair.from} to {pair.to}?</h2>
+        <p className="text-slate-600 mb-8">
           {isInternational
             ? 'Find a verified traveller flying this route and send your package today.'
             : 'Browse live carriers already making the journey today.'}

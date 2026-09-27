@@ -19,8 +19,8 @@ export default function CustomsDutiesPage() {
             <span className="text-xl font-bold text-slate-900">BootHop</span>
           </Link>
           <div className="flex items-center gap-6 text-sm font-medium">
-            <Link href="/how-it-works" className="text-slate-500 hover:text-slate-900 transition">How It Works</Link>
-            <Link href="/customs" className="text-slate-500 hover:text-slate-900 transition">Compliance</Link>
+            <Link href="/how-it-works" className="text-slate-600 hover:text-slate-900 transition">How It Works</Link>
+            <Link href="/customs" className="text-slate-600 hover:text-slate-900 transition">Compliance</Link>
             <Link href="/customs/duties" className="text-blue-600 font-semibold">Duties Estimator</Link>
             <Link href="/login" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition">
               Sign In
@@ -30,17 +30,17 @@ export default function CustomsDutiesPage() {
       </nav>
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white py-20 px-6">
+      <div className="bg-gradient-to-br from-blue-50 via-white to-white border-b border-slate-200 py-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1.5 text-blue-300 text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-4 py-1.5 text-blue-700 text-sm font-medium mb-6">
             <Globe className="h-4 w-4" />
             International Shipments Only
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold mb-5 leading-tight">
+          <h1 className="text-4xl sm:text-5xl font-bold mb-5 leading-tight text-slate-900">
             Duties &amp; VAT Estimator
-            <span className="block text-blue-400 mt-1">Know Your Landed Cost</span>
+            <span className="block text-blue-600 mt-1">Know Your Landed Cost</span>
           </h1>
-          <p className="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto">
+          <p className="text-slate-600 text-lg leading-relaxed max-w-2xl mx-auto">
             Get an instant AI-powered estimate of import duties, VAT, and total landed cost
             for your international BootHop shipment — covering UK, EU, Nigeria, UAE, USA and more.
           </p>
@@ -74,7 +74,7 @@ export default function CustomsDutiesPage() {
               </div>
               <div>
                 <p className="font-semibold text-slate-900 text-sm mb-1">{s.title}</p>
-                <p className="text-xs text-slate-500 leading-relaxed">{s.desc}</p>
+                <p className="text-xs text-slate-600 leading-relaxed">{s.desc}</p>
               </div>
             </div>
           ))}
@@ -84,7 +84,7 @@ export default function CustomsDutiesPage() {
         <section>
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Estimate Your Import Costs</h2>
-            <p className="text-slate-500">Enter your item details and international route for an instant estimate.</p>
+            <p className="text-slate-600">Enter your item details and international route for an instant estimate.</p>
           </div>
           <CustomsCalculator />
         </section>
@@ -103,7 +103,7 @@ export default function CustomsDutiesPage() {
                 <p>3. Total Charges = Duty + VAT + Handling</p>
                 <p className="pt-2 font-bold text-blue-700">Landed Cost = Value + Total Charges</p>
               </div>
-              <p className="text-xs text-slate-400 mt-2">
+              <p className="text-xs text-slate-600 mt-2">
                 VAT is applied to the combined value of the goods and import duty — this is the correct HMRC method for UK imports.
               </p>
             </div>
@@ -118,7 +118,7 @@ export default function CustomsDutiesPage() {
                 ].map((d) => (
                   <li key={d.country} className="bg-slate-50 rounded-xl px-4 py-3">
                     <p className="text-sm font-semibold text-slate-800">{d.country} — {d.threshold}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{d.note}</p>
+                    <p className="text-xs text-slate-600 mt-0.5">{d.note}</p>
                   </li>
                 ))}
               </ul>
@@ -145,7 +145,7 @@ export default function CustomsDutiesPage() {
 
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-white mt-6 py-8 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-600">
           <p>&copy; {new Date().getFullYear()} BootHop. All rights reserved.</p>
           <div className="flex items-center gap-5">
             <Link href="/terms"          className="hover:text-slate-900 transition">Terms</Link>

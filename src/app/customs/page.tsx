@@ -140,8 +140,8 @@ export default function CustomsPage() {
             <span className="text-xl font-bold text-slate-900">BootHop</span>
           </Link>
           <div className="flex items-center gap-6 text-sm font-medium">
-            <Link href="/how-it-works" className="text-slate-500 hover:text-slate-900 transition">How It Works</Link>
-            <Link href="/pricing"      className="text-slate-500 hover:text-slate-900 transition">Pricing</Link>
+            <Link href="/how-it-works" className="text-slate-600 hover:text-slate-900 transition">How It Works</Link>
+            <Link href="/pricing"      className="text-slate-600 hover:text-slate-900 transition">Pricing</Link>
             <Link href="/customs"      className="text-blue-600 font-semibold">Customs</Link>
             <Link href="/login"        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition">
               Sign In
@@ -151,17 +151,17 @@ export default function CustomsPage() {
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────────────────── */}
-      <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white py-20 px-6">
+      <div className="bg-gradient-to-br from-blue-50 via-white to-white border-b border-slate-200 py-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1.5 text-blue-300 text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-4 py-1.5 text-blue-700 text-sm font-medium mb-6">
             <ShieldCheck className="h-4 w-4" />
             Powered by BootHop Compliance Engine
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold mb-5 leading-tight">
+          <h1 className="text-4xl sm:text-5xl font-bold mb-5 leading-tight text-slate-900">
             Customs &amp; Declaration
-            <span className="block text-blue-400 mt-1">Know Before You Ship</span>
+            <span className="block text-blue-600 mt-1">Know Before You Ship</span>
           </h1>
-          <p className="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto">
+          <p className="text-slate-600 text-lg leading-relaxed max-w-2xl mx-auto">
             Instantly check whether your item is allowed, restricted, or prohibited at your
             destination — powered by our own real-time compliance engine covering 20 countries.
           </p>
@@ -174,7 +174,7 @@ export default function CustomsPage() {
         <section>
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Item Compliance Checker</h2>
-            <p className="text-slate-500">Enter your item details to get an instant compliance verdict and risk score.</p>
+            <p className="text-slate-600">Enter your item details to get an instant compliance verdict and risk score.</p>
           </div>
 
           <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden max-w-3xl mx-auto">
@@ -237,7 +237,7 @@ export default function CustomsPage() {
                 className={`w-full py-3.5 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 ${
                   canCheck && !loading
                     ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                    : 'bg-slate-100 text-slate-600 cursor-not-allowed'
                 }`}
               >
                 {loading
@@ -246,7 +246,7 @@ export default function CustomsPage() {
               </button>
 
               {!canCheck && (
-                <p className="text-center text-xs text-slate-400">Fill in item, destination country, and declared value to run a check.</p>
+                <p className="text-center text-xs text-slate-600">Fill in item, destination country, and declared value to run a check.</p>
               )}
             </div>
 
@@ -278,7 +278,7 @@ export default function CustomsPage() {
                       <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
                         <Activity className="h-4 w-4" /> Risk Score
                       </div>
-                      <span className="text-2xl font-bold text-slate-900">{result.riskScore}<span className="text-sm text-slate-400 font-normal">/100</span></span>
+                      <span className="text-2xl font-bold text-slate-900">{result.riskScore}<span className="text-sm text-slate-600 font-normal">/100</span></span>
                     </div>
                     <div className="w-full bg-slate-100 rounded-full h-3">
                       <div className={`h-3 rounded-full ${cfg.bar} transition-all`} style={{ width: `${result.riskScore}%` }} />
@@ -293,7 +293,7 @@ export default function CustomsPage() {
                         { label: 'Qty',     v: result.breakdown.quantityScore },
                       ].map((b) => (
                         <div key={b.label} className="bg-slate-50 rounded-lg py-2 border border-slate-100">
-                          <p className="text-xs text-slate-400">{b.label}</p>
+                          <p className="text-xs text-slate-600">{b.label}</p>
                           <p className="text-sm font-bold text-slate-700">+{b.v}</p>
                         </div>
                       ))}
@@ -302,7 +302,7 @@ export default function CustomsPage() {
 
                   {/* Category pill */}
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">Item Category</span>
+                    <span className="text-xs text-slate-600 uppercase tracking-wider font-medium">Item Category</span>
                     <span className="capitalize text-sm font-semibold bg-slate-100 text-slate-700 px-3 py-1 rounded-full">
                       {result.category}
                     </span>
@@ -312,7 +312,7 @@ export default function CustomsPage() {
                   {docs.length > 0 && (
                     <div>
                       <p className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-slate-500" /> Required Documents
+                        <FileText className="h-4 w-4 text-slate-600" /> Required Documents
                       </p>
                       <ul className="space-y-2.5">
                         {docs.map((d) => (
@@ -320,7 +320,7 @@ export default function CustomsPage() {
                             <CheckCircle2 className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
                             <div>
                               <p className="text-sm font-semibold text-slate-800">{d.name}</p>
-                              <p className="text-xs text-slate-500 mt-0.5">{d.desc}</p>
+                              <p className="text-xs text-slate-600 mt-0.5">{d.desc}</p>
                             </div>
                           </li>
                         ))}
@@ -346,7 +346,7 @@ export default function CustomsPage() {
         <section>
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-2">How Our Compliance Engine Works</h2>
-            <p className="text-slate-500">Five factors combine to give every shipment a precise risk score.</p>
+            <p className="text-slate-600">Five factors combine to give every shipment a precise risk score.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {[
@@ -361,7 +361,7 @@ export default function CustomsPage() {
                   {s.icon}
                 </div>
                 <p className="font-semibold text-slate-900 text-sm mb-1">{s.title}</p>
-                <p className="text-xs text-slate-500 leading-relaxed">{s.desc}</p>
+                <p className="text-xs text-slate-600 leading-relaxed">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -371,7 +371,7 @@ export default function CustomsPage() {
         <section>
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Decision Levels</h2>
-            <p className="text-slate-500">Every check returns one of three outcomes.</p>
+            <p className="text-slate-600">Every check returns one of three outcomes.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
@@ -420,7 +420,7 @@ export default function CustomsPage() {
                   {d.icon}
                   <div>
                     <p className={`font-bold text-sm ${d.text}`}>{d.label}</p>
-                    <p className="text-xs text-slate-400">{d.score}</p>
+                    <p className="text-xs text-slate-600">{d.score}</p>
                   </div>
                 </div>
                 <ul className="space-y-2">
@@ -440,7 +440,7 @@ export default function CustomsPage() {
         <section>
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Country Risk Tiers</h2>
-            <p className="text-slate-500">Click any country to see its restrictions.</p>
+            <p className="text-slate-600">Click any country to see its restrictions.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {countries.map((c) => {
@@ -453,14 +453,14 @@ export default function CustomsPage() {
                     className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-slate-50 transition"
                   >
                     <div className="flex items-center gap-3">
-                      <Globe className="h-4 w-4 text-slate-400 flex-shrink-0" />
+                      <Globe className="h-4 w-4 text-slate-600 flex-shrink-0" />
                       <span className="text-sm font-semibold text-slate-800">{c}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${tierColor[tier]}`}>
                         {tierLabel[tier]}
                       </span>
-                      {isOpen ? <ChevronUp className="h-3.5 w-3.5 text-slate-400" /> : <ChevronDown className="h-3.5 w-3.5 text-slate-400" />}
+                      {isOpen ? <ChevronUp className="h-3.5 w-3.5 text-slate-600" /> : <ChevronDown className="h-3.5 w-3.5 text-slate-600" />}
                     </div>
                   </button>
                   {isOpen && (
@@ -558,13 +558,13 @@ export default function CustomsPage() {
             </Link>
             <Link
               href="/how-it-works"
-              className="border border-white/40 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition"
+              className="border border-white/40 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white transition"
             >
               How It Works
             </Link>
             <Link
               href="/customs/duties"
-              className="border border-white/40 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition"
+              className="border border-white/40 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white transition"
             >
               Estimate Duties &amp; VAT
             </Link>
@@ -575,7 +575,7 @@ export default function CustomsPage() {
 
       {/* ── Footer ─────────────────────────────────────────────────────── */}
       <footer className="border-t border-slate-200 bg-white mt-6 py-8 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-600">
           <p>© {new Date().getFullYear()} BootHop. All rights reserved.</p>
           <div className="flex items-center gap-5">
             <Link href="/terms"   className="hover:text-slate-900 transition">Terms</Link>

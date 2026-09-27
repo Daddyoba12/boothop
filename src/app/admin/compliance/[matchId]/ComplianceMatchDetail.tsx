@@ -151,7 +151,7 @@ const EVENT_STYLES: Record<string, string> = {
 };
 
 const riskColor = (score: number | null) => {
-  if (!score) return 'text-slate-500 bg-slate-100';
+  if (!score) return 'text-slate-600 bg-slate-100';
   if (score >= 80) return 'text-red-700 bg-red-100';
   if (score >= 50) return 'text-amber-700 bg-amber-100';
   return 'text-green-700 bg-green-100';
@@ -160,7 +160,7 @@ const riskColor = (score: number | null) => {
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
-      <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">{label}</p>
+      <p className="text-xs text-slate-600 uppercase tracking-wider mb-1">{label}</p>
       <p className="text-slate-700 font-medium">{value ?? '—'}</p>
     </div>
   );
@@ -234,12 +234,12 @@ export default function ComplianceMatchDetail({
       <div className="bg-white border-b border-slate-200 px-6 py-5">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Link href="/admin/compliance" className="text-slate-400 hover:text-slate-700">
+            <Link href="/admin/compliance" className="text-slate-600 hover:text-slate-700">
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>
               <h1 className="text-lg font-bold text-slate-900">{fromCity} → {toCity}</h1>
-              <p className="text-sm text-slate-500">Match {match.id.slice(0, 8)}… · {match.status.replace(/_/g, ' ')}</p>
+              <p className="text-sm text-slate-600">Match {match.id.slice(0, 8)}… · {match.status.replace(/_/g, ' ')}</p>
             </div>
           </div>
           {declaration?.risk_score != null && (
@@ -257,14 +257,14 @@ export default function ComplianceMatchDetail({
           <div className="bg-white border border-slate-200 rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-2">
               <User className="h-4 w-4 text-blue-500" />
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Sender (Hooper)</span>
+              <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Sender (Hooper)</span>
             </div>
             <p className="font-semibold text-slate-800">{match.sender_email}</p>
           </div>
           <div className="bg-white border border-slate-200 rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-2">
               <Plane className="h-4 w-4 text-indigo-500" />
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Carrier (Booter)</span>
+              <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Carrier (Booter)</span>
             </div>
             <p className="font-semibold text-slate-800">{match.traveler_email}</p>
           </div>
@@ -279,7 +279,7 @@ export default function ComplianceMatchDetail({
             'bg-green-50 border-green-200'
           }`}>
             <div className="flex items-center gap-3 mb-3">
-              <Shield className="h-4 w-4 text-slate-500" />
+              <Shield className="h-4 w-4 text-slate-600" />
               <span className="font-semibold text-slate-800">Risk Assessment</span>
               <span className={`ml-auto text-xs font-bold px-3 py-1 rounded-full border ${
                 RISK_CLASS_STYLES[riskAssessment.risk_classification] ?? 'bg-slate-100 text-slate-600 border-slate-200'
@@ -311,7 +311,7 @@ export default function ComplianceMatchDetail({
             )}
 
             {Object.keys(riskAssessment.breakdown).length > 0 && (
-              <div className="text-xs text-slate-500 space-x-2">
+              <div className="text-xs text-slate-600 space-x-2">
                 <span className="font-semibold">Breakdown:</span>
                 {Object.entries(riskAssessment.breakdown).map(([k, v]) => (
                   <span key={k}>{k.replace(/_/g, ' ')}: +{v}</span>
@@ -319,7 +319,7 @@ export default function ComplianceMatchDetail({
               </div>
             )}
 
-            <p className="text-xs text-slate-400 mt-2">
+            <p className="text-xs text-slate-600 mt-2">
               Assessed {new Date(riskAssessment.assessed_at).toLocaleString('en-GB')} by risk engine
             </p>
           </div>
@@ -330,9 +330,9 @@ export default function ComplianceMatchDetail({
           <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-slate-400" />
+                <FileText className="h-4 w-4 text-slate-600" />
                 <span className="font-semibold text-slate-800">Item Declaration</span>
-                <span className="text-xs text-slate-400">v{declaration.version}</span>
+                <span className="text-xs text-slate-600">v{declaration.version}</span>
                 {declaration.declaration_text_version && (
                   <span className="text-xs text-slate-300">· form {declaration.declaration_text_version}</span>
                 )}
@@ -373,14 +373,14 @@ export default function ComplianceMatchDetail({
 
             {/* Description */}
             <div className="px-5 py-5 border-b border-slate-100">
-              <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">Detailed description</p>
+              <p className="text-xs text-slate-600 uppercase tracking-wider mb-2">Detailed description</p>
               <p className="text-slate-800 leading-relaxed whitespace-pre-wrap">{declaration.item_description || '—'}</p>
             </div>
 
             {/* Proof of ownership */}
             {(declaration.proof_of_ownership_url || declaration.proof_of_ownership_explanation) && (
               <div className="px-5 py-5 border-b border-slate-100 space-y-2">
-                <p className="text-xs text-slate-400 uppercase tracking-wider">Proof of ownership</p>
+                <p className="text-xs text-slate-600 uppercase tracking-wider">Proof of ownership</p>
                 {declaration.proof_of_ownership_url && (
                   <a
                     href={declaration.proof_of_ownership_url}
@@ -402,7 +402,7 @@ export default function ComplianceMatchDetail({
 
             {/* Content flags + item modified */}
             <div className="px-5 py-5 border-b border-slate-100">
-              <p className="text-xs text-slate-400 uppercase tracking-wider mb-3">Contents declared</p>
+              <p className="text-xs text-slate-600 uppercase tracking-wider mb-3">Contents declared</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
                 {CONTENT_FLAGS.map(({ key, label, level }) => {
                   const ticked = declaration[key] as boolean;
@@ -437,7 +437,7 @@ export default function ComplianceMatchDetail({
             {/* Acknowledgements */}
             <div className="px-5 py-5 border-b border-slate-100">
               <div className="flex items-center gap-2 mb-3">
-                <p className="text-xs text-slate-400 uppercase tracking-wider">Sender acknowledgements</p>
+                <p className="text-xs text-slate-600 uppercase tracking-wider">Sender acknowledgements</p>
                 {allAcksChecked
                   ? <span className="text-xs text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded-full">All signed</span>
                   : <span className="text-xs text-red-600 font-semibold bg-red-50 px-2 py-0.5 rounded-full">Incomplete</span>
@@ -450,7 +450,7 @@ export default function ComplianceMatchDetail({
                     <div key={key} className={`flex items-center gap-2 text-sm ${checked ? 'text-slate-600' : 'text-red-500 font-medium'}`}>
                       {checked
                         ? <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
-                        : <XCircle className="h-4 w-4 text-red-400 shrink-0" />
+                        : <XCircle className="h-4 w-4 text-red-600 shrink-0" />
                       }
                       {text}
                     </div>
@@ -475,7 +475,7 @@ export default function ComplianceMatchDetail({
             )}
           </div>
         ) : (
-          <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-400">
+          <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-600">
             <Clock className="h-8 w-8 mx-auto mb-3 opacity-40" />
             <p className="font-medium">Declaration not yet submitted</p>
             <p className="text-sm mt-1">The sender has been emailed to complete it within 48 hours of payment confirmation.</p>
@@ -486,9 +486,9 @@ export default function ComplianceMatchDetail({
         {evidence.length > 0 && (
           <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
-              <Image className="h-4 w-4 text-slate-400" />
+              <Image className="h-4 w-4 text-slate-600" />
               <span className="font-semibold text-slate-800">Evidence</span>
-              <span className="text-xs text-slate-400">{evidence.length} file{evidence.length !== 1 ? 's' : ''}</span>
+              <span className="text-xs text-slate-600">{evidence.length} file{evidence.length !== 1 ? 's' : ''}</span>
             </div>
             <div className="p-5 grid sm:grid-cols-2 gap-3">
               {evidence.map((e) => {
@@ -505,7 +505,7 @@ export default function ComplianceMatchDetail({
                     <div className="px-4 py-3 flex items-center justify-between gap-3">
                       <div>
                         <p className="text-sm font-medium text-slate-700 capitalize">{e.evidence_type.replace(/_/g, ' ')}</p>
-                        <p className="text-xs text-slate-400">{new Date(e.created_at).toLocaleString('en-GB')}</p>
+                        <p className="text-xs text-slate-600">{new Date(e.created_at).toLocaleString('en-GB')}</p>
                       </div>
                       {e.signed_url && (
                         <a
@@ -549,10 +549,10 @@ export default function ComplianceMatchDetail({
                 disabled={!!acting || !canApprove}
                 title={!allAcksChecked ? 'Cannot approve — sender acknowledgements are incomplete' : undefined}
                 onClick={() => decide('approve')}
-                className="flex-1 flex items-center justify-center gap-2 py-3 font-semibold text-white bg-green-600 hover:bg-green-700 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 py-3 font-semibold text-slate-900 bg-green-600 hover:bg-green-700 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {acting === 'approve'
-                  ? <span className="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  ? <span className="h-4 w-4 border-2 border-slate-300 border-t-white rounded-full animate-spin" />
                   : <CheckCircle2 className="h-4 w-4" />}
                 Approve for inspection
               </button>
@@ -570,10 +570,10 @@ export default function ComplianceMatchDetail({
               <button
                 disabled={!!acting}
                 onClick={() => decide('reject')}
-                className="flex-1 flex items-center justify-center gap-2 py-3 font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 py-3 font-semibold text-slate-900 bg-red-600 hover:bg-red-700 rounded-xl transition disabled:opacity-50"
               >
                 {acting === 'reject'
-                  ? <span className="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  ? <span className="h-4 w-4 border-2 border-slate-300 border-t-white rounded-full animate-spin" />
                   : <XCircle className="h-4 w-4" />}
                 Reject — issue refund
               </button>
@@ -595,7 +595,7 @@ export default function ComplianceMatchDetail({
           <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100">
               <span className="font-semibold text-slate-800">Chain of Custody</span>
-              <span className="ml-2 text-xs text-slate-400">{events.length} events</span>
+              <span className="ml-2 text-xs text-slate-600">{events.length} events</span>
             </div>
             <div className="divide-y divide-slate-100">
               {events.map((e) => {
@@ -613,7 +613,7 @@ export default function ComplianceMatchDetail({
                       {e.event_type.replace(/_/g, ' ')}
                     </div>
                     <div className="flex-1 min-w-0 space-y-1">
-                      <p className="text-xs text-slate-500">{e.performed_by}</p>
+                      <p className="text-xs text-slate-600">{e.performed_by}</p>
 
                       {/* INSPECTION_FAILED: show failure_reason badge */}
                       {e.event_type === 'INSPECTION_FAILED' && failureReason && (
@@ -637,7 +637,7 @@ export default function ComplianceMatchDetail({
                           <span className="text-xs font-semibold px-2 py-0.5 rounded-full border bg-green-50 border-green-300 text-green-800">
                             CLEARED — risk engine
                           </span>
-                          <span className="text-xs text-slate-500 font-medium">
+                          <span className="text-xs text-slate-600 font-medium">
                             No physical inspection — relies on declaration + risk score only
                           </span>
                         </div>
@@ -660,12 +660,12 @@ export default function ComplianceMatchDetail({
                               : 'risk engine'}
                           </span>
                           {evReason && (
-                            <span className="text-xs text-slate-400 truncate">{evReason.replace(/_/g, ' ')}</span>
+                            <span className="text-xs text-slate-600 truncate">{evReason.replace(/_/g, ' ')}</span>
                           )}
                         </div>
                       )}
                     </div>
-                    <p className="text-xs text-slate-400 shrink-0">
+                    <p className="text-xs text-slate-600 shrink-0">
                       {new Date(e.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>

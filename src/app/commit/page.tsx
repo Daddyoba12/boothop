@@ -203,84 +203,84 @@ function CommitContent() {
     : '';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white">
+    <div className="min-h-screen bg-white text-slate-900">
       <NavBar />
 
       <main className="max-w-2xl mx-auto px-4 pt-28 pb-24">
 
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 rounded-full px-5 py-2 mb-4">
-            <Scale className="w-4 h-4 text-blue-400" />
-            <span className="text-sm text-blue-300 font-medium">Step 3 of 7 — Terms & Conditions</span>
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-5 py-2 mb-4">
+            <Scale className="w-4 h-4 text-blue-600" />
+            <span className="text-sm text-blue-700 font-medium">Step 3 of 7 — Terms & Conditions</span>
           </div>
-          <h1 className="text-3xl font-black mb-2">Read & Accept Terms</h1>
-          <p className="text-slate-400">Both parties must accept before proceeding to identity verification.</p>
+          <h1 className="text-3xl font-black mb-2 text-slate-900">Read & Accept Terms</h1>
+          <p className="text-slate-600">Both parties must accept before proceeding to identity verification.</p>
         </div>
 
         {loading && (
           <div className="flex justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
+            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
           </div>
         )}
 
         {error && (
-          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center">
-            <AlertTriangle className="w-8 h-8 text-red-400 mx-auto mb-3" />
-            <p className="text-red-300">{error}</p>
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
+            <AlertTriangle className="w-8 h-8 text-red-500 mx-auto mb-3" />
+            <p className="text-red-600">{error}</p>
           </div>
         )}
 
         {waitingOther && (
-          <div className="rounded-2xl border border-green-500/30 bg-green-500/10 p-8 text-center">
-            <CheckCircle className="w-10 h-10 text-green-400 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-white mb-2">Terms accepted!</h2>
-            <p className="text-slate-300">We are waiting for the other party to accept. You will receive an email as soon as they do, and we will send you straight to identity verification.</p>
+          <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center">
+            <CheckCircle className="w-10 h-10 text-green-500 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Terms accepted!</h2>
+            <p className="text-slate-600">We are waiting for the other party to accept. You will receive an email as soon as they do, and we will send you straight to identity verification.</p>
           </div>
         )}
 
         {!loading && !error && match && !waitingOther && (
           <>
             {/* Match summary — read only */}
-            <div className="rounded-2xl border border-white/10 bg-slate-800/50 p-6 mb-6">
-              <p className="text-xs text-slate-400 uppercase font-semibold tracking-widest mb-3">Your Match (cannot be amended)</p>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 mb-6">
+              <p className="text-xs text-slate-600 uppercase font-semibold tracking-widest mb-3">Your Match (cannot be amended)</p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-slate-500 mb-1">Route</p>
-                  <p className="font-bold text-white">{fromCity} → {toCity}</p>
+                  <p className="text-xs text-slate-600 mb-1">Route</p>
+                  <p className="font-bold text-slate-900">{fromCity} → {toCity}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 mb-1">Travel Date</p>
-                  <p className="font-bold text-white">{dateStr}</p>
+                  <p className="text-xs text-slate-600 mb-1">Travel Date</p>
+                  <p className="font-bold text-slate-900">{dateStr}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 mb-1">Agreed Price</p>
-                  <p className="text-2xl font-black text-blue-400">£{Number(agreedPrice).toFixed(2)}</p>
+                  <p className="text-xs text-slate-600 mb-1">Agreed Price</p>
+                  <p className="text-2xl font-black text-blue-600">£{Number(agreedPrice).toFixed(2)}</p>
                 </div>
               </div>
             </div>
 
             {/* Customs duty notice */}
-            <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-5 mb-6">
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 mb-6">
               <div className="flex gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-bold text-amber-300 mb-1">Sender — Customs Duties Notice</p>
-                  <p className="text-sm text-amber-200/80">
-                    As the Sender, you are <strong className="text-amber-300">solely responsible</strong> for all customs duties, import taxes, and compliance with the laws of both the origin and destination country. BootHop does not assume any liability for customs-related charges or seizures.
+                  <p className="font-bold text-amber-800 mb-1">Sender — Customs Duties Notice</p>
+                  <p className="text-sm text-amber-700">
+                    As the Sender, you are <strong className="text-amber-800">solely responsible</strong> for all customs duties, import taxes, and compliance with the laws of both the origin and destination country. BootHop does not assume any liability for customs-related charges or seizures.
                   </p>
                 </div>
               </div>
             </div>
 
             {/* Prohibited items links */}
-            <div className="rounded-2xl border border-slate-600/40 bg-slate-800/40 p-5 mb-6">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 mb-6">
               <div className="flex gap-3 mb-3">
-                <ShieldCheck className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                <p className="font-bold text-white">Check Prohibited Items for Your Route</p>
+                <ShieldCheck className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <p className="font-bold text-slate-900">Check Prohibited Items for Your Route</p>
               </div>
-              <p className="text-sm text-slate-400 mb-4">
-                Before accepting, you must ensure all items comply with customs regulations for <strong className="text-white">{fromCity} → {toCity}</strong>. Use the official government links below:
+              <p className="text-sm text-slate-600 mb-4">
+                Before accepting, you must ensure all items comply with customs regulations for <strong className="text-slate-900">{fromCity} → {toCity}</strong>. Use the official government links below:
               </p>
               <div className="flex flex-col gap-2">
                 {prohibitedLinks.map(link => (
@@ -289,7 +289,7 @@ function CommitContent() {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors"
+                    className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 underline underline-offset-2 transition-colors"
                   >
                     <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
                     {link.label}
@@ -299,19 +299,19 @@ function CommitContent() {
             </div>
 
             {/* Full T&C */}
-            <div className="rounded-2xl border border-white/10 bg-slate-900/60 mb-6 overflow-hidden">
-              <div className="bg-slate-800/80 px-6 py-4 border-b border-white/10">
-                <p className="font-black text-white text-lg">BOOTHOP LIMITED — TERMS & CONDITIONS</p>
-                <p className="text-xs text-slate-400 mt-1">BootHop Limited (Subsidiary of OTB-MIDAS Limited) · Effective: 07 April 2025 · boothop.com</p>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 mb-6 overflow-hidden">
+              <div className="bg-slate-100 px-6 py-4 border-b border-slate-200">
+                <p className="font-black text-slate-900 text-lg">BOOTHOP LIMITED — TERMS & CONDITIONS</p>
+                <p className="text-xs text-slate-600 mt-1">BootHop Limited (Subsidiary of OTB-MIDAS Limited) · Effective: 07 April 2025 · boothop.com</p>
               </div>
-              <div className="px-6 py-5 max-h-96 overflow-y-auto space-y-5 scrollbar-thin scrollbar-thumb-slate-600">
+              <div className="px-6 py-5 max-h-96 overflow-y-auto space-y-5 scrollbar-thin scrollbar-thumb-slate-300">
                 {TC_SECTIONS.map(section => (
                   <div key={section.title}>
-                    <p className="font-bold text-white mb-2 text-sm">{section.title}</p>
+                    <p className="font-bold text-slate-900 mb-2 text-sm">{section.title}</p>
                     <ul className="space-y-1.5">
                       {section.content.map((line, i) => (
-                        <li key={i} className="text-sm text-slate-300 leading-relaxed flex gap-2">
-                          <span className="text-slate-500 flex-shrink-0">•</span>
+                        <li key={i} className="text-sm text-slate-600 leading-relaxed flex gap-2">
+                          <span className="text-slate-600 flex-shrink-0">•</span>
                           <span>{line}</span>
                         </li>
                       ))}
@@ -320,9 +320,9 @@ function CommitContent() {
                 ))}
 
                 {/* Critical clause */}
-                <div className="rounded-xl border border-red-500/40 bg-red-500/10 p-4 mt-4">
-                  <p className="text-sm font-bold text-red-300 mb-1">CRITICAL CLAUSE</p>
-                  <p className="text-sm text-red-200/80 italic">
+                <div className="rounded-xl border border-red-200 bg-red-50 p-4 mt-4">
+                  <p className="text-sm font-bold text-red-700 mb-1">CRITICAL CLAUSE</p>
+                  <p className="text-sm text-red-600 italic">
                     "I confirm that I have inspected (or presented for inspection) all items, that no prohibited goods are included, and that I accept full legal responsibility for any breach of applicable laws."
                   </p>
                 </div>
@@ -330,7 +330,7 @@ function CommitContent() {
             </div>
 
             {/* Checkbox */}
-            <label className="flex gap-4 items-start cursor-pointer rounded-2xl border border-white/15 bg-slate-800/50 hover:border-blue-500/50 transition-colors p-5 mb-6">
+            <label className="flex gap-4 items-start cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 hover:border-blue-300 transition-colors p-5 mb-6">
               <div className="relative flex-shrink-0 mt-0.5">
                 <input
                   type="checkbox"
@@ -338,17 +338,17 @@ function CommitContent() {
                   onChange={e => setChecked(e.target.checked)}
                   className="sr-only"
                 />
-                <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${checked ? 'bg-blue-600 border-blue-600' : 'border-slate-500 bg-slate-800'}`}>
+                <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${checked ? 'bg-blue-600 border-blue-600' : 'border-slate-300 bg-white'}`}>
                   {checked && <CheckCircle className="w-4 h-4 text-white" />}
                 </div>
               </div>
-              <p className="text-sm text-slate-200 leading-relaxed">
-                I confirm I have <strong className="text-white">read and understood</strong> the BootHop Terms & Conditions above. I confirm I am responsible for customs duties, I have checked the prohibited items list for my route, and I accept full legal responsibility for the contents of the goods involved in this transaction.
+              <p className="text-sm text-slate-600 leading-relaxed">
+                I confirm I have <strong className="text-slate-900">read and understood</strong> the BootHop Terms & Conditions above. I confirm I am responsible for customs duties, I have checked the prohibited items list for my route, and I accept full legal responsibility for the contents of the goods involved in this transaction.
               </p>
             </label>
 
             {!checked && (
-              <p className="text-center text-sm text-amber-400 mb-4">You must tick the checkbox above to continue.</p>
+              <p className="text-center text-sm text-amber-600 mb-4">You must tick the checkbox above to continue.</p>
             )}
 
             <button

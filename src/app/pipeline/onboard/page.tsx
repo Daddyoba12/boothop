@@ -7,8 +7,8 @@ import BootHopLogo from '@/components/BootHopLogo';
 
 type Step = 'form' | 'success';
 
-const inputClass = "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:border-blue-400/40 transition-all text-sm";
-const labelClass = "block text-xs font-medium text-white/50 mb-1.5";
+const inputClass = "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:border-blue-400 transition-all text-sm";
+const labelClass = "block text-xs font-medium text-slate-600 mb-1.5";
 
 export default function PipelineOnboardPage() {
   const [step, setStep] = useState<Step>('form');
@@ -54,13 +54,13 @@ export default function PipelineOnboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#07111f] text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
 
       {/* Nav */}
-      <nav className="border-b border-white/8 bg-[#07111f]/90 backdrop-blur-xl">
+      <nav className="border-b border-slate-200 bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
           <Link href="/"><BootHopLogo size="md" /></Link>
-          <Link href="/" className="text-sm text-white/40 hover:text-white transition-colors">← Back to BootHop</Link>
+          <Link href="/" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">← Back to BootHop</Link>
         </div>
       </nav>
 
@@ -68,12 +68,12 @@ export default function PipelineOnboardPage() {
 
         {step === 'success' ? (
           <div className="text-center py-12">
-            <div className="w-16 h-16 rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="h-8 w-8 text-green-400" />
+            <div className="w-16 h-16 rounded-full bg-green-100 border border-green-200 flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
-            <h1 className="text-3xl font-semibold text-white mb-3">You&apos;re on the list</h1>
-            <p className="text-white/50 text-base mb-2">We&apos;ve received your details for <strong className="text-white">{form.businessName}</strong>.</p>
-            <p className="text-white/40 text-sm mb-10">We&apos;ll be in touch within 24 hours to get your content pipeline set up.</p>
+            <h1 className="text-3xl font-semibold text-slate-900 mb-3">You&apos;re on the list</h1>
+            <p className="text-slate-600 text-base mb-2">We&apos;ve received your details for <strong className="text-slate-900">{form.businessName}</strong>.</p>
+            <p className="text-slate-600 text-sm mb-10">We&apos;ll be in touch within 24 hours to get your content pipeline set up.</p>
             <Link href="/" className="inline-flex items-center gap-2 rounded-full bg-blue-500 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-400 transition-all">
               Back to BootHop <ArrowRight className="h-4 w-4" />
             </Link>
@@ -82,13 +82,13 @@ export default function PipelineOnboardPage() {
           <>
             {/* Header */}
             <div className="mb-10">
-              <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/25 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold text-blue-300 mb-5">
+              <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-xs font-semibold text-blue-700 mb-5">
                 <Video className="h-3.5 w-3.5" /> BootHop Content Pipeline
               </div>
-              <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-tight mb-3">
+              <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 tracking-tight mb-3">
                 Get your business posting every day.
               </h1>
-              <p className="text-white/50 text-base leading-relaxed">
+              <p className="text-slate-600 text-base leading-relaxed">
                 Fill in the details below and we&apos;ll set up a fully automated TikTok &amp; Instagram content pipeline for your business — delivering videos to you daily.
               </p>
             </div>
@@ -100,16 +100,16 @@ export default function PipelineOnboardPage() {
                 { icon: <Zap className="h-4 w-4" />, label: 'Auto-posted', sub: 'Or sent to Telegram' },
                 { icon: <Globe className="h-4 w-4" />, label: 'Your brand', sub: 'Custom hooks & voice' },
               ].map(({ icon, label, sub }) => (
-                <div key={label} className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center">
-                  <div className="flex justify-center mb-2 text-blue-400">{icon}</div>
-                  <p className="text-white text-xs font-semibold">{label}</p>
-                  <p className="text-white/35 text-[10px] mt-0.5">{sub}</p>
+                <div key={label} className="rounded-xl border border-slate-200 bg-white p-4 text-center">
+                  <div className="flex justify-center mb-2 text-blue-500">{icon}</div>
+                  <p className="text-slate-900 text-xs font-semibold">{label}</p>
+                  <p className="text-slate-600 text-[10px] mt-0.5">{sub}</p>
                 </div>
               ))}
             </div>
 
             {/* Form */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8 space-y-5">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 space-y-5">
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -157,15 +157,15 @@ export default function PipelineOnboardPage() {
               <div>
                 <label className={labelClass}>Posts per day</label>
                 <select value={form.postsPerDay} onChange={set('postsPerDay')} className={inputClass}>
-                  <option value="1-2" className="bg-slate-900">1–2 posts/day</option>
-                  <option value="2-3" className="bg-slate-900">2–3 posts/day</option>
-                  <option value="3-5" className="bg-slate-900">3–5 posts/day</option>
-                  <option value="5+" className="bg-slate-900">5+ posts/day</option>
+                  <option value="1-2" className="bg-white">1–2 posts/day</option>
+                  <option value="2-3" className="bg-white">2–3 posts/day</option>
+                  <option value="3-5" className="bg-white">3–5 posts/day</option>
+                  <option value="5+" className="bg-white">5+ posts/day</option>
                 </select>
               </div>
 
-              <div className="border-t border-white/8 pt-5 space-y-4">
-                <p className="text-xs font-semibold text-white/40 uppercase tracking-wider">Contact details</p>
+              <div className="border-t border-slate-100 pt-5 space-y-4">
+                <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Contact details</p>
                 <div>
                   <label className={labelClass}>Email address *</label>
                   <input type="email" value={form.email} onChange={set('email')} placeholder="your@email.com" className={inputClass} />
@@ -182,13 +182,13 @@ export default function PipelineOnboardPage() {
                 </div>
               </div>
 
-              {error && <p className="text-sm text-red-400">{error}</p>}
+              {error && <p className="text-sm text-red-500">{error}</p>}
 
               <button onClick={handleSubmit} disabled={submitting}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-500 py-4 text-sm font-bold text-white hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)] transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-500 py-4 text-sm font-bold text-white hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.3)] transition-all disabled:opacity-60 disabled:cursor-not-allowed">
                 {submitting ? 'Sending...' : <>Submit — Get me set up <ArrowRight className="h-4 w-4" /></>}
               </button>
-              <p className="text-center text-xs text-white/25">We&apos;ll review your details and get back to you within 24 hours.</p>
+              <p className="text-center text-xs text-slate-600">We&apos;ll review your details and get back to you within 24 hours.</p>
             </div>
           </>
         )}

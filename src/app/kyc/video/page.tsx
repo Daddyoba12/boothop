@@ -156,43 +156,41 @@ function VideoKYCInner() {
   useEffect(() => () => stopStream(), []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(139,92,246,0.06),transparent_35%)]" />
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <NavBar />
 
       <div className="relative pt-28 pb-20 px-6 max-w-xl mx-auto">
 
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-violet-500/15 border border-violet-500/25 rounded-full px-4 py-2 mb-5 backdrop-blur-sm">
-            <Shield className="h-4 w-4 text-violet-400" />
-            <span className="text-sm text-violet-300 font-semibold">Identity Verification</span>
+          <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-200 rounded-full px-4 py-2 mb-5">
+            <Shield className="h-4 w-4 text-violet-600" />
+            <span className="text-sm text-violet-700 font-semibold">Identity Verification</span>
           </div>
           <h1 className="text-4xl font-black mb-3">Video ID Check</h1>
-          <p className="text-slate-400 text-base max-w-sm mx-auto leading-relaxed">
+          <p className="text-slate-600 text-base max-w-sm mx-auto leading-relaxed">
             Record a short clip saying your name so we can confirm your identity against your registered ID.
           </p>
         </div>
 
         {/* ── INTRO ── */}
         {phase === 'intro' && (
-          <div className="relative overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm p-8 space-y-6">
-            <div className="absolute -top-8 -right-8 w-32 h-32 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)] p-8 space-y-6">
 
             {/* Steps */}
             <div className="space-y-4">
               {[
-                { icon: <Video className="h-5 w-5 text-violet-400" />, grad: 'from-violet-500 to-purple-400', title: 'Record a 20-second video', desc: 'Look into the camera and clearly say: "My name is [Your Full Name]"' },
-                { icon: <Camera className="h-5 w-5 text-blue-400" />,  grad: 'from-blue-500 to-cyan-400',    title: 'Take a photo snapshot',   desc: 'We capture a clear still from your video to compare with your ID' },
-                { icon: <Upload className="h-5 w-5 text-emerald-400" />, grad: 'from-emerald-500 to-teal-400', title: 'Submit for review',       desc: 'Our team verifies the match within a few hours. Valid for 30 days.' },
+                { icon: <Video className="h-5 w-5 text-violet-600" />, grad: 'from-violet-500 to-purple-400', title: 'Record a 20-second video', desc: 'Look into the camera and clearly say: "My name is [Your Full Name]"' },
+                { icon: <Camera className="h-5 w-5 text-blue-600" />,  grad: 'from-blue-500 to-cyan-400',    title: 'Take a photo snapshot',   desc: 'We capture a clear still from your video to compare with your ID' },
+                { icon: <Upload className="h-5 w-5 text-emerald-600" />, grad: 'from-emerald-500 to-teal-400', title: 'Submit for review',       desc: 'Our team verifies the match within a few hours. Valid for 30 days.' },
               ].map((s, i) => (
                 <div key={i} className="flex items-start gap-4">
                   <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.grad} flex items-center justify-center shadow-lg flex-shrink-0 mt-0.5`}>
                     {s.icon}
                   </div>
                   <div>
-                    <p className="font-bold text-white text-sm">{s.title}</p>
-                    <p className="text-slate-400 text-xs mt-0.5 leading-relaxed">{s.desc}</p>
+                    <p className="font-bold text-slate-900 text-sm">{s.title}</p>
+                    <p className="text-slate-600 text-xs mt-0.5 leading-relaxed">{s.desc}</p>
                   </div>
                 </div>
               ))}
@@ -200,21 +198,21 @@ function VideoKYCInner() {
 
             {/* Name input */}
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Your full name (as on your ID)</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Your full name (as on your ID)</label>
               <input
                 type="text"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 placeholder="e.g. John Adebayo Smith"
-                className="w-full py-3 px-4 rounded-xl border border-slate-700/50 bg-slate-800/50 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-violet-500/70 transition text-sm"
+                className="w-full py-3 px-4 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-violet-500/50 transition text-sm"
               />
-              <p className="text-xs text-slate-500 mt-1">Say exactly this name in your video recording.</p>
+              <p className="text-xs text-slate-600 mt-1">Say exactly this name in your video recording.</p>
             </div>
 
             <button
               onClick={startCamera}
               disabled={!userName.trim()}
-              className="group w-full flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-500 text-white font-bold py-4 rounded-xl hover:shadow-xl hover:shadow-violet-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group w-full flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-500 text-white font-bold py-4 rounded-xl hover:shadow-xl hover:shadow-violet-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Video className="h-5 w-5 group-hover:animate-pulse" />
               Start camera
@@ -257,9 +255,9 @@ function VideoKYCInner() {
 
             {/* Script reminder */}
             {phase === 'recording' && (
-              <div className="rounded-2xl border border-violet-500/25 bg-violet-500/10 px-5 py-4 text-center">
-                <p className="text-violet-300 text-sm font-semibold">Say aloud clearly:</p>
-                <p className="text-white text-lg font-black mt-1">&quot;My name is {userName}&quot;</p>
+              <div className="rounded-2xl border border-violet-200 bg-violet-50 px-5 py-4 text-center">
+                <p className="text-violet-700 text-sm font-semibold">Say aloud clearly:</p>
+                <p className="text-slate-900 text-lg font-black mt-1">&quot;My name is {userName}&quot;</p>
               </div>
             )}
 
@@ -284,16 +282,16 @@ function VideoKYCInner() {
               <video src={videoUrl!} controls className="w-full aspect-video bg-black" />
             </div>
 
-            <div className="rounded-2xl border border-blue-500/25 bg-blue-500/10 px-5 py-4 flex items-start gap-3">
-              <Camera className="h-5 w-5 text-blue-400 mt-0.5 shrink-0" />
+            <div className="rounded-2xl border border-blue-200 bg-blue-50 px-5 py-4 flex items-start gap-3">
+              <Camera className="h-5 w-5 text-blue-600 mt-0.5 shrink-0" />
               <div>
-                <p className="text-white font-semibold text-sm">Now take your photo</p>
-                <p className="text-slate-400 text-xs mt-0.5">Position your face clearly in frame, then click the button below.</p>
+                <p className="text-slate-900 font-semibold text-sm">Now take your photo</p>
+                <p className="text-slate-600 text-xs mt-0.5">Position your face clearly in frame, then click the button below.</p>
               </div>
             </div>
 
             {/* Live camera for photo */}
-            <div className="relative rounded-2xl overflow-hidden border border-slate-700/50 aspect-video bg-black">
+            <div className="relative rounded-2xl overflow-hidden border border-slate-200 aspect-video bg-black">
               <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover scale-x-[-1]" />
               {/* Re-open stream if it was stopped */}
               {!streamRef.current && (
@@ -309,12 +307,12 @@ function VideoKYCInner() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <button onClick={retake} className="flex items-center justify-center gap-2 border border-slate-700/50 text-slate-300 hover:bg-slate-800 py-3 rounded-xl transition text-sm font-semibold">
+              <button onClick={retake} className="flex items-center justify-center gap-2 border border-slate-200 text-slate-600 hover:bg-slate-50 py-3 rounded-xl transition text-sm font-semibold">
                 <RotateCcw className="h-4 w-4" /> Re-record
               </button>
               <button
                 onClick={takePhoto}
-                className="group flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold py-3 rounded-xl hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all text-sm"
+                className="group flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold py-3 rounded-xl hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all text-sm"
               >
                 <Camera className="h-4 w-4 group-hover:scale-110 transition-transform" />
                 Take photo
@@ -328,38 +326,38 @@ function VideoKYCInner() {
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">Video</p>
-                <video src={videoUrl!} controls className="w-full rounded-2xl border border-emerald-500/30 aspect-video bg-black" />
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-600">Video</p>
+                <video src={videoUrl!} controls className="w-full rounded-2xl border border-emerald-200 aspect-video bg-black" />
               </div>
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">Photo</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-600">Photo</p>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photoUrl!} alt="Your photo" className="w-full rounded-2xl border border-blue-500/30 aspect-video object-cover" />
+                <img src={photoUrl!} alt="Your photo" className="w-full rounded-2xl border border-blue-200 aspect-video object-cover" />
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-700/50 bg-slate-800/30 px-5 py-4 space-y-2">
+            <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 space-y-2">
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
-                <p className="text-sm text-slate-300">Video recorded ({Math.min(recordSecs, MAX_RECORD_SECS)}s)</p>
+                <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
+                <p className="text-sm text-slate-600">Video recorded ({Math.min(recordSecs, MAX_RECORD_SECS)}s)</p>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
-                <p className="text-sm text-slate-300">Photo captured</p>
+                <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
+                <p className="text-sm text-slate-600">Photo captured</p>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-amber-400 shrink-0" />
-                <p className="text-sm text-slate-300">Verification valid for <strong className="text-white">30 days</strong> once approved</p>
+                <Clock className="h-4 w-4 text-amber-500 shrink-0" />
+                <p className="text-sm text-slate-600">Verification valid for <strong className="text-slate-900">30 days</strong> once approved</p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <button onClick={retake} className="flex items-center justify-center gap-2 border border-slate-700/50 text-slate-300 hover:bg-slate-800 py-3 rounded-xl transition text-sm font-semibold">
+              <button onClick={retake} className="flex items-center justify-center gap-2 border border-slate-200 text-slate-600 hover:bg-slate-50 py-3 rounded-xl transition text-sm font-semibold">
                 <RotateCcw className="h-4 w-4" /> Start over
               </button>
               <button
                 onClick={submit}
-                className="group flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-500 text-white font-bold py-3 rounded-xl hover:shadow-xl hover:shadow-violet-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all text-sm"
+                className="group flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-500 text-white font-bold py-3 rounded-xl hover:shadow-xl hover:shadow-violet-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all text-sm"
               >
                 <Upload className="h-4 w-4 group-hover:translate-y-[-2px] transition-transform" />
                 Submit
@@ -371,29 +369,28 @@ function VideoKYCInner() {
         {/* ── SUBMITTING ── */}
         {phase === 'submitting' && (
           <div className="text-center py-16 space-y-4">
-            <Loader2 className="h-12 w-12 text-violet-400 animate-spin mx-auto" />
-            <p className="text-white font-bold text-lg">Uploading your verification…</p>
-            <p className="text-slate-400 text-sm">Please don't close this page.</p>
+            <Loader2 className="h-12 w-12 text-violet-500 animate-spin mx-auto" />
+            <p className="text-slate-900 font-bold text-lg">Uploading your verification…</p>
+            <p className="text-slate-600 text-sm">Please don't close this page.</p>
           </div>
         )}
 
         {/* ── DONE ── */}
         {phase === 'done' && (
-          <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-slate-900/40 p-10 text-center space-y-5">
-            <div className="absolute -top-8 -right-8 w-32 h-32 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-3xl border border-emerald-200 bg-emerald-50 p-10 text-center space-y-5">
             <div className="relative">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-emerald-500/40">
+              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-emerald-500/30">
                 <CheckCircle className="h-9 w-9 text-white" />
               </div>
-              <h2 className="text-2xl font-black text-white">Submitted!</h2>
-              <p className="text-slate-400 mt-2 text-sm leading-relaxed">
+              <h2 className="text-2xl font-black text-slate-900">Submitted!</h2>
+              <p className="text-slate-600 mt-2 text-sm leading-relaxed">
                 Your video and photo are under review. We aim to verify within a few hours.
-                Once approved, your ID status is set to <strong className="text-emerald-400">verified</strong> for 30 days.
+                Once approved, your ID status is set to <strong className="text-emerald-600">verified</strong> for 30 days.
               </p>
               {matchId && (
                 <Link
                   href={`/kyc/${matchId}`}
-                  className="inline-flex items-center gap-2 mt-6 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold px-8 py-3 rounded-xl hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                  className="inline-flex items-center gap-2 mt-6 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold px-8 py-3 rounded-xl hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all"
                 >
                   Back to match <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -404,12 +401,12 @@ function VideoKYCInner() {
 
         {/* ── ERROR ── */}
         {phase === 'error' && (
-          <div className="rounded-3xl border border-red-500/30 bg-red-500/10 p-8 text-center space-y-4">
-            <AlertCircle className="h-10 w-10 text-red-400 mx-auto" />
-            <h2 className="text-xl font-black text-white">Something went wrong</h2>
-            <p className="text-slate-400 text-sm">{errorMsg}</p>
+          <div className="rounded-3xl border border-red-200 bg-red-50 p-8 text-center space-y-4">
+            <AlertCircle className="h-10 w-10 text-red-500 mx-auto" />
+            <h2 className="text-xl font-black text-slate-900">Something went wrong</h2>
+            <p className="text-slate-600 text-sm">{errorMsg}</p>
             <button onClick={() => { setPhase('intro'); setErrorMsg(null); }}
-              className="bg-gradient-to-r from-red-600 to-rose-500 text-white font-bold px-8 py-3 rounded-xl hover:shadow-xl hover:shadow-red-500/40 transition-all hover:scale-[1.02] active:scale-[0.98]">
+              className="bg-gradient-to-r from-red-600 to-rose-500 text-white font-bold px-8 py-3 rounded-xl hover:shadow-xl hover:shadow-red-500/30 transition-all hover:scale-[1.02] active:scale-[0.98]">
               Try again
             </button>
           </div>

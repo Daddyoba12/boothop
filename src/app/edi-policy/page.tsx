@@ -12,15 +12,15 @@ function Section({ id, title, icon: Icon, children }: {
 }) {
   return (
     <section id={id} className="mb-10 scroll-mt-28">
-      <div className="group relative overflow-hidden rounded-2xl border border-white/8 bg-white/3 hover:bg-white/5 hover:border-purple-500/20 transition-all duration-300 p-7">
+      <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-50 hover:border-purple-500/20 transition-all duration-300 p-7">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none" />
         <div className="flex items-center gap-3 mb-5">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-400 flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/40 group-hover:scale-110 transition-transform duration-300">
-            <Icon className="h-5 w-5 text-white" />
+            <Icon className="h-5 w-5 text-slate-900" />
           </div>
-          <h2 className="text-lg font-black text-white">{title}</h2>
+          <h2 className="text-lg font-black text-slate-900">{title}</h2>
         </div>
-        <div className="relative space-y-4 text-sm text-slate-400 leading-relaxed">{children}</div>
+        <div className="relative space-y-4 text-sm text-slate-700 leading-relaxed">{children}</div>
       </div>
     </section>
   );
@@ -45,7 +45,7 @@ function Ul({ items }: { items: string[] }) {
 
 export default function EDIPolicyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-900 font-sans overflow-x-hidden">
 
       {/* ANIMATED BACKGROUND BLOBS */}
       <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
@@ -59,19 +59,19 @@ export default function EDIPolicyPage() {
       {/* HERO */}
       <section className="relative pt-36 pb-16 px-6 text-center z-10">
         <div className="inline-flex items-center gap-2 mb-6 px-5 py-2.5 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-pink-500/30 backdrop-blur-xl">
-          <Scale className="h-4 w-4 text-pink-400" />
-          <span className="text-xs font-semibold tracking-widest uppercase text-pink-300">EDI Policy</span>
+          <Scale className="h-4 w-4 text-pink-700" />
+          <span className="text-xs font-semibold tracking-widest uppercase text-pink-700">EDI Policy</span>
         </div>
-        <h1 className="text-5xl md:text-6xl font-black text-white mb-4">
+        <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-4">
           Equality, Diversity{' '}
           <span className="bg-gradient-to-r from-purple-400 via-pink-300 to-violet-400 bg-clip-text text-transparent">
             &amp; Inclusion
           </span>
         </h1>
-        <p className="text-slate-400 text-base max-w-2xl mx-auto">
+        <p className="text-slate-600 text-base max-w-2xl mx-auto">
           BootHop is committed to creating an inclusive, respectful, and accessible environment across its workplace, partnerships, and platform.
         </p>
-        <p className="text-xs text-slate-500 mt-4">
+        <p className="text-xs text-slate-600 mt-4">
           Last updated: May 2026 · Applies to all company operations and platform activities
         </p>
       </section>
@@ -79,8 +79,8 @@ export default function EDIPolicyPage() {
       <div className="relative z-10 max-w-3xl mx-auto px-6 pb-24">
 
         {/* TABLE OF CONTENTS */}
-        <div className="rounded-2xl border border-white/8 bg-white/3 backdrop-blur-sm p-6 mb-12">
-          <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">Contents</p>
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 backdrop-blur-sm p-6 mb-12">
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-600 mb-4">Contents</p>
           <ol className="space-y-2 text-sm list-none">
             {[
               ['purpose',         'Purpose'],
@@ -94,7 +94,7 @@ export default function EDIPolicyPage() {
               ['review',          'Policy Review'],
             ].map(([id, label], i) => (
               <li key={id}>
-                <a href={`#${id}`} className="flex items-center gap-2 text-pink-400 hover:text-pink-300 transition-colors">
+                <a href={`#${id}`} className="flex items-center gap-2 text-pink-700 hover:text-pink-800 transition-colors">
                   <span className="text-xs font-bold text-slate-600 w-5">{i + 1}.</span>
                   {label}
                 </a>
@@ -115,8 +115,8 @@ export default function EDIPolicyPage() {
             opportunity across all areas of our operations and to maintaining a culture where people are
             treated with dignity and respect.
           </P>
-          <div className="rounded-xl border border-white/8 bg-white/3 p-5 space-y-1">
-            <p className="font-semibold text-white text-sm">Policy details</p>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 space-y-1">
+            <p className="font-semibold text-slate-900 text-sm">Policy details</p>
             <p>Company: BootHop</p>
             <p>Policy Owner: Management Team</p>
             <p>Last Updated: May 2026</p>
@@ -231,9 +231,9 @@ export default function EDIPolicyPage() {
             All concerns will be reviewed fairly, sensitively, and appropriately. BootHop will not
             tolerate retaliation against any person who raises a genuine concern in good faith.
           </P>
-          <div className="rounded-xl border border-white/8 bg-white/3 p-5">
-            <p className="font-semibold text-white text-sm mb-1">Contact us</p>
-            <p>Email: <a href="mailto:info@boothop.com" className="text-pink-400 hover:text-pink-300 underline transition-colors">info@boothop.com</a></p>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+            <p className="font-semibold text-slate-900 text-sm mb-1">Contact us</p>
+            <p>Email: <a href="mailto:info@boothop.com" className="text-pink-700 hover:text-pink-800 underline transition-colors">info@boothop.com</a></p>
           </div>
         </Section>
 

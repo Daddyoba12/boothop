@@ -393,10 +393,10 @@ function RegisterForm() {
     }
   };
 
-  const inputCls = 'w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:bg-white/10 backdrop-blur-sm';
+  const inputCls = 'w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:bg-slate-50 backdrop-blur-sm';
 
   return (
-    <div className="min-h-screen flex flex-col text-white overflow-hidden">
+    <div className="min-h-screen flex flex-col text-slate-900 overflow-hidden bg-white">
       <NavBar />
 
       {/* Split-screen panels — below fixed NavBar */}
@@ -437,9 +437,9 @@ function RegisterForm() {
 
         {/* Bottom content */}
         <div className="relative z-10 space-y-5">
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-4 py-2 backdrop-blur-sm">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span className="text-sm text-white/80 font-medium">Live platform · 10K+ verified users</span>
+            <span className="text-sm text-slate-700 font-medium">Live platform · 10K+ verified users</span>
           </div>
           <h2 className="text-white text-3xl font-black leading-snug drop-shadow-lg">
             Post your trip.<br />
@@ -454,8 +454,8 @@ function RegisterForm() {
               { v: '95%',  l: 'satisfaction rate' },
             ].map((s) => (
               <div key={s.l} className="flex items-center gap-3">
-                <CheckCircle className="h-5 w-5 text-cyan-400 flex-shrink-0" />
-                <span className="text-white/80 text-sm drop-shadow">
+                <CheckCircle className="h-5 w-5 text-cyan-500 flex-shrink-0" />
+                <span className="text-slate-300 text-sm drop-shadow">
                   <strong className="text-white font-semibold">{s.v}</strong> {s.l}
                 </span>
               </div>
@@ -467,7 +467,7 @@ function RegisterForm() {
               <button
                 key={i}
                 onClick={() => setSlide(i)}
-                className={`h-1.5 rounded-full transition-all duration-500 ${i === slide ? 'w-8 bg-cyan-400 shadow-lg shadow-cyan-400/50' : 'w-2 bg-white/30 hover:bg-white/60'}`}
+                className={`h-1.5 rounded-full transition-all duration-500 ${i === slide ? 'w-8 bg-cyan-400 shadow-lg shadow-cyan-400/50' : 'w-2 bg-slate-50 hover:bg-slate-50'}`}
               />
             ))}
           </div>
@@ -497,15 +497,15 @@ function RegisterForm() {
                     <CheckCircle className="h-8 w-8 text-white" />
                   </div>
                   <h2 className="text-2xl font-black text-white mb-2">Your trip is live!</h2>
-                  <p className="text-slate-400 text-sm mb-6">Your listing has been registered and is now live on BootHop Journeys.</p>
+                  <p className="text-slate-300 text-sm mb-6">Your listing has been registered and is now live on BootHop Journeys.</p>
 
                   {/* Trip summary */}
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm space-y-2 mb-6 text-left">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm space-y-2 mb-6 text-left">
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${successData.type === 'travel' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}`}>
                       {successData.type === 'travel' ? <><Plane className="h-3 w-3" /> Travelling</> : <><Package className="h-3 w-3" /> Sending</>}
                     </span>
-                    <p className="text-white font-bold text-base">{successData.from} → {successData.to}</p>
-                    <p className="text-slate-400">
+                    <p className="text-slate-900 font-bold text-base">{successData.from} → {successData.to}</p>
+                    <p className="text-slate-600">
                       {new Date(successData.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </p>
                   </div>
@@ -518,7 +518,7 @@ function RegisterForm() {
 
                   <button
                     onClick={() => { window.location.href = successData.redirectTo; }}
-                    className="mt-5 w-full bg-gradient-to-r from-emerald-600 to-cyan-500 py-3 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-emerald-500/50 transition-all duration-300 flex items-center justify-center gap-2"
+                    className="mt-5 w-full bg-gradient-to-r from-emerald-600 to-cyan-500 py-3 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 flex items-center justify-center gap-2"
                   >
                     View my listing <ArrowRight className="w-4 h-4" />
                   </button>
@@ -536,8 +536,8 @@ function RegisterForm() {
                     <Mail className="h-8 w-8 text-white" />
                   </div>
                   <h2 className="text-2xl font-black text-white mb-1 text-center">Enter your code</h2>
-                  <p className="text-slate-400 text-sm mb-1 text-center">We sent a 5-character code to</p>
-                  <p className="text-cyan-400 font-bold mb-6 text-center">{form.email}</p>
+                  <p className="text-slate-300 text-sm mb-1 text-center">We sent a 5-character code to</p>
+                  <p className="text-cyan-600 font-bold mb-6 text-center">{form.email}</p>
 
                   {error && (
                     <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300 flex items-center gap-2">
@@ -552,17 +552,17 @@ function RegisterForm() {
                       onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
                       maxLength={5}
                       placeholder="4827A"
-                      className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-4 text-center text-2xl font-bold tracking-[0.35em] uppercase text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-center text-2xl font-bold tracking-[0.35em] uppercase text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all"
                       required
                     />
                     <button type="submit" disabled={loading || codeInput.trim().length < 5}
-                      className="group w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-4 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-blue-500/50 disabled:opacity-60 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
+                      className="group w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-4 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-blue-500/30 disabled:opacity-60 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
                       {loading ? 'Verifying…' : (<>Verify & continue <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" /></>)}
                     </button>
                   </form>
 
                   <button onClick={() => { setStep('email'); setCodeInput(''); setError(null); }}
-                    className="mt-4 w-full text-sm text-slate-500 hover:text-slate-300 transition text-center">
+                    className="mt-4 w-full text-sm text-slate-300 hover:text-white transition text-center">
                     ← Resend code
                   </button>
                 </div>
@@ -571,12 +571,12 @@ function RegisterForm() {
 
             {/* ── EMAIL STEP ── */}
             {step === 'email' && (
-              <div className="relative overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/70 to-slate-900/70 backdrop-blur-xl p-8 shadow-2xl">
+              <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
                 <div className="absolute -top-8 -right-8 w-32 h-32 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
 
                 <button onClick={() => setStep('trip')}
-                  className="relative mb-5 text-sm text-slate-400 hover:text-cyan-400 transition flex items-center gap-1 group">
+                  className="relative mb-5 text-sm text-slate-600 hover:text-cyan-600 transition flex items-center gap-1 group">
                   <ArrowRight className="h-4 w-4 rotate-180 group-hover:-translate-x-1 transition-transform" /> Back
                 </button>
 
@@ -584,17 +584,17 @@ function RegisterForm() {
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/50">
                     <Mail className="h-6 w-6 text-white" />
                   </div>
-                  <h2 className="text-2xl font-black text-white">Almost there</h2>
-                  <p className="text-slate-400 text-sm mt-1">Enter your email — we'll send a BootHop verification link.</p>
+                  <h2 className="text-2xl font-black text-slate-900">Almost there</h2>
+                  <p className="text-slate-600 text-sm mt-1">Enter your email — we'll send a BootHop verification link.</p>
                 </div>
 
                 {/* Trip summary */}
-                <div className="relative mb-5 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm space-y-2 backdrop-blur-sm">
+                <div className="relative mb-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm space-y-2 backdrop-blur-sm">
                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${mode === 'travel' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}`}>
                     {mode === 'travel' ? <><Plane className="h-3 w-3" /> Travelling</> : <><Package className="h-3 w-3" /> Sending</>}
                   </span>
-                  <p className="text-white font-bold text-base">{form.from} → {form.to}</p>
-                  <p className="text-slate-400">
+                  <p className="text-slate-900 font-bold text-base">{form.from} → {form.to}</p>
+                  <p className="text-slate-600">
                     {new Date(form.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                     {' · '}{weightOptions.find(w => w.value === form.weight)?.label}
                     {form.price ? ` · ${currency}${form.price}` : ''}
@@ -610,13 +610,13 @@ function RegisterForm() {
 
                 <form onSubmit={handleSendLink} className="relative space-y-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wide">Email address</label>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Email address</label>
                     <input type="email" required value={form.email}
                       onChange={(e) => setForm(p => ({ ...p, email: e.target.value }))}
                       placeholder="you@example.com" className={inputCls} />
                   </div>
                   <button type="submit" disabled={loading}
-                    className="group w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-4 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-blue-500/50 disabled:opacity-60 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
+                    className="group w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-4 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-blue-500/30 disabled:opacity-60 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
                     {loading ? 'Sending…' : (<>Send verification code <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" /></>)}
                   </button>
                   <p className="text-xs text-slate-600 text-center">No password needed · Free to join · Cancel anytime</p>
@@ -626,7 +626,7 @@ function RegisterForm() {
 
             {/* ── TRIP FORM STEP ── */}
             {step === 'trip' && (
-              <div className="relative overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/70 to-slate-900/70 backdrop-blur-xl p-8 shadow-2xl hover:border-slate-600/70 transition-all duration-500">
+              <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl hover:border-slate-300 transition-all duration-500">
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute top-6 right-6 w-2 h-2 bg-cyan-400 rounded-full animate-ping opacity-60" />
@@ -634,23 +634,23 @@ function RegisterForm() {
                 <div className="relative mb-6">
                   <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-cyan-500/30 rounded-full px-4 py-1.5 mb-4 backdrop-blur-sm">
                     <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
-                    <span className="text-xs text-cyan-300 font-semibold">Register your trip</span>
+                    <span className="text-xs text-cyan-700 font-semibold">Register your trip</span>
                   </div>
-                  <h1 className="text-3xl font-black text-white mb-1">Post a trip</h1>
-                  <p className="text-slate-400 text-sm">
+                  <h1 className="text-3xl font-black text-slate-900 mb-1">Post a trip</h1>
+                  <p className="text-slate-600 text-sm">
                     Already registered?{' '}
-                    <Link href="/login" className="text-cyan-400 hover:text-cyan-300 font-semibold transition">Sign in →</Link>
+                    <Link href="/login" className="text-cyan-600 hover:text-cyan-700 font-semibold transition">Sign in →</Link>
                   </p>
                 </div>
 
                 {/* Mode toggle */}
-                <div className="relative flex rounded-xl border border-white/10 bg-white/5 p-1 mb-6 backdrop-blur-sm">
+                <div className="relative flex rounded-xl border border-slate-200 bg-slate-50 p-1 mb-6 backdrop-blur-sm">
                   <button type="button" onClick={() => setMode('travel')}
-                    className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold transition-all duration-300 ${mode === 'travel' ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/40 scale-[1.03]' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold transition-all duration-300 ${mode === 'travel' ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/30 scale-[1.03]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
                     <Plane className="h-4 w-4" /> I&apos;m Travelling
                   </button>
                   <button type="button" onClick={() => setMode('send')}
-                    className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold transition-all duration-300 ${mode === 'send' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg shadow-emerald-500/40 scale-[1.03]' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold transition-all duration-300 ${mode === 'send' ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg shadow-emerald-500/30 scale-[1.03]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
                     <Package className="h-4 w-4" /> I&apos;m Sending
                   </button>
                 </div>
@@ -666,7 +666,7 @@ function RegisterForm() {
                   <div className="mb-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-center">
                     <AlertCircle className="h-7 w-7 text-red-400 mx-auto mb-2" />
                     <p className="text-red-300 font-bold text-sm mb-1">Service unavailable in your region</p>
-                    <p className="text-slate-400 text-xs">BootHop cannot process deliveries from your country due to international shipping restrictions. Please contact us for assistance.</p>
+                    <p className="text-slate-600 text-xs">BootHop cannot process deliveries from your country due to international shipping restrictions. Please contact us for assistance.</p>
                   </div>
                 )}
 
@@ -674,7 +674,7 @@ function RegisterForm() {
 
                   {/* From city */}
                   <div className="group relative">
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-cyan-400 pointer-events-none transition-colors z-10" />
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 group-focus-within:text-cyan-600 pointer-events-none transition-colors z-10" />
                     <input
                       type="text"
                       placeholder="From city, airport or postcode"
@@ -684,17 +684,17 @@ function RegisterForm() {
                       className={`${inputCls} pl-9 ${fromQuery && !fromOk ? 'ring-2 ring-amber-400/40' : ''}`}
                     />
                     {(fromAirports.length > 0 || fromSugg.length > 0 || fromPostcode) && (
-                      <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-52 overflow-auto rounded-xl border border-white/10 bg-slate-900/95 backdrop-blur-xl shadow-2xl">
+                      <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-52 overflow-auto rounded-xl border border-slate-200 bg-white backdrop-blur-xl shadow-2xl">
                         {fromAirports.map((a) => (
                           <div key={a.iata} onClick={() => selectFromAirport(a)}
-                            className="cursor-pointer px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors flex items-center gap-2">
+                            className="cursor-pointer px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 transition-colors flex items-center gap-2">
                             <Plane className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
-                            <span className="font-mono font-bold text-xs text-cyan-400 w-9 shrink-0">{a.iata}</span>
+                            <span className="font-mono font-bold text-xs text-cyan-600 w-9 shrink-0">{a.iata}</span>
                             <div className="min-w-0">
                               <span className="font-medium">{a.city}</span>
-                              <span className="text-slate-500 text-xs ml-1 truncate">· {a.name}</span>
+                              <span className="text-slate-600 text-xs ml-1 truncate">· {a.name}</span>
                             </div>
-                            {a.terminals?.length ? <span className="ml-auto text-[10px] text-white/25 shrink-0">Select terminal →</span> : null}
+                            {a.terminals?.length ? <span className="ml-auto text-[10px] text-slate-600 shrink-0">Select terminal →</span> : null}
                           </div>
                         ))}
                         {fromPostcode && (
@@ -702,11 +702,11 @@ function RegisterForm() {
                             const v = `${fromPostcode.display} (${fromPostcode.code})`;
                             setFromQuery(v); setForm(p => ({ ...p, from: v }));
                             setFromOk(true); setFromPostcode(null); setFromAirportData(null);
-                          }} className="cursor-pointer px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors flex items-center gap-2">
+                          }} className="cursor-pointer px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 transition-colors flex items-center gap-2">
                             <MapPin className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
                             <div className="min-w-0">
                               <span className="font-medium">{fromPostcode.display}</span>
-                              <span className="text-slate-500 text-xs ml-1">· {fromPostcode.code}</span>
+                              <span className="text-slate-600 text-xs ml-1">· {fromPostcode.code}</span>
                             </div>
                           </div>
                         )}
@@ -716,8 +716,8 @@ function RegisterForm() {
                             setFromSugg([]); setFromAirports([]); setFromOk(true); setFromAirportData(null);
                             if (window.google?.maps?.places)
                               sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
-                          }} className="cursor-pointer px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors flex items-center gap-2">
-                            <MapPin className="h-3.5 w-3.5 text-cyan-400 flex-shrink-0" />{s}
+                          }} className="cursor-pointer px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 transition-colors flex items-center gap-2">
+                            <MapPin className="h-3.5 w-3.5 text-cyan-600 flex-shrink-0" />{s}
                           </div>
                         ))}
                       </div>
@@ -728,12 +728,12 @@ function RegisterForm() {
                   {/* From terminal picker — shown after airport with terminals selected */}
                   {fromAirportData?.terminals?.length && !fromOk && (
                     <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3">
-                      <p className="text-xs text-cyan-400 font-semibold mb-2">Select terminal — {fromAirportData.name}</p>
+                      <p className="text-xs text-cyan-600 font-semibold mb-2">Select terminal — {fromAirportData.name}</p>
                       <div className="flex flex-wrap gap-2">
                         {fromAirportData.terminals.map(t => (
                           <button key={t} type="button"
                             onClick={() => { setFromTerminal(t); applyFromAirport(fromAirportData, t); setFromOk(true); }}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${fromTerminal === t ? 'bg-cyan-500 border-cyan-400 text-white' : 'border-white/15 text-white/60 hover:border-cyan-400/50 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${fromTerminal === t ? 'bg-cyan-500 border-cyan-400 text-slate-900' : 'border-slate-200 text-slate-600 hover:border-cyan-400/50 hover:text-slate-900'}`}
                           >{t}</button>
                         ))}
                       </div>
@@ -742,7 +742,7 @@ function RegisterForm() {
 
                   {/* To city */}
                   <div className="group relative mt-6">
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-cyan-400 pointer-events-none transition-colors z-10" />
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 group-focus-within:text-cyan-600 pointer-events-none transition-colors z-10" />
                     <input
                       type="text"
                       placeholder="To city, airport or postcode"
@@ -752,17 +752,17 @@ function RegisterForm() {
                       className={`${inputCls} pl-9 ${toQuery && !toOk ? 'ring-2 ring-amber-400/40' : ''}`}
                     />
                     {(toAirports.length > 0 || toSugg.length > 0 || toPostcode) && (
-                      <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-52 overflow-auto rounded-xl border border-white/10 bg-slate-900/95 backdrop-blur-xl shadow-2xl">
+                      <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-52 overflow-auto rounded-xl border border-slate-200 bg-white backdrop-blur-xl shadow-2xl">
                         {toAirports.map((a) => (
                           <div key={a.iata} onClick={() => selectToAirport(a)}
-                            className="cursor-pointer px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors flex items-center gap-2">
+                            className="cursor-pointer px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 transition-colors flex items-center gap-2">
                             <Plane className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
-                            <span className="font-mono font-bold text-xs text-cyan-400 w-9 shrink-0">{a.iata}</span>
+                            <span className="font-mono font-bold text-xs text-cyan-600 w-9 shrink-0">{a.iata}</span>
                             <div className="min-w-0">
                               <span className="font-medium">{a.city}</span>
-                              <span className="text-slate-500 text-xs ml-1 truncate">· {a.name}</span>
+                              <span className="text-slate-600 text-xs ml-1 truncate">· {a.name}</span>
                             </div>
-                            {a.terminals?.length ? <span className="ml-auto text-[10px] text-white/25 shrink-0">Select terminal →</span> : null}
+                            {a.terminals?.length ? <span className="ml-auto text-[10px] text-slate-600 shrink-0">Select terminal →</span> : null}
                           </div>
                         ))}
                         {toPostcode && (
@@ -770,11 +770,11 @@ function RegisterForm() {
                             const v = `${toPostcode.display} (${toPostcode.code})`;
                             setToQuery(v); setForm(p => ({ ...p, to: v }));
                             setToOk(true); setToPostcode(null); setToAirportData(null);
-                          }} className="cursor-pointer px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors flex items-center gap-2">
+                          }} className="cursor-pointer px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 transition-colors flex items-center gap-2">
                             <MapPin className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
                             <div className="min-w-0">
                               <span className="font-medium">{toPostcode.display}</span>
-                              <span className="text-slate-500 text-xs ml-1">· {toPostcode.code}</span>
+                              <span className="text-slate-600 text-xs ml-1">· {toPostcode.code}</span>
                             </div>
                           </div>
                         )}
@@ -784,8 +784,8 @@ function RegisterForm() {
                             setToSugg([]); setToAirports([]); setToOk(true); setToAirportData(null);
                             if (window.google?.maps?.places)
                               sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
-                          }} className="cursor-pointer px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors flex items-center gap-2">
-                            <MapPin className="h-3.5 w-3.5 text-cyan-400 flex-shrink-0" />{s}
+                          }} className="cursor-pointer px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 transition-colors flex items-center gap-2">
+                            <MapPin className="h-3.5 w-3.5 text-cyan-600 flex-shrink-0" />{s}
                           </div>
                         ))}
                       </div>
@@ -796,12 +796,12 @@ function RegisterForm() {
                   {/* To terminal picker */}
                   {toAirportData?.terminals?.length && !toOk && (
                     <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3 mt-6">
-                      <p className="text-xs text-cyan-400 font-semibold mb-2">Select terminal — {toAirportData.name}</p>
+                      <p className="text-xs text-cyan-600 font-semibold mb-2">Select terminal — {toAirportData.name}</p>
                       <div className="flex flex-wrap gap-2">
                         {toAirportData.terminals.map(t => (
                           <button key={t} type="button"
                             onClick={() => { setToTerminal(t); applyToAirport(toAirportData, t); setToOk(true); }}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${toTerminal === t ? 'bg-cyan-500 border-cyan-400 text-white' : 'border-white/15 text-white/60 hover:border-cyan-400/50 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${toTerminal === t ? 'bg-cyan-500 border-cyan-400 text-slate-900' : 'border-slate-200 text-slate-600 hover:border-cyan-400/50 hover:text-slate-900'}`}
                           >{t}</button>
                         ))}
                       </div>
@@ -831,24 +831,24 @@ function RegisterForm() {
 
                   {/* Date */}
                   <div className="group relative mt-2">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-cyan-400 pointer-events-none transition-colors" />
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 group-focus-within:text-cyan-600 pointer-events-none transition-colors" />
                     <input type="date" required value={form.date}
                       onChange={set('date')} min={tomorrow}
-                      className={`${inputCls} pl-9 [color-scheme:dark]`} />
+                      className={`${inputCls} pl-9 `} />
                   </div>
 
                   {/* Weight */}
                   <select required value={form.weight} onChange={set('weight')}
                     className={`${inputCls} cursor-pointer`} style={{ colorScheme: 'dark' }}>
-                    <option value="" className="bg-slate-900 text-slate-400">Weight / size *</option>
+                    <option value="" className="bg-white text-slate-600">Weight / size *</option>
                     {weightOptions.map((o) => (
-                      <option key={o.value} value={o.value} className="bg-slate-900 text-white">{o.label}</option>
+                      <option key={o.value} value={o.value} className="bg-white text-slate-900">{o.label}</option>
                     ))}
                   </select>
 
                   {/* Price */}
                   <div className="group relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold pointer-events-none">{currency}</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 text-sm font-semibold pointer-events-none">{currency}</span>
                     <input type="number" required min="1"
                       placeholder={mode === 'travel' ? 'Price per delivery' : 'Your budget'}
                       value={form.price} onChange={set('price')}
@@ -858,7 +858,7 @@ function RegisterForm() {
                   <p className="text-xs text-slate-600">Same-day trips cannot be listed — please select a future date.</p>
 
                   <button type="submit" disabled={countryBlocked}
-                    className="group w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-4 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 mt-2">
+                    className="group w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-4 rounded-xl text-sm font-bold text-white hover:shadow-xl hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 mt-2">
                     Register <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </button>
                 </form>
@@ -872,13 +872,13 @@ function RegisterForm() {
 
       {/* Contact-first modal */}
       {showContactModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-          <div className="w-full max-w-sm rounded-3xl border border-amber-500/30 bg-gradient-to-br from-slate-900 to-slate-800 p-8 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
+          <div className="w-full max-w-sm rounded-3xl border border-amber-500/30 bg-gradient-to-br from-white to-slate-50 p-8 shadow-2xl">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/20">
               <AlertCircle className="h-7 w-7 text-amber-400" />
             </div>
-            <h2 className="text-xl font-black text-white text-center mb-2">Contact us first</h2>
-            <p className="text-slate-400 text-sm text-center mb-6">
+            <h2 className="text-xl font-black text-slate-900 text-center mb-2">Contact us first</h2>
+            <p className="text-slate-600 text-sm text-center mb-6">
               For international shipments originating from your country, we need to speak with you before you proceed. Please contact us to declare your shipping intention and ensure compliance.
             </p>
             <a href="/business/contact"
@@ -886,7 +886,7 @@ function RegisterForm() {
               Contact us to proceed
             </a>
             <button onClick={() => setShowContactModal(false)}
-              className="w-full text-sm text-slate-500 hover:text-slate-300 transition text-center">
+              className="w-full text-sm text-slate-600 hover:text-slate-700 transition text-center">
               Cancel
             </button>
           </div>

@@ -43,8 +43,8 @@ function StatCard({
         {icon}
       </div>
       <div className="text-3xl font-bold text-slate-900 mb-0.5">{value}</div>
-      <div className="text-slate-500 text-sm">{label}</div>
-      {sub && <div className="text-xs text-slate-400 mt-1">{sub}</div>}
+      <div className="text-slate-600 text-sm">{label}</div>
+      {sub && <div className="text-xs text-slate-600 mt-1">{sub}</div>}
     </div>
   );
 }
@@ -97,7 +97,7 @@ export default function HooperDashboard() {
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-500 text-sm">Loading your dashboard…</p>
+          <p className="text-slate-600 text-sm">Loading your dashboard…</p>
         </div>
       </div>
     );
@@ -169,7 +169,7 @@ export default function HooperDashboard() {
             <h1 className="text-2xl font-bold text-slate-900">
               Welcome back, {profile?.full_name?.split(' ')[0]} 👋
             </h1>
-            <p className="text-slate-500 mt-1 text-sm">Manage your delivery requests and track savings</p>
+            <p className="text-slate-600 mt-1 text-sm">Manage your delivery requests and track savings</p>
           </div>
           <Link
             href="/requests/create"
@@ -231,10 +231,10 @@ export default function HooperDashboard() {
           {activeRequests.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center px-4">
               <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
-                <Package className="h-8 w-8 text-slate-400" />
+                <Package className="h-8 w-8 text-slate-600" />
               </div>
               <p className="text-slate-600 font-medium mb-1">No active requests yet</p>
-              <p className="text-slate-400 text-sm mb-5">Post a delivery request to get matched with travelers</p>
+              <p className="text-slate-600 text-sm mb-5">Post a delivery request to get matched with travelers</p>
               <Link href="/requests/create"
                 className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition">
                 <Plus className="h-4 w-4" /> Create Request
@@ -252,7 +252,7 @@ export default function HooperDashboard() {
                     </div>
                     <div className="min-w-0">
                       <p className="font-medium text-slate-900 text-sm truncate">{r.item_name}</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-600">
                         {r.pickup_city} → {r.delivery_city}
                         &nbsp;·&nbsp;
                         {new Date(r.preferred_pickup_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
@@ -263,7 +263,7 @@ export default function HooperDashboard() {
                     <Badge status={r.urgency} />
                     <div className="text-right hidden sm:block">
                       <div className="text-sm font-bold text-blue-600">£{Number(r.offered_price).toFixed(2)}</div>
-                      <div className="text-xs text-slate-400">offered</div>
+                      <div className="text-xs text-slate-600">offered</div>
                     </div>
                     <ArrowRight className="h-4 w-4 text-slate-300" />
                   </div>
@@ -277,15 +277,15 @@ export default function HooperDashboard() {
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
             <h2 className="font-bold text-slate-900">My Posted Journeys</h2>
-            <span className="text-xs text-slate-400">{trips.length} trip{trips.length !== 1 ? 's' : ''} registered</span>
+            <span className="text-xs text-slate-600">{trips.length} trip{trips.length !== 1 ? 's' : ''} registered</span>
           </div>
           {trips.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center px-4">
               <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mb-3">
-                <Plane className="h-7 w-7 text-slate-400" />
+                <Plane className="h-7 w-7 text-slate-600" />
               </div>
               <p className="text-slate-600 font-medium mb-1">No journeys posted yet</p>
-              <p className="text-slate-400 text-sm">Journeys you register from the home page will appear here</p>
+              <p className="text-slate-600 text-sm">Journeys you register from the home page will appear here</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-100">
@@ -301,7 +301,7 @@ export default function HooperDashboard() {
                       <p className="font-medium text-slate-900 text-sm truncate">
                         {t.from_city} → {t.to_city}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-600">
                         {t.travel_date ? new Date(t.travel_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
                         {t.weight ? ` · ${t.weight} kg` : ''}
                       </p>
@@ -314,7 +314,7 @@ export default function HooperDashboard() {
                     {t.price && (
                       <div className="text-right hidden sm:block">
                         <div className="text-sm font-bold text-slate-800">£{Number(t.price).toFixed(2)}</div>
-                        <div className="text-xs text-slate-400">agreed</div>
+                        <div className="text-xs text-slate-600">agreed</div>
                       </div>
                     )}
                   </div>
@@ -336,10 +336,10 @@ export default function HooperDashboard() {
           {pendingMatches.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center px-4">
               <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
-                <Clock className="h-8 w-8 text-slate-400" />
+                <Clock className="h-8 w-8 text-slate-600" />
               </div>
               <p className="text-slate-600 font-medium mb-1">No pending matches</p>
-              <p className="text-slate-400 text-sm">Matches appear when a Booter accepts your request</p>
+              <p className="text-slate-600 text-sm">Matches appear when a Booter accepts your request</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-100">
@@ -353,14 +353,14 @@ export default function HooperDashboard() {
                     </div>
                     <div>
                       <p className="font-medium text-slate-900 text-sm">Delivery Match</p>
-                      <p className="text-xs text-slate-500">Agreed £{Number(m.agreed_price).toFixed(2)}</p>
+                      <p className="text-xs text-slate-600">Agreed £{Number(m.agreed_price).toFixed(2)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0 ml-4">
                     <Badge status={m.payment_status} />
                     <div className="text-right hidden sm:block">
                       <div className="text-sm font-bold text-slate-900">£{Number(m.hooper_pays).toFixed(2)}</div>
-                      <div className="text-xs text-slate-400">you pay</div>
+                      <div className="text-xs text-slate-600">you pay</div>
                     </div>
                     <ArrowRight className="h-4 w-4 text-slate-300" />
                   </div>

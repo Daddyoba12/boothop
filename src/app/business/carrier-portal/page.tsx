@@ -7,7 +7,7 @@ import { Loader2, Truck, MapPin, Package, Clock, CheckCircle2, Circle, LogOut } 
 import { BusinessNav } from '@/components/business/BusinessNav';
 import BusinessFooter from '@/components/business/BusinessFooter';
 
-const BG = 'linear-gradient(135deg, #020617 0%, #0a1628 50%, #020617 100%)';
+const BG = 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)';
 
 type Job = {
   id: string;
@@ -73,7 +73,7 @@ export default function CarrierPortalPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: BG }}>
-        <Loader2 className="h-8 w-8 text-blue-400 animate-spin" />
+        <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
       </div>
     );
   }
@@ -82,14 +82,14 @@ export default function CarrierPortalPage() {
   const completedJobs = jobs.filter(j => j.status === 'delivered');
 
   return (
-    <div className="min-h-screen text-white" style={{ background: BG }}>
+    <div className="min-h-screen text-slate-900" style={{ background: BG }}>
       <BusinessNav
         rightSlot={
           <>
-            <span className="text-sm text-white/40 hidden md:block">{carrier?.company_name}</span>
+            <span className="text-sm text-slate-600 hidden md:block">{carrier?.company_name}</span>
             <button
               onClick={signOut}
-              className="flex items-center gap-1.5 text-sm text-white/40 hover:text-white/70 transition-colors"
+              className="flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-600 transition-colors"
             >
               <LogOut className="h-4 w-4" /> Sign out
             </button>
@@ -106,9 +106,9 @@ export default function CarrierPortalPage() {
         >
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <p className="text-white/40 text-sm mb-1">Carrier dashboard</p>
+              <p className="text-slate-600 text-sm mb-1">Carrier dashboard</p>
               <h1 className="text-3xl font-black">{carrier?.company_name}</h1>
-              <p className="text-white/40 text-sm mt-1">{carrier?.email}</p>
+              <p className="text-slate-600 text-sm mt-1">{carrier?.email}</p>
             </div>
             <div className="flex items-center gap-2 bg-blue-500/15 border border-blue-500/25 rounded-xl px-4 py-2">
               <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
@@ -123,9 +123,9 @@ export default function CarrierPortalPage() {
               { label: 'Active',        value: activeJobs.length },
               { label: 'Completed',     value: completedJobs.length },
             ].map(s => (
-              <div key={s.label} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-center">
+              <div key={s.label} className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-center">
                 <p className="text-2xl font-black">{s.value}</p>
-                <p className="text-xs text-white/40 mt-0.5">{s.label}</p>
+                <p className="text-xs text-slate-600 mt-0.5">{s.label}</p>
               </div>
             ))}
           </div>
@@ -134,16 +134,16 @@ export default function CarrierPortalPage() {
         {/* Job list */}
         {jobsLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Loader2 className="h-6 w-6 text-blue-400 animate-spin" />
+            <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
           </div>
         ) : jobs.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }}
-            className="text-center py-20 border border-white/8 rounded-2xl bg-white/3"
+            className="text-center py-20 border border-slate-200 rounded-2xl bg-slate-50"
           >
-            <Truck className="h-12 w-12 text-white/15 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-white/60 mb-2">No jobs assigned yet</h2>
-            <p className="text-sm text-white/30 max-w-xs mx-auto">
+            <Truck className="h-12 w-12 text-slate-200 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-slate-600 mb-2">No jobs assigned yet</h2>
+            <p className="text-sm text-slate-300 max-w-xs mx-auto">
               When a job in your coverage area is matched to you, it will appear here. You'll also receive an email alert.
             </p>
           </motion.div>
@@ -154,14 +154,14 @@ export default function CarrierPortalPage() {
           >
             {activeJobs.length > 0 && (
               <>
-                <p className="text-xs font-bold text-white/30 uppercase tracking-widest mb-3">Active jobs</p>
+                <p className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-3">Active jobs</p>
                 {activeJobs.map(job => <JobCard key={job.id} job={job} />)}
               </>
             )}
 
             {completedJobs.length > 0 && (
               <>
-                <p className="text-xs font-bold text-white/20 uppercase tracking-widest mt-8 mb-3">Completed</p>
+                <p className="text-xs font-bold text-slate-300 uppercase tracking-widest mt-8 mb-3">Completed</p>
                 {completedJobs.map(job => <JobCard key={job.id} job={job} muted />)}
               </>
             )}
@@ -175,49 +175,49 @@ export default function CarrierPortalPage() {
 }
 
 function JobCard({ job, muted = false }: { job: Job; muted?: boolean }) {
-  const statusCfg = STATUS_CONFIG[job.status] ?? { label: job.status, color: 'bg-white/10 text-white/50 border-white/10', icon: <Circle className="h-3 w-3" /> };
+  const statusCfg = STATUS_CONFIG[job.status] ?? { label: job.status, color: 'bg-slate-100 text-slate-600 border-slate-200', icon: <Circle className="h-3 w-3" /> };
   const typeLabel = job.delivery_type === 'uk' ? 'UK' : 'International';
 
   return (
-    <div className={`bg-white/5 border ${muted ? 'border-white/6 opacity-60' : 'border-white/12'} rounded-2xl p-5`}>
+    <div className={`bg-slate-50 border ${muted ? 'border-slate-100 opacity-60' : 'border-slate-200'} rounded-2xl p-5`}>
       <div className="flex items-start justify-between gap-3 mb-4 flex-wrap">
         <div>
-          <p className="text-xs text-white/30 font-mono mb-1">{job.reference}</p>
+          <p className="text-xs text-slate-300 font-mono mb-1">{job.reference}</p>
           <p className="font-bold">{job.cargo_description || job.package_size || '—'}</p>
-          <p className="text-xs text-white/40 mt-0.5">{typeLabel} delivery · Assigned {fmt(job.assigned_at)}</p>
+          <p className="text-xs text-slate-600 mt-0.5">{typeLabel} delivery · Assigned {fmt(job.assigned_at)}</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${statusCfg.color}`}>
             {statusCfg.icon} {statusCfg.label}
           </span>
           {job.partner_rate && (
-            <span className="text-sm font-black text-emerald-400">£{job.partner_rate.toLocaleString()}</span>
+            <span className="text-sm font-black text-emerald-600">£{job.partner_rate.toLocaleString()}</span>
           )}
         </div>
       </div>
 
       <div className="grid sm:grid-cols-2 gap-2">
-        <div className="flex items-start gap-2 bg-white/4 rounded-xl px-3 py-2.5">
-          <MapPin className="h-3.5 w-3.5 text-blue-400 mt-0.5 shrink-0" />
+        <div className="flex items-start gap-2 bg-slate-50 rounded-xl px-3 py-2.5">
+          <MapPin className="h-3.5 w-3.5 text-blue-600 mt-0.5 shrink-0" />
           <div className="min-w-0">
-            <p className="text-xs font-bold text-white/50 mb-0.5">Pickup</p>
-            <p className="text-sm text-white/80 leading-snug truncate">{job.pickup_address || '—'}</p>
-            {job.pickup_contact && <p className="text-xs text-white/35 truncate">{job.pickup_contact}</p>}
+            <p className="text-xs font-bold text-slate-600 mb-0.5">Pickup</p>
+            <p className="text-sm text-slate-700 leading-snug truncate">{job.pickup_address || '—'}</p>
+            {job.pickup_contact && <p className="text-xs text-slate-600 truncate">{job.pickup_contact}</p>}
           </div>
         </div>
-        <div className="flex items-start gap-2 bg-white/4 rounded-xl px-3 py-2.5">
-          <MapPin className="h-3.5 w-3.5 text-emerald-400 mt-0.5 shrink-0" />
+        <div className="flex items-start gap-2 bg-slate-50 rounded-xl px-3 py-2.5">
+          <MapPin className="h-3.5 w-3.5 text-emerald-600 mt-0.5 shrink-0" />
           <div className="min-w-0">
-            <p className="text-xs font-bold text-white/50 mb-0.5">Delivery</p>
-            <p className="text-sm text-white/80 leading-snug truncate">{job.delivery_address || '—'}</p>
-            {job.delivery_contact && <p className="text-xs text-white/35 truncate">{job.delivery_contact}</p>}
+            <p className="text-xs font-bold text-slate-600 mb-0.5">Delivery</p>
+            <p className="text-sm text-slate-700 leading-snug truncate">{job.delivery_address || '—'}</p>
+            {job.delivery_contact && <p className="text-xs text-slate-600 truncate">{job.delivery_contact}</p>}
           </div>
         </div>
       </div>
 
       {job.special_instructions && (
         <div className="mt-2 flex items-start gap-2 bg-amber-500/8 border border-amber-500/15 rounded-xl px-3 py-2">
-          <Clock className="h-3.5 w-3.5 text-amber-400 mt-0.5 shrink-0" />
+          <Clock className="h-3.5 w-3.5 text-amber-600 mt-0.5 shrink-0" />
           <p className="text-xs text-amber-200/70">{job.special_instructions}</p>
         </div>
       )}
