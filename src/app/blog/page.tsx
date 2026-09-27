@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Calendar, Tag, ArrowRight, BookOpen } from 'lucide-react';
+import { Calendar, Tag, ArrowRight, BookOpen, FileCheck2, Building2, PlaneTakeoff } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 
@@ -44,8 +44,38 @@ function postUrl(entry: Entry): string {
   return alt?.href ?? '#';
 }
 
+function decodeEntities(str: string): string {
+  return str
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&rsquo;/g, '’')
+    .replace(/&lsquo;/g, '‘')
+    .replace(/&rdquo;/g, '”')
+    .replace(/&ldquo;/g, '“')
+    .replace(/&mdash;/g, '—')
+    .replace(/&ndash;/g, '–')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, '\'')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+}
+
 function excerpt(html: string, maxChars = 180): string {
-  return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, maxChars).trimEnd() + '…';
+  const text = decodeEntities(
+    html
+      .replace(/```[\s\S]*?```/g, ' ')        // fenced code blocks
+      .replace(/`([^`]+)`/g, '$1')             // inline code
+      .replace(/<[^>]+>/g, ' ')                // html tags
+      .replace(/^#{1,6}\s+/gm, '')             // markdown headers
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // markdown links
+      .replace(/\*\*([^*]+)\*\*/g, '$1')       // markdown bold
+      .replace(/\*([^*]+)\*/g, '$1')           // markdown italics
+  ).replace(/\s+/g, ' ').trim();
+  return text.length > maxChars ? text.slice(0, maxChars).trimEnd() + '…' : text;
+}
+
+function cleanTitle(title: string): string {
+  return decodeEntities(title).replace(/\s+/g, ' ').trim();
 }
 
 function firstImage(html: string): string | null {
@@ -57,6 +87,18 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
+/* ── Category-specific fallback (icon + gradient) for posts with no cover image ── */
+const CATEGORY_FALLBACKS: { match: RegExp; icon: typeof BookOpen; gradient: string; iconClass: string }[] = [
+  { match: /customs|compliance/i, icon: FileCheck2, gradient: 'from-blue-50 to-slate-100', iconClass: 'text-blue-600' },
+  { match: /small business|b2b/i, icon: Building2, gradient: 'from-emerald-50 to-slate-100', iconClass: 'text-emerald-600' },
+  { match: /time-critical|on-board|courier/i, icon: PlaneTakeoff, gradient: 'from-violet-50 to-slate-100', iconClass: 'text-violet-600' },
+];
+function categoryFallback(labels: string[]) {
+  const joined = labels.join(' ');
+  return CATEGORY_FALLBACKS.find(f => f.match.test(joined))
+    ?? { icon: BookOpen, gradient: 'from-blue-50 to-slate-100', iconClass: 'text-blue-600' };
+}
+
 const STATIC_POSTS = [
   {
     slug: 'customs-clearance-services',
@@ -64,7 +106,8 @@ const STATIC_POSTS = [
     excerpt: 'Learn how pre-departure AI compliance screening is eliminating customs holds, documentation errors, and hidden import fees on cross-border deliveries.',
     date: '2026-05-19',
     labels: ['Customs & Compliance', 'Cross-Border Delivery'],
-    gradient: 'from-blue-50 to-slate-100',
+    image: '/images/Customs1.jpg',
+    alt: 'A traveller with a customs-tagged suitcase at an airport check-in counter, discussing paperwork with a BootHop courier',
   },
   {
     slug: 'small-business-cross-border-shipping',
@@ -72,7 +115,8 @@ const STATIC_POSTS = [
     excerpt: 'How small businesses are shipping internationally without the cost, complexity, or customs risk of traditional couriers — and saving up to 60% per parcel.',
     date: '2026-05-19',
     labels: ['Small Business', 'B2B Logistics'],
-    gradient: 'from-emerald-50 to-slate-100',
+    image: '/images/businessImage/biz-handshake.jpg',
+    alt: 'Two small business owners shaking hands in a modern office in front of the BootHop logo',
   },
   {
     slug: 'on-board-courier-time-critical-logistics',
@@ -80,7 +124,8 @@ const STATIC_POSTS = [
     excerpt: 'When hours matter — not days — on-board courier delivery is the only option. Discover how BootHop makes in-cabin, zero-handoff delivery accessible to every business.',
     date: '2026-05-19',
     labels: ['Time-Critical Logistics', 'On-Board Courier'],
-    gradient: 'from-violet-50 to-slate-100',
+    image: '/images/WBoothop.jpg',
+    alt: 'A traveller handing a BootHop-branded parcel to another traveller at an airport departure gate',
   },
 ];
 
@@ -112,15 +157,31 @@ export default async function BlogPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
           {/* Static SEO posts — always shown first */}
-          {STATIC_POSTS.map((post) => (
+          {STATIC_POSTS.map((post) => {
+            const fallback = categoryFallback(post.labels);
+            const FallbackIcon = fallback.icon;
+            return (
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
               className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50 hover:-translate-y-1 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 flex flex-col"
             >
-              <div className={`h-48 bg-gradient-to-br ${post.gradient} flex items-center justify-center`}>
-                <BookOpen className="h-12 w-12 text-blue-300" />
-              </div>
+              {post.image ? (
+                <div className="relative h-48 overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={post.image}
+                    alt={post.alt}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 to-transparent" />
+                </div>
+              ) : (
+                <div className={`h-48 bg-gradient-to-br ${fallback.gradient} flex items-center justify-center`}>
+                  <FallbackIcon className={`h-12 w-12 ${fallback.iconClass}`} />
+                </div>
+              )}
               <div className="p-6 flex flex-col flex-1">
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {post.labels.map(label => (
@@ -144,13 +205,17 @@ export default async function BlogPage() {
                 </div>
               </div>
             </Link>
-          ))}
+            );
+          })}
 
           {/* Blogger posts */}
           {posts.map((entry) => {
             const img = firstImage(entry.content.$t);
             const labels = entry.category?.map(c => c.term) ?? [];
             const slug = postId(entry);
+            const title = cleanTitle(entry.title.$t);
+            const fallback = categoryFallback(labels);
+            const FallbackIcon = fallback.icon;
             return (
               <Link
                 key={slug}
@@ -160,12 +225,12 @@ export default async function BlogPage() {
                 {img ? (
                   <div className="relative h-48 overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={img} alt={entry.title.$t} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={img} alt={title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
                   </div>
                 ) : (
-                  <div className="h-48 bg-gradient-to-br from-blue-50 to-slate-100 flex items-center justify-center">
-                    <BookOpen className="h-12 w-12 text-blue-300" />
+                  <div className={`h-48 bg-gradient-to-br ${fallback.gradient} flex items-center justify-center`}>
+                    <FallbackIcon className={`h-12 w-12 ${fallback.iconClass}`} />
                   </div>
                 )}
 
@@ -181,7 +246,7 @@ export default async function BlogPage() {
                   )}
 
                   <h2 className="text-lg font-bold text-slate-900 group-hover:text-blue-700 transition-colors mb-2 leading-snug flex-1">
-                    {entry.title.$t}
+                    {title}
                   </h2>
 
                   <p className="text-sm text-slate-600 leading-relaxed mb-4">
