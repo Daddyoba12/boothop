@@ -1,11 +1,16 @@
 import Link from 'next/link';
+import BootHopLogo from './BootHopLogo';
 
-const NAV_LINKS = [
-  ['AI Safety Check', '/ai-check'],
+const EXPLORE_LINKS = [
   ['How It Works', '/how-it-works'],
-  ['Pricing', '/pricing'],
   ['Live Journeys', '/journeys'],
+  ['Pricing', '/pricing'],
   ['About', '/about'],
+  ['Blog', '/blog'],
+  ['AI Safety Check', '/ai-check'],
+];
+
+const SUPPORT_LINKS = [
   ['Help', '/help'],
   ['Contact', '/contact'],
 ];
@@ -27,37 +32,57 @@ const SOCIALS = [
   { href: 'https://www.linkedin.com/in/otb1', label: 'LinkedIn', path: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z' },
 ];
 
+function LinkColumn({ title, links }: { title: string; links: string[][] }) {
+  return (
+    <div>
+      <p className="text-xs font-bold uppercase tracking-widest text-slate-900 mb-3">{title}</p>
+      <nav className="flex flex-col gap-2">
+        {links.map(([label, href]) => (
+          <Link key={href} href={href} className="text-sm text-slate-600 hover:text-slate-900 transition-colors duration-200">
+            {label}
+          </Link>
+        ))}
+      </nav>
+    </div>
+  );
+}
+
 export default function Footer() {
   return (
     <footer className="border-t border-slate-200 bg-slate-50">
-      <div className="mx-auto max-w-7xl px-6 py-8 md:px-8">
+      <div className="mx-auto max-w-7xl px-6 py-12 md:px-8">
 
-        {/* Main row */}
-        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between mb-5">
+        {/* Identity + link columns */}
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-5 mb-10">
 
-          {/* Nav links */}
-          <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
-            {NAV_LINKS.map(([label, href]) =>
-              href.endsWith('.pdf') ? (
-                <a key={href} href={href} download className="hover:text-slate-900 transition-colors duration-200">{label}</a>
-              ) : (
-                <Link key={href} href={href} className="hover:text-slate-900 transition-colors duration-200">{label}</Link>
-              )
-            )}
-          </nav>
+          {/* Identity block */}
+          <div className="col-span-2 md:col-span-2 mb-4 md:mb-0">
+            <Link href="/" className="inline-block -ml-3">
+              <BootHopLogo size="sm" />
+            </Link>
+            <p className="text-sm text-slate-600 max-w-xs mt-1">
+              BootHop connects everyday travellers with senders who need something delivered — verified, escrow-protected, and on a route someone&apos;s already taking.
+            </p>
+          </div>
 
-          {/* Contact + social */}
+          <LinkColumn title="Explore" links={EXPLORE_LINKS} />
+          <LinkColumn title="Support" links={SUPPORT_LINKS} />
+          <LinkColumn title="Legal" links={LEGAL_LINKS} />
+        </div>
+
+        {/* Contact + social */}
+        <div className="flex flex-col gap-5 border-t border-slate-200 pt-6 md:flex-row md:items-center md:justify-between mb-5">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <a href="mailto:info@boothop.com" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">info@boothop.com</a>
             <a href="tel:+441156612825" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">+44 115 661 2825</a>
-            <div className="flex items-center gap-1.5">
-              {SOCIALS.map(({ href, label, path }) => (
-                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all duration-200 hover:border-slate-300 hover:text-slate-900 hover:bg-slate-100">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3"><path d={path} /></svg>
-                </a>
-              ))}
-            </div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            {SOCIALS.map(({ href, label, path }) => (
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+                className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all duration-200 hover:border-slate-300 hover:text-slate-900 hover:bg-slate-100">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3"><path d={path} /></svg>
+              </a>
+            ))}
           </div>
         </div>
 
@@ -66,11 +91,6 @@ export default function Footer() {
           <p className="text-xs text-slate-600">
             © {new Date().getFullYear()} BootHop Ltd · Registered in England &amp; Wales
           </p>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600">
-            {LEGAL_LINKS.map(([label, href]) => (
-              <Link key={href} href={href} scroll={true} className="hover:text-slate-900 transition-colors">{label}</Link>
-            ))}
-          </div>
           <div className="flex items-center gap-1.5">
             <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs text-emerald-600 font-medium">All systems operational</span>

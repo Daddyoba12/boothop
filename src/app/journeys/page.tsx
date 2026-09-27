@@ -368,6 +368,12 @@ function LiveJourneysContent() {
 
           {/* Search bar */}
           <div className="w-full max-w-xl">
+            <div className="mb-4 text-center sm:text-left">
+              <h2 className="text-xl md:text-2xl font-bold text-slate-900">Find a traveller on your route</h2>
+              <p className="text-sm text-slate-600 mt-1">
+                Search by city or route to see who&apos;s already travelling your way.
+              </p>
+            </div>
             <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm focus-within:border-blue-300 transition-all">
               <Search className="h-4 w-4 text-slate-600 shrink-0" />
               <input
@@ -530,13 +536,19 @@ function LiveJourneysContent() {
                     {/* Price + CTA */}
                     <div className="shrink-0 text-right">
                       {trip.price ? (
-                        <p className="font-extrabold text-base bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                          £{Number(trip.price).toFixed(0)}
-                        </p>
+                        <>
+                          <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Asking price</p>
+                          <p className="font-extrabold text-base bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                            £{Number(trip.price).toFixed(0)}
+                          </p>
+                        </>
                       ) : (
-                        <p className="text-sm text-slate-600 font-medium">Open</p>
+                        <>
+                          <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Price</p>
+                          <p className="text-sm text-slate-600 font-medium">Open to offers</p>
+                        </>
                       )}
-                      <span className="flex items-center justify-end gap-1 mt-1 text-[11px] text-slate-300 group-hover:text-blue-600 transition-all font-semibold">
+                      <span className="flex items-center justify-end gap-1 mt-1 text-[11px] text-slate-600 group-hover:text-blue-700 transition-all font-semibold">
                         Connect <ArrowRight className="h-3 w-3" />
                       </span>
                     </div>
@@ -548,6 +560,28 @@ function LiveJourneysContent() {
           </>
         )}
       </div>
+
+      {/* CLOSING CTA */}
+      <section className="relative z-10 px-6 pb-16">
+        <div className="max-w-4xl mx-auto rounded-3xl border border-slate-200 bg-gradient-to-br from-blue-50 to-slate-50 p-10 text-center">
+          <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">
+            Don&apos;t see your route?
+          </h2>
+          <p className="text-slate-600 mb-7 max-w-lg mx-auto">
+            Post what you need to send, or list a trip you&apos;re already taking — we&apos;ll match you the moment someone fits.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a href="/register?type=send"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm px-7 py-3 rounded-full transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(37,99,235,0.3)]">
+              Post what you need to send <ArrowRight className="h-4 w-4" />
+            </a>
+            <a href="/register?type=travel"
+              className="inline-flex items-center gap-2 border border-blue-300 text-blue-700 hover:bg-blue-100 font-semibold text-sm px-7 py-3 rounded-full transition-all">
+              Post your trip <Plane className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      </section>
 
       <Footer />
 

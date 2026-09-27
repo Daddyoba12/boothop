@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import {
   CheckCircle, ArrowRight, MessageCircle,
   Truck, Users, Building2, ChevronDown,
+  ClipboardList, Route, PackageCheck,
 } from 'lucide-react';
 import { BusinessNav } from '@/components/business/BusinessNav';
 import BusinessFooter from '@/components/business/BusinessFooter';
@@ -394,13 +395,15 @@ export default function BoothopBusiness() {
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { n: '01', title: 'REQUEST',  desc: 'Call, SMS, or instant online quote in 30 seconds',                    icon: '📋' },
-                { n: '02', title: 'DISPATCH', desc: 'Verified carrier assigned within 15 minutes',                         icon: '🚗' },
-                { n: '03', title: 'TRACK',    desc: 'Live GPS tracking + photo proof of pickup & delivery',                icon: '📍' },
-                { n: '04', title: 'CONFIRM',  desc: 'Automated billing + delivery confirmation email/SMS',                 icon: '✅' },
-              ].map(({ n, title, desc, icon }) => (
+                { n: '01', title: 'REQUEST',  desc: 'Call, SMS, or instant online quote in 30 seconds',                    Icon: ClipboardList },
+                { n: '02', title: 'DISPATCH', desc: 'Verified carrier assigned within 15 minutes',                         Icon: Truck },
+                { n: '03', title: 'TRACK',    desc: 'Live GPS tracking + photo proof of pickup & delivery',                Icon: Route },
+                { n: '04', title: 'CONFIRM',  desc: 'Automated billing + delivery confirmation email/SMS',                 Icon: PackageCheck },
+              ].map(({ n, title, desc, Icon }) => (
                 <div key={n} className="relative rounded-2xl border border-slate-200 bg-slate-50 backdrop-blur-sm p-6 hover:border-emerald-500/30 hover:bg-slate-50 transition-all duration-300 hover:-translate-y-1">
-                  <div className="text-2xl mb-3">{icon}</div>
+                  <div className="w-11 h-11 rounded-full bg-teal-50 flex items-center justify-center mb-3">
+                    <Icon className="h-5 w-5 text-teal-600" strokeWidth={2} />
+                  </div>
                   <p className="text-[10px] font-black text-emerald-600/60 uppercase tracking-widest mb-1">{n}</p>
                   <p className="text-slate-900 font-black text-sm mb-2">{title}</p>
                   <p className="text-slate-600 text-xs leading-relaxed">{desc}</p>

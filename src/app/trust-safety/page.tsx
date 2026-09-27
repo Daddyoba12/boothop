@@ -3,31 +3,28 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
-  Shield, CheckCircle, Lock, EyeOff,
-  FileText, AlertTriangle, ArrowRight, UserCheck, Sparkles, Navigation,
+  Shield, CheckCircle, ShieldCheck, LockKeyhole, EyeOff,
+  FileCheck2, AlertTriangle, ArrowRight, Sparkles, Navigation,
 } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 const pipeline = [
-  { label: 'CREATED',      desc: 'Trip or delivery posted',               color: 'from-slate-500 to-slate-400' },
-  { label: 'MATCHED',      desc: 'System finds a compatible match',        color: 'from-blue-600 to-blue-400' },
-  { label: 'ACCEPTED',     desc: 'Both parties confirm intent to proceed', color: 'from-indigo-600 to-indigo-400' },
-  { label: 'KYC PENDING',  desc: 'Identity documents verified for both',   color: 'from-violet-600 to-violet-400' },
-  { label: 'PAYMENT HELD', desc: 'Funds locked in escrow via Stripe',      color: 'from-amber-600 to-amber-400' },
-  { label: 'ACTIVE',       desc: 'Details shared — GPS tracking live',      color: 'from-orange-600 to-orange-400' },
-  { label: 'COMPLETED',    desc: 'Both parties confirm delivery',          color: 'from-green-600 to-green-400' },
-  { label: 'RELEASED',     desc: 'Payment sent to traveller',              color: 'from-emerald-600 to-emerald-400' },
+  { label: 'CREATED',      desc: 'Trip or delivery posted' },
+  { label: 'MATCHED',      desc: 'System finds a compatible match' },
+  { label: 'ACCEPTED',     desc: 'Both parties confirm intent to proceed' },
+  { label: 'KYC PENDING',  desc: 'Identity documents verified for both' },
+  { label: 'PAYMENT HELD', desc: 'Funds locked in escrow via Stripe' },
+  { label: 'ACTIVE',       desc: 'Details shared — GPS tracking live' },
+  { label: 'COMPLETED',    desc: 'Both parties confirm delivery' },
+  { label: 'RELEASED',     desc: 'Payment sent to traveller' },
 ];
 
 const pillars = [
   {
-    icon: UserCheck,
+    icon: ShieldCheck,
     title: 'Identity Verification (KYC)',
-    gradient: 'from-blue-500 to-cyan-400',
-    glow: 'shadow-blue-500/50',
-    hover: 'hover:border-blue-500/50 hover:shadow-blue-500/20',
     points: [
       'Passport or Driving Licence scan',
       'Live selfie face-match',
@@ -36,11 +33,8 @@ const pillars = [
     ],
   },
   {
-    icon: Lock,
+    icon: LockKeyhole,
     title: 'Escrow Payments',
-    gradient: 'from-amber-500 to-yellow-400',
-    glow: 'shadow-amber-500/50',
-    hover: 'hover:border-amber-500/50 hover:shadow-amber-500/20',
     points: [
       'Sender pays into Stripe escrow — not the traveller',
       'Funds are locked until delivery is confirmed',
@@ -51,9 +45,6 @@ const pillars = [
   {
     icon: EyeOff,
     title: 'No Details Until Safe',
-    gradient: 'from-violet-500 to-purple-400',
-    glow: 'shadow-violet-500/50',
-    hover: 'hover:border-violet-500/50 hover:shadow-violet-500/20',
     points: [
       'Phone numbers hidden until KYC + payment are complete',
       'Exact meeting location revealed only then',
@@ -62,11 +53,8 @@ const pillars = [
     ],
   },
   {
-    icon: FileText,
+    icon: FileCheck2,
     title: 'Customs Compliance',
-    gradient: 'from-emerald-500 to-teal-400',
-    glow: 'shadow-emerald-500/50',
-    hover: 'hover:border-emerald-500/50 hover:shadow-emerald-500/20',
     points: [
       'Every user signs our customs responsibility declaration',
       'Prohibited items blocked at listing stage',
@@ -74,20 +62,18 @@ const pillars = [
       'Traveller is never liable for undeclared sender contents',
     ],
   },
-  {
-    icon: Navigation,
-    title: 'Real-Time GPS Tracking',
-    gradient: 'from-cyan-500 to-blue-400',
-    glow: 'shadow-cyan-500/50',
-    hover: 'hover:border-cyan-500/50 hover:shadow-cyan-500/20',
-    points: [
-      'Traveller shares live GPS during active deliveries only',
-      'Journey milestones: Collected → At Airport → Departed → Landed → Delivered',
-      'Consent-based — tracking starts and stops with the delivery, never outside it',
-      'Sender sees live map and progress in real time',
-    ],
-  },
 ];
+
+const duringDelivery = {
+  icon: Navigation,
+  title: 'Real-Time GPS Tracking',
+  points: [
+    'Traveller shares live GPS during active deliveries only',
+    'Journey milestones: Collected → At Airport → Departed → Landed → Delivered',
+    'Consent-based — tracking starts and stops with the delivery, never outside it',
+    'Sender sees live map and progress in real time',
+  ],
+};
 
 const prohibited = [
   'Cash or monetary instruments',
@@ -155,25 +141,25 @@ export default function TrustSafetyPage() {
       </section>
 
       {/* STATUS PIPELINE */}
-      <section className="relative py-20 px-6">
+      <section className="relative pt-16 pb-8 px-6 scroll-mt-28">
         <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent pointer-events-none" />
         <div className="relative max-w-5xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-cyan-50 border border-cyan-200 rounded-full px-4 py-2 mb-4 mx-auto flex justify-center w-fit">
             <span className="text-xs font-semibold uppercase tracking-widest text-cyan-700">Every delivery goes through</span>
           </div>
-          <h2 className="text-center text-3xl md:text-4xl font-black text-slate-900 mb-12">
+          <h2 className="text-center text-3xl md:text-4xl font-black text-slate-900 mb-12 scroll-mt-28">
             8-stage verified pipeline
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {pipeline.map((step, i) => (
               <div key={step.label} className={`reveal d${Math.min(i+1,5)} group relative rounded-2xl border border-slate-200 bg-white p-5 text-center hover:scale-[1.06] active:scale-[0.97] transition-all duration-300 hover:shadow-xl cursor-pointer overflow-hidden touch-violet`}>
                 {/* Colour glow on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${step.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-2xl`} />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-400 opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-2xl" />
                 {/* Top edge light bar */}
-                <div className={`absolute top-0 left-4 right-4 h-px bg-gradient-to-r ${step.color} opacity-0 group-hover:opacity-60 transition-opacity duration-300`} />
+                <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-blue-600 to-blue-400 opacity-0 group-hover:opacity-60 transition-opacity duration-300" />
                 <div className="relative">
                   <span className="text-slate-600 text-xs font-mono mb-2 block group-hover:text-slate-800 transition-colors">{String(i+1).padStart(2,'0')}</span>
-                  <span className={`inline-block px-2 py-1 rounded-full text-slate-900 text-[10px] font-bold uppercase tracking-wider mb-3 bg-gradient-to-r ${step.color} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <span className="inline-block px-2 py-1 rounded-full text-white text-[10px] font-bold uppercase tracking-wider mb-3 bg-blue-700 shadow-sm group-hover:scale-110 transition-transform duration-300">
                     {step.label}
                   </span>
                   <p className="text-slate-600 text-xs leading-relaxed group-hover:text-slate-800 transition-colors duration-300">{step.desc}</p>
@@ -188,21 +174,20 @@ export default function TrustSafetyPage() {
       </section>
 
       {/* FOUR PILLARS */}
-      <section className="relative py-20 px-6">
+      <section className="relative pt-4 pb-20 px-6 scroll-mt-28">
         <div className="max-w-6xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-4 py-2 mb-4 mx-auto flex justify-center w-fit">
             <span className="text-xs font-semibold uppercase tracking-widest text-blue-700">How we protect you</span>
           </div>
-          <h2 className="text-center text-3xl md:text-5xl font-black text-slate-900 mb-14">
+          <h2 className="text-center text-3xl md:text-5xl font-black text-slate-900 mb-14 scroll-mt-28">
             Four layers of protection
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
-            {pillars.map(({ icon: Icon, title, gradient, glow, hover, points }, i) => (
-              <div key={title} className={`reveal d${i+1} group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] hover:shadow-xl cursor-pointer touch-violet`}>
-                <div className={`absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-10 rounded-full blur-2xl transition-opacity duration-500`} />
+            {pillars.map(({ icon: Icon, title, points }, i) => (
+              <div key={title} className={`reveal d${i+1} group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] hover:shadow-xl hover:border-blue-200 cursor-pointer touch-violet`}>
                 <div className="relative">
-                  <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} mb-5 shadow-lg ${glow} group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className="h-7 w-7 text-slate-900" />
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-50 mb-5 group-hover:bg-blue-100 transition-colors duration-300">
+                    <Icon className="h-6 w-6 text-blue-800" strokeWidth={1.75} />
                   </div>
                   <h3 className="text-xl font-black text-slate-900 mb-4 group-hover:text-blue-600 transition-colors duration-300">{title}</h3>
                   <ul className="space-y-3">
@@ -216,6 +201,34 @@ export default function TrustSafetyPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DURING DELIVERY */}
+      <section className="relative pt-0 pb-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-4 py-2 mb-4 mx-auto flex justify-center w-fit">
+            <span className="text-xs font-semibold uppercase tracking-widest text-blue-700">While your delivery is moving</span>
+          </div>
+          <h2 className="text-center text-3xl md:text-4xl font-black text-slate-900 mb-10">
+            During delivery
+          </h2>
+          <div className="max-w-2xl mx-auto">
+            <div className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 transition-all duration-500 hover:shadow-xl hover:border-blue-200 touch-violet">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-50 mb-5 group-hover:bg-blue-100 transition-colors duration-300">
+                <duringDelivery.icon className="h-6 w-6 text-blue-800" strokeWidth={1.75} />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 mb-4">{duringDelivery.title}</h3>
+              <ul className="space-y-3">
+                {duringDelivery.points.map((pt) => (
+                  <li key={pt} className="flex items-start gap-3 text-sm text-slate-600">
+                    <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                    {pt}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
