@@ -15,6 +15,12 @@ type Stage = 'loading' | 'landing';
 
 const BG = 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)';
 
+const BIZ_HERO_IMAGES = [
+  '/images/business/hero-aircraft-grounded.jpg',
+  '/images/business/hero-production-stops.jpg',
+];
+
+// Used by the separate "Why BootHop Business" crossfading video banner further down the page
 const BIZ_VIDEOS = [
   '/videos/onecall/test2/compressed/Planeeoff1.mp4',
   '/videos/onecall/test2/compressed/Planeoff2.mp4',
@@ -24,6 +30,7 @@ export default function BoothopBusiness() {
   const router = useRouter();
 
   const [stage,     setStage]     = useState<Stage>('loading');
+  const [heroImg,   setHeroImg]   = useState(0);
   const [bizVid,    setBizVid]    = useState(0);
   const [tickerIdx, setTickerIdx] = useState(0);
 
@@ -33,6 +40,11 @@ export default function BoothopBusiness() {
     { icon: '⚙️', route: 'Birmingham → Leeds',   time: '2.8 hours' },
     { icon: '🏥', route: 'Glasgow → Newcastle',  time: '3.1 hours' },
   ];
+
+  useEffect(() => {
+    const id = setInterval(() => setHeroImg(v => (v + 1) % BIZ_HERO_IMAGES.length), 30000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     const id = setInterval(() => setBizVid(v => (v + 1) % BIZ_VIDEOS.length), 7000);
@@ -126,16 +138,20 @@ export default function BoothopBusiness() {
               </motion.div>
             </div>
 
-            {/* Video — framed card, no dark overlay, bright poster so there's never a black flash while it loads */}
+            {/* Hero photo — framed card, crossfades between two shots every 30s */}
             <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }}
               className="rounded-3xl border border-slate-200 bg-white p-3 shadow-[0_30px_80px_rgba(15,23,42,0.12)]">
               <div className="relative overflow-hidden rounded-2xl" style={{ aspectRatio: '4/5' }}>
-                <video
-                  autoPlay muted loop playsInline preload="auto"
-                  poster="/images/business-hero-poster.jpg"
-                  className="absolute inset-0 w-full h-full object-cover brightness-105 contrast-[1.03]"
-                  src="/videos/onecall/test2/compressed/Planeeoff1.mp4"
-                />
+                {BIZ_HERO_IMAGES.map((src, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={src}
+                    src={src}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out"
+                    style={{ opacity: heroImg === i ? 1 : 0 }}
+                  />
+                ))}
               </div>
             </motion.div>
           </div>

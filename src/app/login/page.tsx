@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
 
-const bgImages = ['/images/D_login1.jpg', '/images/D_login2.jpg'];
+const bgImages = ['/images/login-laptop-homepage.jpg', '/images/login-laptop-signin.jpg'];
 
 type Trip = {
   id: string;

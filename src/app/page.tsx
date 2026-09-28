@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import {
   ArrowRight, CheckCircle, Package,
-  Plane, Search, Star, X, Users,
+  Plane, Search, Star, Users,
   MessageCircle,
 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
@@ -245,7 +245,6 @@ function HomePageContent() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('send');
   const [winsVid,  setWinsVid]  = useState(0);
-  const [heroVisual, setHeroVisual] = useState(0);
   const [showEmail, setShowEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [codeInput, setCodeInput] = useState('');
@@ -317,23 +316,7 @@ function HomePageContent() {
     return () => clearInterval(id);
   }, []);
 
-  // Hero visual — crossfade between the plane video and the delivery photo
-  useEffect(() => {
-    const id = setInterval(() => setHeroVisual(v => (v + 1) % 2), 30000);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    if (localStorage.getItem('banner_dismissed_v1')) setShowBanner(false);
-  }, []);
-
-  const dismissBanner = () => {
-    setShowBanner(false);
-    localStorage.setItem('banner_dismissed_v1', '1');
-  };
-
   const [routeCounts, setRouteCounts] = useState<Record<string, number>>({});
-  const [showBanner, setShowBanner] = useState(true);
   const [routesLoaded, setRoutesLoaded] = useState(false);
 
   const resetForm = () => {
@@ -424,25 +407,22 @@ function HomePageContent() {
   return (
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pb-14">
 
-      {/* ── ANNOUNCEMENT BANNER ── */}
-      {showBanner && (
-        <div className="fixed top-0 left-0 right-0 z-[70] h-10 flex items-center justify-center gap-3 bg-amber-50 border-b border-amber-200 px-4">
-          <span className="text-amber-800 text-xs font-semibold hidden sm:inline">🎁 New members get £20 delivery credit — first 500 only · No subscription needed</span>
-          <span className="text-amber-800 text-xs font-semibold sm:hidden">🎁 Get £20 delivery credit — first 500 members</span>
-          <Link href="/start" className="rounded-full bg-amber-500 text-black text-xs font-bold px-3 py-1 hover:bg-amber-400 transition-colors whitespace-nowrap">
-            Claim yours →
-          </Link>
-          <button onClick={dismissBanner} className="ml-1 text-amber-700/60 hover:text-amber-800 transition-colors" aria-label="Dismiss">
-            <X className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      )}
-
       {/* ── NAV ── */}
-      <NavBar bannerVisible={showBanner} />
+      <NavBar />
 
       {/* ── HERO ── */}
-      <section className={`relative overflow-hidden bg-gradient-to-b from-white to-slate-50 ${showBanner ? 'pt-[120px]' : 'pt-20'}`}>
+      <section className="relative overflow-hidden pt-20">
+
+        {/* PLANE VIDEO — full-bleed background, brightened for a cinematic feel, poster shown while it loads */}
+        <video autoPlay muted loop playsInline poster="/images/hero-plane-poster.jpg"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ filter: 'brightness(1.18) saturate(1.08) contrast(1.02)' }}>
+          <source src={HERO_VIDEO} type="video/mp4" />
+        </video>
+
+        {/* Overlay — mobile gets an even wash since the copy spans full width; desktop concentrates the dark gradient behind the text column (strong enough to hold the smaller lines, not just the headline) and fades out toward the plane/photo */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/60 md:hidden" />
+        <div className="absolute inset-0 hidden md:block bg-gradient-to-r from-black/80 via-black/55 to-transparent" />
 
         {/* CONTENT */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 py-14 md:py-20">
@@ -450,75 +430,71 @@ function HomePageContent() {
 
             {/* LEFT */}
             <div>
-              <h1 className="text-4xl md:text-6xl font-semibold text-slate-900 leading-tight mb-4 tracking-tight">
+              <h1 className="text-4xl md:text-6xl font-semibold text-white leading-tight mb-4 tracking-tight">
                 Sending home shouldn&apos;t<br />cost £300 and take a week.
               </h1>
 
-              <p className="text-slate-600 text-lg mb-1 max-w-xl leading-relaxed">
+              <p className="text-white/90 text-lg mb-1 max-w-xl leading-relaxed" style={{ textShadow: '0 1px 10px rgba(0,0,0,0.55)' }}>
                 Connect with a verified traveller already flying your route.
               </p>
-              <p className="text-slate-500 text-sm mb-7 max-w-xl">
+              <p className="text-white/75 text-sm mb-7 max-w-xl" style={{ textShadow: '0 1px 10px rgba(0,0,0,0.55)' }}>
                 Same day. You set the price. Payment protected.{' '}
-                <Link href="/trust-safety" className="underline underline-offset-2 hover:text-slate-800 transition-colors">What can I send? →</Link>
+                <Link href="/trust-safety" className="underline underline-offset-2 hover:text-white transition-colors">What can I send? →</Link>
               </p>
 
               {/* CTAs — two equal options, the first choice made immediately clear */}
               <div className="flex flex-col sm:flex-row gap-3 mb-3">
                 <Link href="/start?role=sender"
                   onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'hero_sender_cta' })}
-                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.35)] shadow-lg shadow-amber-500/20">
+                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-base transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.45)] shadow-lg shadow-amber-500/30">
                   📦 Send an Item
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link href="/start?role=traveller"
                   onClick={() => (window as any).ttq?.track('InitiateCheckout', { description: 'hero_traveller_cta' })}
-                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full border-2 border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50 text-slate-900 font-bold text-base transition-all hover:-translate-y-0.5 shadow-sm">
+                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full border border-white/25 bg-white/10 hover:bg-white/15 hover:border-white/40 text-white font-bold text-base transition-all hover:-translate-y-0.5">
                   ✈️ Earn While Travelling
                 </Link>
               </div>
-              <p className="text-slate-400 text-sm mb-7">
-                🎁 New members receive <span className="text-slate-900 font-semibold">£20</span> delivery credit ·{' '}
-                <span className="text-slate-400">Most deliveries £30–£120</span>
+              <p className="text-white/70 text-sm mb-7" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.55)' }}>
+                🎁 New members receive <span className="text-white font-semibold">£20</span> delivery credit ·{' '}
+                <span className="text-white/55">Most deliveries £30–£120</span>
               </p>
               <div className="flex flex-col gap-1.5 mb-7">
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-white/60" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.55)' }}>
                   Using BootHop for business?{' '}
-                  <Link href="/business" className="underline underline-offset-2 hover:text-slate-600 transition-colors">
+                  <Link href="/business" className="underline underline-offset-2 hover:text-white transition-colors">
                     Explore Business Portal →
                   </Link>
                 </p>
               </div>
 
               {/* Micro How It Works */}
-              <div className="flex flex-wrap items-center gap-2 text-slate-400 text-sm mb-6">
+              <div className="flex flex-wrap items-center gap-2 text-white/65 text-sm mb-6" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.55)' }}>
                 {['Post', 'Match', 'Handoff', 'Deliver'].map((step, i, arr) => (
                   <span key={step} className="flex items-center gap-2">
-                    <span className="text-slate-700 font-medium">{step}</span>
-                    {i < arr.length - 1 && <ArrowRight className="h-3 w-3 text-slate-300" />}
+                    <span className="text-white font-medium">{step}</span>
+                    {i < arr.length - 1 && <ArrowRight className="h-3 w-3 text-white/45" />}
                   </span>
                 ))}
               </div>
 
               {/* Trust strip */}
-              <div className="flex flex-wrap gap-5 text-slate-500 text-xs">
-                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-500" />Every traveller ID-verified before matching</span>
-                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-500" />Payment held in escrow until you confirm delivery</span>
-                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-500" />Real-time GPS tracking on every active delivery</span>
+              <div className="flex flex-wrap gap-5 text-white/75 text-xs" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.55)' }}>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Every traveller ID-verified before matching</span>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Payment held in escrow until you confirm delivery</span>
+                <span className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-green-400" />Real-time GPS tracking on every active delivery</span>
               </div>
             </div>
 
-            {/* RIGHT — one window, crossfading between the plane video and the delivery photo */}
+            {/* RIGHT — delivery photo, floating over the hero video */}
             <div className="relative hidden md:block">
-              <div className="rounded-3xl border border-slate-200 bg-white p-3 shadow-[0_30px_80px_rgba(15,23,42,0.12)]">
-                <div className="relative overflow-hidden rounded-2xl" style={{ aspectRatio: '4/5' }}>
-                  <video autoPlay muted loop playsInline
-                    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[1500ms] ease-in-out"
-                    style={{ opacity: heroVisual === 0 ? 1 : 0 }}>
-                    <source src={HERO_VIDEO} type="video/mp4" />
-                  </video>
-                  <Image src="/images/drealboothop.jpg" alt="BootHop delivery" fill
-                    className="absolute inset-0 object-cover transition-opacity duration-[1500ms] ease-in-out"
-                    style={{ opacity: heroVisual === 1 ? 1 : 0 }} />
+              <div className="rounded-[28px] border border-white/12 bg-white/5 backdrop-blur-xl p-1.5 shadow-[0_25px_70px_rgba(0,0,0,0.3)]">
+                <div className="relative overflow-hidden rounded-[22px]" style={{ aspectRatio: '4/5' }}>
+                  <Image src="/images/drealboothop.jpg" alt="BootHop delivery" fill priority
+                    className="absolute inset-0 object-cover"
+                    style={{ filter: 'sepia(0.14) saturate(1.2) brightness(1.03) contrast(1.02)' }} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-transparent" />
 
                   {/* Live badge */}
                   <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-1.5 backdrop-blur-xl shadow-sm">
@@ -534,14 +510,6 @@ function HomePageContent() {
                   <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-xl bg-white/90 px-4 py-2 backdrop-blur-md shadow-sm">
                     <span className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
                     <span className="text-xs text-slate-800 font-medium">Match found · 2 mins ago</span>
-                  </div>
-
-                  {/* Dot toggle — shows which visual is active */}
-                  <div className="absolute bottom-4 right-4 flex items-center gap-1.5">
-                    {[0, 1].map(i => (
-                      <button key={i} onClick={() => setHeroVisual(i)} aria-label={`Show visual ${i + 1}`}
-                        className={`rounded-full transition-all duration-300 ${heroVisual === i ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/60 hover:bg-white/90'}`} />
-                    ))}
                   </div>
                 </div>
               </div>

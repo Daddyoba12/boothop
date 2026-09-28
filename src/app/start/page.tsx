@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -10,6 +10,20 @@ import BootHopLogo from '@/components/BootHopLogo';
 const FlightTicker = dynamic(() => import('@/components/bfi/FlightTicker'), { ssr: false });
 
 type Role = 'sender' | 'traveller';
+
+function StartBackground() {
+  return (
+    <div className="fixed inset-0 -z-10 overflow-hidden bg-white">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/start/hero-background.jpg"
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-white/18" />
+    </div>
+  );
+}
 
 interface Journey {
   from: string;
@@ -275,17 +289,22 @@ function StartContent() {
 
   const inputCls = 'w-full rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-slate-900 text-base placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all';
 
-  // Show a spinner while we confirm auth status (avoids flicker)
+  // Show the video behind an empty shell while we confirm auth status (avoids a flash of plain dark screen)
   if (!authChecked) {
-    return <div className="min-h-screen bg-white" />;
+    return (
+      <div className="relative min-h-screen">
+        <StartBackground />
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 flex flex-col">
+    <div className="relative min-h-screen flex flex-col text-slate-900">
+      <StartBackground />
 
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-lg mx-auto w-full">
-        <Link href="/"><BootHopLogo size="sm" /></Link>
+        <Link href="/"><span className="inline-flex rounded-xl bg-white/90 backdrop-blur-md px-2 py-1 shadow-sm"><BootHopLogo size="sm" /></span></Link>
         {authenticated
           ? <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">Dashboard</Link>
           : <Link href="/login"     className="text-sm text-slate-500 hover:text-slate-900 transition-colors">Log in</Link>
@@ -294,7 +313,7 @@ function StartContent() {
 
       {/* Progress bar */}
       {step > 0 && (
-        <div className="w-full h-1 bg-slate-50">
+        <div className="w-full h-1 bg-slate-900/10">
           <div
             className="h-1 bg-blue-500 rounded-r-full transition-all duration-500 ease-out"
             style={{ width: `${progressPct}%` }}
@@ -303,7 +322,7 @@ function StartContent() {
       )}
 
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-        <div className="w-full max-w-lg">
+        <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white/95 shadow-[0_30px_90px_rgba(15,23,42,0.15)] p-6 md:p-10">
 
           {/* ── STEP 0 — Role picker ── */}
           {step === 0 && (
@@ -312,7 +331,7 @@ function StartContent() {
                 <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
                   {authenticated ? 'Add a new listing' : 'Welcome to BootHop'}
                 </h1>
-                <p className="text-slate-500 text-base">How can we help you today?</p>
+                <p className="text-slate-600 text-base">How can we help you today?</p>
               </div>
 
               <div className="space-y-4">
@@ -321,7 +340,7 @@ function StartContent() {
                   { r: 'traveller' as Role, emoji: '✈️', title: "I'm Travelling",  sub: 'Earn money from your spare luggage space',    accent: 'blue'    },
                 ] as const).map(({ r, emoji, title, sub, accent }) => (
                   <button key={r} onClick={() => chooseRole(r)}
-                    className={`w-full rounded-2xl border border-slate-200 bg-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 p-6 text-left group ${
+                    className={`w-full rounded-2xl border border-slate-200 bg-slate-50 hover:bg-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 p-6 text-left group ${
                       accent === 'emerald' ? 'hover:border-emerald-300 hover:shadow-emerald-500/10' : 'hover:border-blue-300 hover:shadow-blue-500/10'
                     }`}>
                     <div className="flex items-center gap-4">
@@ -561,7 +580,7 @@ function StartContent() {
 
 export default function StartPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+    <Suspense fallback={<div className="relative min-h-screen"><StartBackground /></div>}>
       <StartContent />
     </Suspense>
   );
