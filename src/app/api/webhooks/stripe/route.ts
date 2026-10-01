@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
-import { sendPaymentConfirmationEmail } from '@/lib/email';
 import { sendResendEmail } from '@/lib/resend-client';
 import { sendDeliveryCompleteEmail } from '@/lib/email/sendDeliveryEmail';
 import {
@@ -66,7 +65,7 @@ const signature = headersList.get('stripe-signature');
     if (isInternalRetry) {
       try {
         event = JSON.parse(body) as Stripe.Event;
-      } catch (err: any) {
+      } catch {
         return NextResponse.json({ error: 'Invalid event body' }, { status: 400 });
       }
     } else {
@@ -528,61 +527,6 @@ async function handleTransferCreated(transfer: Stripe.Transfer) {
 // ============================================================================
 // NOTIFICATION HELPERS
 // ============================================================================
-
-async function sendPaymentConfirmationEmails(matchId: string, customerEmail?: string | null) {
-  console.log(`📧 Sending payment confirmation emails for match ${matchId}`);
-
-  const { data: match } = await supabase
-    .from('matches')
-    .select(`
-      *,
-      sender_trip:sender_trip_id(from_city, to_city, travel_date, user_id),
-      traveler_trip:traveler_trip_id(from_city, to_city, travel_date, user_id)
-    `)
-    .eq('id', matchId)
-    .single();
-
-  if (!match) return;
-
-  // Fetch user emails via admin API
-  const { createClient: mkClient } = await import('@supabase/supabase-js');
-  const admin = mkClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
-  const [{ data: senderData }, { data: travelerData }] = await Promise.all([
-    admin.auth.admin.getUserById(match.sender_trip?.user_id),
-    admin.auth.admin.getUserById(match.traveler_trip?.user_id),
-  ]);
-
-  const route    = `${match.sender_trip?.from_city} → ${match.sender_trip?.to_city}`;
-  const date     = match.sender_trip?.travel_date || '';
-  const amount   = `£${match.agreed_price || match.hooper_pays || 0}`;
-
-  await Promise.allSettled([
-    senderData?.user?.email && sendPaymentConfirmationEmail({
-      to:           senderData.user.email,
-      name:         senderData.user.user_metadata?.full_name || 'there',
-      amount,
-      role:         'sender',
-      from:         match.sender_trip?.from_city,
-      to_location:  match.sender_trip?.to_city,
-      transactionId: matchId,
-      date,
-    }),
-    travelerData?.user?.email && sendPaymentConfirmationEmail({
-      to:           travelerData.user.email,
-      name:         travelerData.user.user_metadata?.full_name || 'there',
-      amount:       `£${match.carrier_payout || 0}`,
-      role:         'traveler',
-      from:         match.traveler_trip?.from_city,
-      to_location:  match.traveler_trip?.to_city,
-      transactionId: matchId,
-      date,
-    }),
-  ]);
-}
 
 async function sendPaymentFailureNotification(matchId: string) {
   const { data: match } = await supabase

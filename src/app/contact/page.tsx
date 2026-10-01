@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { trackEvent } from '@/lib/analytics';
-import { Mail, MessageCircle, Clock, CheckCircle, AlertCircle, ArrowRight, Sparkles, Shield, Phone } from 'lucide-react';
+import { Mail, Clock, CheckCircle, AlertCircle, ArrowRight, Sparkles, Shield, Phone } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
@@ -96,7 +96,7 @@ export default function ContactPage() {
             </span>
           </h1>
           <p className="text-slate-300 text-xl max-w-2xl mx-auto">
-            Have a question or a problem? We're here to help. Fill in the form below and we'll get back to you quickly.
+            Have a question or a problem? We&apos;re here to help. Fill in the form below and we&apos;ll get back to you quickly.
           </p>
         </div>
       </section>
@@ -220,7 +220,7 @@ export default function ContactPage() {
                   <CheckCircle className="h-8 w-8 text-white" />
                 </div>
                 <h2 className="text-3xl font-black text-slate-900 mb-2">Message sent!</h2>
-                <p className="text-slate-600 text-sm mb-8">We'll be in touch within 24 hours on business days.</p>
+                <p className="text-slate-600 text-sm mb-8">We&apos;ll be in touch within 24 hours on business days.</p>
                 <button
                   onClick={() => { setForm({ name: '', email: '', topic: '', message: '', _hp: '' }); setStatus('idle'); }}
                   className="rounded-xl border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-all duration-300 hover:scale-105"

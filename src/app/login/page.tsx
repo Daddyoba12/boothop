@@ -27,7 +27,7 @@ export default function LoginPage() {
   const [email, setEmail]             = useState('');
   const [code, setCode]               = useState('');
   const [step, setStep]               = useState<'email' | 'verify'>('email');
-  const [trips, setTrips]             = useState<Trip[]>([]);
+  const [, setTrips]                  = useState<Trip[]>([]);
   const [showNoListingModal, setShowNoListingModal] = useState(false);
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState<string | null>(null);

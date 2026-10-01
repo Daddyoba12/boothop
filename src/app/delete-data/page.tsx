@@ -103,7 +103,7 @@ export default function DeleteDataPage() {
               <div>
                 <p className="font-medium">Tell us what to delete</p>
                 <p className="text-slate-600 text-sm mt-1">
-                  Specify which categories of data you want removed (e.g. "delete all my messages" or "remove my delivery history"). Include the email or phone number on your account.
+                  Specify which categories of data you want removed (e.g. &quot;delete all my messages&quot; or &quot;remove my delivery history&quot;). Include the email or phone number on your account.
                 </p>
               </div>
             </li>
@@ -112,7 +112,7 @@ export default function DeleteDataPage() {
               <div>
                 <p className="font-medium">We confirm and action it</p>
                 <p className="text-slate-600 text-sm mt-1">
-                  We'll confirm receipt within <strong className="text-slate-900">48 hours</strong> and complete the deletion within <strong className="text-slate-900">30 days</strong>. Your account remains active.
+                  We&apos;ll confirm receipt within <strong className="text-slate-900">48 hours</strong> and complete the deletion within <strong className="text-slate-900">30 days</strong>. Your account remains active.
                 </p>
               </div>
             </li>

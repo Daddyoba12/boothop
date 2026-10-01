@@ -1,4 +1,4 @@
-import Link from 'next/link';
+
 import { Shield, AlertTriangle, CheckCircle, Globe, FileText, Scale } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
@@ -178,15 +178,15 @@ export default function TermsPage() {
 
         {/* 1. DEFINITIONS */}
         <Section id="definitions" title="1. Definitions" icon={FileText}>
-          <P><strong className="text-slate-900">"BootHop"</strong>, <strong className="text-slate-900">"we"</strong>, <strong className="text-slate-900">"us"</strong> or <strong className="text-slate-900">"our"</strong> refers to BootHop Ltd, a company registered in England and Wales.</P>
-          <P><strong className="text-slate-900">"Platform"</strong> means the BootHop website, mobile application, and all related services.</P>
-          <P><strong className="text-slate-900">"Sender"</strong> (also referred to as <em>Hooper</em> on our platform) means a user who posts a delivery request — i.e. a person who wishes to have an item transported.</P>
-          <P><strong className="text-slate-900">"Traveller"</strong> (also referred to as <em>Booter</em> on our platform) means a user who accepts a delivery request — i.e. a person who carries an item as part of an existing journey.</P>
-          <P><strong className="text-slate-900">"Match"</strong> means a confirmed pairing between a Sender and a Traveller for a specific delivery.</P>
-          <P><strong className="text-slate-900">"Escrow"</strong> means the secure holding of funds by Stripe on behalf of both parties, pending confirmation of delivery.</P>
-          <P><strong className="text-slate-900">"KYC"</strong> means Know Your Customer identity verification, carried out via Stripe Identity.</P>
-          <P><strong className="text-slate-900">"Goods"</strong> means any item or items posted for delivery on the Platform.</P>
-          <P><strong className="text-slate-900">"Insurance"</strong> means the optional but default-selected cover charged at 7.5% of the declared goods value, as described in Section 8.</P>
+          <P><strong className="text-slate-900">&quot;BootHop&quot;</strong>, <strong className="text-slate-900">&quot;we&quot;</strong>, <strong className="text-slate-900">&quot;us&quot;</strong> or <strong className="text-slate-900">&quot;our&quot;</strong> refers to BootHop Ltd, a company registered in England and Wales.</P>
+          <P><strong className="text-slate-900">&quot;Platform&quot;</strong> means the BootHop website, mobile application, and all related services.</P>
+          <P><strong className="text-slate-900">&quot;Sender&quot;</strong> (also referred to as <em>Hooper</em> on our platform) means a user who posts a delivery request — i.e. a person who wishes to have an item transported.</P>
+          <P><strong className="text-slate-900">&quot;Traveller&quot;</strong> (also referred to as <em>Booter</em> on our platform) means a user who accepts a delivery request — i.e. a person who carries an item as part of an existing journey.</P>
+          <P><strong className="text-slate-900">&quot;Match&quot;</strong> means a confirmed pairing between a Sender and a Traveller for a specific delivery.</P>
+          <P><strong className="text-slate-900">&quot;Escrow&quot;</strong> means the secure holding of funds by Stripe on behalf of both parties, pending confirmation of delivery.</P>
+          <P><strong className="text-slate-900">&quot;KYC&quot;</strong> means Know Your Customer identity verification, carried out via Stripe Identity.</P>
+          <P><strong className="text-slate-900">&quot;Goods&quot;</strong> means any item or items posted for delivery on the Platform.</P>
+          <P><strong className="text-slate-900">&quot;Insurance&quot;</strong> means the optional but default-selected cover charged at 7.5% of the declared goods value, as described in Section 8.</P>
         </Section>
 
         {/* 2. PLATFORM */}
@@ -228,13 +228,13 @@ export default function TermsPage() {
         <Section id="traveller" title="6. Traveller Responsibilities" icon={Shield}>
           <P>As a Traveller on BootHop, you accept the following responsibilities:</P>
           <Ul items={travellerDuties} />
-          <P>BootHop strongly recommends that all Travellers inspect and photograph items before accepting them and again before handing them over to the Sender's recipient.</P>
+          <P>BootHop strongly recommends that all Travellers inspect and photograph items before accepting them and again before handing them over to the Sender&apos;s recipient.</P>
         </Section>
 
         {/* 7. CUSTOMS */}
         <Section id="customs" title="7. Customs & Import Duties" icon={Globe}>
           <P><strong className="text-slate-900">The Sender is solely and exclusively responsible for all customs duties, import taxes, VAT, excise duties, and any other charges levied by customs authorities</strong> in the destination country (and in any transit country).</P>
-          <P>BootHop does not facilitate customs declarations on behalf of users. It is the Sender's responsibility to ensure that appropriate customs documentation is prepared and provided to the Traveller before handover.</P>
+          <P>BootHop does not facilitate customs declarations on behalf of users. It is the Sender&apos;s responsibility to ensure that appropriate customs documentation is prepared and provided to the Traveller before handover.</P>
           <P>Common customs thresholds users must be aware of (these are indicative and subject to change — always verify with official customs authorities):</P>
           <div className="rounded-xl border border-slate-200 overflow-hidden text-xs">
             <table className="w-full">
@@ -297,12 +297,12 @@ export default function TermsPage() {
             'Fragile items not marked as such and not packed appropriately',
             'Any items involved in criminal activity',
           ]} />
-          <P>Insurance is underwritten by BootHop's insurance partner. Full policy documents are available on request. BootHop acts as an introducer only and is not itself an insurer.</P>
+          <P>Insurance is underwritten by BootHop&apos;s insurance partner. Full policy documents are available on request. BootHop acts as an introducer only and is not itself an insurer.</P>
         </Section>
 
         {/* 9. ESCROW */}
         <Section id="escrow" title="9. Escrow Payments" icon={Scale}>
-          <P>All payments between Senders and Travellers are processed via Stripe's secure escrow system. By using the Platform, you agree to Stripe's terms of service in addition to these Terms.</P>
+          <P>All payments between Senders and Travellers are processed via Stripe&apos;s secure escrow system. By using the Platform, you agree to Stripe&apos;s terms of service in addition to these Terms.</P>
           <Ul items={[
             'The Sender pays the agreed delivery price plus insurance premium into escrow. These funds are held by Stripe — not by BootHop, not by the Traveller.',
             'Escrowed funds are released to the Traveller only when both the Sender and Traveller have confirmed successful delivery.',
@@ -351,7 +351,7 @@ export default function TermsPage() {
             'Nothing in these Terms limits liability for death or personal injury caused by our negligence, or for fraudulent misrepresentation.',
             'BootHop is not responsible for the acts or omissions of Senders or Travellers who are independent third parties.',
           ]} />
-          <P>Users engage with each other at their own risk. BootHop's role is to facilitate connections and provide security infrastructure — we are not a party to any delivery contract between Sender and Traveller.</P>
+          <P>Users engage with each other at their own risk. BootHop&apos;s role is to facilitate connections and provide security infrastructure — we are not a party to any delivery contract between Sender and Traveller.</P>
         </Section>
 
         {/* 13. DISPUTES */}

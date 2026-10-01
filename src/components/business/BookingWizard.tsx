@@ -2,12 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  ChevronLeft, ChevronRight, Loader2, AlertCircle, AlertTriangle,
-  CheckCircle, MapPin, Package, Clock, Shield,
-  Plane, Globe, Truck, Zap, Star, Info, Phone, Mail,
-  CreditCard, X, RotateCcw, Building2, User,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, AlertCircle, AlertTriangle, CheckCircle, MapPin, Package, Clock, Shield, Plane, Globe, Truck, Zap, Star, Phone, Mail, CreditCard, X, RotateCcw } from 'lucide-react';
 import {
   calculateQuote, RouteType, DeliveryMode, UrgencyTier,
   ROUTE_META, URGENCY_META, CATEGORIES, QuoteBreakdown,
@@ -388,17 +383,10 @@ export function BusinessBookingWizard({ tier, bizEmail, companyName, onSuccess, 
   const [error,           setError]         = useState<string | null>(null);
   const [showDangerModal, setShowDangerModal] = useState(false);
   const [showDraftBanner, setShowDraftBanner] = useState(false);
-  const [savedDraftStep,  setSavedDraftStep] = useState<number | null>(null);
+  const [, setSavedDraftStep] = useState<number | null>(null);
   const draftSavedRef = useRef(false);
 
   const up = (key: keyof Form, val: unknown) => setForm(f => ({ ...f, [key]: val }));
-
-  // Derive routeType from airport selections
-  const derivedRouteType = useMemo<RouteType | ''>(() => {
-    if (form.routeType) return form.routeType;
-    // If both are addresses (UK-UK assumed unless overridden)
-    return '';
-  }, [form.routeType]);
 
   const isIntl = form.routeType !== '' && form.routeType !== 'uk_uk';
   const totalSteps = isIntl ? 4 : 3;

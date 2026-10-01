@@ -220,7 +220,7 @@ export default function CarrierSignInPage() {
                     </button>
                     <button onClick={sendOtp}
                       className="w-full text-center text-slate-600 text-sm hover:text-slate-800 transition-colors">
-                      Didn't get it? Resend code
+                      Didn&apos;t get it? Resend code
                     </button>
                   </div>
                 </motion.div>
@@ -266,7 +266,7 @@ export default function CarrierSignInPage() {
                     <div>
                       <h2 className="text-2xl font-black mb-2">No carrier account found</h2>
                       <p className="text-slate-600 text-base">
-                        We couldn't find a carrier profile for <span className="text-slate-900 font-semibold">{email}</span>.
+                        We couldn&apos;t find a carrier profile for <span className="text-slate-900 font-semibold">{email}</span>.
                         Register below to join the BootHop carrier network.
                       </p>
                     </div>

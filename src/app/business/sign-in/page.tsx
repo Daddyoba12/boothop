@@ -208,7 +208,7 @@ export default function ExpressSignInPage() {
                     </button>
                     <button onClick={sendOtp}
                       className="w-full text-center text-slate-500 text-xs hover:text-slate-600 transition-colors">
-                      Didn't get it? Resend code
+                      Didn&apos;t get it? Resend code
                     </button>
                   </div>
                 </motion.div>

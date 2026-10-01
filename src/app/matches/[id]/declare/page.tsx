@@ -416,7 +416,7 @@ export default function DeclarePage() {
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-600">Detailed description</p>
           <p className="text-xs text-slate-600">
             Be specific — include brand, model, size, colour, condition, and purpose.
-            Vague descriptions like "clothes" or "electronics" will be rejected.
+            Vague descriptions like &quot;clothes&quot; or &quot;electronics&quot; will be rejected.
           </p>
           <textarea
             rows={4}

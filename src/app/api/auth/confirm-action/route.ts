@@ -4,7 +4,7 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { signAppSession, getSessionCookieName } from '@/lib/auth/session';
 import { sendTermsAcceptanceEmail } from '@/lib/email/sendTermsEmail';
 import { sendResendEmail } from '@/lib/resend-client';
-import { sendAdminCarrierPayoutAlertEmail, sendDeliveryCompleteEmail, sendCarrierConfirmedEmail } from '@/lib/email/sendDeliveryEmail';
+import { sendAdminCarrierPayoutAlertEmail, sendCarrierConfirmedEmail } from '@/lib/email/sendDeliveryEmail';
 import { sendRatingRequestEmail } from '@/lib/email/sendRatingEmail';
 import { sendMatchDeclinedEmail, sendMatchCancelledEmail } from '@/lib/email/sendMatchEmail';
 

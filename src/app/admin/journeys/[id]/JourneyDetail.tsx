@@ -3,11 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import {
-  ArrowLeft, Shield, MapPin, Mail, Package,
-  CheckCircle, RefreshCw, X, Edit2, Trash2, Eye,
-  DollarSign, AlertTriangle, Clock, Calendar,
-} from 'lucide-react';
+import { ArrowLeft, Shield, MapPin, Package, CheckCircle, RefreshCw, X, Edit2, Trash2, Eye, Clock } from 'lucide-react';
 
 function fmt(d: string | null | undefined) {
   if (!d) return '—';

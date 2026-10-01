@@ -6,10 +6,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { trackEvent } from '@/lib/analytics';
 import { ttTrack } from '@/lib/tiktok';
-import {
-  Package, Plane, MapPin, Calendar, ArrowRight,
-  CheckCircle, AlertCircle, Mail, Home, PlusCircle,
-} from 'lucide-react';
+import { Package, Plane, MapPin, Calendar, ArrowRight, CheckCircle, AlertCircle, Mail } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 
 // ── Country validation ────────────────────────────────────────────────────────
@@ -221,17 +218,6 @@ function RegisterForm() {
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((p) => ({ ...p, [field]: e.target.value }));
-
-  const resetForm = () => {
-    setForm({ from: '', to: '', date: '', weight: '', price: '', email: '' });
-    setFromQuery(''); setToQuery('');
-    setFromSugg([]); setToSugg([]);
-    setFromAirports([]); setToAirports([]);
-    setFromAirportData(null); setToAirportData(null);
-    setFromTerminal(null); setToTerminal(null);
-    setFromPostcode(null); setToPostcode(null);
-    setFromOk(false); setToOk(false);
-  };
 
   // Build the display string and store it — called after airport or terminal selection
   const applyFromAirport = (a: Airport, terminal: string | null) => {
@@ -514,7 +500,7 @@ function RegisterForm() {
                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                     Redirecting to Live Journeys…
                   </div>
-                  <p className="text-slate-500 text-xs">You'll be taken there automatically in a moment.</p>
+                  <p className="text-slate-500 text-xs">You&apos;ll be taken there automatically in a moment.</p>
 
                   <button
                     onClick={() => { window.location.href = successData.redirectTo; }}
@@ -585,7 +571,7 @@ function RegisterForm() {
                     <Mail className="h-6 w-6 text-white" />
                   </div>
                   <h2 className="text-2xl font-black text-slate-900">Almost there</h2>
-                  <p className="text-slate-600 text-sm mt-1">Enter your email — we'll send a BootHop verification link.</p>
+                  <p className="text-slate-600 text-sm mt-1">Enter your email — we&apos;ll send a BootHop verification link.</p>
                 </div>
 
                 {/* Trip summary */}

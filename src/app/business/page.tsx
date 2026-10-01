@@ -179,7 +179,7 @@ export default function BoothopBusiness() {
               </motion.h2>
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
                 className="text-slate-600 text-base max-w-xl mx-auto">
-                Whether you're shipping, carrying, or managing critical logistics at scale — there's a route built for you.
+                Whether you&apos;re shipping, carrying, or managing critical logistics at scale — there&apos;s a route built for you.
               </motion.p>
             </div>
 

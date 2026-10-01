@@ -2,11 +2,8 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import {
-  Search, Plane, Calendar, Package, ArrowRight, X, Filter,
-  Sparkles, CheckCircle, Tag, ChevronLeft, Mail, Shield, Globe,
-} from 'lucide-react';
-import RoleToggle from '@/components/RoleToggle';
+import { Search, Plane, Calendar, Package, ArrowRight, X, Sparkles, CheckCircle, Tag, ChevronLeft, Mail, Shield, Globe } from 'lucide-react';
+
 import { createSupabaseClient } from '@/lib/supabase';
 import { ttTrack } from '@/lib/tiktok';
 import NavBar from '@/components/NavBar';
@@ -107,7 +104,6 @@ function LiveJourneysContent() {
   const [busy, setBusy]                 = useState(false);
   const [fieldError, setFieldError]     = useState('');
   const [blockingError, setBlockingError] = useState('');
-  const [isLoggedIn, setIsLoggedIn]     = useState(false);
   const [pendingOpenId, setPendingOpenId] = useState<string | null>(null);
   // Track which trip cards are showing their original (non-English) text
   const [showOriginalIds, setShowOriginalIds] = useState<Set<string>>(new Set());

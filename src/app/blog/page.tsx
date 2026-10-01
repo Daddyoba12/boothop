@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Calendar, Tag, ArrowRight, BookOpen, FileCheck2, Building2, PlaneTakeoff, Globe2, Network, TrendingUp, Heart } from 'lucide-react';
+import { Calendar, Tag, ArrowRight, BookOpen, FileCheck2, Globe2, Network, TrendingUp, Heart } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 
@@ -37,11 +37,6 @@ async function getPosts(): Promise<Entry[]> {
 
 function postId(entry: Entry): string {
   return entry.id.$t.split('post-')[1] ?? entry.id.$t;
-}
-
-function postUrl(entry: Entry): string {
-  const alt = entry.link.find(l => l.rel === 'alternate');
-  return alt?.href ?? '#';
 }
 
 function decodeEntities(str: string): string {

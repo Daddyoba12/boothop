@@ -4,11 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Loader2, CheckCircle, ArrowRight, LogOut, Pencil,
-  XCircle, User, Loader2 as Spin, AlertCircle, X, MessageCircle,
-  Zap, Globe, Truck, Shield, Clock, Package,
-} from 'lucide-react';
+import { Loader2, CheckCircle, ArrowRight, LogOut, Pencil, XCircle, User, Loader2 as Spin, AlertCircle, X, MessageCircle, Zap, Globe, Truck, Shield, Package } from 'lucide-react';
 import { BusinessNav } from '@/components/business/BusinessNav';
 import BusinessFooter from '@/components/business/BusinessFooter';
 import { BusinessBookingWizard } from '@/components/business/BookingWizard';
@@ -220,7 +216,7 @@ export default function BusinessPortalPage() {
                 <AlertCircle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-bold text-orange-600">Payment cancelled</p>
-                  <p className="text-xs text-slate-600 mt-0.5">Your booking was not completed. No charge was made — you can try again whenever you're ready.</p>
+                  <p className="text-xs text-slate-600 mt-0.5">Your booking was not completed. No charge was made — you can try again whenever you&apos;re ready.</p>
                 </div>
                 <button onClick={() => setPaymentCancelled(false)} className="ml-auto text-slate-500 hover:text-slate-900 transition-colors"><X className="h-4 w-4" /></button>
               </div>
@@ -469,7 +465,7 @@ export default function BusinessPortalPage() {
               {isPaid ? (
                 <>
                   <h2 className="text-4xl font-black mb-3">Payment received</h2>
-                  <p className="text-slate-600 mb-2 leading-relaxed">Your payment has been received. Your job is now under review — we'll confirm dispatch and send you full details by email.</p>
+                  <p className="text-slate-600 mb-2 leading-relaxed">Your payment has been received. Your job is now under review — we&apos;ll confirm dispatch and send you full details by email.</p>
                   <p className="text-emerald-600/70 text-sm mb-6">Usually confirmed within 2–4 hours during business hours.</p>
                 </>
               ) : (

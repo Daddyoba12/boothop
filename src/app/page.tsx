@@ -2,19 +2,15 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Suspense, useEffect, useMemo, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import {
-  ArrowRight, CheckCircle, Package,
-  Plane, Search, Star, Users,
-  MessageCircle,
-} from 'lucide-react';
+import { ArrowRight, CheckCircle, Plane, Star, Users, MessageCircle } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import dynamic from 'next/dynamic';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
-import RoleToggle from '@/components/RoleToggle';
+
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 const FlightTicker = dynamic(() => import('@/components/bfi/FlightTicker'), { ssr: false });
@@ -157,8 +153,8 @@ const TRANSPORT_MODES = [
 
 function TransportCarousel() {
   const [active, setActive]   = useState(0);
-  const [prev,   setPrev]     = useState<number | null>(null);
-  const [dir,    setDir]      = useState<1 | -1>(1);  // 1 = forward, -1 = back
+  const [,       setPrev]     = useState<number | null>(null);
+  const [,       setDir]      = useState<1 | -1>(1);  // 1 = forward, -1 = back
 
   const go = useCallback((next: number, direction: 1 | -1 = 1) => {
     setPrev(active);
@@ -249,7 +245,7 @@ function HomePageContent() {
   const [emailSent, setEmailSent] = useState(false);
   const [codeInput, setCodeInput] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [trips, setTrips] = useState<RecentTrip[]>([]);
+  const [, setTrips] = useState<RecentTrip[]>([]);
   const [queryFrom, setQueryFrom] = useState('');
   const [fromSuggestions, setFromSuggestions] = useState<string[]>([]);
   const [queryTo, setQueryTo] = useState('');
@@ -263,7 +259,7 @@ function HomePageContent() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [otpError, setOtpError] = useState('');
 
-  const [scrollY, setScrollY] = useState(0);
+  const [, setScrollY] = useState(0);
   useEffect(() => {
     const onScroll = () => { setScrollY(window.scrollY); };
     window.addEventListener('scroll', onScroll);
@@ -318,14 +314,6 @@ function HomePageContent() {
 
   const [routeCounts, setRouteCounts] = useState<Record<string, number>>({});
   const [routesLoaded, setRoutesLoaded] = useState(false);
-
-  const resetForm = () => {
-    setTrip({ from: '', to: '', date: '', price: '', email: '', weight: '' });
-    setQueryFrom(''); setQueryTo('');
-    setFromSuggestions([]); setToSuggestions([]);
-    setFromSelected(false); setToSelected(false);
-    setShowEmail(false); setEmailSent(false);
-  };
 
   const loadTrips = useCallback(async () => {
     const today = new Date().toISOString().split('T')[0];

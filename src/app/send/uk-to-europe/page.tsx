@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Globe, Clock, Shield, FileCheck, Plane, Package } from 'lucide-react';
+import { ArrowRight, Globe, FileCheck, Package } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 
@@ -199,7 +199,7 @@ export default function UKToEuropePage() {
         <div className="max-w-2xl mx-auto bg-blue-50 border border-blue-200 rounded-3xl p-10 text-center">
           <h2 className="text-3xl font-black mb-4 text-slate-900">Europe is closer than you think.</h2>
           <p className="text-slate-600 mb-8">
-            Post your UK to Europe delivery in under 2 minutes. Matched with a verified traveller on today's flights.
+            Post your UK to Europe delivery in under 2 minutes. Matched with a verified traveller on today&apos;s flights.
           </p>
           <Link
             href="/start"

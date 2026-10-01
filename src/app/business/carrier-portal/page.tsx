@@ -144,7 +144,7 @@ export default function CarrierPortalPage() {
             <Truck className="h-12 w-12 text-slate-200 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-slate-600 mb-2">No jobs assigned yet</h2>
             <p className="text-sm text-slate-500 max-w-xs mx-auto">
-              When a job in your coverage area is matched to you, it will appear here. You'll also receive an email alert.
+              When a job in your coverage area is matched to you, it will appear here. You&apos;ll also receive an email alert.
             </p>
           </motion.div>
         ) : (

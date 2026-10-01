@@ -164,7 +164,7 @@ export default function BusinessUrgentPage() {
                 ))}
               </ul>
               <blockquote className="border-l-2 border-blue-300 pl-4 text-slate-600 text-sm italic">
-                "{quote}"
+                &quot;{quote}&quot;
               </blockquote>
             </div>
           ))}

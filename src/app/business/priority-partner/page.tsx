@@ -313,7 +313,7 @@ export default function PriorityPartnerPage() {
                   </button>
                   <button onClick={sendGateOtp}
                     className="w-full text-center text-slate-500 text-xs hover:text-slate-600 transition-colors">
-                    Didn't get it? Resend code
+                    Didn&apos;t get it? Resend code
                   </button>
                 </>
               )}

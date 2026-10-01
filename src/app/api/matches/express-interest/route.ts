@@ -17,7 +17,6 @@ export async function POST(request: Request) {
     const body         = await request.json();
     const tripId       = String(body?.tripId || '').trim();
     const interestType = body?.interestType === 'offer' ? 'offer' : 'full_price';
-    const discountPct  = interestType === 'offer' ? Number(body?.discountPct ?? 0) : 0;
     const offeredPrice = body?.offeredPrice != null ? Number(body.offeredPrice) : null;
 
     // Always use the authenticated session email — never trust the body email

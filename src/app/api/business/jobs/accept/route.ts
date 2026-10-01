@@ -17,7 +17,6 @@ function makeStatusToken(jobId: string, action: string) {
 
 export async function GET(request: NextRequest) {
   const jobId     = request.nextUrl.searchParams.get('job');
-  const carrierId = request.nextUrl.searchParams.get('carrier');
 
   if (!jobId) return NextResponse.json({ error: 'job parameter required' }, { status: 400 });
 

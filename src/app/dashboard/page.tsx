@@ -603,7 +603,6 @@ export default function DashboardPage() {
                     {match.status === 'matched' && !isExpired && (() => {
                       const userIsSender = match.sender_email === user?.email;
                       const userTrip     = userIsSender ? senderTrip : travelerTrip;
-                      const otherTrip    = userIsSender ? travelerTrip : senderTrip;
 
                       // Express-interest match: one side is auto_created (the expresser).
                       // The listing owner (non-auto_created) can respond; expresser waits.

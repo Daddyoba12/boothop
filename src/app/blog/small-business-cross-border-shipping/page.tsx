@@ -70,9 +70,9 @@ export default function SmallBusinessShippingPage() {
           <ol>
             <li><strong>High per-parcel cost</strong> — DHL, FedEx, and UPS charge a premium for low-volume international shipments. A 1kg parcel from London to Lagos can cost £45–£80 with a traditional courier on a standard rate.</li>
             <li><strong>Customs complexity</strong> — every country has different rules, restrictions, and documentation requirements. Getting it wrong means delays, additional charges, or rejected shipments.</li>
-            <li><strong>Unpredictable delivery times</strong> — "3–7 business days" can become three weeks when customs intervenes, or during peak periods.</li>
-            <li><strong>No relationship with the carrier</strong> — when something goes wrong, you're dealing with a call centre, not someone who cares about your parcel.</li>
-            <li><strong>Volume minimums</strong> — most couriers won't negotiate business rates unless you're shipping 50+ parcels per month, which excludes the majority of small businesses.</li>
+            <li><strong>Unpredictable delivery times</strong> — &quot;3–7 business days&quot; can become three weeks when customs intervenes, or during peak periods.</li>
+            <li><strong>No relationship with the carrier</strong> — when something goes wrong, you&apos;re dealing with a call centre, not someone who cares about your parcel.</li>
+            <li><strong>Volume minimums</strong> — most couriers won&apos;t negotiate business rates unless you&apos;re shipping 50+ parcels per month, which excludes the majority of small businesses.</li>
           </ol>
 
           <h2>How BootHop Changes the Equation for Small Business Shipping</h2>
@@ -96,7 +96,7 @@ export default function SmallBusinessShippingPage() {
             A food producer sending a 2kg sample box from London to Dubai: BootHop rate £32–£48 versus FedEx International Priority at £90+.
           </p>
           <p>
-            The savings compound when you factor in BootHop's compliance support — fewer rejected shipments, fewer customs holds, and documentation guidance that would otherwise require a freight forwarder or customs broker.
+            The savings compound when you factor in BootHop&apos;s compliance support — fewer rejected shipments, fewer customs holds, and documentation guidance that would otherwise require a freight forwarder or customs broker.
           </p>
 
           <h2>What to Look for in a Cross-Border Shipping Partner</h2>
@@ -111,7 +111,7 @@ export default function SmallBusinessShippingPage() {
 
           <h2>Getting Started as a Small Business on BootHop</h2>
           <p>
-            BootHop's Business Portal is designed for growing companies that need flexibility without enterprise overhead:
+            BootHop&apos;s Business Portal is designed for growing companies that need flexibility without enterprise overhead:
           </p>
           <ol>
             <li>Post your delivery job with route, item description, and required date</li>

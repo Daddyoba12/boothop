@@ -33,7 +33,7 @@ function audioUrl(t: Track): string | null {
 }
 type YtResult = { id: string; title: string; channel: string; thumbnail: string };
 
-export default function MusicManager({ clientId: _clientId, library, assignedTrackIds: initial }: Props) {
+export default function MusicManager({ library, assignedTrackIds: initial }: Props) {
   const [tab, setTab]           = useState<Tab>(library.length === 0 ? 'youtube' : 'library');
   const [assigned, setAssigned] = useState(new Set(initial));
   const [busy, setBusy]         = useState<string | null>(null);

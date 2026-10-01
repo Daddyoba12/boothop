@@ -14,7 +14,7 @@ interface Props {
   toCity?: string;
 }
 
-export default function MapboxMap({ points, fromCity, toCity }: Props) {
+export default function MapboxMap({ points, fromCity }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
 

@@ -3,16 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { TickerEntry } from '@/lib/bfi/types';
 
-function Stars({ rating }: { rating: number }) {
-  const full = Math.floor(rating);
-  const half = rating % 1 >= 0.5;
-  return (
-    <span className="text-yellow-400 text-xs">
-      {'★'.repeat(full)}{half ? '½' : ''}{'☆'.repeat(5 - full - (half ? 1 : 0))}
-    </span>
-  );
-}
-
 function TickerCard({ entry }: { entry: TickerEntry }) {
   const isGood    = entry.opportunityScore >= 65;
   const routeSlug = `${entry.origin}-${entry.destination}`.toLowerCase();

@@ -63,7 +63,7 @@ export default function WorkingAwayPage() {
           <span className="text-blue-600">We Deliver to Where You Are</span>
         </h1>
         <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-4 leading-relaxed">
-          Contracts take you away from home. Tools, documents, and personal items don't always follow. BootHop connects you with verified travellers already heading your way — same-day delivery to hotels, site offices, or temporary accommodation anywhere in the UK.
+          Contracts take you away from home. Tools, documents, and personal items don&apos;t always follow. BootHop connects you with verified travellers already heading your way — same-day delivery to hotels, site offices, or temporary accommodation anywhere in the UK.
         </p>
         <p className="text-slate-600 mb-10 text-sm">No fixed address required. No account needed to browse routes.</p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -100,7 +100,7 @@ export default function WorkingAwayPage() {
       <section className="py-20 px-6 max-w-5xl mx-auto bg-slate-50">
         <h2 className="text-3xl md:text-4xl font-black text-center mb-4 text-slate-900">The Working-Away Moments BootHop Solves</h2>
         <p className="text-slate-600 text-center mb-14 max-w-xl mx-auto">
-          Six weeks on a contract in a city you don't live in creates problems. Here are the ones we hear most.
+          Six weeks on a contract in a city you don&apos;t live in creates problems. Here are the ones we hear most.
         </p>
         <div className="grid md:grid-cols-3 gap-6">
           {scenarios.map(({ icon: Icon, title, desc }) => (
@@ -158,7 +158,7 @@ export default function WorkingAwayPage() {
       {/* CTA */}
       <section className="py-20 px-6 bg-white">
         <div className="max-w-2xl mx-auto bg-blue-50 border border-blue-200 rounded-3xl p-10 text-center">
-          <h2 className="text-3xl font-black mb-4 text-slate-900">Your contract doesn't have to mean going without.</h2>
+          <h2 className="text-3xl font-black mb-4 text-slate-900">Your contract doesn&apos;t have to mean going without.</h2>
           <p className="text-slate-600 mb-8">
             Post your delivery in 2 minutes. First £20 on us. Verified traveller, same-day UK delivery.
           </p>

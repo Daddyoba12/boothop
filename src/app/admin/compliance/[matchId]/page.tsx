@@ -1,5 +1,5 @@
-import { notFound, redirect } from 'next/navigation';
-import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
 import { requireAdminPage } from '@/lib/auth/admin';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import ComplianceMatchDetail from './ComplianceMatchDetail';

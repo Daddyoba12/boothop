@@ -118,7 +118,7 @@ export default function CookiePolicyPage() {
               </tbody>
             </table>
           </div>
-          <p className="mt-3">Third-party cookies may also be set by Stripe when you make a payment. These are governed by <a href="https://stripe.com/cookies-policy/legal" target="_blank" rel="noopener noreferrer" className="text-cyan-700 hover:text-cyan-800 underline transition-colors">Stripe's Cookie Policy</a>.</p>
+          <p className="mt-3">Third-party cookies may also be set by Stripe when you make a payment. These are governed by <a href="https://stripe.com/cookies-policy/legal" target="_blank" rel="noopener noreferrer" className="text-cyan-700 hover:text-cyan-800 underline transition-colors">Stripe&apos;s Cookie Policy</a>.</p>
         </Section>
 
         <Section id="third-party" title="Third-Party Cookies" icon={Shield}>
@@ -155,7 +155,7 @@ export default function CookiePolicyPage() {
         </Section>
 
         <Section id="changes" title="Changes to This Policy" icon={Settings}>
-          <p>We may update this Cookie Policy from time to time to reflect changes in technology, regulation, or our use of cookies. The "Last updated" date at the top of this page will always show when it was last revised.</p>
+          <p>We may update this Cookie Policy from time to time to reflect changes in technology, regulation, or our use of cookies. The &quot;Last updated&quot; date at the top of this page will always show when it was last revised.</p>
           <p>Continued use of BootHop after any changes constitutes your acceptance of the updated policy.</p>
         </Section>
 

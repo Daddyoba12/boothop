@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Check, CheckCircle, Shield, Package, DollarSign, Sparkles, ArrowRight, Lock, Zap, ChevronDown, X, Calendar, Tag } from 'lucide-react';
+import { Check, CheckCircle, Package, DollarSign, Sparkles, ArrowRight, Lock, Zap, ChevronDown, X, Calendar, Tag } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import { useScrollReveal } from '@/hooks/useScrollReveal';

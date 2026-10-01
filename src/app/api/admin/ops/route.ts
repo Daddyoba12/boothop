@@ -7,7 +7,6 @@ export async function GET() {
   const supabase = createSupabaseAdminClient();
   const now      = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-  const in7  = new Date(now.getTime() + 7  * 86400000).toISOString().slice(0, 10);
   const in30 = new Date(now.getTime() + 30 * 86400000).toISOString().slice(0, 10);
   const hrs2ago = new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString();
 

@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { writeFileSync, mkdirSync } from 'fs';
+import { mkdirSync } from 'fs';
 import { join } from 'path';
 
 const BASE = 'http://localhost:3001';

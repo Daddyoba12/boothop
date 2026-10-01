@@ -3,13 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  Package, 
-  Star,
-  MessageSquare,
-  Users,
-  CheckCircle
-} from 'lucide-react';
+import { Package, Star, CheckCircle } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
 
 function CreateRatingPageInner() {
@@ -21,7 +15,7 @@ function CreateRatingPageInner() {
   
   const [match, setMatch] = useState<any>(null);
   const [otherUser, setOtherUser] = useState<any>(null);
-  const [userType, setUserType] = useState<'booter' | 'hooper' | null>(null);
+  const [, setUserType] = useState<'booter' | 'hooper' | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   

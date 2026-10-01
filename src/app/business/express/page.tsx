@@ -200,7 +200,7 @@ export default function ExpressPage() {
               <span className="text-emerald-600">No account. No contracts.</span>
             </h1>
             <p className="text-slate-600 text-base max-w-xl mx-auto">
-              Tell us where it needs to go and we'll give you a price in under 30 seconds.
+              Tell us where it needs to go and we&apos;ll give you a price in under 30 seconds.
             </p>
           </div>
         )}
@@ -356,7 +356,7 @@ export default function ExpressPage() {
               <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 text-center">
                 <h2 className="text-2xl font-black mb-2">Check your inbox</h2>
                 <p className="text-slate-600 text-sm mb-8">
-                  We've sent a 6-digit code to<br />
+                  We&apos;ve sent a 6-digit code to<br />
                   <span className="text-slate-900 font-semibold">{email}</span>
                 </p>
 
@@ -383,7 +383,7 @@ export default function ExpressPage() {
                   ← Back
                 </button>
                 <button onClick={sendOtp} className="text-slate-500 text-xs hover:text-slate-800 transition-colors mt-3 block mx-auto">
-                  Didn't get it? Resend code
+                  Didn&apos;t get it? Resend code
                 </button>
               </div>
             </motion.div>
@@ -480,7 +480,7 @@ export default function ExpressPage() {
                 A verified carrier will be assigned within 15 minutes.
               </p>
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-left max-w-sm mx-auto mb-8">
-                <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">You'll receive</p>
+                <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">You&apos;ll receive</p>
                 {['SMS confirmation shortly', 'Live tracking link by email', 'Delivery confirmation when done'].map(t => (
                   <div key={t} className="flex items-center gap-2 text-sm text-slate-600 mb-2">
                     <CheckCircle className="h-3.5 w-3.5 text-emerald-600 shrink-0" /> {t}

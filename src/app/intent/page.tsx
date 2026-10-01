@@ -4,11 +4,10 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Package, Plane, ArrowRight, Shield, CheckCircle, LogOut } from 'lucide-react';
-import { createSupabaseClient } from '@/lib/supabase';
+
 
 export default function IntentPage() {
   const router   = useRouter();
-  const supabase = createSupabaseClient();
 
   const [email, setEmail]     = useState('');
   const [loading, setLoading] = useState(true);

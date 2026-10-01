@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { getMediaInsights, getAccountInsights } from '@/lib/services/instagram';
+import { getMediaInsights } from '@/lib/services/instagram';
 
 export const dynamic    = 'force-dynamic';
 export const maxDuration = 60;

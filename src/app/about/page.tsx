@@ -180,7 +180,7 @@ export default function AboutPage() {
             <div className="reveal d2">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-600 mb-6">What people send with BootHop</p>
               <div className="space-y-3">
-                {CARRY_ITEMS.map((item, i) => (
+                {CARRY_ITEMS.map((item) => (
                   <div key={item.title}
                     className={`group flex items-start gap-5 p-5 rounded-2xl border transition-all duration-300
                       ${item.muted

@@ -21,35 +21,6 @@ async function createActionToken(
   return data?.token as string | undefined;
 }
 
-/* ── Haversine distance in miles ── */
-function haversineMiles(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 3958.8;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
-    Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-async function geocode(city: string): Promise<{ lat: number; lng: number } | null> {
-  const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  if (!key) return null;
-  try {
-    const res  = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(city)}&key=${key}`);
-    const json = await res.json();
-    const loc  = json.results?.[0]?.geometry?.location;
-    return loc ? { lat: loc.lat, lng: loc.lng } : null;
-  } catch { return null; }
-}
-
-async function withinPickupRange(city1: string, city2: string): Promise<boolean> {
-  const [c1, c2] = await Promise.all([geocode(city1), geocode(city2)]);
-  if (!c1 || !c2) return true; // let through if geocoding unavailable
-  return haversineMiles(c1.lat, c1.lng, c2.lat, c2.lng) <= 20;
-}
-
 /** Strip country suffix so "London, UK" and "London" both normalise to "london" */
 function normalizeCity(city: string): string {
   return (city ?? '').toLowerCase().split(',')[0].trim();

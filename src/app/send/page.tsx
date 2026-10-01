@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import { ArrowRight, CheckCircle, Shield, Clock, MapPin, Star } from 'lucide-react';
+import { ArrowRight, CheckCircle, Shield, MapPin, Star } from 'lucide-react';
 import BootHopLogo from '@/components/BootHopLogo';
 
 const supabase = createClient(

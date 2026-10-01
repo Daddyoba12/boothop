@@ -159,8 +159,6 @@ export default function MatchPage() {
 
       // Fetch active verification providers when external verification is required
       if (d.match.status === 'external_verification_required') {
-        const trip = d.match.sender_trip;
-        const country = trip?.from_city ? undefined : undefined; // route-based filter via country if available
         const pvRes = await fetch(`/api/matches/${matchId}/verification-providers`);
         if (pvRes.ok) {
           const pvData = await pvRes.json();

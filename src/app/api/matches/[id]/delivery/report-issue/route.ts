@@ -111,8 +111,6 @@ export async function POST(
     return NextResponse.json({ error: 'There is already an open dispute for this match.' }, { status: 409 });
   }
 
-  const nowIso = new Date().toISOString();
-
   // Create dispute — auto-payout cron skips matches with status='open' disputes
   const { data: dispute, error: insertErr } = await supabase
     .from('disputes')

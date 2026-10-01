@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowLeft, CheckCircle2, XCircle, Package, Shield,
@@ -174,13 +174,12 @@ function CheckRow({
 
 export default function InspectionPage() {
   const params  = useParams();
-  const router  = useRouter();
   const matchId = params.id as string;
 
   const [match,       setMatch]       = useState<MatchData | null>(null);
   const [declaration, setDeclaration] = useState<Declaration | null>(null);
   const [evidence,    setEvidence]    = useState<Evidence[]>([]);
-  const [inspection,  setInspection]  = useState<Inspection | null>(null);
+  const [,            setInspection]  = useState<Inspection | null>(null);
   const [loading,     setLoading]     = useState(true);
   const [checks,      setChecks]      = useState<CheckState>(INITIAL_CHECKS);
   const [note,          setNote]          = useState('');

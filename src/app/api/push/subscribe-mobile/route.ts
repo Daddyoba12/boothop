@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE() {
   const cookieStore = await cookies();
   const session = getAppSession(cookieStore);
   if (!session?.email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

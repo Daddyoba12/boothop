@@ -104,7 +104,6 @@ export async function GET(request: Request) {
       if (!acceptToken || !declineToken) continue;
 
       const acceptUrl  = `${appUrl}/confirm?token=${acceptToken}`;
-      const declineUrl = `${appUrl}/confirm?token=${declineToken}`;
 
       // Send reminder email
       await sendMatchReminderEmail({

@@ -110,7 +110,6 @@ function NavIcon({ path }: { path: string }) {
 export default function AllClientsClient({
   clients,
   adminName,
-  adminSlug,
 }: {
   clients: Client[];
   adminName: string;

@@ -144,14 +144,6 @@ const glowMap: Record<string, string> = {
   amber:  'from-amber-500 to-yellow-400 shadow-amber-500/50',
 };
 
-const borderMap: Record<string, string> = {
-  blue:   'hover:border-blue-500/50 hover:shadow-blue-500/20',
-  emerald:'hover:border-emerald-500/50 hover:shadow-emerald-500/20',
-  violet: 'hover:border-violet-500/50 hover:shadow-violet-500/20',
-  red:    'hover:border-red-500/50 hover:shadow-red-500/20',
-  amber:  'hover:border-amber-500/50 hover:shadow-amber-500/20',
-};
-
 const touchMap: Record<string, string> = {
   blue:   'touch-blue',
   emerald:'touch-emerald',
@@ -214,7 +206,7 @@ export default function HelpPageClient() {
         <div className="rounded-2xl border border-amber-200 bg-amber-50 flex items-start gap-3 p-5">
           <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-amber-800 leading-relaxed">
-            <span className="font-semibold text-amber-900">Never carry items you haven't inspected.</span> BootHop is a peer-to-peer platform — always verify item contents before agreeing to carry anything.
+            <span className="font-semibold text-amber-900">Never carry items you haven&apos;t inspected.</span> BootHop is a peer-to-peer platform — always verify item contents before agreeing to carry anything.
           </p>
         </div>
       </div>
@@ -272,8 +264,8 @@ export default function HelpPageClient() {
             </div>
             <h4 className="text-slate-900 font-semibold mb-3">How to request data deletion</h4>
             <ol className="text-slate-600 text-sm space-y-2 mb-6 list-decimal list-inside">
-              <li>Email <a href="mailto:privacy@boothop.com" className="text-blue-600 underline">privacy@boothop.com</a> with subject line <strong className="text-slate-900">"Data Deletion Request"</strong></li>
-              <li>Include your registered email address and what you'd like deleted (specific data or full account)</li>
+              <li>Email <a href="mailto:privacy@boothop.com" className="text-blue-600 underline">privacy@boothop.com</a> with subject line <strong className="text-slate-900">&quot;Data Deletion Request&quot;</strong></li>
+              <li>Include your registered email address and what you&apos;d like deleted (specific data or full account)</li>
               <li>We will confirm receipt within 48 hours and complete the deletion within 30 days</li>
             </ol>
             <Link href="/contact" className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-red-500/25 transition-all duration-300 hover:scale-105">

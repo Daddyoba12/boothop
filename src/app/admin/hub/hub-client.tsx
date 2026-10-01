@@ -1,10 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  CheckCircle, XCircle, AlertTriangle, Clock,
-  Loader2, RefreshCw, DollarSign, Truck, Scale, Globe, Zap,
-} from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Loader2, RefreshCw, DollarSign, Truck, Scale, Globe, Zap } from 'lucide-react';
 
 type Match = {
   id: string;
@@ -109,7 +106,7 @@ export default function AdminHubClient() {
       } else {
         setMatchResult(`Error: ${json.error ?? 'Match run failed'}`);
       }
-    } catch (e) {
+    } catch {
       setMatchResult('Network error — match run failed.');
     }
     setMatchRunning(false);

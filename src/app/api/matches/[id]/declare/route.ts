@@ -454,7 +454,6 @@ async function handleInspectionPending(
   }).eq('id', matchId);
 
   // Pre-create the inspection record (traveller will fill it in)
-  const trip = (match as any).sender_trip;
   const { data: decl } = await supabase
     .from('item_declarations')
     .select('item_name')
@@ -475,7 +474,6 @@ async function handleInspectionPending(
   ]);
 
   const itemName   = decl?.item_name ?? 'Item';
-  const travelDate = Array.isArray(trip) ? trip[0]?.travel_date : trip?.travel_date ?? '';
 
   await Promise.allSettled([
     match.traveler_email && sendInspectionRequestEmail({

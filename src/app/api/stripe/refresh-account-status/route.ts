@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { refreshAccountStatus } from '@/lib/services/stripe-connect';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getAppSession } from '@/lib/auth/session';
 import { cookies } from 'next/headers';
 
-export async function POST(_req: NextRequest) {
+export async function POST() {
   try {
     const cookieStore = await cookies();
     const session = getAppSession(cookieStore);

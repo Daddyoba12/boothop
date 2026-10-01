@@ -47,7 +47,7 @@ function UserPlusIcon() {
 }
 
 /* ── Branded shell wrapper ───────────────────────────────────────────────── */
-function AuthShell({ children, view, onSwitch }: {
+function AuthShell({ children }: {
   children: React.ReactNode;
   view: View;
   onSwitch: (v: View) => void;
@@ -341,7 +341,7 @@ export default function CommanderPage() {
             <div>
               <h1 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', lineHeight: 1.2 }}>Reset your password</h1>
               <p style={{ fontSize: 13, color: '#64748b', marginTop: 3, lineHeight: 1.5 }}>
-                Enter your workspace ID and registered email. We'll send you a secure reset link.
+                Enter your workspace ID and registered email. We&apos;ll send you a secure reset link.
               </p>
             </div>
           </div>

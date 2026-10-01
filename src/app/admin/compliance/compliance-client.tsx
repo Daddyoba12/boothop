@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {
-  ShieldCheck, ShieldAlert, ShieldX, Clock, CheckCircle2,
-  XCircle, RefreshCw, Search, Package, AlertTriangle,
-} from 'lucide-react';
+import { ShieldCheck, ShieldAlert, ShieldX, Clock, CheckCircle2, XCircle, RefreshCw, Search, Package } from 'lucide-react';
 
 // ── Shipment compliance types ─────────────────────────────────────────────────
 interface ItemDeclaration {
@@ -434,7 +431,7 @@ export default function ComplianceClient() {
                     {req.admin_note && (
                       <div>
                         <p className="text-xs text-slate-600 uppercase tracking-wider font-medium mb-1">Admin Note</p>
-                        <p className="text-sm text-slate-700 italic">"{req.admin_note}"</p>
+                        <p className="text-sm text-slate-700 italic">&quot;{req.admin_note}&quot;</p>
                       </div>
                     )}
                   </div>

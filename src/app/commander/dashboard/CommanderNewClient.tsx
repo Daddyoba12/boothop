@@ -247,12 +247,6 @@ interface Slot {
   v1?: string; v2?: string; pending_approval?: boolean; rendered_at?: string;
 }
 
-function esc(s: unknown): string {
-  return String(s || '')
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
 function vidUrl(path: string): string {
   if (!path) return '';
   if (path.startsWith('http')) return path;
@@ -343,7 +337,6 @@ export default function CommanderNewClient({
   const musicSelRef  = useRef<HTMLSelectElement | null>(null);
   const blockIdRef   = useRef<HTMLInputElement | null>(null);
   const ytQueryRef   = useRef<HTMLInputElement | null>(null);
-  const dlLinkRef    = useRef<HTMLAnchorElement | null>(null);
   // profile refs
   const pfBiz  = useRef<HTMLInputElement | null>(null);
   const pfCon  = useRef<HTMLInputElement | null>(null);

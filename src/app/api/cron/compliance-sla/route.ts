@@ -69,7 +69,6 @@ export async function GET(request: Request) {
 
       if (decl?.declaration_status === 'submitted') continue;
 
-      const nowIso = new Date().toISOString();
       const trip     = Array.isArray(match.sender_trip) ? match.sender_trip[0] : (match.sender_trip as any);
       const fromCity = trip?.from_city ?? '';
       const toCity   = trip?.to_city   ?? '';

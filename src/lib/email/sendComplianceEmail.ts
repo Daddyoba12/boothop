@@ -274,7 +274,6 @@ export async function sendAdminComplianceReviewEmail(params: {
   flags:           string[];
 }) {
   const reviewUrl = `${appUrl}/admin/compliance/${params.matchId}`;
-  const approveUrl = `${appUrl}/api/admin/compliance/approve`;
 
   await sendResendEmail({
     from,

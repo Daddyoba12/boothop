@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
+
 import { AlertTriangle, ExternalLink, CheckCircle, Loader2, ShieldCheck, Scale } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 
@@ -155,7 +155,7 @@ function CommitContent() {
   const [error,    setError]    = useState('');
   const [checked,  setChecked]  = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [done,     setDone]     = useState(false);
+  const [,         setDone]     = useState(false);
   const [waitingOther, setWaitingOther] = useState(false);
 
   useEffect(() => {
@@ -323,7 +323,7 @@ function CommitContent() {
                 <div className="rounded-xl border border-red-200 bg-red-50 p-4 mt-4">
                   <p className="text-sm font-bold text-red-700 mb-1">CRITICAL CLAUSE</p>
                   <p className="text-sm text-red-600 italic">
-                    "I confirm that I have inspected (or presented for inspection) all items, that no prohibited goods are included, and that I accept full legal responsibility for any breach of applicable laws."
+                    &quot;I confirm that I have inspected (or presented for inspection) all items, that no prohibited goods are included, and that I accept full legal responsibility for any breach of applicable laws.&quot;
                   </p>
                 </div>
               </div>

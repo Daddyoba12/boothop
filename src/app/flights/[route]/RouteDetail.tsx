@@ -292,7 +292,7 @@ function MatchLayer({
 
 // ── Airline mini-list from today's offers ─────────────────────────────────────
 
-function AirlinesTab({ offers, origin, destination }: { offers: BFIFlightOffer[]; origin: string; destination: string }) {
+function AirlinesTab({ offers }: { offers: BFIFlightOffer[]; origin: string; destination: string }) {
   const byAirline: Record<string, { name: string; count: number; min: number; avg: number }> = {};
   for (const o of offers) {
     const key = o.airline_code;

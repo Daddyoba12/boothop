@@ -175,7 +175,7 @@ interface PaymentEmailProps {
 }
 
 export async function sendPaymentConfirmationEmail(props: PaymentEmailProps) {
-  const { to, name, amount, role, from, to_location, transactionId, date } = props;
+  const { to, amount, role, from, to_location, transactionId, date } = props;
 
   const isSender = role === 'sender';
   const emoji = isSender ? '💳' : '💰';

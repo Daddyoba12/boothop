@@ -1,7 +1,6 @@
 import { sendResendEmail } from '@/lib/resend-client';
 
 const from   = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
 
 function header() {
   return `<div style="margin-bottom:24px;">

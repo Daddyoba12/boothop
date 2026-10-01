@@ -3,15 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  Package, 
-  Search, 
-  MapPin,
-  Calendar,
-  Star,
-  DollarSign,
-  AlertCircle
-} from 'lucide-react';
+import { Package, Search, MapPin, Calendar, Star, AlertCircle } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
 import type { DeliveryRequest } from '@/lib/supabase';
 

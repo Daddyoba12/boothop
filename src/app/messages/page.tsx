@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { MessageSquare, ArrowLeft, Package, Plane, CheckCircle, AlertTriangle } from 'lucide-react';
+import { MessageSquare, ArrowLeft, Package, Plane } from 'lucide-react';
 
 type MatchTrip = { from_city?: string; to_city?: string; travel_date?: string; auto_created?: boolean } | null;
 

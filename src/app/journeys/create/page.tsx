@@ -184,9 +184,6 @@ export default function CreateJourneyPage() {
         throw new Error('Please specify available space (kg)');
       }
 
-      // Check if international
-      const isInternational = formData.fromCountry !== formData.toCountry;
-
       // Create journey
       const { data: journey, error: journeyError } = await supabase
         .from('journeys')
@@ -567,7 +564,7 @@ export default function CreateJourneyPage() {
                   />
                 </div>
                 <p className="text-xs text-slate-600 mt-1">
-                  Leave blank to negotiate with Hoopers. You'll receive 95% after 5% service fee.
+                  Leave blank to negotiate with Hoopers. You&apos;ll receive 95% after 5% service fee.
                 </p>
               </div>
             </div>
@@ -590,7 +587,7 @@ export default function CreateJourneyPage() {
                   className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
-                <p className="text-xs text-slate-600 mt-1">Required — senders need this to decide if you're a good match.</p>
+                <p className="text-xs text-slate-600 mt-1">Required — senders need this to decide if you&apos;re a good match.</p>
               </div>
             </div>
 
@@ -601,7 +598,7 @@ export default function CreateJourneyPage() {
               {/* Excludes */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Items You Won't Carry
+                  Items You Won&apos;t Carry
                 </label>
                 <div className="flex gap-2 mb-3">
                   <input

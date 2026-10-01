@@ -143,7 +143,7 @@ export default function PrioritySignInPage() {
                     </div>
                     <h2 className="text-2xl font-black mb-2">Priority member sign in</h2>
                     <p className="text-slate-600 text-sm max-w-xs mx-auto leading-relaxed">
-                      Enter your registered email and we'll send a one-time code directly to your inbox.
+                      Enter your registered email and we&apos;ll send a one-time code directly to your inbox.
                     </p>
                   </div>
                   <div className="bg-white border border-slate-200 shadow-xl rounded-2xl p-8 space-y-4">
@@ -210,7 +210,7 @@ export default function PrioritySignInPage() {
                     </button>
                     <button onClick={sendOtp}
                       className="w-full text-center text-slate-500 text-xs hover:text-slate-600 transition-colors">
-                      Didn't get it? Resend code
+                      Didn&apos;t get it? Resend code
                     </button>
                   </div>
                 </motion.div>

@@ -2,10 +2,7 @@
 
 import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import {
-  CheckCircle, Lock, ArrowRight,
-  Shield, Eye, CreditCard, Loader2,
-} from 'lucide-react';
+import { CheckCircle, Lock, ArrowRight, Eye, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { ttTrack } from '@/lib/tiktok';
 

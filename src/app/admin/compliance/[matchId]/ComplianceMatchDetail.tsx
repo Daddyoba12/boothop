@@ -3,10 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-  ArrowLeft, CheckCircle2, XCircle, Package, Shield,
-  Clock, AlertTriangle, FileText, User, Plane, Image, ExternalLink,
-} from 'lucide-react';
+import { ArrowLeft, CheckCircle2, XCircle, Shield, Clock, AlertTriangle, FileText, User, Plane, Image, ExternalLink } from 'lucide-react';
 
 interface Declaration {
   id:                          string;

@@ -162,7 +162,7 @@ export default function StudentDeliveryPage() {
         <div className="bg-slate-50 border border-slate-200 rounded-2xl p-8 text-center">
           <h3 className="text-xl font-bold mb-3 text-slate-900">Parents: send a care package today</h3>
           <p className="text-slate-600 text-sm mb-6 max-w-md mx-auto">
-            Home-cooked food, forgotten medication, a new laptop charger. You don't need to wait for a visit. BootHop gets it there today.
+            Home-cooked food, forgotten medication, a new laptop charger. You don&apos;t need to wait for a visit. BootHop gets it there today.
           </p>
           <Link
             href="/start"

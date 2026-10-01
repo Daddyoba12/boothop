@@ -12,7 +12,6 @@ export async function GET() {
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
 
   const mins90 = new Date(Date.now() - 90 * 60000).toISOString();
-  const hrs2   = new Date(Date.now() - 2 * 3600000).toISOString();
 
   // Priority jobs unmatched for 90+ minutes
   const { data: breaching } = await supabase

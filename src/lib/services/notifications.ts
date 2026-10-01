@@ -62,12 +62,6 @@ async function sendSMS(to: string, body: string): Promise<void> {
   await telnyxSMS(to, body).catch(e => console.error('SMS failed:', e));
 }
 
-async function makeCall(to: string, message: string): Promise<void> {
-  if (!process.env.TELNYX_API_KEY) return;
-  const { makeCall: telnyxCall } = await import('./telnyx');
-  await telnyxCall(to, message).catch(e => console.error('Call failed:', e));
-}
-
 // ── Tracking ready notification ───────────────────────────────────────────────
 
 function trackingEmailHtml(opts: {

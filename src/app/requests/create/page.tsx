@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Package, Calendar, MapPin, FileText, AlertCircle, Plane, Globe, ShieldCheck } from 'lucide-react';
+import { Calendar, MapPin, FileText, AlertCircle, Plane, Globe, ShieldCheck } from 'lucide-react';
 import { createSupabaseClient } from '@/lib/supabase';
 import { checkCityCountry } from '@/lib/cityCountry';
 export default function CreateRequestPage() {

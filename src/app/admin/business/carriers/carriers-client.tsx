@@ -1,10 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  Loader2, RefreshCw, Users, CheckCircle, XCircle,
-  Clock, Shield, Truck, Plane, ChevronDown, ChevronUp,
-} from 'lucide-react';
+import { Loader2, RefreshCw, Users, CheckCircle, XCircle, Clock, Truck, ChevronDown, ChevronUp } from 'lucide-react';
 
 type Carrier = {
   id: string;
@@ -158,7 +155,6 @@ export default function CarriersAdminPage() {
         <div className="space-y-3">
           {carriers.map(c => {
             const certs    = CERT_LABELS.filter(k => c[k] === true);
-            const services = SVC_LABELS.filter(k => c[k] === true);
             const isOpen   = expanded === c.id;
 
             return (

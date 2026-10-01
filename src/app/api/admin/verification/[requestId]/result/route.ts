@@ -93,7 +93,6 @@ export async function POST(
   const trip      = Array.isArray(match.sender_trip) ? (match.sender_trip as any)[0] : (match.sender_trip as any);
   const fromCity  = trip?.from_city  ?? '';
   const toCity    = trip?.to_city    ?? '';
-  const travelDate = trip?.travel_date ?? '';
 
   // Update verification request
   await supabase.from('shipment_verification_requests').update({

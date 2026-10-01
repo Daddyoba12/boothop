@@ -100,7 +100,7 @@ export async function checkRulesDB(
   return {
     verdict:        best.verdict as ComplianceVerdict,
     explanation:    best.explanation,
-    tips:           buildTips(best.verdict as ComplianceVerdict, best.category, toCountry),
+    tips:           buildTips(best.verdict as ComplianceVerdict, best.category),
     requiresReview: best.verdict === 'REVIEW_REQUIRED' || best.verdict === 'PROHIBITED',
     riskScore:      riskMap[best.verdict] ?? 50,
     source:         'rules_db',
@@ -185,7 +185,7 @@ export async function storeInCache(
 }
 
 /** Build contextual tips based on verdict */
-function buildTips(verdict: ComplianceVerdict, category: string | null, toCountry: string): string[] {
+function buildTips(verdict: ComplianceVerdict, category: string | null): string[] {
   const tips: string[] = [];
   if (verdict === 'PROHIBITED') {
     tips.push('Do not attempt to send this item — it may be seized and the sender could face legal consequences.');

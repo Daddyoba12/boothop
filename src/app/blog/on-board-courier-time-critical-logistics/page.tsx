@@ -50,7 +50,7 @@ export default function OnBoardCourierPage() {
         <div className="prose prose-lg max-w-none prose-headings:font-black prose-headings:text-slate-900 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-5 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 prose-li:text-slate-600">
 
           <p>
-            When a patient needs medication tonight. When a grounded aircraft is costing £40,000 per hour waiting for a part. When a signed contract needs to reach a solicitor's office before the 9am hearing. Standard logistics does not move fast enough.
+            When a patient needs medication tonight. When a grounded aircraft is costing £40,000 per hour waiting for a part. When a signed contract needs to reach a solicitor&apos;s office before the 9am hearing. Standard logistics does not move fast enough.
           </p>
           <p>
             This is where the on-board courier — and the technology network now making OBC available to every business — becomes the only viable option.
@@ -58,7 +58,7 @@ export default function OnBoardCourierPage() {
 
           <h2>What Is an On-Board Courier?</h2>
           <p>
-            An on-board courier (OBC) is a person who personally accompanies a shipment on a commercial flight as a carry-on item. The shipment never leaves the courier's sight — it travels in the cabin, not the cargo hold. There are no handoffs to sorting depots, no cargo consolidation queues, no mysterious "in transit" delays.
+            An on-board courier (OBC) is a person who personally accompanies a shipment on a commercial flight as a carry-on item. The shipment never leaves the courier&apos;s sight — it travels in the cabin, not the cargo hold. There are no handoffs to sorting depots, no cargo consolidation queues, no mysterious &quot;in transit&quot; delays.
           </p>
           <p>
             On-board couriers have been used by aerospace companies, pharmaceutical firms, and financial institutions for decades. But the service has traditionally been expensive (£500–£2,000+ per delivery), slow to arrange (often four to six hours from request to departure), and exclusive to organisations with dedicated logistics procurement teams.
@@ -66,7 +66,7 @@ export default function OnBoardCourierPage() {
 
           <h2>Why Standard Logistics Fails for Time-Critical Shipments</h2>
           <p>
-            Even "express" courier services introduce multiple handoffs. A typical international express shipment:
+            Even &quot;express&quot; courier services introduce multiple handoffs. A typical international express shipment:
           </p>
           <ol>
             <li>Gets collected by a local driver</li>
@@ -90,7 +90,7 @@ export default function OnBoardCourierPage() {
             <li><strong>Zero depot handoffs</strong> — the carrier takes your item from pickup to destination personally, in-cabin</li>
             <li><strong>Flight-speed delivery</strong> — your parcel travels on the first available flight to the destination</li>
             <li><strong>Verified identity</strong> — every carrier completes KYC before being trusted with any delivery</li>
-            <li><strong>Pre-departure compliance</strong> — BootHop's compliance engine prepares customs documentation before departure, not at the border</li>
+            <li><strong>Pre-departure compliance</strong> — BootHop&apos;s compliance engine prepares customs documentation before departure, not at the border</li>
             <li><strong>Direct communication</strong> — sender and carrier communicate in-platform throughout the journey</li>
           </ul>
 
@@ -98,7 +98,7 @@ export default function OnBoardCourierPage() {
 
           <h3>Aerospace &amp; Aviation</h3>
           <p>
-            Aircraft-on-Ground (AOG) situations — where a grounded aircraft is costing an airline or lessor tens of thousands of pounds per hour — require parts to move faster than any standard freight service can manage. An on-board courier with the right component can reach a remote airport in Europe or the Middle East in hours, not days. BootHop's platform connects procurement teams with verified carriers already heading to the right destination.
+            Aircraft-on-Ground (AOG) situations — where a grounded aircraft is costing an airline or lessor tens of thousands of pounds per hour — require parts to move faster than any standard freight service can manage. An on-board courier with the right component can reach a remote airport in Europe or the Middle East in hours, not days. BootHop&apos;s platform connects procurement teams with verified carriers already heading to the right destination.
           </p>
 
           <h3>Legal &amp; Professional Services</h3>
@@ -121,7 +121,7 @@ export default function OnBoardCourierPage() {
             Traditional on-board courier services charge £500–£2,000 or more per booking. This reflects the cost of sourcing a courier at short notice, travel expenses, and agency markup.
           </p>
           <p>
-            BootHop's model changes this fundamentally. Verified travellers who are already making the journey carry your item as part of their existing trip — they cover their own travel costs. You pay for the service of having your item carried, not for a bespoke courier to fly specifically for you.
+            BootHop&apos;s model changes this fundamentally. Verified travellers who are already making the journey carry your item as part of their existing trip — they cover their own travel costs. You pay for the service of having your item carried, not for a bespoke courier to fly specifically for you.
           </p>
           <p>
             This makes OBC-level service — in-cabin, zero-handoff, personally accompanied — accessible to businesses that previously could not justify the cost.
@@ -139,12 +139,12 @@ export default function OnBoardCourierPage() {
             <li>Monitor in real time and confirm delivery</li>
           </ol>
           <p>
-            For recurring time-critical logistics needs, BootHop's Priority Partner programme connects enterprise clients with a dedicated account manager and a pre-vetted carrier network ready to move at short notice.
+            For recurring time-critical logistics needs, BootHop&apos;s Priority Partner programme connects enterprise clients with a dedicated account manager and a pre-vetted carrier network ready to move at short notice.
           </p>
 
           <h2>Conclusion</h2>
           <p>
-            On-board courier is no longer exclusively the domain of multinational aerospace and pharmaceutical companies. BootHop's compliance-first logistics network brings time-critical delivery — in-cabin, zero-handoff, personally accompanied — to any business that needs something to move within hours, not days.
+            On-board courier is no longer exclusively the domain of multinational aerospace and pharmaceutical companies. BootHop&apos;s compliance-first logistics network brings time-critical delivery — in-cabin, zero-handoff, personally accompanied — to any business that needs something to move within hours, not days.
           </p>
           <p>
             When the clock is running, <Link href="/business">BootHop delivers.</Link>

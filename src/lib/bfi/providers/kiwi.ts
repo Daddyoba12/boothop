@@ -24,7 +24,6 @@ export class KiwiProvider implements BFIProvider {
   }
 
   async search(params: SearchParams): Promise<RawFlightOffer[]> {
-    const dateStr = params.departureDate.toLocaleDateString('en-GB').replace(/\//g, '/');
     // Kiwi uses dd/mm/yyyy format
     const d       = params.departureDate;
     const day     = String(d.getDate()).padStart(2, '0');

@@ -98,7 +98,7 @@ function VideoKYCInner() {
 
   const stopRecording = () => {
     recorderRef.current?.stop();
-    streamRef.current?.getVideoTracks().forEach((t) => {}); // keep stream alive for photo
+    streamRef.current?.getVideoTracks().forEach(() => {}); // keep stream alive for photo
   };
 
   // ── Take snapshot photo ───────────────────────────────────────────────────
@@ -371,7 +371,7 @@ function VideoKYCInner() {
           <div className="text-center py-16 space-y-4">
             <Loader2 className="h-12 w-12 text-violet-500 animate-spin mx-auto" />
             <p className="text-slate-900 font-bold text-lg">Uploading your verification…</p>
-            <p className="text-slate-600 text-sm">Please don't close this page.</p>
+            <p className="text-slate-600 text-sm">Please don&apos;t close this page.</p>
           </div>
         )}
 

@@ -66,7 +66,7 @@ function VerifyContent() {
           window.location.href = target;
         }
 
-      } catch (err) {
+      } catch {
         setLoading(false);
         setError('Something went wrong. Please try again.');
         hasRunRef.current = false; // 🔥 PATCH
@@ -111,7 +111,7 @@ function VerifyContent() {
         window.location.href = target;
       }
 
-    } catch (err) {
+    } catch {
       setLoading(false);
       setError('Something went wrong. Please try again.');
     }

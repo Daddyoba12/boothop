@@ -121,7 +121,6 @@ export async function POST(request: Request) {
       const agreedPrice = match.agreed_price ?? 0;
       const adminEmail  = process.env.ADMIN_EMAIL    || 'admin@boothop.com';
       const from        = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
-      const appUrl      = process.env.NEXT_PUBLIC_APP_URL || '';
 
       await Promise.allSettled([
         sendResendEmail({

@@ -13,7 +13,6 @@ export async function GET() {
   const now       = Date.now();
   const hrs2      = new Date(now - 2  * 3600000).toISOString();
   const hrs48     = new Date(now - 48 * 3600000).toISOString();
-  const APP_URL   = process.env.NEXT_PUBLIC_APP_URL || 'https://boothop.com';
 
   // Chase carrier for photo proof — delivered 2+ hours ago, no photo
   const { data: noPhoto } = await supabase
