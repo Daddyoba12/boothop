@@ -3,10 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import {
-  Mail, MapPin, Truck, CheckCircle,
-  Star, ShieldCheck, Plane, Zap, ArrowRight,
-} from 'lucide-react';
+import { Mail, MapPin, Truck, CheckCircle, Star, ShieldCheck, Zap, ArrowRight } from 'lucide-react';
 import { BusinessNav } from '@/components/business/BusinessNav';
 import BusinessFooter from '@/components/business/BusinessFooter';
 
@@ -17,26 +14,26 @@ const STRIP_BOXES = [
   {
     images: [
       '/images/businessImage/biz-hero.jpg',
-      '/images/businessImage/Office conversation in a modern space.png',
+      '/images/businessImage/biz-global-link.jpg',
       '/images/businessImage/biz-team.jpg',
     ],
-    labels: ['UK · EU · Global', 'Same-Day Routes', 'Global Network'],
+    labels: ['UK · EU · Global', 'Global Link', 'Local Engagement'],
   },
   {
     images: [
       '/images/businessImage/biz-handshake.jpg',
       '/images/businessImage/Professional handshake in modern office (1).png',
-      '/images/businessImage/biz-hero.jpg',
+      '/images/businessImage/biz-enterprise-partnership.jpg',
     ],
-    labels: ['Verified Operators', 'Background Checked', 'Insured Carriers'],
+    labels: ['Verified Operators', 'Background Checked', 'Enterprise Partnership'],
   },
   {
     images: [
-      '/images/businessImage/biz-team.jpg',
+      '/images/businessImage/biz-international-diplomacy.jpg',
       '/images/businessImage/Boothop homepage banner in a modern office.png',
-      '/images/businessImage/biz-handshake.jpg',
+      '/images/businessImage/biz-global-offices.jpg',
     ],
-    labels: ['Full Documentation', 'Customs Ready', 'End-to-End Tracked'],
+    labels: ['International Diplomacy', 'Customs Ready', 'Global Offices'],
   },
 ];
 
@@ -106,8 +103,9 @@ function AirportPhotoStrip() {
                   fill
                   className="object-cover"
                 />
-                {/* Dark tint */}
-                <div className="absolute inset-0 bg-black/35" />
+                {/* Dark tint, stronger toward the bottom so the label always has a solid backing regardless of how bright the photo is */}
+                <div className="absolute inset-0 bg-black/20" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
 
                 {/* Scanline shimmer — gives premium CRT/board feel */}
                 <div className="absolute inset-0 pointer-events-none"
@@ -118,7 +116,7 @@ function AirportPhotoStrip() {
 
               {/* Label — outside the flip so it stays visible */}
               <div className="absolute bottom-3 left-3 z-10">
-                <p className={`text-xs font-black uppercase tracking-widest drop-shadow transition-colors duration-300 ${i === 0 ? 'text-emerald-600' : 'text-slate-700'}`}>
+                <p className={`text-xs font-black uppercase tracking-widest transition-colors duration-300 ${i === 0 ? 'text-emerald-400' : 'text-white'}`}>
                   {box.labels[imgIdx[i]]}
                 </p>
               </div>
