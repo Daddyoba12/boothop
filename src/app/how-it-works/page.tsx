@@ -1,129 +1,21 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Shield, CheckCircle, Sparkles, TrendingUp, Globe, ChevronDown } from 'lucide-react';
+import { ArrowRight, Shield, CheckCircle, Sparkles, TrendingUp, Globe } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 
-// ─── StepCard must live OUTSIDE the page component so React keeps the same
-//     component type across renders — if it were inside, every state change
-//     would create a new type reference, unmounting/remounting all cards and
-//     stripping the CSS animation that makes them visible. ─────────────────
-function StepCard({
-  s, i, color,
-}: {
-  s: { num: string; title: string; desc: string; icon: string; image: string };
-  i: number;
-  color: 'blue' | 'emerald';
-}) {
-  const isBlue = color === 'blue';
-  return (
-    <div className={`step-enter d${Math.min(i + 1, 5)} group flex gap-5 mb-6 p-5 rounded-2xl
-      bg-white border border-slate-200
-      ${isBlue
-        ? 'hover:border-blue-300 hover:shadow-blue-500/10 touch-blue'
-        : 'hover:border-emerald-300 hover:shadow-emerald-500/10 touch-emerald'}
-      transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5
-      active:scale-[0.98] active:translate-y-0 cursor-pointer`}
-    >
-      {/* Icon badge */}
-      <div className="relative flex-shrink-0">
-        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-lg
-          group-hover:scale-110 transition-transform duration-300
-          ${isBlue
-            ? 'bg-gradient-to-br from-blue-500 to-cyan-400 shadow-blue-500/50'
-            : 'bg-gradient-to-br from-emerald-500 to-teal-400 shadow-emerald-500/50'}`}
-        >
-          {s.icon}
-        </div>
-        <div className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-slate-900
-          ${isBlue ? 'bg-cyan-400' : 'bg-teal-400'}`}
-        >
-          {s.num}
-        </div>
-      </div>
-
-      {/* Text */}
-      <div className="flex-1 min-w-0">
-        <div className={`font-bold text-lg mb-1.5 text-slate-900 transition-colors duration-300
-          ${isBlue ? 'group-hover:text-blue-600' : 'group-hover:text-emerald-600'}`}>
-          {s.title}
-        </div>
-        <div className="text-slate-600 text-sm leading-relaxed">{s.desc}</div>
-      </div>
-
-      {/* Image thumbnail — with glow border matching the card colour */}
-      <div className={`relative w-16 h-16 md:w-28 md:h-28 rounded-xl overflow-hidden flex-shrink-0
-        border shadow-lg transition-all duration-300
-        ${isBlue
-          ? 'border-blue-500/25 shadow-blue-500/20 group-hover:border-blue-500/55 group-hover:shadow-blue-500/40'
-          : 'border-emerald-500/25 shadow-emerald-500/20 group-hover:border-emerald-500/55 group-hover:shadow-emerald-500/40'}`}
-      >
-        <img
-          src={s.image}
-          alt={s.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-        />
-        {/* Colour overlay on hover */}
-        <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300
-          ${isBlue
-            ? 'bg-gradient-to-br from-blue-500/20 to-cyan-500/10'
-            : 'bg-gradient-to-br from-emerald-500/20 to-teal-500/10'}`}
-        />
-      </div>
-    </div>
-  );
-}
-
 export default function HowItWorksPage() {
   useScrollReveal();
   const [scrollY, setScrollY] = useState(0);
-  const [booterExpanded, setBooterExpanded] = useState(false);
-  const [hooperExpanded, setHooperExpanded] = useState(false);
-  const booterStepsRef = useRef<HTMLDivElement>(null);
-  const hooperStepsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Collapse steps when section scrolls out of view
-  useEffect(() => {
-    const refs = [
-      { ref: booterStepsRef, set: setBooterExpanded },
-      { ref: hooperStepsRef, set: setHooperExpanded },
-    ];
-    const observers = refs.map(({ ref, set }) => {
-      if (!ref.current) return null;
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (!entry.isIntersecting) set(false); },
-        { threshold: 0.05 }
-      );
-      obs.observe(ref.current);
-      return obs;
-    });
-    return () => observers.forEach((o) => o?.disconnect());
-  }, []);
-
-  const booterSteps = [
-    { num: '01', title: 'Post Your Journey', desc: 'Share your route, travel dates, and available luggage capacity. Takes under 60 seconds.', icon: '✈️', image: '/images/Traveling.jpg' },
-    { num: '02', title: 'Browse Requests',   desc: 'See curated delivery requests along your exact route from verified senders.', icon: '🔍', image: '/images/GoingonHols.jpg' },
-    { num: '03', title: 'Agree on Terms',    desc: 'Confirm price and compliance through secure messaging.', icon: '🤝', image: '/images/meetup1.jpg' },
-    { num: '04', title: 'Collect & Deliver', desc: 'Meet sender, carry item, deliver safely.', icon: '📦', image: '/images/Handover.jpg' },
-    { num: '05', title: 'Get Paid',          desc: 'Payment released 4 hours after confirmed delivery — only if no dispute is raised.', icon: '💰', image: '/images/TrustedComm.jpg' },
-  ];
-
-  const hooperSteps = [
-    { num: '01', title: 'Post Your Request', desc: 'Describe item, route, and budget.', icon: '📝', image: '/images/WBoothop.jpg' },
-    { num: '02', title: 'Find Traveller',    desc: 'Browse or get matched automatically.', icon: '🎯', image: '/images/boothopeveryd.jpg' },
-    { num: '03', title: 'Pay Securely',      desc: 'Funds held safely in escrow.', icon: '🔒', image: '/images/D_login1.jpg' },
-    { num: '04', title: 'Track Delivery',    desc: 'Stay connected in real time.', icon: '📍', image: '/images/Traveling.jpg' },
-    { num: '05', title: 'Confirm Receipt',   desc: 'Release payment and rate experience.', icon: '⭐', image: '/images/meetuup2.jpg' },
-  ];
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans overflow-x-hidden">

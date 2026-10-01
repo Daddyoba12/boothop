@@ -10,7 +10,7 @@ import {
   TrendingUp, Activity, Download, RefreshCw, Clock,
   Send, MessageSquare, X, ChevronDown, Zap,
   ArrowLeft, HelpCircle, ChevronRight,
-  Plus, Trash2, Edit2,
+  Plus,
 } from 'lucide-react';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -19,14 +19,6 @@ function fmt(date: string | null | undefined) {
   if (!date) return '—';
   return new Date(date).toLocaleDateString('en-GB', {
     day: 'numeric', month: 'short', year: 'numeric',
-  });
-}
-
-function fmtLong(date: string | null | undefined) {
-  if (!date) return '—';
-  return new Date(date).toLocaleString('en-GB', {
-    day: 'numeric', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
   });
 }
 
@@ -66,9 +58,6 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   const [sortField, setSortField] = useState<'date' | 'status' | 'route'>('date');
   const [sortDir, setSortDir]     = useState<'asc' | 'desc'>('desc');
 
-  const [selectedTrip, setSelectedTrip]   = useState<any>(null);
-  const [tripDetail, setTripDetail]       = useState<any>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
   const [actionResult, setActionResult]   = useState<string | null>(null);
 
   const [showAddJourney, setShowAddJourney] = useState(false);
@@ -77,16 +66,6 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
   });
   const [addBusy, setAddBusy]   = useState(false);
   const [addError, setAddError] = useState('');
-
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteReason, setDeleteReason]       = useState('');
-  const [deleteBusy, setDeleteBusy]           = useState(false);
-
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [updateField, setUpdateField]         = useState('status');
-  const [updateValue, setUpdateValue]         = useState('');
-  const [updateReason, setUpdateReason]       = useState('');
-  const [updateBusy, setUpdateBusy]           = useState(false);
 
   // ── data loading ─────────────────────────────────────────────────────────
 
@@ -148,24 +127,6 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
 
   // ── journey handlers ──────────────────────────────────────────────────────
 
-  const openTripDetail = async (trip: any) => {
-    setSelectedTrip(trip);
-    setTripDetail(null);
-    setDetailLoading(true);
-    setActionResult(null);
-    try {
-      const res  = await fetch(`/api/admin/journeys/${trip.id}/detail`);
-      const data = await res.json();
-      setTripDetail(data);
-    } catch {}
-    setDetailLoading(false);
-  };
-
-  const closeTripDrawer = () => {
-    setSelectedTrip(null);
-    setActionResult(null);
-  };
-
   const handleAddJourney = async () => {
     if (!addForm.from_city || !addForm.to_city || !addForm.travel_date) {
       setAddError('From city, to city, and travel date are required');
@@ -189,53 +150,6 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
       setAddError(err.message);
     }
     setAddBusy(false);
-  };
-
-  const handleDeleteTrip = async () => {
-    if (!selectedTrip || deleteReason.trim().length < 10) return;
-    setDeleteBusy(true);
-    try {
-      const res  = await fetch(`/api/admin/journeys/${selectedTrip.id}/delete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: deleteReason }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setShowDeleteModal(false);
-      setDeleteReason('');
-      setSelectedTrip(null);
-      setActionResult(`✅ Journey cancelled. ${data.notified} parties notified.`);
-      loadDashboardData();
-    } catch (err: any) {
-      setShowDeleteModal(false);
-      setActionResult(`❌ ${err.message}`);
-    }
-    setDeleteBusy(false);
-  };
-
-  const handleUpdateTrip = async () => {
-    if (!selectedTrip || !updateValue || updateReason.trim().length < 10) return;
-    setUpdateBusy(true);
-    try {
-      const res  = await fetch(`/api/admin/journeys/${selectedTrip.id}/update`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ field: updateField, value: updateValue, reason: updateReason }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setShowUpdateModal(false);
-      setUpdateReason('');
-      setUpdateValue('');
-      setSelectedTrip((prev: any) => prev ? { ...prev, [updateField]: updateValue } : prev);
-      setActionResult('✅ Journey updated successfully.');
-      loadDashboardData();
-    } catch (err: any) {
-      setShowUpdateModal(false);
-      setActionResult(`❌ ${err.message}`);
-    }
-    setUpdateBusy(false);
   };
 
   // ── filtering & sorting ───────────────────────────────────────────────────
@@ -604,7 +518,7 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
             </div>
 
             {/* global action result banner */}
-            {actionResult && !selectedTrip && (
+            {actionResult && (
               <div className={`mb-4 px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-between ${
                 actionResult.startsWith('✅') ? 'bg-green-500/20 text-green-700 border border-green-400/30' : 'bg-red-500/20 text-red-700 border border-red-400/30'
               }`}>
@@ -940,295 +854,6 @@ export default function AdminDashboard({ serverSession }: { serverSession: any }
         )}
 
       </div>{/* end max-w-7xl */}
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          JOURNEY DETAIL DRAWER
-      ══════════════════════════════════════════════════════════════════════ */}
-      {selectedTrip && (
-        <div className="fixed inset-0 z-40 flex justify-end">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeTripDrawer} />
-          <div className="relative w-full max-w-lg h-full bg-white border-l border-slate-200 shadow-2xl flex flex-col">
-
-            {/* drawer header */}
-            <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-slate-200 px-6 py-4 flex items-center justify-between z-10">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className={`w-3 h-3 rounded-full shrink-0 ${
-                  selectedTrip.status === 'active'                                          ? 'bg-green-400 animate-pulse' :
-                  ['expired', 'cancelled', 'inactive'].includes(selectedTrip.status)        ? 'bg-red-400' :
-                  'bg-blue-400'
-                }`} />
-                <div className="min-w-0">
-                  <h2 className="text-slate-900 font-bold text-base truncate">{selectedTrip.from_city} → {selectedTrip.to_city}</h2>
-                  <p className="text-slate-600 text-xs truncate">{selectedTrip.email}</p>
-                </div>
-              </div>
-              <button onClick={closeTripDrawer} className="p-1.5 hover:bg-slate-100 rounded-lg transition-all shrink-0">
-                <X className="w-5 h-5 text-slate-600" />
-              </button>
-            </div>
-
-            {/* scrollable body */}
-            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
-
-              {/* action result inside drawer */}
-              {actionResult && (
-                <div className={`px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-between ${
-                  actionResult.startsWith('✅') ? 'bg-green-500/20 text-green-700 border border-green-400/30' : 'bg-red-500/20 text-red-700 border border-red-400/30'
-                }`}>
-                  <span>{actionResult}</span>
-                  <button onClick={() => setActionResult(null)} className="text-slate-600 hover:text-slate-900 ml-2"><X className="w-4 h-4" /></button>
-                </div>
-              )}
-
-              {/* journey details */}
-              <section>
-                <h3 className="text-slate-600 text-xs font-bold uppercase tracking-widest mb-3">Journey Details</h3>
-                <div className="bg-slate-50 rounded-xl border border-slate-200 divide-y divide-white/5">
-                  {[
-                    { label: 'Email',       value: selectedTrip.email || '—' },
-                    { label: 'Type',        value: (selectedTrip.type === 'travel' || selectedTrip.type === 'traveller') ? '✈️ Traveller' : '📦 Sender' },
-                    { label: 'From',        value: selectedTrip.from_city || '—' },
-                    { label: 'To',          value: selectedTrip.to_city   || '—' },
-                    { label: 'Travel Date', value: fmt(selectedTrip.travel_date) },
-                    { label: 'Weight',      value: selectedTrip.weight ? `${selectedTrip.weight} kg` : '—' },
-                    { label: 'Price',       value: selectedTrip.price  ? `£${Number(selectedTrip.price).toFixed(2)}` : '—' },
-                    { label: 'Status',      value: selectedTrip.status || 'unknown' },
-                    { label: 'Created',     value: fmtLong(selectedTrip.created_at) },
-                  ].map(row => (
-                    <div key={row.label} className="flex items-center justify-between px-4 py-3">
-                      <span className="text-slate-600 text-sm">{row.label}</span>
-                      <span className="text-slate-900 text-sm font-medium text-right max-w-[260px]">{row.value}</span>
-                    </div>
-                  ))}
-                  {/* any extra fields from select('*') */}
-                  {tripDetail?.trip && Object.entries(tripDetail.trip)
-                    .filter(([k]) => !['id','email','from_city','to_city','travel_date','weight','price','status','created_at','type','updated_at'].includes(k))
-                    .map(([k, v]) => (
-                      <div key={k} className="flex items-center justify-between px-4 py-3">
-                        <span className="text-slate-600 text-sm capitalize">{k.replace(/_/g, ' ')}</span>
-                        <span className="text-slate-700 text-sm text-right max-w-[260px] truncate">{String(v ?? '—')}</span>
-                      </div>
-                    ))
-                  }
-                </div>
-              </section>
-
-              {/* match history */}
-              <section>
-                <h3 className="text-slate-600 text-xs font-bold uppercase tracking-widest mb-3">Match History</h3>
-                {detailLoading ? (
-                  <div className="text-center py-8 text-slate-600 text-sm">
-                    <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
-                    Loading matches...
-                  </div>
-                ) : tripDetail?.matches?.length > 0 ? (
-                  <div className="space-y-3">
-                    {tripDetail.matches.map((m: any) => (
-                      <div key={m.id} className="bg-slate-50 rounded-xl border border-slate-200 p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                            m.status === 'completed' ? 'bg-green-500/20 text-green-700' :
-                            m.status === 'cancelled' ? 'bg-red-500/20 text-red-700'    :
-                            'bg-blue-500/20 text-blue-700'
-                          }`}>{m.status}</span>
-                          <span className="text-slate-600 text-xs">{fmt(m.created_at)}</span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm mb-2">
-                          <span className="text-slate-900 font-semibold">£{Number(m.agreed_price || 0).toFixed(2)}</span>
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                            m.payment_status === 'released' ? 'bg-green-500/20 text-green-700' :
-                            m.payment_status === 'escrowed' ? 'bg-yellow-500/20 text-yellow-700' :
-                            'bg-slate-100 text-slate-600'
-                          }`}>{m.payment_status || 'pending'}</span>
-                        </div>
-                        {m.id && (
-                          <Link href={`/matches/${m.id}`} onClick={e => e.stopPropagation()} className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1">
-                            <Eye className="w-3 h-3" /> View full match
-                          </Link>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 bg-slate-50 rounded-xl border border-slate-200">
-                    <Package className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-                    <p className="text-slate-600 text-sm">No matches for this journey yet</p>
-                  </div>
-                )}
-              </section>
-
-            </div>
-
-            {/* sticky action bar */}
-            {selectedTrip.status !== 'cancelled' && (
-              <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 px-6 py-4 flex gap-3">
-                <button
-                  onClick={() => { setUpdateField('status'); setUpdateValue(''); setUpdateReason(''); setShowUpdateModal(true); }}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600/80 hover:bg-blue-600 text-white rounded-xl font-semibold transition-all text-sm"
-                >
-                  <Edit2 className="w-4 h-4" /> Update
-                </button>
-                <button
-                  onClick={() => { setDeleteReason(''); setShowDeleteModal(true); }}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-red-600/80 hover:bg-red-600 text-white rounded-xl font-semibold transition-all text-sm"
-                >
-                  <Trash2 className="w-4 h-4" /> Cancel Journey
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          DELETE MODAL
-      ══════════════════════════════════════════════════════════════════════ */}
-      {showDeleteModal && selectedTrip && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowDeleteModal(false)} />
-          <div className="relative w-full max-w-md bg-white border border-red-200 rounded-3xl shadow-2xl overflow-hidden">
-            <div className="px-8 py-5 border-b border-slate-200 flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-500/20 rounded-xl flex items-center justify-center">
-                <Trash2 className="w-5 h-5 text-red-600" />
-              </div>
-              <div>
-                <h3 className="text-slate-900 font-bold text-lg">Cancel Journey</h3>
-                <p className="text-slate-600 text-xs">{selectedTrip.from_city} → {selectedTrip.to_city}</p>
-              </div>
-            </div>
-            <div className="px-8 py-6 space-y-5">
-              <div className="bg-red-500/10 border border-red-400/30 rounded-xl p-4">
-                <p className="text-red-200 text-sm leading-relaxed">
-                  This will cancel the journey, cancel any linked active matches, and send notification emails to all involved parties. <strong className="text-red-700">This cannot be undone.</strong>
-                </p>
-              </div>
-              <div>
-                <label className="block text-slate-700 text-xs font-semibold uppercase tracking-wide mb-2">
-                  Reason for Cancellation <span className="text-red-600">*</span>
-                </label>
-                <textarea
-                  rows={4}
-                  value={deleteReason}
-                  onChange={e => setDeleteReason(e.target.value)}
-                  placeholder="Enter the reason (sent to all affected parties)..."
-                  className="w-full px-4 py-3 bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400 resize-none text-sm leading-relaxed"
-                />
-                <p className={`text-xs mt-1.5 ${deleteReason.trim().length >= 10 ? 'text-green-600' : 'text-red-600'}`}>
-                  {deleteReason.trim().length} / 10 minimum characters
-                </p>
-              </div>
-              <div className="flex gap-3 pt-1">
-                <button onClick={() => setShowDeleteModal(false)} className="flex-1 px-6 py-3 bg-slate-100 text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-all">
-                  Back
-                </button>
-                <button
-                  onClick={handleDeleteTrip}
-                  disabled={deleteReason.trim().length < 10 || deleteBusy}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-red-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {deleteBusy ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                  {deleteBusy ? 'Cancelling...' : 'Confirm Cancel'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          UPDATE MODAL
-      ══════════════════════════════════════════════════════════════════════ */}
-      {showUpdateModal && selectedTrip && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowUpdateModal(false)} />
-          <div className="relative w-full max-w-md bg-white border border-blue-200 rounded-3xl shadow-2xl overflow-hidden">
-            <div className="px-8 py-5 border-b border-slate-200 flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                <Edit2 className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="text-slate-900 font-bold text-lg">Update Journey</h3>
-                <p className="text-slate-600 text-xs">{selectedTrip.from_city} → {selectedTrip.to_city}</p>
-              </div>
-            </div>
-            <div className="px-8 py-6 space-y-5">
-              <div>
-                <label className="block text-slate-700 text-xs font-semibold uppercase tracking-wide mb-2">Field to Update</label>
-                <select
-                  value={updateField}
-                  onChange={e => { setUpdateField(e.target.value); setUpdateValue(''); }}
-                  className="w-full px-4 py-3 bg-slate-100 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none cursor-pointer"
-                >
-                  <option value="status">Status</option>
-                  <option value="weight">Weight (kg)</option>
-                  <option value="price">Price (£)</option>
-                  <option value="travel_date">Travel Date</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-slate-700 text-xs font-semibold uppercase tracking-wide mb-2">New Value</label>
-                {updateField === 'status' ? (
-                  <select
-                    value={updateValue}
-                    onChange={e => setUpdateValue(e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-100 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none cursor-pointer"
-                  >
-                    <option value="">Select new status...</option>
-                    <option value="active">Active</option>
-                    <option value="matched">Matched</option>
-                    <option value="completed">Completed</option>
-                    <option value="expired">Expired</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
-                ) : updateField === 'travel_date' ? (
-                  <input
-                    type="date"
-                    value={updateValue}
-                    onChange={e => setUpdateValue(e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-100 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  />
-                ) : (
-                  <input
-                    type="number"
-                    value={updateValue}
-                    onChange={e => setUpdateValue(e.target.value)}
-                    placeholder={updateField === 'weight' ? 'e.g. 10' : 'e.g. 80'}
-                    className="w-full px-4 py-3 bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  />
-                )}
-              </div>
-              <div>
-                <label className="block text-slate-700 text-xs font-semibold uppercase tracking-wide mb-2">
-                  Reason for Update <span className="text-red-600">*</span>
-                </label>
-                <textarea
-                  rows={3}
-                  value={updateReason}
-                  onChange={e => setUpdateReason(e.target.value)}
-                  placeholder="Why is this field being changed?..."
-                  className="w-full px-4 py-3 bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none text-sm"
-                />
-                <p className={`text-xs mt-1.5 ${updateReason.trim().length >= 10 ? 'text-green-600' : 'text-red-600'}`}>
-                  {updateReason.trim().length} / 10 minimum characters
-                </p>
-              </div>
-              <div className="flex gap-3 pt-1">
-                <button onClick={() => setShowUpdateModal(false)} className="flex-1 px-6 py-3 bg-slate-100 text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-all">
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUpdateTrip}
-                  disabled={!updateValue || updateReason.trim().length < 10 || updateBusy}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-blue-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {updateBusy ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                  {updateBusy ? 'Updating...' : 'Confirm Update'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ══════════════════════════════════════════════════════════════════════
           ADD JOURNEY MODAL
