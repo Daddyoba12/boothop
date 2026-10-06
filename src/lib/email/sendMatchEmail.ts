@@ -316,6 +316,67 @@ export async function sendMatchReminderEmail(params: {
   });
 }
 
+export async function sendCounterOfferEmail(params: {
+  toEmail:       string;
+  fromCity:      string;
+  toCity:        string;
+  travelDate:    string;
+  originalPrice: number;
+  newPrice:      number;
+  reason?:       string;
+  acceptToken?:  string;
+  declineToken?: string;
+}) {
+  const acceptUrl  = params.acceptToken  ? `${appUrl}/confirm?token=${params.acceptToken}`  : `${appUrl}/dashboard`;
+  const declineUrl = params.declineToken ? `${appUrl}/confirm?token=${params.declineToken}` : `${appUrl}/dashboard`;
+  const dateStr     = params.travelDate ? new Date(params.travelDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+
+  await sendResendEmail({
+    from,
+    to: params.toEmail,
+    subject: `New price proposed — ${params.fromCity} → ${params.toCity}`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;background:#0f172a;color:#f8fafc;border-radius:16px;overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#451a03,#0f172a);padding:28px 36px;text-align:center;border-bottom:2px solid #f59e0b;">
+          <div style="font-size:26px;font-weight:900;color:#fff;">Boot<span style="color:#38bdf8;">Hop</span></div>
+          <div style="color:#fde68a;font-size:11px;margin-top:4px;letter-spacing:1.5px;text-transform:uppercase;">Price Adjustment Requested</div>
+        </div>
+        <div style="padding:32px 36px;">
+          <h2 style="color:#f1f5f9;font-size:20px;font-weight:700;margin:0 0 6px;">The traveller has proposed a new price</h2>
+          <p style="color:#94a3b8;font-size:14px;margin:0 0 24px;">
+            For your <strong style="color:#f1f5f9;">${params.fromCity} → ${params.toCity}</strong>${dateStr ? ` trip on <strong style="color:#f1f5f9;">${dateStr}</strong>` : ' trip'}, they're willing to carry it, but are asking for a different price than your original offer.
+          </p>
+          <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:18px 22px;margin:0 0 20px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+              <span style="color:#64748b;font-size:13px;">Your original offer</span>
+              <span style="color:#94a3b8;font-size:14px;">£${Number(params.originalPrice).toFixed(2)}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+              <span style="color:#fbbf24;font-size:13px;font-weight:700;">New proposed price</span>
+              <span style="color:#fbbf24;font-weight:900;font-size:20px;">£${Number(params.newPrice).toFixed(2)}</span>
+            </div>
+          </div>
+          ${params.reason ? `<div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px 18px;margin:0 0 24px;"><p style="margin:0 0 4px;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;">Traveller's note</p><p style="margin:0;font-size:14px;color:#cbd5e1;">${params.reason}</p></div>` : ''}
+          <p style="color:#94a3b8;font-size:13px;margin:0 0 20px;">Accept the new price to proceed, or decline — declining will end this match (your listing stays active and we'll keep looking).</p>
+          <div style="display:flex;gap:12px;margin-bottom:24px;">
+            <a href="${acceptUrl}" style="flex:1;display:block;background:#16a34a;color:#fff;text-decoration:none;padding:14px 20px;border-radius:10px;font-weight:700;font-size:15px;text-align:center;">
+              ✅ Accept £${Number(params.newPrice).toFixed(2)}
+            </a>
+            <a href="${declineUrl}" style="flex:1;display:block;background:#1e293b;border:1px solid #334155;color:#94a3b8;text-decoration:none;padding:14px 20px;border-radius:10px;font-weight:600;font-size:15px;text-align:center;">
+              ✗ Decline
+            </a>
+          </div>
+          <p style="color:#475569;font-size:11px;margin:0;">This link expires in 72 hours.</p>
+        </div>
+        <div style="background:#0f172a;border-top:1px solid #1e293b;padding:16px 36px;text-align:center;">
+          <p style="color:#334155;font-size:11px;margin:0;">© BootHop · <a href="${appUrl}" style="color:#38bdf8;text-decoration:none;">boothop.com</a></p>
+        </div>
+      </div>
+    `,
+    text: `The traveller has proposed a new price for ${params.fromCity} → ${params.toCity}.\n\nYour original offer: £${Number(params.originalPrice).toFixed(2)}\nNew proposed price: £${Number(params.newPrice).toFixed(2)}\n${params.reason ? `\nTraveller's note: ${params.reason}\n` : ''}\nAccept: ${acceptUrl}\nDecline: ${declineUrl}\n\nDeclining will end this match. This link expires in 72 hours.`,
+  });
+}
+
 export async function sendAlternativeJourneysEmail(params: {
   toEmail: string;
   fromCity: string;

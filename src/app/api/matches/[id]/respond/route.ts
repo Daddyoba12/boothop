@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getAppSession } from '@/lib/auth/session';
-import { sendMatchAcceptedEmail, sendMatchDeclinedEmail } from '@/lib/email/sendMatchEmail';
+import { sendMatchAcceptedEmail, sendMatchDeclinedEmail, sendCounterOfferEmail } from '@/lib/email/sendMatchEmail';
 import { isIpBanned, isAccountBanned, evaluateFraud, banIp, banAccount, logFraudFlag } from '@/lib/services/fraud-engine';
 import { checkItemCompliance } from '@/lib/services/item-compliance';
 import { sendPushToEmail } from '@/lib/services/notifications';
@@ -19,9 +19,9 @@ export async function POST(
       return NextResponse.json({ error: 'Not authenticated.' }, { status: 401 });
     }
 
-    const { action } = await request.json();
-    if (!['accept', 'decline'].includes(action)) {
-      return NextResponse.json({ error: 'action must be accept or decline.' }, { status: 400 });
+    const { action, proposedPrice, reason } = await request.json();
+    if (!['accept', 'decline', 'counter'].includes(action)) {
+      return NextResponse.json({ error: 'action must be accept, decline, or counter.' }, { status: 400 });
     }
 
     const supabase = createSupabaseAdminClient();
@@ -72,6 +72,57 @@ export async function POST(
     const travelDate   = tripInfo?.travel_date ?? '';
     const price        = match.agreed_price ?? match.offered_price ?? 0;
     const appUrl       = process.env.NEXT_PUBLIC_APP_URL || 'https://www.boothop.com';
+
+    if (action === 'counter') {
+      const newPrice = Number(proposedPrice);
+      if (!Number.isFinite(newPrice) || newPrice <= 0) {
+        return NextResponse.json({ error: 'proposedPrice must be a positive number.' }, { status: 400 });
+      }
+      if (!otherEmail) {
+        return NextResponse.json({ error: 'Could not find the other party on this match.' }, { status: 400 });
+      }
+
+      const myRole = email === senderEmail ? 'sender' : 'traveler';
+      const acceptedField = myRole === 'sender' ? 'sender_accepted_negotiation' : 'traveler_accepted_negotiation';
+
+      // Atomic — only succeeds if still in 'matched' status, same guard as accept.
+      const { data: counteredRow } = await supabase
+        .from('matches')
+        .update({
+          proposed_price:      newPrice,
+          negotiation_status:  'pending',
+          [acceptedField]:     true, // proposing counts as accepting your own number
+        })
+        .eq('id', matchId)
+        .eq('status', 'matched')
+        .select('id')
+        .maybeSingle();
+
+      if (!counteredRow) {
+        return NextResponse.json({ error: 'Match is no longer available.' }, { status: 409 });
+      }
+
+      const otherRole = myRole === 'sender' ? 'traveler' : 'sender';
+      const expires_at = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
+      const [{ data: acceptTok }, { data: declineTok }] = await Promise.all([
+        supabase.from('action_tokens').insert({ email: otherEmail, action_type: 'accept_negotiation', entity_id: matchId, payload: { role: otherRole }, expires_at }).select('token').single(),
+        supabase.from('action_tokens').insert({ email: otherEmail, action_type: 'reject_negotiation', entity_id: matchId, payload: { role: otherRole }, expires_at }).select('token').single(),
+      ]);
+
+      await sendCounterOfferEmail({
+        toEmail:       otherEmail,
+        fromCity,
+        toCity,
+        travelDate,
+        originalPrice: price,
+        newPrice,
+        reason:        typeof reason === 'string' ? reason.trim().slice(0, 500) : undefined,
+        acceptToken:   acceptTok?.token,
+        declineToken:  declineTok?.token,
+      }).catch(e => console.error('sendCounterOfferEmail failed', { matchId, toEmail: otherEmail, error: String(e) }));
+
+      return NextResponse.json({ ok: true, status: 'negotiating' });
+    }
 
     if (action === 'accept') {
       // ── Fraud & ban checks ──────────────────────────────────────────────────

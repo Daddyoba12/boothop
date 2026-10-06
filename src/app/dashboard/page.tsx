@@ -40,6 +40,11 @@ export default function DashboardPage() {
   const [deletingTrip, setDeletingTrip] = useState<string | null>(null);
   const [credit, setCredit] = useState<{ amount_pence: number; redeemed: boolean } | null>(null);
   const [respondingMatch, setRespondingMatch] = useState<string | null>(null);
+  const [counteringMatch, setCounteringMatch] = useState<string | null>(null);
+  const [counterPrice, setCounterPrice] = useState('');
+  const [counterReason, setCounterReason] = useState('');
+  const [counterSending, setCounterSending] = useState(false);
+  const [counterError, setCounterError] = useState('');
   const [editingTripId, setEditingTripId] = useState<string | null>(null);
   const [editDate, setEditDate] = useState('');
   const [editDateError, setEditDateError] = useState('');
@@ -128,6 +133,37 @@ export default function DashboardPage() {
       alert('Network error — please check your connection and try again');
     } finally {
       setRespondingMatch(null);
+    }
+  };
+
+  const sendCounterOffer = async (matchId: string) => {
+    const price = Number(counterPrice);
+    if (!Number.isFinite(price) || price <= 0) {
+      setCounterError('Enter a valid price.');
+      return;
+    }
+    setCounterSending(true);
+    setCounterError('');
+    try {
+      const res = await fetch(`/api/matches/${matchId}/respond`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'counter', proposedPrice: price, reason: counterReason.trim() || undefined }),
+        credentials: 'include',
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setCounterError(data.error || 'Failed to send — please try again');
+        return;
+      }
+      setCounteringMatch(null);
+      setCounterPrice('');
+      setCounterReason('');
+      loadDashboard();
+    } catch {
+      setCounterError('Network error — please check your connection and try again');
+    } finally {
+      setCounterSending(false);
     }
   };
 
@@ -631,6 +667,66 @@ export default function DashboardPage() {
                         ) : (
                           <p className="text-xs text-slate-600 text-center mb-2">Waiting for listing owner to respond…</p>
                         )
+                    })()}
+                    {/* Adjust price instead of a flat accept (e.g. extra leg, cross-border connection) */}
+                    {match.status === 'matched' && !isExpired && (() => {
+                      const userIsSender = match.sender_email === user?.email;
+                      const userTrip     = userIsSender ? senderTrip : travelerTrip;
+                      const isExpressInterest = !!(senderTrip?.auto_created || travelerTrip?.auto_created);
+                      const canRespond = isExpressInterest ? !userTrip?.auto_created : true;
+                      if (!canRespond) return null;
+
+                      if (counteringMatch !== match.id) {
+                        return (
+                          <button
+                            onClick={() => { setCounteringMatch(match.id); setCounterPrice(String(match.agreed_price ?? match.offered_price ?? '')); setCounterError(''); }}
+                            className="w-full text-center text-xs text-slate-600 hover:text-slate-900 underline mb-2"
+                          >
+                            Need a different price? Adjust instead
+                          </button>
+                        );
+                      }
+
+                      return (
+                        <div className="mb-2 p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                          <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wide">Your price (£)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={counterPrice}
+                            onChange={e => setCounterPrice(e.target.value)}
+                            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg"
+                            placeholder="e.g. 180"
+                          />
+                          <input
+                            type="text"
+                            value={counterReason}
+                            onChange={e => setCounterReason(e.target.value)}
+                            maxLength={200}
+                            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg"
+                            placeholder="Optional note (e.g. connecting leg cost) — visible to the other party"
+                          />
+                          {counterError && <p className="text-xs text-red-600">{counterError}</p>}
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => sendCounterOffer(match.id)}
+                              disabled={counterSending}
+                              className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg disabled:opacity-50"
+                            >
+                              {counterSending ? 'Sending…' : 'Send new price'}
+                            </button>
+                            <button
+                              onClick={() => { setCounteringMatch(null); setCounterError(''); }}
+                              disabled={counterSending}
+                              className="px-3 py-2 bg-white border border-slate-300 text-slate-600 text-xs font-semibold rounded-lg"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                          <p className="text-[11px] text-slate-500">The other party will be asked to accept or decline this price. Declining ends the match.</p>
+                        </div>
+                      );
                     })()}
                     <div className="flex gap-2">
                       <Link
