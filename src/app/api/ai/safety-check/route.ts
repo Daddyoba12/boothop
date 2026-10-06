@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       const fromLabel = fromCity ? `${fromCity}, ${fromCountry}` : fromCountry || 'Not specified';
       const toLabel   = toCity   ? `${toCity}, ${toCountry}`   : toCountry;
       if (dbHit.requiresReview || dbHit.verdict === 'REVIEW_REQUIRED') {
-        sendAdminAISafetyFlagEmail({
+        await sendAdminAISafetyFlagEmail({
           item, fromLabel, toLabel,
           category: 'compliance_db',
           riskScore: dbHit.riskScore,
@@ -169,7 +169,7 @@ Based on this, give your verdict and explanation.`;
     }
 
     // ── 5. Store Claude result in cache for future reuse ─────────────────────
-    storeInCache(
+    await storeInCache(
       item, fromCountry || 'ANY', toCountry,
       aiResult.verdict, aiResult.explanation, aiResult.tips ?? [],
       aiResult.requiresReview, risk.score, category,
@@ -177,7 +177,7 @@ Based on this, give your verdict and explanation.`;
 
     // ── 6. Notify admin if review required ───────────────────────────────────
     if (aiResult.requiresReview || aiResult.verdict === 'REVIEW_REQUIRED') {
-      sendAdminAISafetyFlagEmail({
+      await sendAdminAISafetyFlagEmail({
         item,
         fromLabel,
         toLabel,

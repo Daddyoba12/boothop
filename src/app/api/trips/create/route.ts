@@ -78,8 +78,9 @@ export async function POST(request: Request) {
       }
     }
 
-    // Notify admin of new trip (best-effort, non-blocking)
-    sendResendEmail({
+    // Notify admin of new trip. Awaited: un-awaited sends can get cut off
+    // when the function returns on Vercel.
+    await sendResendEmail({
       from: 'BootHop Notifications <noreply@boothop.com>',
       to: ['info@boothop.com'],
       subject: `New trip posted: ${from} → ${to} (${mode})`,
@@ -95,10 +96,10 @@ export async function POST(request: Request) {
       ].join('\n'),
     }).catch(() => {});
 
-    // Fire auto-match (best-effort, non-blocking)
+    // Fire auto-match. Awaited: see note above.
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
     if (appUrl && process.env.CRON_SECRET) {
-      fetch(`${appUrl}/api/cron/auto-match`, {
+      await fetch(`${appUrl}/api/cron/auto-match`, {
         headers: { 'Authorization': `Bearer ${process.env.CRON_SECRET}` },
       }).catch(() => {});
     }

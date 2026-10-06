@@ -104,7 +104,7 @@ export async function POST(request: Request) {
         });
       } catch { /* non-fatal */ }
 
-      sendResendEmail({
+      await sendResendEmail({
         from:    process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>',
         to:      process.env.ADMIN_EMAIL     || 'admin@boothop.com',
         subject: `[BLOCKED] Contact-sharing attempt — Match ${matchId}`,
@@ -134,7 +134,7 @@ export async function POST(request: Request) {
       });
 
       // Alert admin asynchronously
-      sendResendEmail({
+      await sendResendEmail({
         from:    process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>',
         to:      process.env.ADMIN_EMAIL     || 'admin@boothop.com',
         subject: `[HELD:${moderation.category}] Message held for review — Match ${matchId}`,

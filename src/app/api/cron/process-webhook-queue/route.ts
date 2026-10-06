@@ -79,7 +79,7 @@ async function runQueueProcessor() {
   // Notify admin if events still failing
   if (stillFailed.length > 0) {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
-    sendResendEmail({
+    await sendResendEmail({
       from:    'BootHop System <noreply@boothop.com>',
       to:      [adminEmail],
       subject: `⚠️ Stripe webhook retry: ${stillFailed.length} event(s) still failing`,

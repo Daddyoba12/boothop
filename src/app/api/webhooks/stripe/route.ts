@@ -272,8 +272,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }),
   ]);
 
-  // Send tracking-ready notifications asynchronously — does not block checkout confirmation
-  import('@/lib/services/notifications').then(({ sendTrackingNotification }) => {
+  // Send tracking-ready notifications. Awaited: un-awaited sends can get cut
+  // off when the function returns on Vercel.
+  await import('@/lib/services/notifications').then(({ sendTrackingNotification }) => {
     const senderTrip = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
     return sendTrackingNotification({
       senderEmail:    match.sender_email,

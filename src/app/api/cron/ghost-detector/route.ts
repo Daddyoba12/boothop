@@ -98,9 +98,10 @@ async function runGhostDetector() {
       metadata:   { match_id: match.id, traveller_email: match.traveler_email },
     });
 
-    // Notify sender
+    // Notify sender. Awaited: un-awaited sends can get cut off when the
+    // function returns on Vercel.
     if (match.sender_email) {
-      sendResendEmail({
+      await sendResendEmail({
         from:    'BootHop Support <noreply@boothop.com>',
         to:      [match.sender_email],
         subject: 'Update on your delivery — traveller unresponsive',
@@ -119,9 +120,9 @@ async function runGhostDetector() {
       }).catch(() => {});
     }
 
-    // Notify traveller
+    // Notify traveller. Awaited: see note above.
     if (match.traveler_email) {
-      sendResendEmail({
+      await sendResendEmail({
         from:    'BootHop Support <noreply@boothop.com>',
         to:      [match.traveler_email],
         subject: 'Action required — please update your delivery status',
@@ -142,7 +143,7 @@ async function runGhostDetector() {
   // Admin summary email if any ghosts found
   if (ghostCount > 0) {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@boothop.com';
-    sendResendEmail({
+    await sendResendEmail({
       from:    'BootHop Support <noreply@boothop.com>',
       to:      [adminEmail],
       subject: `⚠️ Ghost detector: ${ghostCount} silent traveller${ghostCount > 1 ? 's' : ''} detected`,

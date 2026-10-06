@@ -71,7 +71,7 @@ async function triggerSuspension(
     performed_by:   email,
     metadata:       { reason: 'immutable_declaration_edit_attempt' },
   });
-  sendResendEmail({
+  await sendResendEmail({
     from,
     to:      adminEmail,
     subject: `[SUSPENDED] Declaration edit on immutable — match ${matchId}`,
