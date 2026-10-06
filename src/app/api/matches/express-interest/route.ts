@@ -128,7 +128,9 @@ export async function POST(request: Request) {
         payload: { redirectTo: '/dashboard' }, expires_at,
       }).select('token').single();
 
-      sendInterestEmail({
+      // Awaited: on Vercel, the function can freeze right after the response is sent,
+      // so an un-awaited send here can get cut off before it ever reaches Resend.
+      await sendInterestEmail({
         toEmail:      trip.email,
         fromEmail:    email,
         fromCity:     trip.from_city,

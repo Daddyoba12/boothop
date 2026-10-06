@@ -178,8 +178,10 @@ export async function POST(
           }).catch(e => console.error('sendPushToEmail (accept) failed', String(e))),
         ];
 
-        // Fire both — don't await so we don't add latency to the accept response
-        Promise.allSettled(notifyPromises);
+        // Awaited: on Vercel, the function can freeze right after the response is sent,
+        // so un-awaited sends here can get cut off before they complete. Failures inside
+        // each promise are already caught above and never throw, so this doesn't risk the response.
+        await Promise.allSettled(notifyPromises);
       }
 
       return NextResponse.json({ ok: true, status: 'agreed' });
@@ -205,7 +207,8 @@ export async function POST(
       }
 
       if (otherEmail) {
-        sendMatchDeclinedEmail({
+        // Awaited: see note above — un-awaited sends can get cut off on Vercel.
+        await sendMatchDeclinedEmail({
           toEmail:    otherEmail,
           fromCity,
           toCity,

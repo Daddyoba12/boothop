@@ -88,8 +88,9 @@ export async function POST(request: Request) {
     const from         = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
     const dateStr      = new Date(draft.travel_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
-    // Confirmation to trip creator (non-blocking)
-    sendResendEmail({
+    // Confirmation to trip creator. Awaited: on Vercel, the function can freeze right after
+    // the response is sent, so un-awaited sends here can get cut off before they complete.
+    await sendResendEmail({
       from,
       to:      session.email,
       subject: `Your trip is live — ${draft.from_city} → ${draft.to_city}`,
@@ -119,7 +120,7 @@ export async function POST(request: Request) {
       text: `Your trip is live: ${draft.from_city} → ${draft.to_city} on ${dateStr}. Price: £${draft.price}.\n\nWe'll email you when we find a match. Dashboard: ${appUrl}/dashboard`,
     }).catch(e => console.error('Trip creator confirmation email error:', e));
 
-    sendResendEmail({
+    await sendResendEmail({
       from,
       to:      supportEmail,
       subject: `🚀 New trip registered — ${draft.from_city} → ${draft.to_city} (${typeLabel})`,
@@ -144,8 +145,8 @@ export async function POST(request: Request) {
       text: `New trip: ${draft.type} | ${draft.from_city} → ${draft.to_city} | ${draft.travel_date} | ${session.email}`,
     }).catch(e => console.error('Trip notification email error:', e));
 
-    // Run match engine (non-blocking)
-    fetch(`${appUrl}/api/match-engine`, {
+    // Run match engine. Awaited: see note above — un-awaited calls can get cut off on Vercel.
+    await fetch(`${appUrl}/api/match-engine`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ tripId: trip.id }),
