@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 // ============================================================================
@@ -54,9 +54,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
   }
 
-  // Respond 200 immediately — Meta requires a fast acknowledgement
-  processIncoming(body).catch((e) =>
-    console.error("[WhatsApp webhook] Processing error:", e)
+  // Respond 200 immediately — Meta requires a fast acknowledgement.
+  // after() keeps this running post-response instead of a bare un-awaited
+  // promise, which Vercel can cut off the instant the response is sent.
+  after(() =>
+    processIncoming(body).catch((e) =>
+      console.error("[WhatsApp webhook] Processing error:", e)
+    )
   );
 
   return NextResponse.json({ received: true });
