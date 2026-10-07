@@ -36,7 +36,7 @@ export default function JourneyDetail({
   const [deleteReason, setDeleteReason] = useState('');
   const [deleteBusy, setDeleteBusy]     = useState(false);
 
-  type AdminMatch = { id: string; status: string; agreed_price: number | null };
+  type AdminMatch = { id: string; status: string; agreed_price: number | null; sender_email?: string; traveler_email?: string };
   const [matchList, setMatchList]       = useState(matches);
   const [adminMatch, setAdminMatch]     = useState<AdminMatch | null>(null);
   const [adminAction, setAdminAction]   = useState<'force_agree' | 'bypass_kyc_sender' | 'bypass_kyc_traveler' | 'force_terms' | 'request_payment'>('force_agree');
@@ -44,6 +44,7 @@ export default function JourneyDetail({
   const [adminReason, setAdminReason]   = useState('');
   const [adminBusy, setAdminBusy]       = useState(false);
   const [adminError, setAdminError]     = useState('');
+  const [adminPreviewed, setAdminPreviewed] = useState(false);
   const [forcePayBusy, setForcePayBusy] = useState<string | null>(null);
 
   const openAdminAction = (m: AdminMatch, action: typeof adminAction) => {
@@ -52,6 +53,19 @@ export default function JourneyDetail({
     setAdminPrice(m.agreed_price != null ? String(m.agreed_price) : '');
     setAdminReason('');
     setAdminError('');
+    setAdminPreviewed(false);
+  };
+
+  // Always re-pull the real state from the server after an override — the
+  // override endpoints don't all return every changed field, so trusting a
+  // partial client-side merge can leave the UI showing a stale status.
+  const refreshMatches = async () => {
+    try {
+      const res = await fetch(`/api/admin/journeys/${trip.id}/detail`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.matches) setMatchList(data.matches);
+    } catch { /* keep showing what we have — actionResult already reported success */ }
   };
 
   const submitAdminAction = async () => {
@@ -68,6 +82,10 @@ export default function JourneyDetail({
         'Continue?'
       );
       if (!ok) return;
+    }
+    if (adminAction === 'request_payment' && !adminPreviewed) {
+      setAdminError('Review the email preview above before sending.');
+      return;
     }
     setAdminBusy(true);
     setAdminError('');
@@ -92,7 +110,7 @@ export default function JourneyDetail({
       });
       const data = await res.json();
       if (!res.ok) { setAdminError(data.error || 'Action failed.'); setAdminBusy(false); return; }
-      setMatchList(prev => prev.map(m => m.id === adminMatch.id ? { ...m, ...data } : m));
+      await refreshMatches();
       setActionResult('✅ Admin action applied.');
       setAdminMatch(null);
     } catch {
@@ -112,7 +130,7 @@ export default function JourneyDetail({
       });
       const data = await res.json();
       if (!res.ok) { setActionResult(`❌ ${data.error || 'Failed to confirm payment.'}`); setForcePayBusy(null); return; }
-      setMatchList(prev => prev.map(m => m.id === matchId ? { ...m, status: 'locked_pending_compliance' } : m));
+      await refreshMatches();
       setActionResult('✅ Payment marked as received.');
     } catch {
       setActionResult('❌ Network error — please try again.');
@@ -754,6 +772,40 @@ export default function JourneyDetail({
                 )}
               </div>
 
+              {adminAction === 'request_payment' && (
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                  <div className="px-4 py-2.5 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
+                    <span className="text-slate-700 text-xs font-bold uppercase tracking-wide">Email preview — 3 emails will be sent</span>
+                  </div>
+                  <div className="p-4 space-y-3 text-xs">
+                    <div>
+                      <p className="font-semibold text-slate-900">→ {adminMatch?.sender_email || 'sender'}</p>
+                      <p className="text-slate-600">Subject: &quot;Payment request received — {'{route}'}&quot;</p>
+                      <p className="text-slate-500 mt-0.5">&quot;Amount due: £{adminMatch?.agreed_price ?? '—'}. Our team will contact you shortly with payment instructions (bank transfer details or a payment link).&quot;</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900">→ {adminMatch?.traveler_email || 'traveller'}</p>
+                      <p className="text-slate-600">Subject: &quot;Payment in progress — {'{route}'}&quot;</p>
+                      <p className="text-slate-500 mt-0.5">&quot;The sender has submitted payment for £{adminMatch?.agreed_price ?? '—'}. We&apos;re verifying it now.&quot;</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900">→ admin@boothop.com</p>
+                      <p className="text-slate-600">Subject: &quot;[ACTION] Payment request — £{adminMatch?.agreed_price ?? '—'}&quot;</p>
+                      <p className="text-slate-500 mt-0.5">Full details table + a &quot;Confirm payment received&quot; link, with a reminder to send the sender bank-transfer details manually.</p>
+                    </div>
+                    <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                      <p className="text-green-800 font-medium">✓ None of these emails contain real bank account details — nothing automated exposes banking info.</p>
+                    </div>
+                  </div>
+                  <div className="px-4 py-3 bg-slate-50 border-t border-slate-200">
+                    <label className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
+                      <input type="checkbox" checked={adminPreviewed} onChange={e => setAdminPreviewed(e.target.checked)} />
+                      I&apos;ve reviewed this and want to send it
+                    </label>
+                  </div>
+                </div>
+              )}
+
               {adminAction === 'force_agree' && (
                 <div>
                   <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Agreed price (£)</label>
@@ -791,11 +843,11 @@ export default function JourneyDetail({
                 </button>
                 <button
                   onClick={submitAdminAction}
-                  disabled={adminBusy || adminReason.trim().length < 10}
+                  disabled={adminBusy || adminReason.trim().length < 10 || (adminAction === 'request_payment' && !adminPreviewed)}
                   className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-amber-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {adminBusy ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                  {adminBusy ? 'Applying…' : 'Apply'}
+                  {adminBusy ? 'Applying…' : adminAction === 'request_payment' ? 'Send payment request' : 'Apply'}
                 </button>
               </div>
             </div>
