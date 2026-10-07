@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Shield, MapPin, Package, CheckCircle, RefreshCw, X, Edit2, Trash2, Eye, Clock } from 'lucide-react';
+import { ArrowLeft, Shield, MapPin, Package, CheckCircle, RefreshCw, X, Edit2, Trash2, Eye, Clock, Wrench, PoundSterling, UserCheck, Banknote } from 'lucide-react';
 
 function fmt(d: string | null | undefined) {
   if (!d) return '—';
@@ -35,6 +35,77 @@ export default function JourneyDetail({
   const [showDelete, setShowDelete]     = useState(false);
   const [deleteReason, setDeleteReason] = useState('');
   const [deleteBusy, setDeleteBusy]     = useState(false);
+
+  type AdminMatch = { id: string; agreed_price: number | null };
+  const [matchList, setMatchList]       = useState(matches);
+  const [adminMatch, setAdminMatch]     = useState<AdminMatch | null>(null);
+  const [adminAction, setAdminAction]   = useState<'force_agree' | 'bypass_kyc_sender' | 'bypass_kyc_traveler'>('force_agree');
+  const [adminPrice, setAdminPrice]     = useState('');
+  const [adminReason, setAdminReason]   = useState('');
+  const [adminBusy, setAdminBusy]       = useState(false);
+  const [adminError, setAdminError]     = useState('');
+  const [forcePayBusy, setForcePayBusy] = useState<string | null>(null);
+
+  const openAdminAction = (m: AdminMatch, action: typeof adminAction) => {
+    setAdminMatch(m);
+    setAdminAction(action);
+    setAdminPrice(m.agreed_price != null ? String(m.agreed_price) : '');
+    setAdminReason('');
+    setAdminError('');
+  };
+
+  const submitAdminAction = async () => {
+    if (!adminMatch) return;
+    if (adminReason.trim().length < 10) { setAdminError('Reason must be at least 10 characters.'); return; }
+    if (adminAction === 'force_agree') {
+      const p = Number(adminPrice);
+      if (!Number.isFinite(p) || p <= 0) { setAdminError('Enter a valid price.'); return; }
+    }
+    setAdminBusy(true);
+    setAdminError('');
+    try {
+      const payload: Record<string, unknown> = { reason: adminReason.trim() };
+      if (adminAction === 'force_agree') {
+        payload.action = 'force_agree';
+        payload.price = Number(adminPrice);
+      } else {
+        payload.action = 'bypass_kyc';
+        payload.role = adminAction === 'bypass_kyc_sender' ? 'sender' : 'traveler';
+      }
+      const res = await fetch(`/api/admin/matches/${adminMatch.id}/override`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) { setAdminError(data.error || 'Action failed.'); setAdminBusy(false); return; }
+      setMatchList(prev => prev.map(m => m.id === adminMatch.id ? { ...m, ...data } : m));
+      setActionResult('✅ Admin action applied.');
+      setAdminMatch(null);
+    } catch {
+      setAdminError('Network error — please try again.');
+    }
+    setAdminBusy(false);
+  };
+
+  const forcePaymentReceived = async (matchId: string) => {
+    if (!confirm('⚠️ Force this match\'s payment to confirmed? Only use this when the sender has genuinely paid but the system failed to record it.')) return;
+    setForcePayBusy(matchId);
+    try {
+      const res = await fetch('/api/admin/confirm-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matchId }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setActionResult(`❌ ${data.error || 'Failed to confirm payment.'}`); setForcePayBusy(null); return; }
+      setMatchList(prev => prev.map(m => m.id === matchId ? { ...m, status: 'locked_pending_compliance' } : m));
+      setActionResult('✅ Payment marked as received.');
+    } catch {
+      setActionResult('❌ Network error — please try again.');
+    }
+    setForcePayBusy(null);
+  };
 
   // date-aware active check
   const travelMs     = trip.travel_date ? new Date(trip.travel_date).getTime() : null;
@@ -233,17 +304,17 @@ export default function JourneyDetail({
                   <Package className="w-4 h-4 text-purple-600" />
                   <h2 className="text-slate-900 font-bold text-sm uppercase tracking-wide">Match History</h2>
                 </div>
-                <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-xs font-bold">{matches.length}</span>
+                <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-xs font-bold">{matchList.length}</span>
               </div>
 
-              {matches.length === 0 ? (
+              {matchList.length === 0 ? (
                 <div className="px-6 py-12 text-center">
                   <Package className="w-10 h-10 text-slate-600 mx-auto mb-3" />
                   <p className="text-slate-600 text-sm">No matches for this journey yet</p>
                 </div>
               ) : (
                 <div className="divide-y divide-white/5">
-                  {matches.map(m => {
+                  {matchList.map(m => {
                     const statusColor =
                       m.status === 'completed'                 ? 'bg-green-500/20 text-green-700'   :
                       m.status === 'cancelled' || m.status === 'cancellation_requested'
@@ -315,6 +386,45 @@ export default function JourneyDetail({
                         {m.cancellation_reason && (
                           <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-xs text-red-700">
                             <span className="font-semibold">Reason: </span>{m.cancellation_reason}
+                          </div>
+                        )}
+
+                        {/* Admin overrides */}
+                        {!['cancelled', 'declined', 'completed', 'disputed'].includes(m.status) && (
+                          <div className="flex flex-wrap gap-2 pt-1">
+                            {m.status === 'matched' && (
+                              <button
+                                onClick={() => openAdminAction(m, 'force_agree')}
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-semibold rounded-lg"
+                              >
+                                <PoundSterling className="w-3 h-3" /> Force agree + set price
+                              </button>
+                            )}
+                            {m.sender_kyc_status !== 'verified' && (
+                              <button
+                                onClick={() => openAdminAction(m, 'bypass_kyc_sender')}
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-xs font-semibold rounded-lg"
+                              >
+                                <UserCheck className="w-3 h-3" /> Bypass sender KYC
+                              </button>
+                            )}
+                            {m.traveler_kyc_status !== 'verified' && (
+                              <button
+                                onClick={() => openAdminAction(m, 'bypass_kyc_traveler')}
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-xs font-semibold rounded-lg"
+                              >
+                                <UserCheck className="w-3 h-3" /> Bypass traveller KYC
+                              </button>
+                            )}
+                            {m.status === 'payment_processing' && (
+                              <button
+                                onClick={() => forcePaymentReceived(m.id)}
+                                disabled={forcePayBusy === m.id}
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 text-xs font-semibold rounded-lg disabled:opacity-50"
+                              >
+                                <Banknote className="w-3 h-3" /> {forcePayBusy === m.id ? 'Confirming…' : 'Force payment received'}
+                              </button>
+                            )}
                           </div>
                         )}
 
@@ -569,6 +679,86 @@ export default function JourneyDetail({
                 >
                   {deleteBusy ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                   {deleteBusy ? 'Cancelling...' : 'Confirm Cancel'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {adminMatch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => !adminBusy && setAdminMatch(null)} />
+          <div className="relative w-full max-w-md bg-white border border-amber-200 rounded-3xl shadow-2xl overflow-hidden">
+            <div className="px-8 py-5 border-b border-slate-200 flex items-center gap-3">
+              <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                <Wrench className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="text-slate-900 font-bold text-lg">Admin Override</h3>
+                <p className="text-slate-600 text-xs">Match {adminMatch.id.slice(0, 8)}…</p>
+              </div>
+              <button onClick={() => !adminBusy && setAdminMatch(null)} className="ml-auto p-1.5 hover:bg-slate-100 rounded-lg">
+                <X className="w-5 h-5 text-slate-600" />
+              </button>
+            </div>
+            <div className="px-8 py-6 space-y-4">
+              <div>
+                <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Action</label>
+                <select
+                  value={adminAction}
+                  onChange={e => setAdminAction(e.target.value as typeof adminAction)}
+                  className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm appearance-none cursor-pointer"
+                >
+                  <option value="force_agree">Force agree and set price</option>
+                  <option value="bypass_kyc_sender">Mark sender ID check complete</option>
+                  <option value="bypass_kyc_traveler">Mark traveller ID check complete</option>
+                </select>
+                <p className="text-xs text-slate-500 mt-1">Use the ID-check options only when BootHop itself is a party to this delivery, or another documented exception applies.</p>
+              </div>
+
+              {adminAction === 'force_agree' && (
+                <div>
+                  <label className="block text-slate-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Agreed price (£)</label>
+                  <input
+                    type="number" min="0" step="0.01"
+                    value={adminPrice}
+                    onChange={e => setAdminPrice(e.target.value)}
+                    placeholder="e.g. 200"
+                    className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-slate-700 text-xs font-semibold uppercase tracking-wide mb-1.5">
+                  Reason <span className="text-red-600">*</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={adminReason}
+                  onChange={e => setAdminReason(e.target.value)}
+                  placeholder="Why is this being done manually?..."
+                  className="w-full px-4 py-3 bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none text-sm"
+                />
+                <p className={`text-xs mt-1 ${adminReason.trim().length >= 10 ? 'text-green-600' : 'text-red-600'}`}>
+                  {adminReason.trim().length} / 10 min characters
+                </p>
+              </div>
+
+              {adminError && <p className="text-xs text-red-600">{adminError}</p>}
+
+              <div className="flex gap-3 pt-1">
+                <button onClick={() => setAdminMatch(null)} disabled={adminBusy} className="flex-1 px-6 py-3 bg-slate-100 text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-all disabled:opacity-50">
+                  Cancel
+                </button>
+                <button
+                  onClick={submitAdminAction}
+                  disabled={adminBusy || adminReason.trim().length < 10}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-amber-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {adminBusy ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                  {adminBusy ? 'Applying…' : 'Apply'}
                 </button>
               </div>
             </div>
