@@ -114,6 +114,10 @@ export async function sendPaymentRequestedEmail(params: {
   totalDue:  number;
   matchId:   string;
 }) {
+  const bankName   = process.env.BOOTHOP_BANK_ACCOUNT_NAME;
+  const bankNumber = process.env.BOOTHOP_BANK_ACCOUNT_NUMBER;
+  const bankSort   = process.env.BOOTHOP_BANK_SORT_CODE;
+  const hasBankDetails = !!(bankName && bankNumber && bankSort);
 
   await sendResendEmail({
     from,
@@ -132,16 +136,32 @@ export async function sendPaymentRequestedEmail(params: {
           <p style="margin:0 0 4px;font-size:12px;color:#64748b;font-weight:600;text-transform:uppercase;">Amount due</p>
           <p style="margin:0;font-size:24px;font-weight:900;color:#1d4ed8;">£${params.totalDue.toFixed(2)}</p>
         </div>
+        ${hasBankDetails ? `
+        <div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:16px;padding:16px 20px;margin:0 0 24px;">
+          <p style="margin:0 0 10px;font-size:12px;color:#64748b;font-weight:600;text-transform:uppercase;">Please pay by bank transfer to</p>
+          <table style="width:100%;border-collapse:collapse;font-size:14px;">
+            <tr><td style="padding:4px 0;color:#64748b;width:40%;">Account name</td><td style="padding:4px 0;font-weight:700;color:#0f172a;">${bankName}</td></tr>
+            <tr><td style="padding:4px 0;color:#64748b;">Account number</td><td style="padding:4px 0;font-weight:700;color:#0f172a;">${bankNumber}</td></tr>
+            <tr><td style="padding:4px 0;color:#64748b;">Sort code</td><td style="padding:4px 0;font-weight:700;color:#0f172a;">${bankSort}</td></tr>
+            <tr><td style="padding:4px 0;color:#64748b;">Reference</td><td style="padding:4px 0;font-weight:700;color:#0f172a;">${params.matchId.slice(0, 8)}</td></tr>
+          </table>
+          <p style="margin:12px 0 0;font-size:12px;color:#94a3b8;">Please include the reference above so we can match your payment quickly.</p>
+        </div>
+        <p style="font-size:14px;color:#475569;margin:0 0 16px;">
+          Once we confirm receipt, your contact details will be shared with the carrier automatically.
+        </p>` : `
         <p style="font-size:14px;color:#475569;margin:0 0 16px;">
           Our team will contact you shortly with payment instructions (bank transfer details or a payment link).
           Once we confirm receipt, your contact details will be shared with the carrier automatically.
-        </p>
+        </p>`}
         <p style="font-size:13px;color:#94a3b8;border-top:1px solid #f1f5f9;padding-top:16px;margin:0;">
           Match ID: ${params.matchId} · If you have questions, reply to this email.
         </p>
       </div>
     `,
-    text: `Payment request received for ${params.fromCity} → ${params.toCity}.\nAmount due: £${params.totalDue.toFixed(2)}\n\nWe will contact you shortly with payment instructions.`,
+    text: `Payment request received for ${params.fromCity} → ${params.toCity}.\nAmount due: £${params.totalDue.toFixed(2)}\n\n${hasBankDetails
+      ? `Please pay by bank transfer to:\nAccount name: ${bankName}\nAccount number: ${bankNumber}\nSort code: ${bankSort}\nReference: ${params.matchId.slice(0, 8)}\n\nPlease include the reference so we can match your payment quickly.`
+      : `We will contact you shortly with payment instructions.`}`,
   });
 }
 

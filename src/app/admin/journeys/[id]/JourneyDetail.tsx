@@ -781,7 +781,8 @@ export default function JourneyDetail({
                     <div>
                       <p className="font-semibold text-slate-900">→ {adminMatch?.sender_email || 'sender'}</p>
                       <p className="text-slate-600">Subject: &quot;Payment request received — {'{route}'}&quot;</p>
-                      <p className="text-slate-500 mt-0.5">&quot;Amount due: £{adminMatch?.agreed_price ?? '—'}. Our team will contact you shortly with payment instructions (bank transfer details or a payment link).&quot;</p>
+                      <p className="text-slate-500 mt-0.5">&quot;Amount due: £{adminMatch?.agreed_price ?? '—'}. Please pay by bank transfer to:&quot;</p>
+                      <p className="text-slate-700 font-mono mt-1 bg-slate-50 rounded px-2 py-1">BootHop BD · Acc 31957648 · Sort 04-06-05 · Ref {adminMatch?.id.slice(0, 8)}</p>
                     </div>
                     <div>
                       <p className="font-semibold text-slate-900">→ {adminMatch?.traveler_email || 'traveller'}</p>
@@ -791,10 +792,10 @@ export default function JourneyDetail({
                     <div>
                       <p className="font-semibold text-slate-900">→ admin@boothop.com</p>
                       <p className="text-slate-600">Subject: &quot;[ACTION] Payment request — £{adminMatch?.agreed_price ?? '—'}&quot;</p>
-                      <p className="text-slate-500 mt-0.5">Full details table + a &quot;Confirm payment received&quot; link, with a reminder to send the sender bank-transfer details manually.</p>
+                      <p className="text-slate-500 mt-0.5">Full details table + a &quot;Confirm payment received&quot; link.</p>
                     </div>
-                    <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                      <p className="text-green-800 font-medium">✓ None of these emails contain real bank account details — nothing automated exposes banking info.</p>
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                      <p className="text-amber-800 font-medium">⚠ This email now includes real BootHop bank details for manual transfer. Double-check the amount above before sending.</p>
                     </div>
                   </div>
                   <div className="px-4 py-3 bg-slate-50 border-t border-slate-200">
