@@ -39,7 +39,7 @@ export default function JourneyDetail({
   type AdminMatch = { id: string; status: string; agreed_price: number | null };
   const [matchList, setMatchList]       = useState(matches);
   const [adminMatch, setAdminMatch]     = useState<AdminMatch | null>(null);
-  const [adminAction, setAdminAction]   = useState<'force_agree' | 'bypass_kyc_sender' | 'bypass_kyc_traveler' | 'force_terms'>('force_agree');
+  const [adminAction, setAdminAction]   = useState<'force_agree' | 'bypass_kyc_sender' | 'bypass_kyc_traveler' | 'force_terms' | 'request_payment'>('force_agree');
   const [adminPrice, setAdminPrice]     = useState('');
   const [adminReason, setAdminReason]   = useState('');
   const [adminBusy, setAdminBusy]       = useState(false);
@@ -79,6 +79,8 @@ export default function JourneyDetail({
       } else if (adminAction === 'force_terms') {
         payload.action = 'force_terms';
         payload.confirmed = true;
+      } else if (adminAction === 'request_payment') {
+        payload.action = 'request_payment';
       } else {
         payload.action = 'bypass_kyc';
         payload.role = adminAction === 'bypass_kyc_sender' ? 'sender' : 'traveler';
@@ -435,6 +437,14 @@ export default function JourneyDetail({
                                 <UserCheck className="w-3 h-3" /> Bypass traveller KYC
                               </button>
                             )}
+                            {['kyc_complete', 'payment_pending'].includes(m.status) && (
+                              <button
+                                onClick={() => openAdminAction(m, 'request_payment')}
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 text-xs font-semibold rounded-lg"
+                              >
+                                <Banknote className="w-3 h-3" /> Request payment
+                              </button>
+                            )}
                             {m.status === 'payment_processing' && (
                               <button
                                 onClick={() => forcePaymentReceived(m.id)}
@@ -733,10 +743,14 @@ export default function JourneyDetail({
                   <option value="force_terms">Force Terms acceptance (both parties)</option>
                   <option value="bypass_kyc_sender">Mark sender ID check complete</option>
                   <option value="bypass_kyc_traveler">Mark traveller ID check complete</option>
+                  <option value="request_payment">Request payment (admin-initiated)</option>
                 </select>
                 <p className="text-xs text-slate-500 mt-1">Use the ID-check options only when BootHop itself is a party to this delivery, or another documented exception applies.</p>
                 {adminAction === 'force_terms' && (
                   <p className="text-xs text-red-600 mt-1 font-medium">Legal signature on behalf of both parties — only use with documented outside-app agreement. You&apos;ll be asked to confirm again before this is applied.</p>
+                )}
+                {adminAction === 'request_payment' && (
+                  <p className="text-xs text-amber-600 mt-1 font-medium">This is the manual payment path (money moves outside Stripe Checkout) — only use when the live payment flow can&apos;t run, e.g. the traveller hasn&apos;t completed Stripe Connect onboarding. Once the sender has actually paid, use &quot;Force payment received&quot; to confirm it.</p>
                 )}
               </div>
 

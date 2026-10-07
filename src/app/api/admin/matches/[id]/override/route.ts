@@ -4,6 +4,7 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { sendResendEmail } from '@/lib/resend-client';
 import { sendKycVerifiedEmail, sendBothKycVerifiedEmail } from '@/lib/email/sendKycEmail';
 import { sendBothTermsAcceptedEmail } from '@/lib/email/sendTermsEmail';
+import { sendAdminPaymentAlertEmail, sendPaymentRequestedEmail, sendCarrierPaymentProcessingEmail } from '@/lib/email/sendPaymentEmail';
 
 const TERMS_VERSION = '2025-04-07';
 
@@ -28,8 +29,8 @@ export async function POST(
   if (!reason || reason.trim().length < 10) {
     return NextResponse.json({ error: 'Reason must be at least 10 characters.' }, { status: 400 });
   }
-  if (!action || !['force_agree', 'bypass_kyc', 'force_terms'].includes(action)) {
-    return NextResponse.json({ error: 'action must be force_agree, bypass_kyc, or force_terms.' }, { status: 400 });
+  if (!action || !['force_agree', 'bypass_kyc', 'force_terms', 'request_payment'].includes(action)) {
+    return NextResponse.json({ error: 'action must be force_agree, bypass_kyc, force_terms, or request_payment.' }, { status: 400 });
   }
   // Terms acceptance is a legal signature — require an explicit second confirmation
   // from the client beyond the reason text, so this can't fire from a stray click.
@@ -209,6 +210,44 @@ export async function POST(
     ]);
 
     return NextResponse.json({ ok: true, status: 'committed' });
+  }
+
+  // ── Request payment (admin-initiated, mirrors /api/payment/request) ──────
+  if (action === 'request_payment') {
+    if (!['kyc_complete', 'payment_pending'].includes(match.status)) {
+      return NextResponse.json({ error: `Match status is '${match.status}' — request_payment needs 'kyc_complete' or 'payment_pending'.` }, { status: 400 });
+    }
+    if (!match.sender_email || !match.traveler_email) {
+      return NextResponse.json({ error: 'Match is missing a sender or traveller email.' }, { status: 400 });
+    }
+
+    const totalDue = match.agreed_price ?? 0;
+    const travelDate = trip?.travel_date ?? '';
+
+    await supabase
+      .from('matches')
+      .update({ status: 'payment_processing' })
+      .eq('id', matchId);
+
+    await supabase.from('admin_alerts').insert({
+      alert_type: 'admin_request_payment',
+      match_id: matchId,
+      email: session.email,
+      message: `Admin ${session.email} manually requested payment of £${totalDue} from ${match.sender_email} on match ${matchId}. Reason: ${reason.trim()}`,
+      metadata: { totalDue, reason: reason.trim() },
+    });
+
+    await Promise.allSettled([
+      sendAdminPaymentAlertEmail({
+        matchId, senderEmail: match.sender_email, travelerEmail: match.traveler_email,
+        fromCity, toCity, travelDate, agreedPrice: match.agreed_price ?? 0,
+        goodsValue: 0, insuranceAccepted: false, insuranceFee: 0, totalDue,
+      }),
+      sendPaymentRequestedEmail({ toEmail: match.sender_email, fromCity, toCity, totalDue, matchId }),
+      sendCarrierPaymentProcessingEmail({ toEmail: match.traveler_email, fromCity, toCity, travelDate, agreedPrice: match.agreed_price ?? 0, matchId }),
+    ]);
+
+    return NextResponse.json({ ok: true, status: 'payment_processing', totalDue });
   }
 
   return NextResponse.json({ error: 'Unhandled action.' }, { status: 400 });
