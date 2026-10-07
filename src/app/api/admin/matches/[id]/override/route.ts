@@ -3,6 +3,9 @@ import { requireAdminApi } from '@/lib/auth/admin';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { sendResendEmail } from '@/lib/resend-client';
 import { sendKycVerifiedEmail, sendBothKycVerifiedEmail } from '@/lib/email/sendKycEmail';
+import { sendBothTermsAcceptedEmail } from '@/lib/email/sendTermsEmail';
+
+const TERMS_VERSION = '2025-04-07';
 
 // Admin-only overrides for cases where two parties agreed a price outside the
 // app, or KYC needs to be bypassed (e.g. BootHop itself is the Booter/Hooper
@@ -25,8 +28,13 @@ export async function POST(
   if (!reason || reason.trim().length < 10) {
     return NextResponse.json({ error: 'Reason must be at least 10 characters.' }, { status: 400 });
   }
-  if (!action || !['force_agree', 'bypass_kyc'].includes(action)) {
-    return NextResponse.json({ error: 'action must be force_agree or bypass_kyc.' }, { status: 400 });
+  if (!action || !['force_agree', 'bypass_kyc', 'force_terms'].includes(action)) {
+    return NextResponse.json({ error: 'action must be force_agree, bypass_kyc, or force_terms.' }, { status: 400 });
+  }
+  // Terms acceptance is a legal signature — require an explicit second confirmation
+  // from the client beyond the reason text, so this can't fire from a stray click.
+  if (action === 'force_terms' && body.confirmed !== true) {
+    return NextResponse.json({ error: 'force_terms requires confirmed: true.' }, { status: 400 });
   }
 
   const supabase = createSupabaseAdminClient();
@@ -155,6 +163,52 @@ export async function POST(
     }
 
     return NextResponse.json({ ok: true, status: match.status, [kycField]: 'verified' });
+  }
+
+  // ── Force Terms acceptance for both parties ───────────────────────────────
+  if (action === 'force_terms') {
+    if (match.status !== 'agreed') {
+      return NextResponse.json({ error: `Match status is '${match.status}' — force_terms only applies from 'agreed'.` }, { status: 400 });
+    }
+
+    const nowIso = new Date().toISOString();
+    const emails = [match.sender_email, match.traveler_email].filter(Boolean) as string[];
+
+    for (const email of emails) {
+      const { data: existing } = await supabase
+        .from('terms_acceptance')
+        .select('id')
+        .eq('match_id', matchId)
+        .eq('email', email)
+        .maybeSingle();
+      if (!existing) {
+        await supabase.from('terms_acceptance').insert({
+          match_id: matchId,
+          email,
+          terms_version: TERMS_VERSION,
+          accepted: true,
+          ip_address: `admin-override:${session.email}`,
+          accepted_at: nowIso,
+        });
+      }
+    }
+
+    await supabase.from('matches').update({ status: 'committed' }).eq('id', matchId);
+
+    await supabase.from('admin_alerts').insert({
+      alert_type: 'admin_force_terms',
+      match_id: matchId,
+      email: session.email,
+      message: `Admin ${session.email} force-accepted Terms on behalf of both parties on match ${matchId}. Reason: ${reason.trim()}`,
+      metadata: { reason: reason.trim() },
+    });
+
+    await Promise.allSettled([
+      match.sender_email && sendBothTermsAcceptedEmail({ toEmail: match.sender_email, fromCity, toCity, matchId }),
+      match.traveler_email && sendBothTermsAcceptedEmail({ toEmail: match.traveler_email, fromCity, toCity, matchId }),
+    ]);
+
+    return NextResponse.json({ ok: true, status: 'committed' });
   }
 
   return NextResponse.json({ error: 'Unhandled action.' }, { status: 400 });

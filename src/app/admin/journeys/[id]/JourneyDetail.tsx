@@ -36,10 +36,10 @@ export default function JourneyDetail({
   const [deleteReason, setDeleteReason] = useState('');
   const [deleteBusy, setDeleteBusy]     = useState(false);
 
-  type AdminMatch = { id: string; agreed_price: number | null };
+  type AdminMatch = { id: string; status: string; agreed_price: number | null };
   const [matchList, setMatchList]       = useState(matches);
   const [adminMatch, setAdminMatch]     = useState<AdminMatch | null>(null);
-  const [adminAction, setAdminAction]   = useState<'force_agree' | 'bypass_kyc_sender' | 'bypass_kyc_traveler'>('force_agree');
+  const [adminAction, setAdminAction]   = useState<'force_agree' | 'bypass_kyc_sender' | 'bypass_kyc_traveler' | 'force_terms'>('force_agree');
   const [adminPrice, setAdminPrice]     = useState('');
   const [adminReason, setAdminReason]   = useState('');
   const [adminBusy, setAdminBusy]       = useState(false);
@@ -61,6 +61,14 @@ export default function JourneyDetail({
       const p = Number(adminPrice);
       if (!Number.isFinite(p) || p <= 0) { setAdminError('Enter a valid price.'); return; }
     }
+    if (adminAction === 'force_terms') {
+      const ok = window.confirm(
+        'This marks BOTH parties as having accepted BootHop\'s Terms & Conditions on their behalf, without either of them clicking anything themselves.\n\n' +
+        'Only proceed if you have documented confirmation that both parties actually agreed outside the app.\n\n' +
+        'Continue?'
+      );
+      if (!ok) return;
+    }
     setAdminBusy(true);
     setAdminError('');
     try {
@@ -68,6 +76,9 @@ export default function JourneyDetail({
       if (adminAction === 'force_agree') {
         payload.action = 'force_agree';
         payload.price = Number(adminPrice);
+      } else if (adminAction === 'force_terms') {
+        payload.action = 'force_terms';
+        payload.confirmed = true;
       } else {
         payload.action = 'bypass_kyc';
         payload.role = adminAction === 'bypass_kyc_sender' ? 'sender' : 'traveler';
@@ -400,6 +411,14 @@ export default function JourneyDetail({
                                 <PoundSterling className="w-3 h-3" /> Force agree + set price
                               </button>
                             )}
+                            {m.status === 'agreed' && (
+                              <button
+                                onClick={() => openAdminAction(m, 'force_terms')}
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 text-xs font-semibold rounded-lg"
+                              >
+                                <UserCheck className="w-3 h-3" /> Force Terms acceptance
+                              </button>
+                            )}
                             {m.sender_kyc_status !== 'verified' && (
                               <button
                                 onClick={() => openAdminAction(m, 'bypass_kyc_sender')}
@@ -711,10 +730,14 @@ export default function JourneyDetail({
                   className="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm appearance-none cursor-pointer"
                 >
                   <option value="force_agree">Force agree and set price</option>
+                  <option value="force_terms">Force Terms acceptance (both parties)</option>
                   <option value="bypass_kyc_sender">Mark sender ID check complete</option>
                   <option value="bypass_kyc_traveler">Mark traveller ID check complete</option>
                 </select>
                 <p className="text-xs text-slate-500 mt-1">Use the ID-check options only when BootHop itself is a party to this delivery, or another documented exception applies.</p>
+                {adminAction === 'force_terms' && (
+                  <p className="text-xs text-red-600 mt-1 font-medium">Legal signature on behalf of both parties — only use with documented outside-app agreement. You&apos;ll be asked to confirm again before this is applied.</p>
+                )}
               </div>
 
               {adminAction === 'force_agree' && (
