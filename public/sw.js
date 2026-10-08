@@ -1,4 +1,4 @@
-const CACHE_NAME = 'boothop-v1791390434280';
+const CACHE_NAME = 'boothop-v1791427587646';
 
 const STATIC_ASSETS = [
   '/',

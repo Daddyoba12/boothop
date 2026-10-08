@@ -39,7 +39,7 @@ export default function JourneyDetail({
   type AdminMatch = { id: string; status: string; agreed_price: number | null; sender_email?: string; traveler_email?: string };
   const [matchList, setMatchList]       = useState(matches);
   const [adminMatch, setAdminMatch]     = useState<AdminMatch | null>(null);
-  const [adminAction, setAdminAction]   = useState<'force_agree' | 'bypass_kyc_sender' | 'bypass_kyc_traveler' | 'force_terms' | 'request_payment'>('force_agree');
+  const [adminAction, setAdminAction]   = useState<'force_agree' | 'bypass_kyc_sender' | 'bypass_kyc_traveler' | 'force_terms' | 'request_payment' | 'force_delivery_confirmed'>('force_agree');
   const [adminPrice, setAdminPrice]     = useState('');
   const [adminReason, setAdminReason]   = useState('');
   const [adminBusy, setAdminBusy]       = useState(false);
@@ -99,6 +99,8 @@ export default function JourneyDetail({
         payload.confirmed = true;
       } else if (adminAction === 'request_payment') {
         payload.action = 'request_payment';
+      } else if (adminAction === 'force_delivery_confirmed') {
+        payload.action = 'force_delivery_confirmed';
       } else {
         payload.action = 'bypass_kyc';
         payload.role = adminAction === 'bypass_kyc_sender' ? 'sender' : 'traveler';
@@ -132,6 +134,25 @@ export default function JourneyDetail({
       if (!res.ok) { setActionResult(`❌ ${data.error || 'Failed to confirm payment.'}`); setForcePayBusy(null); return; }
       await refreshMatches();
       setActionResult('✅ Payment marked as received.');
+    } catch {
+      setActionResult('❌ Network error — please try again.');
+    }
+    setForcePayBusy(null);
+  };
+
+  const releasePayment = async (matchId: string) => {
+    if (!confirm('⚠️ Release payment to the traveller and mark this match completed? Only use this once delivery is genuinely confirmed.')) return;
+    setForcePayBusy(matchId);
+    try {
+      const res = await fetch('/api/admin/release-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matchId }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setActionResult(`❌ ${data.error || 'Failed to release payment.'}`); setForcePayBusy(null); return; }
+      await refreshMatches();
+      setActionResult('✅ Payment released — match completed.');
     } catch {
       setActionResult('❌ Network error — please try again.');
     }
@@ -472,6 +493,23 @@ export default function JourneyDetail({
                                 <Banknote className="w-3 h-3" /> {forcePayBusy === m.id ? 'Confirming…' : 'Force payment received'}
                               </button>
                             )}
+                            {['active', 'escrowed'].includes(m.status) && (
+                              <button
+                                onClick={() => openAdminAction(m, 'force_delivery_confirmed')}
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 text-xs font-semibold rounded-lg"
+                              >
+                                <CheckCircle className="w-3 h-3" /> Force delivery confirmed
+                              </button>
+                            )}
+                            {m.status === 'delivery_confirmed' && (
+                              <button
+                                onClick={() => releasePayment(m.id)}
+                                disabled={forcePayBusy === m.id}
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg disabled:opacity-50"
+                              >
+                                <Banknote className="w-3 h-3" /> {forcePayBusy === m.id ? 'Releasing…' : 'Release payment (complete)'}
+                              </button>
+                            )}
                           </div>
                         )}
 
@@ -762,6 +800,7 @@ export default function JourneyDetail({
                   <option value="bypass_kyc_sender">Mark sender ID check complete</option>
                   <option value="bypass_kyc_traveler">Mark traveller ID check complete</option>
                   <option value="request_payment">Request payment (admin-initiated)</option>
+                  <option value="force_delivery_confirmed">Force delivery confirmed (goods received)</option>
                 </select>
                 <p className="text-xs text-slate-500 mt-1">Use the ID-check options only when BootHop itself is a party to this delivery, or another documented exception applies.</p>
                 {adminAction === 'force_terms' && (
@@ -769,6 +808,9 @@ export default function JourneyDetail({
                 )}
                 {adminAction === 'request_payment' && (
                   <p className="text-xs text-amber-600 mt-1 font-medium">This is the manual payment path (money moves outside Stripe Checkout) — only use when the live payment flow can&apos;t run, e.g. the traveller hasn&apos;t completed Stripe Connect onboarding. Once the sender has actually paid, use &quot;Force payment received&quot; to confirm it.</p>
+                )}
+                {adminAction === 'force_delivery_confirmed' && (
+                  <p className="text-xs text-purple-600 mt-1 font-medium">Only use once you have real confirmation the goods were physically received by the sender — this skips the in-app PIN/confirmation handshake both parties would normally complete themselves.</p>
                 )}
               </div>
 

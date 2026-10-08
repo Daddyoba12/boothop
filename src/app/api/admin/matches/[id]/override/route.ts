@@ -5,7 +5,6 @@ import { sendResendEmail } from '@/lib/resend-client';
 import { sendKycVerifiedEmail, sendBothKycVerifiedEmail } from '@/lib/email/sendKycEmail';
 import { sendBothTermsAcceptedEmail } from '@/lib/email/sendTermsEmail';
 import { sendAdminPaymentAlertEmail, sendPaymentRequestedEmail, sendCarrierPaymentProcessingEmail } from '@/lib/email/sendPaymentEmail';
-
 const TERMS_VERSION = '2025-04-07';
 
 // Admin-only overrides for cases where two parties agreed a price outside the
@@ -29,8 +28,9 @@ export async function POST(
   if (!reason || reason.trim().length < 10) {
     return NextResponse.json({ error: 'Reason must be at least 10 characters.' }, { status: 400 });
   }
-  if (!action || !['force_agree', 'bypass_kyc', 'force_terms', 'request_payment'].includes(action)) {
-    return NextResponse.json({ error: 'action must be force_agree, bypass_kyc, force_terms, or request_payment.' }, { status: 400 });
+  const VALID_ACTIONS = ['force_agree', 'bypass_kyc', 'force_terms', 'request_payment', 'force_delivery_confirmed'];
+  if (!action || !VALID_ACTIONS.includes(action)) {
+    return NextResponse.json({ error: `action must be one of: ${VALID_ACTIONS.join(', ')}.` }, { status: 400 });
   }
   // Terms acceptance is a legal signature — require an explicit second confirmation
   // from the client beyond the reason text, so this can't fire from a stray click.
@@ -74,7 +74,7 @@ export async function POST(
       return NextResponse.json({ error: `Match status is '${match.status}' — force_agree only applies from 'matched'.` }, { status: 400 });
     }
 
-    await supabase
+    const { error: agreeErr } = await supabase
       .from('matches')
       .update({
         agreed_price: price,
@@ -83,6 +83,7 @@ export async function POST(
         status: 'agreed',
       })
       .eq('id', matchId);
+    if (agreeErr) return NextResponse.json({ error: `Status update rejected by the database: ${agreeErr.message}` }, { status: 500 });
 
     await supabase.from('admin_alerts').insert({
       alert_type: 'admin_force_agree',
@@ -128,10 +129,11 @@ export async function POST(
     const kycAtField = isSender ? 'sender_kyc_verified_at' : 'traveler_kyc_verified_at';
     const toEmail = isSender ? match.sender_email : match.traveler_email;
 
-    await supabase
+    const { error: kycErr } = await supabase
       .from('matches')
       .update({ [kycField]: 'verified', [kycAtField]: new Date().toISOString() })
       .eq('id', matchId);
+    if (kycErr) return NextResponse.json({ error: `KYC update rejected by the database: ${kycErr.message}` }, { status: 500 });
 
     await supabase.from('admin_alerts').insert({
       alert_type: 'admin_bypass_kyc',
@@ -145,7 +147,8 @@ export async function POST(
     const travelerVerified = !isSender ? true : match.traveler_kyc_status === 'verified';
 
     if (senderVerified && travelerVerified) {
-      await supabase.from('matches').update({ status: 'kyc_complete' }).eq('id', matchId);
+      const { error: completeErr } = await supabase.from('matches').update({ status: 'kyc_complete' }).eq('id', matchId);
+      if (completeErr) return NextResponse.json({ error: `Status update rejected by the database: ${completeErr.message}` }, { status: 500 });
 
       await Promise.allSettled([
         match.sender_email && sendBothKycVerifiedEmail({
@@ -194,7 +197,8 @@ export async function POST(
       }
     }
 
-    await supabase.from('matches').update({ status: 'committed' }).eq('id', matchId);
+    const { error: termsErr } = await supabase.from('matches').update({ status: 'committed' }).eq('id', matchId);
+    if (termsErr) return NextResponse.json({ error: `Status update rejected by the database: ${termsErr.message}` }, { status: 500 });
 
     await supabase.from('admin_alerts').insert({
       alert_type: 'admin_force_terms',
@@ -224,10 +228,11 @@ export async function POST(
     const totalDue = match.agreed_price ?? 0;
     const travelDate = trip?.travel_date ?? '';
 
-    await supabase
+    const { error: payReqErr } = await supabase
       .from('matches')
       .update({ status: 'payment_processing' })
       .eq('id', matchId);
+    if (payReqErr) return NextResponse.json({ error: `Status update rejected by the database: ${payReqErr.message}` }, { status: 500 });
 
     await supabase.from('admin_alerts').insert({
       alert_type: 'admin_request_payment',
@@ -248,6 +253,39 @@ export async function POST(
     ]);
 
     return NextResponse.json({ ok: true, status: 'payment_processing', totalDue });
+  }
+
+  // ── Force delivery confirmed (admin attests goods were received) ─────────
+  if (action === 'force_delivery_confirmed') {
+    if (!['active', 'escrowed'].includes(match.status)) {
+      return NextResponse.json({ error: `Match status is '${match.status}' — force_delivery_confirmed only applies from 'active' or 'escrowed'.` }, { status: 400 });
+    }
+
+    const nowIso = new Date().toISOString();
+    const { error: deliveryErr } = await supabase
+      .from('matches')
+      .update({
+        status: 'delivery_confirmed',
+        sender_confirmed_delivery: true,
+        traveller_confirmed_delivery: true,
+        booter_confirmed_delivery: true,
+        hooper_confirmed_receipt: true,
+        booter_confirmed_at: nowIso,
+        hooper_confirmed_at: nowIso,
+        locked_at: nowIso,
+      })
+      .eq('id', matchId);
+    if (deliveryErr) return NextResponse.json({ error: `Status update rejected by the database: ${deliveryErr.message}` }, { status: 500 });
+
+    await supabase.from('admin_alerts').insert({
+      alert_type: 'admin_force_delivery_confirmed',
+      match_id: matchId,
+      email: session.email,
+      message: `Admin ${session.email} force-confirmed delivery for match ${matchId}. Reason: ${reason.trim()}`,
+      metadata: { reason: reason.trim() },
+    });
+
+    return NextResponse.json({ ok: true, status: 'delivery_confirmed' });
   }
 
   return NextResponse.json({ error: 'Unhandled action.' }, { status: 400 });
