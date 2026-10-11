@@ -15,14 +15,22 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
-      // /studio/* → BootHop Creative Studio (separate Vercel deployment, Multi-Zones)
+      // /studio/* → BootHop Creative Studio (separate Vercel deployment, Multi-Zones).
+      // Points at the `boothop-studio` project, not the old `desktop-web`
+      // project (renamed to `old-studio-deprecated`) -- that one was stale,
+      // last deployed 28 days before this fix and disconnected from the
+      // Postgres/S3 migration and every subsequent bug fix.
+      // The studio app itself runs with basePath:"/studio" (required for
+      // Multi-Zones proxying -- without it, assets resolve against this
+      // domain instead of the zone app, and client-side nav breaks out of
+      // the /studio prefix), so the destination must carry /studio too.
       {
         source: '/studio',
-        destination: 'https://desktop-web-beige.vercel.app/studio',
+        destination: 'https://boothop-studio.vercel.app/studio',
       },
       {
         source: '/studio/:path*',
-        destination: 'https://desktop-web-beige.vercel.app/studio/:path*',
+        destination: 'https://boothop-studio.vercel.app/studio/:path*',
       },
       // Intercept Oracle's onboard API call — saves to Supabase then forwards to Oracle
       {
