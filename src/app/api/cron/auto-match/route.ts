@@ -116,6 +116,26 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
     (existingMatches ?? []).map((m: any) => `${m.sender_trip_id}__${m.traveler_trip_id}`)
   );
 
+  /* Trips that already carry an open (non-terminal) match must not be matched again.
+     The DB lock below (trips.status = 'pending') is not enough on its own: this run
+     holds `senders`/`travellers` in memory, so a trip matched on one iteration is
+     still 'active' in those arrays on the next one. */
+  // Statuses that mean the match is over and both trips are free to match again.
+  // 'blocked' (fraud) and 'disputed' (live dispute) are deliberately NOT here —
+  // those trips stay locked. Everything mid-flow (agreed, committed, kyc_pending,
+  // payment_processing, active, delivery_confirmed, …) also keeps its trips locked.
+  const TERMINAL_MATCH_STATUSES = ['declined', 'cancelled', 'completed', 'compliance_timeout', 'refunded'];
+  const { data: openMatches } = await supabase
+    .from('matches')
+    .select('sender_trip_id, traveler_trip_id')
+    .not('status', 'in', `(${TERMINAL_MATCH_STATUSES.join(',')})`);
+
+  const tripsWithOpenMatch = new Set<string>(
+    (openMatches ?? [])
+      .flatMap((m) => [m.sender_trip_id, m.traveler_trip_id])
+      .filter((id): id is string => Boolean(id))
+  );
+
   const created: string[] = [];
   const skipped: object[] = [];
 
@@ -124,6 +144,22 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
       const pairKey = `${send.id}__${travel.id}`;
       if (alreadyMatched.has(pairKey)) {
         skipped.push({ reason: 'already_matched', send: send.from_city, travel: travel.from_city });
+        continue;
+      }
+
+      // Never match a user with their own listing.
+      if (send.email && travel.email && send.email.toLowerCase().trim() === travel.email.toLowerCase().trim()) {
+        skipped.push({ reason: 'self_match', email: send.email, send: send.from_city, travel: travel.from_city });
+        continue;
+      }
+
+      // One open match per trip — skip if either side is already spoken for.
+      if (tripsWithOpenMatch.has(send.id) || tripsWithOpenMatch.has(travel.id)) {
+        skipped.push({
+          reason: 'trip_already_has_open_match',
+          send: send.from_city, travel: travel.from_city,
+          sendLocked: tripsWithOpenMatch.has(send.id), travelLocked: tripsWithOpenMatch.has(travel.id),
+        });
         continue;
       }
 
@@ -164,6 +200,10 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
 
       created.push(matchRecord.id);
       alreadyMatched.add(pairKey);
+      // Keep the in-memory lock in step with the DB one, so neither trip is
+      // paired again later in this same run.
+      tripsWithOpenMatch.add(send.id);
+      tripsWithOpenMatch.add(travel.id);
 
       // Lock both trips so no one else can match with them
       await Promise.all([

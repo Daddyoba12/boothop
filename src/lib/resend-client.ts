@@ -33,5 +33,18 @@ export async function sendResendEmail(params: {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return client.emails.send(mergedParams as any);
+  const result = await client.emails.send(mergedParams as any);
+
+  // The Resend SDK reports failures by returning { data: null, error } — it does not
+  // throw. Without this log a rejected send (suppression, rate limit, invalid address)
+  // is completely silent, and the .catch() guards around every call site never fire.
+  if (result?.error) {
+    console.error('[resend] send failed', {
+      to:      params.to,
+      subject: params.subject,
+      error:   result.error,
+    });
+  }
+
+  return result;
 }

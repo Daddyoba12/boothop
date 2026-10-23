@@ -30,7 +30,7 @@ export async function POST(
     const { data: match, error: matchErr } = await supabase
       .from('matches')
       .select(`id, status, sender_email, traveler_email, offered_price, agreed_price, sender_trip_id, traveler_trip_id, item_category,
-        sender_trip:sender_trip_id(from_city, to_city, from_country, to_country, travel_date, auto_created),
+        sender_trip:sender_trip_id(from_city, to_city, travel_date, auto_created),
         traveler_trip:traveler_trip_id(from_city, to_city, travel_date, auto_created)`)
       .eq('id', matchId)
       .maybeSingle();
@@ -171,9 +171,13 @@ export async function POST(
       // ── Item compliance check ───────────────────────────────────────────────
       const itemCategory = match.item_category;
       if (itemCategory) {
-        const senderTripData  = Array.isArray(match.sender_trip)   ? match.sender_trip[0]   : match.sender_trip;
-        const fromCountry     = senderTripData?.from_country ?? country ?? '';
-        const toCountry       = senderTripData?.to_country  ?? '';
+        // NOTE: the `trips` table has no from_country/to_country columns, so the old
+        // `senderTripData?.from_country ?? country ?? ''` could only ever resolve to
+        // `country`. Worth knowing: this branch has never executed in production —
+        // item_category is null on every match ever created — so the compliance gate
+        // is effectively unused. Giving it real route countries is a separate decision.
+        const fromCountry     = country ?? '';
+        const toCountry       = '';
         const compliance      = checkItemCompliance(itemCategory, fromCountry, toCountry);
         if (!compliance.allowed) {
           return NextResponse.json({ error: compliance.reason ?? 'Item not permitted on this route.' }, { status: 400 });
