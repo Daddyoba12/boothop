@@ -3,7 +3,7 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { sendMatchConfirmedEmail } from '@/lib/email/sendMatchEmail';
 import { sendResendEmail } from '@/lib/resend-client';
 import { isAfricanCity } from '@/lib/africanCities';
-import { hoursBetween, agreementDeadline, MIN_RUNWAY_HOURS } from '@/lib/matching';
+import { hoursBetween, beforeAgreementDeadline } from '@/lib/matching';
 
 async function createActionToken(
   supabase: ReturnType<typeof createSupabaseAdminClient>,
@@ -35,18 +35,17 @@ function cityEn(trip: any, field: 'from_city' | 'to_city'): string {
 
 /* ── Matching rules ─────────────────────────────────────────────────────────
    The TRAVELLER is the anchor: their flight is booked, so their date is fixed.
-   The sender's date is indicative, not binding — it can fall either side of the
+   The sender's listed date is NOT material — it may sit either side of the
    flight and the pair is still matchable:
 
-     traveller flies 7 Nov, sender listed 5th or 6th  → match (parcel waits)
-     traveller flies 7 Nov, sender listed 8th or 9th  → match (sender brings it forward)
+     traveller flies 7 Nov, sender listed 5th or 6th → goods already there
+     traveller flies 7 Nov, sender listed 8th or 9th → goods brought forward
 
-   What actually binds is a single deadline: the agreement must be completed by
-   END OF BUSINESS on the day before departure. Nothing can be handed over after
-   that, whatever the two listed dates say.
+   Exactly one thing binds: the connect must happen by 6pm the day before
+   travel. There is no proximity window and no minimum lead time.
 
-   So the sender's date is not a gate at all — it only ranks. The gates are the
-   deadline, the trip types, and self-matching.                                  */
+   A pair therefore matches when all four gates below pass. Score is used only
+   to choose the BEST traveller for a sender, never to accept or reject.       */
 
 /** Hard gate. Returns null if the pair may match, or a reason string if not. */
 function rejectReason(send: any, travel: any, now = new Date()): string | null {
@@ -59,25 +58,35 @@ function rejectReason(send: any, travel: any, now = new Date()): string | null {
   if (send.email && travel.email &&
       send.email.toLowerCase().trim() === travel.email.toLowerCase().trim()) return 'self_match';
 
-  // There must still be enough runway to reach the agreement deadline.
-  // Deliberately NOT gated on the sender's date relative to the flight — a sender
-  // listed for the 8th can still send on a flight departing the 7th.
-  if (hoursBetween(now, agreementDeadline(travel.travel_date)) < MIN_RUNWAY_HOURS) {
-    return 'past_agreement_deadline';
+  // Same route, both ends.
+  if (normalizeCity(cityEn(send, 'from_city')) !== normalizeCity(cityEn(travel, 'from_city')) ||
+      normalizeCity(cityEn(send, 'to_city'))   !== normalizeCity(cityEn(travel, 'to_city'))) {
+    return 'different_route';
+  }
+
+  // The only timing rule: there must still be time to connect before 6pm on the
+  // day before travel, in the TRAVELLER's local time at their departure city.
+  // The sender's own date is deliberately not consulted.
+  if (!beforeAgreementDeadline(travel.travel_date, travel.from_city, now)) {
+    return 'past_connect_deadline';
   }
 
   return null;
 }
 
+/**
+ * Preference score — used ONLY to pick the best traveller for a sender once
+ * rejectReason() has already decided the pair is valid. Never a threshold.
+ *
+ * Route is not scored here: it is a hard gate, so every pair reaching this
+ * function already matches on both cities.
+ */
 function calcScore(send: any, travel: any): number {
   let score = 0;
-  if (normalizeCity(cityEn(send, 'from_city')) === normalizeCity(cityEn(travel, 'from_city')) &&
-      normalizeCity(cityEn(send, 'to_city'))   === normalizeCity(cityEn(travel, 'to_city'))) {
-    score += 50;
-  }
 
-  // How far the sender's listed date sits from the flight, in either direction.
-  // Closer ranks higher; distance never rejects.
+  // Closer listed dates are preferred, in either direction — a sender listed
+  // for the 6th and one listed for the 8th are equally valid for a flight on
+  // the 7th, and both beat one listed for the 20th.
   const gapHours = Math.abs(hoursBetween(send.travel_date, travel.travel_date));
   if (gapHours <= 24)        score += 30;
   else if (gapHours <= 72)   score += 25;
@@ -85,6 +94,7 @@ function calcScore(send: any, travel: any): number {
   else if (gapHours <= 720)  score += 10;  // within a month
   else                       score += 5;
 
+  // Closer asking prices are preferred — less negotiation to do.
   if (send.price && travel.price) {
     const diff = Math.abs(send.price - travel.price) / Math.max(send.price, travel.price);
     if (diff <= 0.2) score += 20;
@@ -181,6 +191,11 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
   const skipped: object[] = [];
 
   for (const send of senders) {
+    // Gather every traveller this sender could legitimately go with, then take
+    // the best one. Iterating and taking the first match would hand the sender
+    // whichever traveller happened to come back first from the database.
+    const candidates: { travel: any; score: number }[] = [];
+
     for (const travel of travellers) {
       const pairKey = `${send.id}__${travel.id}`;
       if (alreadyMatched.has(pairKey)) {
@@ -188,7 +203,7 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
         continue;
       }
 
-      // Hard gates: trip types, self-match, 48h lead time, flight direction.
+      // Hard gates: trip types, self-match, same route, connect deadline.
       const reject = rejectReason(send, travel);
       if (reject) {
         skipped.push({
@@ -209,13 +224,22 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
         continue;
       }
 
-      const score = calcScore(send, travel);
-      // Threshold 60. The route match alone scores 50, and the smallest timing
-      // score is 5, so route-only tops out at 55 — a same-city pair with a wait
-      // of over a month only matches if the two prices are also close.
-      if (score < 60) {
-        skipped.push({ reason: 'low_score', score, sendFrom: normalizeCity(cityEn(send,'from_city')), sendTo: normalizeCity(cityEn(send,'to_city')), travelFrom: normalizeCity(cityEn(travel,'from_city')), travelTo: normalizeCity(cityEn(travel,'to_city')) });
-        continue;
+      candidates.push({ travel, score: calcScore(send, travel) });
+    }
+
+    if (candidates.length) {
+      candidates.sort((a, b) => b.score - a.score);
+      const best = candidates[0];
+      const travel = best.travel;
+      const score  = best.score;
+
+      if (candidates.length > 1) {
+        skipped.push({
+          reason: 'not_best_candidate',
+          send: `${send.from_city}->${send.to_city} ${send.travel_date}`,
+          chose: `${travel.email} flying ${travel.travel_date} (score ${score})`,
+          over: candidates.slice(1).map(c => `${c.travel.email} flying ${c.travel.travel_date} (score ${c.score})`),
+        });
       }
 
       const rawPrice = (send.price && travel.price)
@@ -246,7 +270,7 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
       }
 
       created.push(matchRecord.id);
-      alreadyMatched.add(pairKey);
+      alreadyMatched.add(`${send.id}__${travel.id}`);
       // Keep the in-memory lock in step with the DB one, so neither trip is
       // paired again later in this same run.
       tripsWithOpenMatch.add(send.id);

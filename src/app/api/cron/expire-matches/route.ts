@@ -50,16 +50,17 @@ export async function GET(request: Request) {
       .from('matches')
       .select(`id, status, sender_email, traveler_email, sender_trip_id, traveler_trip_id,
         sender_trip:sender_trip_id(from_city, to_city, travel_date, price, auto_created),
-        traveler_trip:traveler_trip_id(travel_date, auto_created)`)
+        traveler_trip:traveler_trip_id(from_city, travel_date, auto_created)`)
       .eq('status', 'matched');
 
     const stuckMatched = (allMatchedMatches ?? []).filter((m: any) => {
       const travellerTrip = Array.isArray(m.traveler_trip) ? m.traveler_trip[0] : m.traveler_trip;
       const senderTrip    = Array.isArray(m.sender_trip)   ? m.sender_trip[0]   : m.sender_trip;
       // Fall back to the sender's date only if the traveller side has none.
-      const departure = travellerTrip?.travel_date ?? senderTrip?.travel_date;
+      const departure     = travellerTrip?.travel_date ?? senderTrip?.travel_date;
+      const departureCity = travellerTrip?.from_city   ?? senderTrip?.from_city ?? '';
       if (!departure) return false;
-      return Date.now() > agreementDeadline(departure).getTime();
+      return Date.now() > agreementDeadline(departure, departureCity).getTime();
     });
 
     // Matches stuck at 'agreed' or 'committed' for over 12 hours
