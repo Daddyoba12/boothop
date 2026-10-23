@@ -32,25 +32,61 @@ function cityEn(trip: any, field: 'from_city' | 'to_city'): string {
   return trip[enField] || trip[field] || '';
 }
 
+/* ── Matching rules ─────────────────────────────────────────────────────────
+   The TRAVELLER is the anchor. Their flight is already booked, so their date is
+   fixed. The sender's date is a "ready from" date, not a deadline — a parcel
+   ready on the 24th is perfectly well served by a flight on the 5th; it simply
+   waits. So the rule is directional, not a proximity window:
+
+     • the traveller must fly ON OR AFTER the sender is ready, and
+     • the flight must be at least MIN_LEAD_HOURS away, because accept → KYC →
+       payment → handover cannot be completed in less.
+
+   Timing is measured in HOURS, not whole days — a flight tomorrow morning and
+   one tomorrow night are not the same thing.                                   */
+const MIN_LEAD_HOURS = 48;
+
+const hoursBetween = (from: string | number | Date, to: string | number | Date): number =>
+  (new Date(to).getTime() - new Date(from).getTime()) / 3_600_000;
+
+/** Hard gate. Returns null if the pair may match, or a reason string if not. */
+function rejectReason(send: any, travel: any, now = new Date()): string | null {
+  // A traveller can never carry for another traveller, and a sender cannot send
+  // to a sender. Auto-match already queries the two types separately, so this is
+  // belt-and-braces — but the rule is explicit rather than implied by a query.
+  if (send.type !== 'send' || travel.type !== 'travel') return 'wrong_trip_types';
+
+  // Never pair someone with their own listing.
+  if (send.email && travel.email &&
+      send.email.toLowerCase().trim() === travel.email.toLowerCase().trim()) return 'self_match';
+
+  // The flight must be far enough out to actually complete the handover flow.
+  const leadHours = hoursBetween(now, travel.travel_date);
+  if (leadHours < MIN_LEAD_HOURS) return 'flight_too_soon';
+
+  // The traveller must fly on or after the sender is ready — a parcel ready on
+  // the 5th cannot go on a flight that left on the 24th.
+  if (hoursBetween(send.travel_date, travel.travel_date) < 0) return 'flight_before_sender_ready';
+
+  return null;
+}
+
 function calcScore(send: any, travel: any): number {
   let score = 0;
   if (normalizeCity(cityEn(send, 'from_city')) === normalizeCity(cityEn(travel, 'from_city')) &&
       normalizeCity(cityEn(send, 'to_city'))   === normalizeCity(cityEn(travel, 'to_city'))) {
     score += 50;
   }
-  const daysDiff = Math.abs(
-    (new Date(send.travel_date).getTime() - new Date(travel.travel_date).getTime()) / 86400000
-  );
-  // Dates must be reasonably close — a parcel shipping on the 24th is not served by
-  // someone flying on the 5th of the next month. Without this guard, route (50) plus
-  // the price bonus (20) reaches the threshold of 60 on its own, and date proximity
-  // stops mattering at all. That is how a 12-day and a 20-day gap both got matched
-  // on 2026-10-23.
-  if (daysDiff > 3) return 0;
 
-  if (daysDiff === 0)      score += 30;
-  else if (daysDiff <= 1)  score += 20;
-  else if (daysDiff <= 3)  score += 10;
+  // Waiting time between the sender being ready and the flight departing.
+  // Sooner is better, but a long wait is still a valid match — it only ranks lower.
+  const waitHours = hoursBetween(send.travel_date, travel.travel_date);
+  if (waitHours <= 24)        score += 30;
+  else if (waitHours <= 72)   score += 25;
+  else if (waitHours <= 168)  score += 20;  // within a week
+  else if (waitHours <= 720)  score += 10;  // within a month
+  else                        score += 5;
+
   if (send.price && travel.price) {
     const diff = Math.abs(send.price - travel.price) / Math.max(send.price, travel.price);
     if (diff <= 0.2) score += 20;
@@ -154,9 +190,14 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
         continue;
       }
 
-      // Never match a user with their own listing.
-      if (send.email && travel.email && send.email.toLowerCase().trim() === travel.email.toLowerCase().trim()) {
-        skipped.push({ reason: 'self_match', email: send.email, send: send.from_city, travel: travel.from_city });
+      // Hard gates: trip types, self-match, 48h lead time, flight direction.
+      const reject = rejectReason(send, travel);
+      if (reject) {
+        skipped.push({
+          reason: reject,
+          send: `${send.from_city}->${send.to_city} ${send.travel_date}`,
+          travel: `${travel.from_city}->${travel.to_city} ${travel.travel_date}`,
+        });
         continue;
       }
 
@@ -171,8 +212,9 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
       }
 
       const score = calcScore(send, travel);
-      // Threshold 60 = route match (50) + at least date within 3 days (10).
-      // A route-only match (score=50) is not enough — dates must be reasonably close.
+      // Threshold 60. The route match alone scores 50, and the smallest timing
+      // score is 5, so route-only tops out at 55 — a same-city pair with a wait
+      // of over a month only matches if the two prices are also close.
       if (score < 60) {
         skipped.push({ reason: 'low_score', score, sendFrom: normalizeCity(cityEn(send,'from_city')), sendTo: normalizeCity(cityEn(send,'to_city')), travelFrom: normalizeCity(cityEn(travel,'from_city')), travelTo: normalizeCity(cityEn(travel,'to_city')) });
         continue;
