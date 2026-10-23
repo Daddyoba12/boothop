@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { sendResendEmail } from '@/lib/resend-client';
 import { sendAlternativeJourneysEmail } from '@/lib/email/sendMatchEmail';
+import { agreementDeadline } from '@/lib/matching';
 
 const from = process.env.AUTH_FROM_EMAIL || 'BootHop <noreply@boothop.com>';
 
@@ -35,22 +36,30 @@ export async function GET(request: Request) {
 
   try {
     const supabase  = createSupabaseAdminClient();
-    const today     = new Date().toISOString().split('T')[0];
     const cutoff12h = new Date(Date.now() -  12 * 3_600_000).toISOString();
     const cutoff72h = new Date(Date.now() -  72 * 3_600_000).toISOString();
     const cutoff7d  = new Date(Date.now() - 168 * 3_600_000).toISOString();
 
-    // Matches still awaiting acceptance whose travel date has now passed — release the route
+    // Matches still awaiting acceptance past the agreement deadline — release the route.
+    //
+    // Anchored on the TRAVELLER's departure, not the sender's listed date. The
+    // sender's date is indicative and may legitimately fall after the flight
+    // (listed the 8th, flying the 7th), so expiring on it cancelled live matches
+    // early. The binding moment is end of business the day before departure.
     const { data: allMatchedMatches } = await supabase
       .from('matches')
       .select(`id, status, sender_email, traveler_email, sender_trip_id, traveler_trip_id,
         sender_trip:sender_trip_id(from_city, to_city, travel_date, price, auto_created),
-        traveler_trip:traveler_trip_id(auto_created)`)
+        traveler_trip:traveler_trip_id(travel_date, auto_created)`)
       .eq('status', 'matched');
 
     const stuckMatched = (allMatchedMatches ?? []).filter((m: any) => {
-      const trip = Array.isArray(m.sender_trip) ? m.sender_trip[0] : m.sender_trip;
-      return trip?.travel_date && trip.travel_date < today;
+      const travellerTrip = Array.isArray(m.traveler_trip) ? m.traveler_trip[0] : m.traveler_trip;
+      const senderTrip    = Array.isArray(m.sender_trip)   ? m.sender_trip[0]   : m.sender_trip;
+      // Fall back to the sender's date only if the traveller side has none.
+      const departure = travellerTrip?.travel_date ?? senderTrip?.travel_date;
+      if (!departure) return false;
+      return Date.now() > agreementDeadline(departure).getTime();
     });
 
     // Matches stuck at 'agreed' or 'committed' for over 12 hours

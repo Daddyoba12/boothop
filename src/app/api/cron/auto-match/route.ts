@@ -3,6 +3,7 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { sendMatchConfirmedEmail } from '@/lib/email/sendMatchEmail';
 import { sendResendEmail } from '@/lib/resend-client';
 import { isAfricanCity } from '@/lib/africanCities';
+import { hoursBetween, agreementDeadline, MIN_RUNWAY_HOURS } from '@/lib/matching';
 
 async function createActionToken(
   supabase: ReturnType<typeof createSupabaseAdminClient>,
@@ -33,21 +34,19 @@ function cityEn(trip: any, field: 'from_city' | 'to_city'): string {
 }
 
 /* ── Matching rules ─────────────────────────────────────────────────────────
-   The TRAVELLER is the anchor. Their flight is already booked, so their date is
-   fixed. The sender's date is a "ready from" date, not a deadline — a parcel
-   ready on the 24th is perfectly well served by a flight on the 5th; it simply
-   waits. So the rule is directional, not a proximity window:
+   The TRAVELLER is the anchor: their flight is booked, so their date is fixed.
+   The sender's date is indicative, not binding — it can fall either side of the
+   flight and the pair is still matchable:
 
-     • the traveller must fly ON OR AFTER the sender is ready, and
-     • the flight must be at least MIN_LEAD_HOURS away, because accept → KYC →
-       payment → handover cannot be completed in less.
+     traveller flies 7 Nov, sender listed 5th or 6th  → match (parcel waits)
+     traveller flies 7 Nov, sender listed 8th or 9th  → match (sender brings it forward)
 
-   Timing is measured in HOURS, not whole days — a flight tomorrow morning and
-   one tomorrow night are not the same thing.                                   */
-const MIN_LEAD_HOURS = 48;
+   What actually binds is a single deadline: the agreement must be completed by
+   END OF BUSINESS on the day before departure. Nothing can be handed over after
+   that, whatever the two listed dates say.
 
-const hoursBetween = (from: string | number | Date, to: string | number | Date): number =>
-  (new Date(to).getTime() - new Date(from).getTime()) / 3_600_000;
+   So the sender's date is not a gate at all — it only ranks. The gates are the
+   deadline, the trip types, and self-matching.                                  */
 
 /** Hard gate. Returns null if the pair may match, or a reason string if not. */
 function rejectReason(send: any, travel: any, now = new Date()): string | null {
@@ -60,13 +59,12 @@ function rejectReason(send: any, travel: any, now = new Date()): string | null {
   if (send.email && travel.email &&
       send.email.toLowerCase().trim() === travel.email.toLowerCase().trim()) return 'self_match';
 
-  // The flight must be far enough out to actually complete the handover flow.
-  const leadHours = hoursBetween(now, travel.travel_date);
-  if (leadHours < MIN_LEAD_HOURS) return 'flight_too_soon';
-
-  // The traveller must fly on or after the sender is ready — a parcel ready on
-  // the 5th cannot go on a flight that left on the 24th.
-  if (hoursBetween(send.travel_date, travel.travel_date) < 0) return 'flight_before_sender_ready';
+  // There must still be enough runway to reach the agreement deadline.
+  // Deliberately NOT gated on the sender's date relative to the flight — a sender
+  // listed for the 8th can still send on a flight departing the 7th.
+  if (hoursBetween(now, agreementDeadline(travel.travel_date)) < MIN_RUNWAY_HOURS) {
+    return 'past_agreement_deadline';
+  }
 
   return null;
 }
@@ -78,14 +76,14 @@ function calcScore(send: any, travel: any): number {
     score += 50;
   }
 
-  // Waiting time between the sender being ready and the flight departing.
-  // Sooner is better, but a long wait is still a valid match — it only ranks lower.
-  const waitHours = hoursBetween(send.travel_date, travel.travel_date);
-  if (waitHours <= 24)        score += 30;
-  else if (waitHours <= 72)   score += 25;
-  else if (waitHours <= 168)  score += 20;  // within a week
-  else if (waitHours <= 720)  score += 10;  // within a month
-  else                        score += 5;
+  // How far the sender's listed date sits from the flight, in either direction.
+  // Closer ranks higher; distance never rejects.
+  const gapHours = Math.abs(hoursBetween(send.travel_date, travel.travel_date));
+  if (gapHours <= 24)        score += 30;
+  else if (gapHours <= 72)   score += 25;
+  else if (gapHours <= 168)  score += 20;  // within a week
+  else if (gapHours <= 720)  score += 10;  // within a month
+  else                       score += 5;
 
   if (send.price && travel.price) {
     const diff = Math.abs(send.price - travel.price) / Math.max(send.price, travel.price);
