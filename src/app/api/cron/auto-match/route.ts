@@ -41,6 +41,13 @@ function calcScore(send: any, travel: any): number {
   const daysDiff = Math.abs(
     (new Date(send.travel_date).getTime() - new Date(travel.travel_date).getTime()) / 86400000
   );
+  // Dates must be reasonably close — a parcel shipping on the 24th is not served by
+  // someone flying on the 5th of the next month. Without this guard, route (50) plus
+  // the price bonus (20) reaches the threshold of 60 on its own, and date proximity
+  // stops mattering at all. That is how a 12-day and a 20-day gap both got matched
+  // on 2026-10-23.
+  if (daysDiff > 3) return 0;
+
   if (daysDiff === 0)      score += 30;
   else if (daysDiff <= 1)  score += 20;
   else if (daysDiff <= 3)  score += 10;
