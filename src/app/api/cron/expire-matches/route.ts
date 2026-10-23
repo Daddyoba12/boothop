@@ -100,9 +100,18 @@ export async function GET(request: Request) {
 
     // ── Matched cancellations: sender gets alternatives email, traveller gets nothing (ghost) ──
     for (const match of matchedToCancel) {
-      const senderTripForReason = Array.isArray(match.sender_trip) ? match.sender_trip[0] : match.sender_trip;
+      // Report the deadline that actually lapsed — 6pm the day before the
+      // traveller departs — not the sender's listed date, which is immaterial
+      // and may well sit after the flight.
+      const travellerTripForReason = Array.isArray(match.traveler_trip) ? match.traveler_trip[0] : match.traveler_trip;
+      const senderTripForReason    = Array.isArray(match.sender_trip)   ? match.sender_trip[0]   : match.sender_trip;
+      const departureForReason     = travellerTripForReason?.travel_date ?? senderTripForReason?.travel_date;
+      const reason = departureForReason
+        ? `Match expired — neither party confirmed before the deadline (6pm the day before departure on ${departureForReason}).`
+        : 'Match expired — neither party confirmed before the connect deadline.';
+
       await supabase.from('matches')
-        .update({ status: 'cancelled', cancelled_at: nowIso, cancellation_reason: `Match expired — travel date (${senderTripForReason?.travel_date ?? 'unknown'}) has passed with no response from either party.` })
+        .update({ status: 'cancelled', cancelled_at: nowIso, cancellation_reason: reason })
         .eq('id', match.id);
 
       const senderTrip   = Array.isArray(match.sender_trip)   ? match.sender_trip[0]   : match.sender_trip;
