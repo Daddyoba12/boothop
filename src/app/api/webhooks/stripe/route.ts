@@ -215,11 +215,15 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   await supabase
     .from('matches')
     .update({
-      status:               'escrowed',
-      payment_intent_id:    session.payment_intent as string,
-      stripe_session_id:    session.id,
-      payment_confirmed_at: new Date().toISOString(),
-      premium_tracking:     premiumTracking,
+      status:                   'escrowed',
+      // `matches` names these stripe_payment_intent_id / payment_session_id.
+      // The old payment_intent_id / stripe_session_id names exist only on the
+      // `transactions` table, so this update was rejected outright and the
+      // match never reached 'escrowed'.
+      stripe_payment_intent_id: session.payment_intent as string,
+      payment_session_id:       session.id,
+      payment_confirmed_at:     new Date().toISOString(),
+      premium_tracking:         premiumTracking,
     })
     .eq('id', matchId);
 
@@ -370,11 +374,11 @@ async function handleChargeCaptured(charge: Stripe.Charge) {
   const paymentIntentId = charge.payment_intent as string;
 
   try {
-    // Find match by payment_intent_id
+    // Find match by its Stripe payment intent
     const { data: match, error: selectError } = await supabase
       .from('matches')
       .select('*')
-      .eq('payment_intent_id', paymentIntentId)
+      .eq('stripe_payment_intent_id', paymentIntentId)
       .single();
 
     if (selectError || !match) {
@@ -446,7 +450,7 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
   const { data: match } = await supabase
     .from('matches')
     .select('*')
-    .eq('payment_intent_id', paymentIntentId)
+    .eq('stripe_payment_intent_id', paymentIntentId)
     .single();
 
   if (match) {

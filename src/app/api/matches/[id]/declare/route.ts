@@ -28,6 +28,7 @@ import {
   DECLARATION_TEXT_VERSION,
 } from '@/lib/declarations/validate';
 import { scoreRisk } from '@/lib/risk/engine';
+import { isoCountryForCity } from '@/lib/countryCodes';
 import { sendSMS } from '@/lib/services/telnyx';
 
 // ── Auth helper ───────────────────────────────────────────────────────────────
@@ -300,11 +301,17 @@ export async function POST(
     { match_id: matchId, declaration_id: declId, event_type: 'COMPLIANCE_REVIEW_STARTED', performed_by: 'ai_engine' },
   ]);
 
-  // Risk engine assessment
-  const riskResult = scoreRisk(fields);
   const trip      = (match as any).sender_trip;
   const fromCity  = Array.isArray(trip) ? trip[0]?.from_city : trip?.from_city ?? '';
   const toCity    = Array.isArray(trip) ? trip[0]?.to_city   : trip?.to_city   ?? '';
+
+  // Risk engine assessment, against this shipment's actual route rather than a
+  // hardcoded GB→NG. An unrecognised city yields '', meaning no route-specific
+  // rule applies — the global prohibited-item list still does.
+  const riskResult = scoreRisk(fields, {
+    fromCountry: isoCountryForCity(fromCity),
+    toCountry:   isoCountryForCity(toCity),
+  });
 
   // Persist risk assessment
   const { data: riskAssessment } = await supabase

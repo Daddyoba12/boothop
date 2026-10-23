@@ -23,7 +23,18 @@ export interface RiskResult {
  * Manual-floor triggers (any one alone → minimum MANUAL_REVIEW):
  *  - currency, powder, or sender_owns_item === false
  */
-export function scoreRisk(fields: Record<string, unknown>): RiskResult {
+export function scoreRisk(
+  fields: Record<string, unknown>,
+  /**
+   * The shipment's real route as ISO alpha-2 codes, used to select the row in
+   * ROUTE_RULES. This was previously hardcoded to GB→NG, so every shipment was
+   * assessed against the UK→Nigeria rules whatever its actual route.
+   *
+   * Empty strings mean "route unknown": no route-specific rule applies and only
+   * the global prohibited-item list does. Callers must not substitute a default.
+   */
+  route: { fromCountry: string; toCountry: string } = { fromCountry: '', toCountry: '' },
+): RiskResult {
   // Hard reject — prohibited items
   if (fields.contains_weapons || fields.contains_hazardous) {
     return { score: 100, classification: 'REJECTED', flags: ['prohibited item'], breakdown: {}, reason: 'Prohibited items declared' };
@@ -41,9 +52,9 @@ export function scoreRisk(fields: Record<string, unknown>): RiskResult {
     return { score: 85, classification: 'EXTERNAL_VERIFICATION_REQUIRED', flags: ['currency above threshold — customs declaration required'], breakdown: { currency_high_value: 85 }, reason: 'Currency above £1,000 requires customs broker verification' };
   }
 
-  // Category hard-block (GB→NG routes) — pass-through for missing category
+  // Category hard-block on the shipment's actual route — pass-through for missing category
   if (fields.item_category) {
-    const cat = checkItemCompliance(fields.item_category as string, 'GB', 'NG', value);
+    const cat = checkItemCompliance(fields.item_category as string, route.fromCountry, route.toCountry, value);
     if (!cat.allowed) {
       return { score: 100, classification: 'REJECTED', flags: ['prohibited category'], breakdown: {}, reason: cat.reason };
     }
@@ -93,7 +104,7 @@ export function scoreRisk(fields: Record<string, unknown>): RiskResult {
 
   // Category review flag (not a hard-block, already checked above)
   if (fields.item_category) {
-    const cat = checkItemCompliance(fields.item_category as string, 'GB', 'NG', value);
+    const cat = checkItemCompliance(fields.item_category as string, route.fromCountry, route.toCountry, value);
     if (cat.action === 'review') {
       score += 10; breakdown.category = 10;
       flags.push(`category: ${fields.item_category}`);

@@ -4,7 +4,6 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getAppSession } from '@/lib/auth/session';
 import { sendMatchAcceptedEmail, sendMatchDeclinedEmail, sendCounterOfferEmail } from '@/lib/email/sendMatchEmail';
 import { isIpBanned, isAccountBanned, evaluateFraud, banIp, banAccount, logFraudFlag } from '@/lib/services/fraud-engine';
-import { checkItemCompliance } from '@/lib/services/item-compliance';
 import { sendPushToEmail } from '@/lib/services/notifications';
 
 export async function POST(
@@ -168,22 +167,17 @@ export async function POST(
       }
       // ── End fraud checks ────────────────────────────────────────────────────
 
-      // ── Item compliance check ───────────────────────────────────────────────
-      const itemCategory = match.item_category;
-      if (itemCategory) {
-        // NOTE: the `trips` table has no from_country/to_country columns, so the old
-        // `senderTripData?.from_country ?? country ?? ''` could only ever resolve to
-        // `country`. Worth knowing: this branch has never executed in production —
-        // item_category is null on every match ever created — so the compliance gate
-        // is effectively unused. Giving it real route countries is a separate decision.
-        const fromCountry     = country ?? '';
-        const toCountry       = '';
-        const compliance      = checkItemCompliance(itemCategory, fromCountry, toCountry);
-        if (!compliance.allowed) {
-          return NextResponse.json({ error: compliance.reason ?? 'Item not permitted on this route.' }, { status: 400 });
-        }
-      }
-      // ── End compliance check ────────────────────────────────────────────────
+      // ── Item compliance ─────────────────────────────────────────────────────
+      // Deliberately NOT checked here. Nothing has been declared at accept time:
+      // `matches.item_category` is written by no code path in this repo and is
+      // null on every match ever created, so the check that used to sit here
+      // could never fire. Leaving it in place implied an accept-time protection
+      // that does not exist.
+      //
+      // The real gate is the declaration flow — POST /api/matches/[id]/declare
+      // runs scoreRisk() against the submitted item_declaration and can reject
+      // the shipment outright. That is where item compliance is enforced.
+      // ────────────────────────────────────────────────────────────────────────
 
       // Stripe payout guard — only enforced once Stripe is live (users table populated).
       // Re-enable this block when traveller onboarding is complete.

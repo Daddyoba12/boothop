@@ -81,6 +81,30 @@ export async function POST(request: Request) {
       }
     } catch { /* non-blocking — dedup failure must never break login */ }
 
+    // Ensure a `users` row exists for this email.
+    //
+    // Nothing in the codebase wrote to `users` before this, so the table was
+    // empty and every traveller hitting /api/stripe/create-connect-account got
+    // "User not found" (404) — which is why no traveller could ever complete
+    // Stripe Connect onboarding, can_receive_payments was never true, and no
+    // payment reached payout.
+    //
+    // `users.id` has no database default, so the UUID is generated here.
+    // ignoreDuplicates leaves an existing row completely untouched — this must
+    // never overwrite a returning user's id or Stripe Connect fields.
+    //
+    // `country` is deliberately left null: createConnectAccount() already falls
+    // back to 'GB', and guessing a payout country from an IP address would be
+    // worse than that existing default.
+    try {
+      const { error: userUpsertErr } = await supabase
+        .from('users')
+        .upsert({ id: crypto.randomUUID(), email }, { onConflict: 'email', ignoreDuplicates: true });
+      if (userUpsertErr) console.error('users upsert failed', { email, error: userUpsertErr });
+    } catch (e) {
+      console.error('users upsert threw', { email, error: String(e) });
+    }
+
     // Grant £20 signup credit to new users — INSERT with unique email key.
     // If email already exists (returning user) the insert fails silently — no double grant.
     let isNewUser = false;
