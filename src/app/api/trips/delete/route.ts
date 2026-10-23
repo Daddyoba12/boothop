@@ -50,7 +50,32 @@ export async function POST(request: Request) {
       );
     }
 
-    await supabase.from('trips').delete().eq('id', tripId);
+    // The result MUST be checked. matches.sender_trip_id / traveler_trip_id are
+    // real foreign keys, so a trip still referenced by a DEAD match (declined,
+    // cancelled, completed, blocked) gets past the guard above and is then
+    // refused by the database. Unchecked, this returned { ok: true } and the
+    // dashboard removed the row from the screen — the listing came straight
+    // back on the next refresh.
+    const { data: removed, error: deleteErr } = await supabase
+      .from('trips')
+      .delete()
+      .eq('id', tripId)
+      .select('id');
+
+    if (deleteErr || !removed?.length) {
+      // Cannot be removed outright, so close it instead. Same result for the
+      // user — it stops being a live listing and stops being matched — while
+      // the old match keeps a readable record of where the shipment was going.
+      if (deleteErr) console.error('trip delete blocked, closing instead', { tripId, error: deleteErr });
+      const { error: closeErr } = await supabase
+        .from('trips').update({ status: 'cancelled' }).eq('id', tripId);
+
+      if (closeErr) {
+        console.error('trip close failed', { tripId, error: closeErr });
+        return NextResponse.json({ error: 'Could not remove this listing.' }, { status: 500 });
+      }
+      return NextResponse.json({ ok: true, closed: true });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {

@@ -131,15 +131,28 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
 
   const supabase = createSupabaseAdminClient();
 
-  const cutoff = new Date();
-  if (!includeTodayTrips) cutoff.setDate(cutoff.getDate() + 1);
-  const tomorrowStr = cutoff.toISOString().split('T')[0];
+  /* Only trips that are still active are matched — nothing else counts.
+     `includeTodayTrips` is retained for the admin POST trigger but no longer
+     changes anything: today's listings are always eligible now.
 
-  /* Fetch all future trips — active or NULL status (old trips before status field existed).
-     .not('in') silently drops NULLs in PostgreSQL so we use .or() instead. */
+     The cutoff is TODAY, not tomorrow. Under the traveller-anchored rule a
+     sender listed for the 13th must still be matchable on the 13th against a
+     flight on the 14th; the old `>= tomorrow` cutoff silently excluded them on
+     the very day they were listed for.
+
+     Anything older than today is removed daily by /api/cron/expire-listings,
+     so this filter and "no filter at all" agree in steady state.
+
+     Status is matched exactly: previously this also accepted NULL for trips
+     predating the status column. All 64 trips in production carry a status, so
+     that branch only risked letting stale rows back in. */
+  const cutoff = new Date();
+  void includeTodayTrips;
+  const cutoffStr = cutoff.toISOString().split('T')[0];
+
   const [{ data: senders, error: sendErr }, { data: travellers, error: travErr }] = await Promise.all([
-    supabase.from('trips').select('*').eq('type', 'send').or('status.eq.active,status.is.null').gte('travel_date', tomorrowStr),
-    supabase.from('trips').select('*').eq('type', 'travel').or('status.eq.active,status.is.null').gte('travel_date', tomorrowStr),
+    supabase.from('trips').select('*').eq('type', 'send').eq('status', 'active').gte('travel_date', cutoffStr),
+    supabase.from('trips').select('*').eq('type', 'travel').eq('status', 'active').gte('travel_date', cutoffStr),
   ]);
 
   if (sendErr || travErr) {
