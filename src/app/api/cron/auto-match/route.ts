@@ -289,11 +289,20 @@ async function runAutoMatch({ includeTodayTrips = false }: { includeTodayTrips?:
       tripsWithOpenMatch.add(send.id);
       tripsWithOpenMatch.add(travel.id);
 
-      // Lock both trips so no one else can match with them
-      await Promise.all([
-        supabase.from('trips').update({ status: 'pending' }).eq('id', send.id),
-        supabase.from('trips').update({ status: 'pending' }).eq('id', travel.id),
+      // Lock both trips so no one else can match with them.
+      // The result is checked: production shows no trip has ever carried
+      // 'pending' despite matches being created, so this update has been
+      // failing or being reverted silently. Logging it makes the next
+      // occurrence visible instead of invisible. Matching does not depend on
+      // this lock — tripsWithOpenMatch above is the authoritative guard.
+      const [sendLock, travelLock] = await Promise.all([
+        supabase.from('trips').update({ status: 'pending' }).eq('id', send.id).select('id'),
+        supabase.from('trips').update({ status: 'pending' }).eq('id', travel.id).select('id'),
       ]);
+      for (const [label, res] of [['sender', sendLock], ['traveller', travelLock]] as const) {
+        if (res.error)            console.error(`auto-match: ${label} trip lock failed`, { matchId: matchRecord.id, error: res.error });
+        else if (!res.data?.length) console.error(`auto-match: ${label} trip lock matched no row`, { matchId: matchRecord.id });
+      }
 
       // Notify both parties immediately
       const emailPromises = [];
