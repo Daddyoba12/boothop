@@ -22,6 +22,17 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
+    // `mode` was written straight into trips.type with no validation, so any
+    // value the client sent became the listing type — and a listing whose type
+    // is neither 'send' nor 'travel' can never be matched by anything.
+    if (mode !== 'send' && mode !== 'travel') {
+      console.error('trips/create: invalid mode rejected', { mode, email: session.email });
+      return NextResponse.json(
+        { error: 'Listing type must be either sending or travelling.' },
+        { status: 400 },
+      );
+    }
+
     const priceNum = parseFloat(String(price).replace(/[^0-9.]/g, ''));
     if (!priceNum || priceNum <= 0) {
       return NextResponse.json({ error: 'A valid price greater than £0 is required.' }, { status: 400 });

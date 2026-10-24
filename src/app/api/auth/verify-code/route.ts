@@ -155,11 +155,20 @@ export async function POST(request: Request) {
         );
       }
 
+      // `p.mode || 'send'` silently turned any missing or unexpected mode into
+      // a SEND listing — a traveller would then be listed as sending goods.
+      // Fall back only on a genuinely absent value, and log anything unexpected
+      // so a broken caller is visible rather than quietly mislabelling someone.
+      const listingType = p.mode === 'travel' || p.mode === 'send' ? p.mode : 'send';
+      if (p.mode && p.mode !== listingType) {
+        console.error('verify-code: unexpected listing mode, defaulted to send', { mode: p.mode, email });
+      }
+
       // Publish as a live trip
       const { error: tripErr } = await supabase.from('trips').insert({
         email,
         user_id:     userId,
-        type:        p.mode || 'send',
+        type:        listingType,
         from_city:   p.from,
         to_city:     p.to,
         travel_date: p.date,

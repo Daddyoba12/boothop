@@ -48,15 +48,37 @@ const slides = [
   { src: '/images/register_c.jpg',  alt: 'BootHop community' },
 ];
 
+/**
+ * ?type= accepts BootHop's own vocabulary as well as the raw column values.
+ * A Booter is a traveller and a Hooper is a sender (see CLAUDE.md).
+ *
+ * This previously read `get('type') === 'travel' ? 'travel' : 'send'`, so every
+ * value that was not literally "travel" fell through to SEND — including
+ * ?type=booter, which is what the airline, airport and flight-route pages link
+ * with. Anyone arriving from a flight page is a traveller by definition, and
+ * they were all landing on the form pre-set to "Sending".
+ */
+const TYPE_PARAM_TO_MODE: Record<string, 'travel' | 'send'> = {
+  travel:    'travel',
+  traveller: 'travel',
+  traveler:  'travel',
+  booter:    'travel',
+  carry:     'travel',
+  send:      'send',
+  sender:    'send',
+  hooper:    'send',
+};
+
 function RegisterForm() {
   const searchParams  = useSearchParams();
-  const initialMode   = searchParams.get('type') === 'travel' ? 'travel' : 'send';
+  // No recognised ?type= keeps the long-standing 'send' default.
+  const initialMode   = TYPE_PARAM_TO_MODE[(searchParams.get('type') ?? '').trim().toLowerCase()] ?? 'send';
   const prefillFrom   = searchParams.get('from')  || '';
   const prefillTo     = searchParams.get('to')    || '';
   const prefillDate   = searchParams.get('date')  || '';
   const interestedIn  = searchParams.get('interestedIn') || '';
 
-  const [mode, setMode]         = useState<'travel' | 'send'>(initialMode as 'travel' | 'send');
+  const [mode, setMode]         = useState<'travel' | 'send'>(initialMode);
   const [form, setForm]         = useState({ from: prefillFrom, to: prefillTo, date: prefillDate, weight: '', price: '', email: '' });
   const [step, setStep]         = useState<'trip' | 'email' | 'sent' | 'success'>('trip');
   const [authedEmail, setAuthedEmail] = useState<string | null>(null);
