@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
       .from('tracking_sessions')
       .select('id, status')
       .eq('match_id', matchId)
+      .limit(1)
       .maybeSingle();
 
     let sessionId: string;

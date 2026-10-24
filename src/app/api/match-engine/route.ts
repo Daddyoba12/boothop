@@ -150,6 +150,7 @@ export async function POST(request: Request) {
         .select('id')
         .eq('sender_trip_id', sender_trip_id)
         .eq('traveler_trip_id', traveler_trip_id)
+        .limit(1)
         .maybeSingle();
 
       if (existingMatch) continue;

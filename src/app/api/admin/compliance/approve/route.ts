@@ -147,6 +147,7 @@ export async function POST(req: NextRequest) {
       .from('shipment_inspections')
       .select('id')
       .eq('match_id', matchId)
+      .limit(1)
       .maybeSingle();
 
     if (!existingInspection) {

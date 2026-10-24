@@ -61,10 +61,16 @@ export async function GET(request: Request) {
 
     for (const match of timedOut ?? []) {
       // Check no submitted declaration exists (sender might have submitted very late)
+      // Declarations are versioned, so a match can legitimately hold several
+      // rows. maybeSingle() returns an ERROR rather than a row when more than
+      // one matches, and that error was discarded — leaving `decl` null and
+      // auto-cancelling a match whose sender HAD submitted one. Take the latest.
       const { data: decl } = await supabase
         .from('item_declarations')
         .select('id, declaration_status')
         .eq('match_id', match.id)
+        .order('version', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (decl?.declaration_status === 'submitted') continue;

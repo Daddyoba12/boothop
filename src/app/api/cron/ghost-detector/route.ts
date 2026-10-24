@@ -70,6 +70,7 @@ async function runGhostDetector() {
       .select('id')
       .eq('match_id', match.id)
       .eq('status', 'open')
+      .limit(1)
       .maybeSingle();
 
     if (existing) continue;

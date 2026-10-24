@@ -186,6 +186,7 @@ export async function POST(
     .from('shipment_inspections')
     .select('id')
     .eq('match_id', matchId)
+    .limit(1)
     .maybeSingle();
 
   const validFailureReason = overall_pass ? null : (failure_reason as FailureReason);

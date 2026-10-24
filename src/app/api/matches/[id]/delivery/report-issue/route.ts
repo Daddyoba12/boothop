@@ -105,6 +105,7 @@ export async function POST(
     .select('id')
     .eq('match_id', matchId)
     .eq('status', 'open')
+    .limit(1)
     .maybeSingle();
 
   if (existing) {
