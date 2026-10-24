@@ -36,12 +36,23 @@ export async function POST(request: Request) {
     // payment_processing, active, delivery_confirmed, disputed,
     // cancellation_requested, matched) keeps the trip locked.
     const TERMINAL_STATUSES = ['cancelled', 'declined', 'blocked', 'completed'];
-    const { data: liveMatch } = await supabase
+    // limit(1) matters here. maybeSingle() returns an ERROR, not a row, when the
+    // query matches more than one record — verified against PostgREST: 2+ rows
+    // gives 406 PGRST116. The error was being discarded, so a trip caught in
+    // TWO live matches made this guard return null and the trip was deleted
+    // mid-match. Bounding the query means it can only ever see one.
+    const { data: liveMatch, error: liveMatchErr } = await supabase
       .from('matches')
       .select('id, status')
       .or(`sender_trip_id.eq.${tripId},traveler_trip_id.eq.${tripId}`)
       .not('status', 'in', `(${TERMINAL_STATUSES.join(',')})`)
+      .limit(1)
       .maybeSingle();
+
+    if (liveMatchErr) {
+      console.error('trip delete: live-match check failed', { tripId, error: liveMatchErr });
+      return NextResponse.json({ error: 'Could not check this listing right now. Please try again.' }, { status: 500 });
+    }
 
     if (liveMatch) {
       return NextResponse.json(

@@ -58,6 +58,38 @@ export async function POST(request: Request) {
       );
     }
 
+    // Block duplicate interest from the same email on the same trip.
+    //
+    // Two things were wrong here.
+    //
+    // 1. ORDERING. This ran *after* the mirror trip was inserted, so returning
+    //    409 left an orphaned auto_created trip behind every time. Production
+    //    holds four identical auto_created trips for one user created inside a
+    //    single second, with no match referencing any of them.
+    //
+    // 2. maybeSingle() ERRORS ON MULTIPLE ROWS. Verified against PostgREST:
+    //    more than one row returns 406 PGRST116, not a row. The error was
+    //    discarded, so `existing` came back null and the guard passed — the
+    //    duplicate check stopped working for exactly the people who already
+    //    had duplicates. limit(1) makes the query incapable of returning more
+    //    than one row, and the error is now inspected rather than dropped.
+    const { data: existing, error: existingErr } = await supabase
+      .from('matches')
+      .select('id')
+      .eq('trip_id', tripId)
+      .or(`sender_email.eq.${email},traveler_email.eq.${email}`)
+      .limit(1)
+      .maybeSingle();
+
+    if (existingErr) {
+      console.error('express-interest: duplicate check failed', { tripId, email, error: existingErr });
+      return NextResponse.json({ error: 'Could not check this trip right now. Please try again.' }, { status: 500 });
+    }
+
+    if (existing) {
+      return NextResponse.json({ error: 'You have already expressed interest in this trip.' }, { status: 409 });
+    }
+
     // Auto-create a mirror trip for the expressing party so both sides always have a trip ID.
     // If the listed trip is 'travel' → the expressing party is the sender → auto-create a 'send' trip.
     // If the listed trip is 'send'   → the expressing party is the traveler → auto-create a 'travel' trip.
@@ -85,18 +117,6 @@ export async function POST(request: Request) {
 
     const sender_trip_id   = trip.type === 'send'   ? tripId : mirrorTrip.id;
     const traveler_trip_id = trip.type === 'travel' ? tripId : mirrorTrip.id;
-
-    // Block duplicate interest from the same email on the same trip
-    const { data: existing } = await supabase
-      .from('matches')
-      .select('id')
-      .eq('trip_id', tripId)
-      .or(`sender_email.eq.${email},traveler_email.eq.${email}`)
-      .maybeSingle();
-
-    if (existing) {
-      return NextResponse.json({ error: 'You have already expressed interest in this trip.' }, { status: 409 });
-    }
 
     // Insert match and get back the generated ID
     const { data: newMatch, error: matchErr } = await supabase.from('matches').insert({
